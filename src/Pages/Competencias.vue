@@ -1,40 +1,43 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen bg-black py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-6xl mx-auto">
       <!-- Header -->
       <div class="text-center mb-12">
-        <h1 class="text-4xl font-bold text-white mb-2">Competencias</h1>
-        <p class="text-gray-300">Tabla de posiciones - SERIE AB+</p>
-        <p class="text-sm text-gray-400 mt-2">LigaDoble Summer Cup 2026</p>
+        <h1 class="text-5xl md:text-6xl font-bold text-white mb-2" style="font-family: 'Gobold High', sans-serif;">COMPETENCIAS</h1>
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <div class="h-1 w-12 bg-primary rounded-full"></div>
+          <p class="text-primary font-bold text-lg tracking-widest">SERIE AB+</p>
+          <div class="h-1 w-12 bg-primary rounded-full"></div>
+        </div>
+        <p class="text-white/70 text-sm">LigaDoble Summer Cup 2026</p>
       </div>
 
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <div class="inline-block">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
-        <p class="text-gray-300 mt-4">Cargando tabla de posiciones...</p>
+        <p class="text-white/70 mt-4 font-medium">Cargando tabla de posiciones...</p>
       </div>
 
       <!-- Error State -->
-      <div v-else-if="error" class="bg-red-900/50 border border-red-500 text-red-100 px-6 py-4 rounded-lg mb-6">
-        <h3 class="font-semibold mb-2">Error al cargar los datos</h3>
+      <div v-else-if="error" class="bg-red-900/20 border border-primary text-primary px-6 py-4 rounded-lg mb-6">
+        <h3 class="font-bold mb-2 text-white">Error al cargar los datos</h3>
         <p class="text-sm mb-4">{{ error }}</p>
         <button 
           @click="fetchTabla"
-          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition"
+          class="bg-primary hover:bg-primary/80 text-black px-4 py-2 rounded font-bold transition"
         >
           Intentar de nuevo
         </button>
       </div>
 
       <!-- Table -->
-      <div v-else class="bg-slate-800 rounded-lg shadow-lg overflow-hidden border border-slate-700">
+      <div v-else class="bg-black border-2 border-primary rounded-lg shadow-2xl overflow-hidden">
         <!-- Last Update -->
-        <div class="bg-slate-700 px-6 py-3 border-b border-slate-600">
-          <p class="text-sm text-gray-300">
-            <span class="font-semibold">Última actualización:</span>
-            {{ formatDate(lastUpdate) }}
+        <div class="bg-primary-dark px-6 py-3 border-b-2 border-primary">
+          <p class="text-black font-bold text-sm">
+            Última actualización: {{ formatDate(lastUpdate) }}
           </p>
         </div>
 
@@ -42,17 +45,17 @@
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
-              <tr class="bg-slate-700 border-b border-slate-600">
-                <th class="px-4 py-3 text-left text-white font-semibold">#</th>
-                <th class="px-4 py-3 text-left text-white font-semibold">Equipo</th>
-                <th class="px-4 py-3 text-center text-white font-semibold">PJ</th>
-                <th class="px-4 py-3 text-center text-white font-semibold">PG</th>
-                <th class="px-4 py-3 text-center text-white font-semibold">PE</th>
-                <th class="px-4 py-3 text-center text-white font-semibold">PP</th>
-                <th class="px-4 py-3 text-center text-white font-semibold">DG</th>
-                <th class="px-4 py-3 text-center text-white font-semibold">GF</th>
-                <th class="px-4 py-3 text-center text-white font-semibold">GC</th>
-                <th class="px-4 py-3 text-center text-white font-semibold">Pts</th>
+              <tr class="bg-primary-dark border-b-2 border-primary">
+                <th class="px-4 py-4 text-left text-black font-bold">#</th>
+                <th class="px-4 py-4 text-left text-black font-bold">EQUIPO</th>
+                <th class="px-4 py-4 text-center text-black font-bold">PJ</th>
+                <th class="px-4 py-4 text-center text-black font-bold">PG</th>
+                <th class="px-4 py-4 text-center text-black font-bold">PE</th>
+                <th class="px-4 py-4 text-center text-black font-bold">PP</th>
+                <th class="px-4 py-4 text-center text-black font-bold">DG</th>
+                <th class="px-4 py-4 text-center text-black font-bold">GF</th>
+                <th class="px-4 py-4 text-center text-black font-bold">GC</th>
+                <th class="px-4 py-4 text-center text-black font-bold">Pts</th>
               </tr>
             </thead>
             <tbody>
@@ -60,79 +63,79 @@
                 v-for="(equipo, index) in tabla" 
                 :key="index"
                 :class="[
-                  'border-b border-slate-600 hover:bg-slate-700 transition',
-                  index === 0 ? 'bg-yellow-900/20' : index === 1 ? 'bg-gray-600/20' : index === 2 ? 'bg-orange-900/20' : ''
+                  'border-b border-white/10 hover:bg-primary/5 transition',
+                  index === 0 ? 'bg-primary/10' : index === 1 ? 'bg-primary/5' : ''
                 ]"
               >
                 <!-- Posición con medalla -->
-                <td class="px-4 py-3 text-center font-bold">
-                  <span v-if="index === 0" class="text-yellow-400">🥇</span>
-                  <span v-else-if="index === 1" class="text-gray-300">🥈</span>
-                  <span v-else-if="index === 2" class="text-orange-400">🥉</span>
-                  <span v-else class="text-white">{{ equipo.posicion }}</span>
+                <td class="px-4 py-4 text-center font-bold">
+                  <span v-if="index === 0" class="text-2xl">🥇</span>
+                  <span v-else-if="index === 1" class="text-2xl">🥈</span>
+                  <span v-else-if="index === 2" class="text-2xl">🥉</span>
+                  <span v-else class="text-primary font-bold text-lg">{{ equipo.posicion }}</span>
                 </td>
 
                 <!-- Equipo -->
-                <td class="px-4 py-3 font-semibold text-white">
+                <td class="px-4 py-4 font-bold text-white">
                   {{ equipo.equipo }}
-                  <span v-if="equipo.equipo === 'CD Vikingas'" class="ml-2 text-xs bg-red-600 text-white px-2 py-1 rounded">Tu equipo</span>
+                  <span v-if="equipo.equipo === 'CD Vikingas'" class="ml-2 text-xs bg-primary text-black px-2 py-1 rounded font-bold">VIKINGAS</span>
                 </td>
 
                 <!-- Estadísticas -->
-                <td class="px-4 py-3 text-center text-gray-300">{{ equipo.pj }}</td>
-                <td class="px-4 py-3 text-center text-green-400 font-semibold">{{ equipo.pg }}</td>
-                <td class="px-4 py-3 text-center text-blue-400 font-semibold">{{ equipo.pe }}</td>
-                <td class="px-4 py-3 text-center text-red-400 font-semibold">{{ equipo.pp }}</td>
-                <td class="px-4 py-3 text-center" :class="parseInt(equipo.dg) >= 0 ? 'text-green-400' : 'text-red-400'">
+                <td class="px-4 py-4 text-center text-white/70 font-medium">{{ equipo.pj }}</td>
+                <td class="px-4 py-4 text-center text-primary font-bold">{{ equipo.pg }}</td>
+                <td class="px-4 py-4 text-center text-yellow-400 font-bold">{{ equipo.pe }}</td>
+                <td class="px-4 py-4 text-center text-red-400 font-bold">{{ equipo.pp }}</td>
+                <td class="px-4 py-4 text-center font-bold" :class="parseInt(equipo.dg) >= 0 ? 'text-primary' : 'text-red-400'">
                   {{ equipo.dg > 0 ? '+' : '' }}{{ equipo.dg }}
                 </td>
-                <td class="px-4 py-3 text-center text-gray-300">{{ equipo.gf }}</td>
-                <td class="px-4 py-3 text-center text-gray-300">{{ equipo.gc }}</td>
-                <td class="px-4 py-3 text-center font-bold text-white">{{ equipo.ptos }}</td>
+                <td class="px-4 py-4 text-center text-white/70 font-medium">{{ equipo.gf }}</td>
+                <td class="px-4 py-4 text-center text-white/70 font-medium">{{ equipo.gc }}</td>
+                <td class="px-4 py-4 text-center text-primary font-bold text-lg">{{ equipo.ptos }}</td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <!-- Legenda -->
-        <div class="bg-slate-700 px-6 py-4 border-t border-slate-600">
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 text-xs text-gray-300">
-            <div><span class="font-semibold">PJ:</span> Partidos Jugados</div>
-            <div><span class="font-semibold">PG:</span> Partidos Ganados</div>
-            <div><span class="font-semibold">PE:</span> Partidos Empatados</div>
-            <div><span class="font-semibold">PP:</span> Partidos Perdidos</div>
-            <div><span class="font-semibold">DG:</span> Diferencia de Goles</div>
-            <div><span class="font-semibold">GF:</span> Goles a Favor</div>
-            <div><span class="font-semibold">GC:</span> Goles en Contra</div>
-            <div><span class="font-semibold">Pts:</span> Puntos</div>
+        <div class="bg-primary-dark px-6 py-4 border-t-2 border-primary">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 text-xs">
+            <div class="text-black font-bold"><span class="font-black">PJ:</span> Part. Jugados</div>
+            <div class="text-black font-bold"><span class="font-black">PG:</span> Part. Ganados</div>
+            <div class="text-black font-bold"><span class="font-black">PE:</span> Part. Empatados</div>
+            <div class="text-black font-bold"><span class="font-black">PP:</span> Part. Perdidos</div>
+            <div class="text-black font-bold"><span class="font-black">DG:</span> Dif. Goles</div>
+            <div class="text-black font-bold"><span class="font-black">GF:</span> Goles a Favor</div>
+            <div class="text-black font-bold"><span class="font-black">GC:</span> Goles en Contra</div>
+            <div class="text-black font-bold"><span class="font-black">Pts:</span> Puntos</div>
           </div>
         </div>
       </div>
 
       <!-- Información de la liga -->
-      <div class="mt-12 bg-slate-800 rounded-lg p-6 border border-slate-700">
-        <h2 class="text-xl font-bold text-white mb-4">Información de la Liga</h2>
-        <div class="grid md:grid-cols-2 gap-6">
+      <div class="mt-12 bg-primary-dark rounded-lg p-8 border-2 border-primary">
+        <h2 class="text-3xl font-bold text-black mb-6" style="font-family: 'Collegiate Black', sans-serif;">🏆 SOBRE LA COMPETENCIA</h2>
+        <div class="grid md:grid-cols-2 gap-8">
           <div>
-            <h3 class="text-white font-semibold mb-3">🏆 LigaDoble Summer Cup 2026</h3>
-            <p class="text-gray-300 text-sm mb-4">
-              Torneo de fútbol femenino organizado por Trotamundos. Participa CD Vikingas en la Serie AB+.
+            <h3 class="text-black font-bold text-lg mb-3">LIGADOUBLE SUMMER CUP 2026</h3>
+            <p class="text-black/80 text-sm mb-4 leading-relaxed">
+              Torneo de fútbol femenino organizado por Trotamundos. CD Vikingas participa en la Serie AB+, compitiendo contra los mejores equipos de la región.
             </p>
             <a 
               href="https://trotamundos.cl/index.php/ligadobleve-summer-cup/" 
               target="_blank" 
-              class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition text-sm"
+              class="inline-block bg-black hover:bg-black/80 text-primary px-4 py-2 rounded font-bold transition text-sm"
             >
-              Ver página oficial ↗
+              Ver página oficial →
             </a>
           </div>
           <div>
-            <h3 class="text-white font-semibold mb-3">📅 Calendario</h3>
-            <ul class="text-gray-300 text-sm space-y-2">
-              <li>• Jornada 3: martes 12 enero</li>
-              <li>• Jornada 4: jueves 14 enero</li>
-              <li>• Jornada 5: martes 19 enero</li>
-              <li>• Gran Final: martes 3 febrero</li>
+            <h3 class="text-black font-bold text-lg mb-3">📅 PRÓXIMAS JORNADAS</h3>
+            <ul class="text-black/80 text-sm space-y-2">
+              <li class="font-semibold text-black">• Jornada 3: martes 13 enero</li>
+              <li class="font-semibold text-black">• Jornada 4: jueves 15 enero</li>
+              <li class="font-semibold text-black">• Jornada 5: martes 20 enero</li>
+              <li class="font-semibold text-black">• Gran Final: martes 3 febrero</li>
             </ul>
           </div>
         </div>
