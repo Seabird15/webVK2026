@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <div class="relative h-96 overflow-hidden">
       <img
-        src="../assets/historia/6L6A7218.jpg"
+        src="@/assets/historia/6L6A7218.jpg"
         alt="Club Deportivo Vikingas"
         class="w-full h-full object-cover opacity-40"
       />
@@ -38,7 +38,7 @@
         <div class="relative">
           <div class="absolute -inset-2 bg-gradient-to-r from-cyan-400 to-yellow-400 rounded-lg opacity-20 blur"></div>
           <img
-            src="../assets/historia/IMG-20210318-WA0093.jpg"
+            src="@/assets/historia/IMG-20210318-WA0093.jpg"
             alt="Inicio Vikingas"
             class="relative w-full rounded-lg shadow-2xl"
           />
@@ -50,7 +50,7 @@
         <div class="relative order-2 lg:order-1">
           <div class="absolute -inset-2 bg-linear-to-r from-yellow-400 to-cyan-400 rounded-lg opacity-20 blur"></div>
           <img
-            src="../assets/historia/415088951_877976967666498_2652487421033914590_n.jpg"
+            src="@/assets/historia/415088951_877976967666498_2652487421033914590_n.jpg"
             alt="Crecimiento del equipo"
             class="relative w-full rounded-lg shadow-2xl"
           />
@@ -95,7 +95,7 @@
         <div class="relative">
           <div class="absolute -inset-2 bg-gradient-to-r from-cyan-400 to-yellow-400 rounded-lg opacity-20 blur"></div>
           <img
-            src="../assets/historia/489001928_1227061809424677_8981689682664346162_n.jpg"
+            src="@/assets/historia/489001928_1227061809424677_8981689682664346162_n.jpg"
             alt="Competencia"
             class="relative w-full rounded-lg shadow-2xl"
           />

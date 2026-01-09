@@ -4,7 +4,7 @@
     <div class=" mx-auto">
       <!-- First Row of Sponsors -->
       <div class="flex justify-center items-center gap-8 mb-12 flex-wrap">
-        <img src="../assets/sponsors/sponsors.png" alt="Sponsors" class="h-20 object-contain" />
+        <img src="@/assets/sponsors/sponsors.png" alt="Sponsors" class="h-20 object-contain" />
       </div>
 
       <!-- Second Row with Alianza and Spirit Sport -->
@@ -14,7 +14,7 @@
 
         <!-- Center - Main Logo -->
         <div class="flex justify-center w-36">
-          <img src="../assets/logoVk.png" alt="Club Deportivo Vikingas" class="h-10 object-contain" />
+          <img src="@/assets/logoVk.png" alt="Club Deportivo Vikingas" class="h-10 object-contain" />
         </div>
 
         <!-- Right section with Alianza and Spirit -->
@@ -22,7 +22,7 @@
           <div class="text-right">
             <h3 class="text-xl font-bold mb-2">ALIANZA</h3>
           </div>
-          <img src="../assets/sponsors/spirit.png" alt="Spirit Sport" class=" w-24 h-20 object-contain" />
+          <img src="@/assets/sponsors/spirit.png" alt="Spirit Sport" class=" w-24 h-20 object-contain" />
         </div>
       </div>
     </div>

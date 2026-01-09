@@ -165,7 +165,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
-import logoBlanco from '../assets/logoblanco.jpg';
+import logoBlanco from '@/assets/logoblanco.jpg';
 import { obtenerEquipoCompleto } from '../firebase/jugadoras';
 import { useLoader } from '../composables/useLoader.js';
 

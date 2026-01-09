@@ -19,7 +19,7 @@
                         <!-- Equipos -->
                         <div class="flex items-center justify-between">
                             <div class="flex flex-col items-center gap-2">
-                                <img src="../assets/logoVK.png" :alt="proximoPartido.equipo1.nombre"
+                                <img src="@/assets/logoVk.png" :alt="proximoPartido.equipo1.nombre"
                                     class="w-16 h-16">
                                 <p class="text-white text-sm font-bold">{{ proximoPartido.equipo1.nombre }}</p>
                             </div>
@@ -64,7 +64,7 @@
                         <!-- Equipos y Resultado -->
                         <div class="flex items-center justify-between">
                             <div class="flex flex-col items-center gap-2">
-                                <img src="../assets/logoVK.png" :alt="ultimoPartido.equipo1.nombre"
+                                <img src="@/assets/logoVk.png" :alt="ultimoPartido.equipo1.nombre"
                                     class="w-16 h-16">
                                 <p class="text-white text-sm font-bold">{{ ultimoPartido.equipo1.nombre }}</p>
                             </div>
