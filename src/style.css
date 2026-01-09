@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Collegiate Black';
+  src: url('@/assets/fonts/CollegiateBlackFLF.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Collegiate Border';
+  src: url('@/assets/fonts/CollegiateBorderFLF.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Gobold High';
+  src: url('@/assets/fonts/Gobold High Bold.otf') format('opentype');
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'Gobold High';
+  src: url('@/assets/fonts/Gobold High Bold Italic.otf') format('opentype');
+  font-weight: bold;
+  font-style: italic;
+}
+
+@theme {
+  --color-primary: #00ECB1;
+  --color-primary-dark: #05AB90;
+  --color-primary-light: #33f5c7;
+}
+
+* {
+  font-family: 'Montserrat', sans-serif;
+}
