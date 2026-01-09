@@ -53,9 +53,9 @@
                 <th class="px-4 py-4 text-center text-black font-bold">PE</th>
                 <th class="px-4 py-4 text-center text-black font-bold">PP</th>
                 <th class="px-4 py-4 text-center text-black font-bold">DG</th>
+                <th class="px-4 py-4 text-center text-black font-bold">Pts</th>
                 <th class="px-4 py-4 text-center text-black font-bold">GF</th>
                 <th class="px-4 py-4 text-center text-black font-bold">GC</th>
-                <th class="px-4 py-4 text-center text-black font-bold">Pts</th>
               </tr>
             </thead>
             <tbody>
@@ -89,9 +89,9 @@
                 <td class="px-4 py-4 text-center font-bold" :class="parseInt(equipo.dg) >= 0 ? 'text-primary' : 'text-red-400'">
                   {{ equipo.dg > 0 ? '+' : '' }}{{ equipo.dg }}
                 </td>
+                <td class="px-4 py-4 text-center text-primary font-bold text-lg">{{ equipo.ptos }}</td>
                 <td class="px-4 py-4 text-center text-white/70 font-medium">{{ equipo.gf }}</td>
                 <td class="px-4 py-4 text-center text-white/70 font-medium">{{ equipo.gc }}</td>
-                <td class="px-4 py-4 text-center text-primary font-bold text-lg">{{ equipo.ptos }}</td>
               </tr>
             </tbody>
           </table>
@@ -105,9 +105,9 @@
             <div class="text-black font-bold"><span class="font-black">PE:</span> Part. Empatados</div>
             <div class="text-black font-bold"><span class="font-black">PP:</span> Part. Perdidos</div>
             <div class="text-black font-bold"><span class="font-black">DG:</span> Dif. Goles</div>
+            <div class="text-black font-bold"><span class="font-black">Pts:</span> Puntos</div>
             <div class="text-black font-bold"><span class="font-black">GF:</span> Goles a Favor</div>
             <div class="text-black font-bold"><span class="font-black">GC:</span> Goles en Contra</div>
-            <div class="text-black font-bold"><span class="font-black">Pts:</span> Puntos</div>
           </div>
         </div>
       </div>
