@@ -2,8 +2,17 @@
   <div class="relative w-full mx-auto overflow-hidden py-4 md:py-8">
     <!-- Contenedor principal con sombra -->
     <div class="relative w-full mx-auto overflow-hidden rounded-2xl shadow-2xl" @touchstart="handleTouchStart" @touchend="handleTouchEnd">
+      <!-- Loader -->
+      <div v-if="cargando" class="absolute inset-0 z-40 flex items-center justify-center bg-black/80 rounded-2xl">
+        <div class="flex flex-col items-center gap-4">
+          <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+          <p class="text-primary font-semibold text-sm">Cargando galería...</p>
+        </div>
+      </div>
+
       <!-- Botón izquierda -->
       <button
+        v-if="!cargando"
         @click="previousImage"
         class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20  hover:shadow-lg hover:scale-110 text-white font-bold text-lg md:text-2xl px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200"
         aria-label="Imagen anterior"
@@ -41,6 +50,7 @@
 
       <!-- Botón derecha -->
       <button
+        v-if="!cargando"
         @click="nextImage"
         class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20  hover:shadow-lg hover:scale-110 text-white font-bold text-lg md:text-2xl px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200"
         aria-label="Siguiente imagen"
@@ -50,7 +60,7 @@
     </div>
 
     <!-- Indicadores mejorados -->
-    <div class="flex justify-center gap-2 md:gap-3 mt-5 md:mt-6 px-4">
+    <div v-if="!cargando" class="flex justify-center gap-2 md:gap-3 mt-5 md:mt-6 px-4">
       <span
         v-for="(_, index) in images"
         :key="index"
@@ -64,7 +74,7 @@
     </div>
 
     <!-- Indicador de swipe en móvil -->
-    <div class="md:hidden text-center mt-4 text-xs text-gray-400">
+    <div v-if="!cargando" class="md:hidden text-center mt-4 text-xs text-gray-400">
       👆 Desliza para cambiar
     </div>
   </div>
