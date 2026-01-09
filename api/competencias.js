@@ -103,9 +103,9 @@ function parseTabla(html) {
               pe: cleanHtml(cells[4]).trim(),
               pp: cleanHtml(cells[5]).trim(),
               dg: cleanHtml(cells[6]).trim(),
-              gf: cleanHtml(cells[7]).trim(),
-              gc: cleanHtml(cells[8]).trim(),
-              ptos: cleanHtml(cells[9]).trim(),
+              ptos: cleanHtml(cells[7]).trim(),
+              gf: cleanHtml(cells[8]).trim(),
+              gc: cleanHtml(cells[9]).trim(),
               ultimos: cells.length > 10 ? cleanHtml(cells[10]).trim() : ''
             });
           }
