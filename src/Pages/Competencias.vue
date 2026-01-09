@@ -154,18 +154,12 @@ const fetchTabla = async () => {
   error.value = null;
   
   try {
-    // Construir URL de API dinámicamente
-    let apiUrl = import.meta.env.VITE_API_URL;
+    // En desarrollo, usar localhost
+    // En producción, usar el mismo dominio que la app
+    const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const apiUrl = isDev ? 'http://localhost:3001' : window.location.origin;
     
-    if (!apiUrl) {
-      // En desarrollo, usar localhost
-      if (import.meta.env.DEV) {
-        apiUrl = 'http://localhost:3001';
-      } else {
-        // En producción, usar el mismo dominio que la app
-        apiUrl = window.location.origin;
-      }
-    }
+    console.log('API URL:', apiUrl);
     
     const response = await fetch(`${apiUrl}/api/competencias`);
     const data = await response.json();
