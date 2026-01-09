@@ -1,6 +1,3 @@
-import axios from 'axios';
-import * as cheerio from 'cheerio';
-
 export default async function handler(req, res) {
   // Permitir CORS desde cualquier origen
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -21,43 +18,21 @@ export default async function handler(req, res) {
   try {
     const url = 'https://trotamundos.cl/index.php/ligadobleve-summer-cup/';
     
-    const response = await axios.get(url, {
+    const response = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      },
-      timeout: 10000
-    });
-
-    const $ = cheerio.load(response.data);
-    const tabla = [];
-
-    // Buscar todas las filas de la tabla
-    const rows = $('table tbody tr');
-
-    rows.each((index, element) => {
-      const cells = $(element).find('td');
-      
-      if (cells.length >= 11) {
-        const teamName = $(cells[1]).text().trim();
-        
-        // Solo procesar filas que tengan nombre de equipo válido
-        if (teamName && teamName.length > 0) {
-          tabla.push({
-            posicion: index + 1,
-            equipo: teamName,
-            pj: $(cells[2]).text().trim(),
-            pg: $(cells[3]).text().trim(),
-            pe: $(cells[4]).text().trim(),
-            pp: $(cells[5]).text().trim(),
-            dg: $(cells[6]).text().trim(),
-            gf: $(cells[7]).text().trim(),
-            gc: $(cells[8]).text().trim(),
-            ptos: $(cells[9]).text().trim(),
-            ultimos: $(cells[10]).text().trim()
-          });
-        }
       }
     });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch: ${response.status}`);
+    }
+
+    const html = await response.text();
+    
+    // Simple parsing sin dependencias externas
+    // Buscamos la tabla y extraemos datos
+    const tabla = parseTabla(html);
 
     if (tabla.length === 0) {
       return res.status(200).json({
@@ -80,4 +55,62 @@ export default async function handler(req, res) {
       error: error.message
     });
   }
+}
+
+// Parser simple sin dependencias
+function parseTabla(html) {
+  const tabla = [];
+  
+  // Buscar la tabla usando regex
+  const tableMatch = html.match(/<table[^>]*>[\s\S]*?<\/table>/);
+  if (!tableMatch) return tabla;
+  
+  const tableHtml = tableMatch[0];
+  
+  // Buscar filas
+  const rowRegex = /<tr[^>]*>[\s\S]*?<\/tr>/g;
+  const rows = tableHtml.match(rowRegex) || [];
+  
+  rows.forEach((row, index) => {
+    const cellRegex = /<td[^>]*>([\s\S]*?)<\/td>/g;
+    const cells = [];
+    let match;
+    
+    while ((match = cellRegex.exec(row)) !== null) {
+      cells.push(match[1]);
+    }
+    
+    if (cells.length >= 11) {
+      // Limpieza de HTML
+      const teamName = cleanHtml(cells[1]).trim();
+      
+      if (teamName && teamName.length > 0) {
+        tabla.push({
+          posicion: index + 1,
+          equipo: teamName,
+          pj: cleanHtml(cells[2]).trim(),
+          pg: cleanHtml(cells[3]).trim(),
+          pe: cleanHtml(cells[4]).trim(),
+          pp: cleanHtml(cells[5]).trim(),
+          dg: cleanHtml(cells[6]).trim(),
+          gf: cleanHtml(cells[7]).trim(),
+          gc: cleanHtml(cells[8]).trim(),
+          ptos: cleanHtml(cells[9]).trim(),
+          ultimos: cleanHtml(cells[10]).trim()
+        });
+      }
+    }
+  });
+  
+  return tabla;
+}
+
+// Limpiar HTML
+function cleanHtml(html) {
+  return html
+    .replace(/<[^>]*>/g, '') // Remover tags
+    .replace(/&nbsp;/g, ' ')  // Remover &nbsp;
+    .replace(/&amp;/g, '&')   // Remover &amp;
+    .replace(/\s+/g, ' ')     // Normalizar espacios
+    .trim();
 }
