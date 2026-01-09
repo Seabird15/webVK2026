@@ -33,11 +33,14 @@ export default async function handler(req, res) {
     // Simple parsing sin dependencias externas
     // Buscamos la tabla y extraemos datos
     const tabla = parseTabla(html);
+    
+    console.log('Tabla parseada:', tabla.length, 'filas');
 
     if (tabla.length === 0) {
       return res.status(200).json({
         success: false,
-        message: 'No se pudo procesar la tabla. Por favor intenta más tarde.'
+        message: 'No se pudo procesar la tabla. Por favor intenta más tarde.',
+        debug: 'No rows found in HTML'
       });
     }
 
@@ -61,46 +64,62 @@ export default async function handler(req, res) {
 function parseTabla(html) {
   const tabla = [];
   
-  // Buscar la tabla usando regex
-  const tableMatch = html.match(/<table[^>]*>[\s\S]*?<\/table>/);
-  if (!tableMatch) return tabla;
-  
-  const tableHtml = tableMatch[0];
-  
-  // Buscar filas
-  const rowRegex = /<tr[^>]*>[\s\S]*?<\/tr>/g;
-  const rows = tableHtml.match(rowRegex) || [];
-  
-  rows.forEach((row, index) => {
-    const cellRegex = /<td[^>]*>([\s\S]*?)<\/td>/g;
-    const cells = [];
-    let match;
+  try {
+    // Buscar todas las tablas
+    const tablesRegex = /<table[^>]*>([\s\S]*?)<\/table>/gi;
+    let tableMatch;
     
-    while ((match = cellRegex.exec(row)) !== null) {
-      cells.push(match[1]);
-    }
-    
-    if (cells.length >= 11) {
-      // Limpieza de HTML
-      const teamName = cleanHtml(cells[1]).trim();
+    while ((tableMatch = tablesRegex.exec(html)) !== null) {
+      const tableHtml = tableMatch[1];
       
-      if (teamName && teamName.length > 0) {
-        tabla.push({
-          posicion: index + 1,
-          equipo: teamName,
-          pj: cleanHtml(cells[2]).trim(),
-          pg: cleanHtml(cells[3]).trim(),
-          pe: cleanHtml(cells[4]).trim(),
-          pp: cleanHtml(cells[5]).trim(),
-          dg: cleanHtml(cells[6]).trim(),
-          gf: cleanHtml(cells[7]).trim(),
-          gc: cleanHtml(cells[8]).trim(),
-          ptos: cleanHtml(cells[9]).trim(),
-          ultimos: cleanHtml(cells[10]).trim()
-        });
+      // Buscar filas (tr) en esta tabla
+      const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+      let rowMatch;
+      let rowIndex = 0;
+      
+      while ((rowMatch = rowRegex.exec(tableHtml)) !== null) {
+        const rowHtml = rowMatch[1];
+        
+        // Buscar celdas (td) en esta fila
+        const cellRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+        const cells = [];
+        let cellMatch;
+        
+        while ((cellMatch = cellRegex.exec(rowHtml)) !== null) {
+          cells.push(cellMatch[1]);
+        }
+        
+        // Validar que tenga suficientes columnas
+        if (cells.length >= 10) {
+          const teamName = cleanHtml(cells[1]).trim();
+          
+          // Validar que sea un nombre de equipo válido
+          if (teamName && teamName.length > 2) {
+            tabla.push({
+              posicion: tabla.length + 1,
+              equipo: teamName,
+              pj: cleanHtml(cells[2]).trim(),
+              pg: cleanHtml(cells[3]).trim(),
+              pe: cleanHtml(cells[4]).trim(),
+              pp: cleanHtml(cells[5]).trim(),
+              dg: cleanHtml(cells[6]).trim(),
+              gf: cleanHtml(cells[7]).trim(),
+              gc: cleanHtml(cells[8]).trim(),
+              ptos: cleanHtml(cells[9]).trim(),
+              ultimos: cells.length > 10 ? cleanHtml(cells[10]).trim() : ''
+            });
+          }
+        }
+        
+        rowIndex++;
       }
+      
+      // Si encontramos datos, salir del loop de tablas
+      if (tabla.length > 0) break;
     }
-  });
+  } catch (err) {
+    console.error('Error parsing tabla:', err);
+  }
   
   return tabla;
 }
@@ -108,9 +127,13 @@ function parseTabla(html) {
 // Limpiar HTML
 function cleanHtml(html) {
   return html
-    .replace(/<[^>]*>/g, '') // Remover tags
+    .replace(/<[^>]*>/g, '') // Remover tags HTML
     .replace(/&nbsp;/g, ' ')  // Remover &nbsp;
     .replace(/&amp;/g, '&')   // Remover &amp;
+    .replace(/&lt;/g, '<')    // Remover &lt;
+    .replace(/&gt;/g, '>')    // Remover &gt;
+    .replace(/&quot;/g, '"')  // Remover &quot;
+    .replace(/&#039;/g, "'")  // Remover &#039;
     .replace(/\s+/g, ' ')     // Normalizar espacios
     .trim();
 }
