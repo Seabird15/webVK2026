@@ -12,7 +12,7 @@
       </button>
 
       <!-- Contenedor de imágenes -->
-      <div class="overflow-hidden rounded-2xl h-68 md:h-80 lg:h-158 relative bg-black">
+      <div class="overflow-hidden rounded-2xl h-68 md:h-80 lg:h-184 2xl:h-158 relative bg-black">
         <div
           class="flex transition-transform duration-500 ease-out"
           :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
@@ -23,6 +23,7 @@
             :src="image"
             :alt="`Imagen ${index + 1}`"
             class="w-full h-full shrink-0 object-cover"
+            style="filter: sepia(0.4)"
           />
         </div>
         
