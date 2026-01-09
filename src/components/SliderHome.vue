@@ -4,9 +4,12 @@
     <div class="relative w-full mx-auto overflow-hidden rounded-2xl shadow-2xl" @touchstart="handleTouchStart" @touchend="handleTouchEnd">
       <!-- Loader -->
       <div v-if="cargando" class="absolute inset-0 z-40 flex items-center justify-center bg-black/80 rounded-2xl">
-        <div class="flex flex-col items-center gap-4">
-          <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-          <p class="text-primary font-semibold text-sm">Cargando galería...</p>
+        <div class="animate-pulse">
+          <img 
+            src="@/assets/logoVk.png" 
+            alt="Cargando" 
+            class="h-20 w-20 md:h-24 md:w-24 drop-shadow-lg"
+          />
         </div>
       </div>
 
