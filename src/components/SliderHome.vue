@@ -24,7 +24,7 @@
       </button>
 
       <!-- Contenedor de imágenes -->
-      <div class="overflow-hidden rounded-2xl h-68 md:h-80 lg:h-184 2xl:h-158 relative bg-black">
+      <div class="overflow-hidden rounded-2xl h-68 md:h-80 lg:h-184 2xl:h-184 2xl:container 2xl:mx-auto relative bg-black">
         <div
           class="flex transition-transform duration-500 ease-out"
           :style="{ transform: `translateX(-${currentIndex * 100}%)` }"

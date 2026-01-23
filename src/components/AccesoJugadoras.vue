@@ -6,7 +6,7 @@
         <h2 style="font-family: 'Gobold High', sans-serif;" class="text-lg lg:text-6xl md:text-4xl tracking-wider leading-2 font-bold text-white mb-4">
           ¿Eres parte de la comunidad Vikingas?
         </h2>
-        <p class="text-white/80 text-md">
+        <p class="text-white/80 text-md my-7">
           Accede a los entrenamientos y crea tu perfil
         </p>
       </div>
