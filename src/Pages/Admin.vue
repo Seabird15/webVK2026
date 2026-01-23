@@ -39,6 +39,11 @@
 
       <!-- Contenido de Tabs -->
       <div class="bg-white rounded-lg shadow p-6">
+        <!-- Solicitudes de Registro -->
+        <div v-if="activeTab === 'solicitudes'">
+          <GestionarSolicitudesRegistro />
+        </div>
+
         <!-- Slider Home -->
         <div v-if="activeTab === 'slider'">
           <GestionarSliderHome />
@@ -59,6 +64,11 @@
         <!-- Eventos -->
         <div v-if="activeTab === 'eventos'">
           <GestionarEventos />
+        </div>
+
+        <!-- Entrenamientos -->
+        <div v-if="activeTab === 'entrenamientos'">
+          <GestionarEntrenamientos />
         </div>
 
         <!-- Galería -->
@@ -97,9 +107,11 @@ import GestionarGalerias from '../components/GestionarGalerias.vue';
 import GestionarEventosEspeciales from '../components/GestionarEventosEspeciales.vue';
 import GestionarEstadisticas from '../components/GestionarEstadisticas.vue';
 import GestionarSliderHome from '../components/GestionarSliderHome.vue';
+import GestionarSolicitudesRegistro from '../components/GestionarSolicitudesRegistro.vue';
+import GestionarEntrenamientos from '../components/GestionarEntrenamientos.vue';
 
 const router = useRouter();
-const activeTab = ref('equipo');
+const activeTab = ref('solicitudes');
 
 const userGreeting = computed(() => {
   if (authUser.value) {
@@ -110,9 +122,11 @@ const userGreeting = computed(() => {
 });
 
 const tabs = [
+  { id: 'solicitudes', label: 'Solicitudes' },
   { id: 'slider', label: 'Slider Home' },
   { id: 'equipo', label: 'Equipos' },
   { id: 'jugadoras', label: 'Jugadoras' },
+  { id: 'entrenamientos', label: 'Entrenamientos' },
   { id: 'eventos', label: 'Eventos' },
   { id: 'eventos-especiales', label: 'Próximo/Último Partido' },
   { id: 'galeria', label: 'Galería' },

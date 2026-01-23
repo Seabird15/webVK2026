@@ -4,6 +4,7 @@ import Equipo from '../Pages/Equipo.vue';
 import Login from '../Pages/Login.vue';
 import Admin from '../Pages/Admin.vue';
 import { authUser, userRole } from '../firebase/auth';
+import { jugadoraAuthUser, authReady } from '../firebase/jugadorasAuth';
 
 const routes = [
   {
@@ -62,6 +63,41 @@ const routes = [
     component: Admin,
     meta: { requiresAuth: true }
   },
+  // Rutas de jugadoras
+  {
+    path: '/solicitud-acceso',
+    name: 'SolicitudAcceso',
+    component: () => import('../Pages/SolicitudAcceso.vue')
+  },
+  {
+    path: '/login-jugadora',
+    name: 'LoginJugadora',
+    component: () => import('../Pages/LoginJugadora.vue')
+  },
+  {
+    path: '/completar-perfil',
+    name: 'CompletarPerfil',
+    component: () => import('../Pages/CompletarPerfil.vue'),
+    meta: { requiresJugadora: true }
+  },
+  {
+    path: '/seleccionar-categoria',
+    name: 'SeleccionarCategoria',
+    component: () => import('../Pages/SeleccionarCategoria.vue'),
+    meta: { requiresJugadora: true }
+  },
+  {
+    path: '/entrenamientos',
+    name: 'Entrenamientos',
+    component: () => import('../Pages/Entrenamientos.vue'),
+    meta: { requiresJugadora: true }
+  },
+  {
+    path: '/perfil',
+    name: 'Perfil',
+    component: () => import('../Pages/Perfil.vue'),
+    meta: { requiresJugadora: true }
+  },
   // Ruta por defecto
   {
     path: '/:pathMatch(.*)*',
@@ -82,8 +118,9 @@ const router = createRouter({
 });
 
 // Guard para rutas protegidas
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiresJugadora = to.matched.some(record => record.meta.requiresJugadora);
   
   if (requiresAuth) {
     // Verificar si está autenticado y tiene rol admin o coach
@@ -91,6 +128,27 @@ router.beforeEach((to, from, next) => {
       next();
     } else {
       next('/login');
+    }
+  } else if (requiresJugadora) {
+    // Esperar a que Firebase Auth esté listo
+    let intentos = 0;
+    while (!authReady.value && intentos < 50) {
+      console.log('Esperando a que Auth esté listo... intento', intentos + 1);
+      await new Promise(resolve => setTimeout(resolve, 100));
+      intentos++;
+    }
+    
+    if (!authReady.value) {
+      console.warn('Timeout esperando Auth, permitiendo acceso pero puede haber problemas');
+    }
+    
+    // Ahora sí, verificar si jugadora está autenticada
+    if (jugadoraAuthUser.value) {
+      console.log('Jugadora autenticada, permitiendo acceso');
+      next();
+    } else {
+      console.log('Jugadora no autenticada, redirigiendo a login');
+      next('/login-jugadora');
     }
   } else if (to.path === '/login' && authUser.value && (userRole.value === 'admin' || userRole.value === 'coach')) {
     next('/admin');

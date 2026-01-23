@@ -2,8 +2,8 @@
   <div class="min-h-screen bg-linear-to-br from-black to-primary-dark flex items-center justify-center px-4">
     <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
       <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-primary-dark mb-2">Vikingas</h1>
-        <p class="text-gray-600">Panel de Administración</p>
+        <h1 class="text-6xl font-bold text-primary-dark mb-2"  style="font-family: 'Gobold High', sans-serif;">Vikingas</h1>
+        <p class="text-gray-600">Panel Profe y admin</p>
       </div>
 
       <form @submit.prevent="handleLogin" class="space-y-6">

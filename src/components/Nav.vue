@@ -29,19 +29,19 @@
         </router-link>
       </div>
 
-      <!-- Admin link -->
-      <router-link
-        to="/login"
-        class="text-black font-bold text-xs tracking-wider hover:text-black/70 transition-colors ml-auto mr-4"
-        title="Administración"
-      >
-        <UserCircleIcon class="w-6 h-6" />
-      </router-link>
+     
 
-      <!-- Redes sociales y menú mobile -->
       <div class="flex items-center gap-4">
         <!-- Links de redes sociales -->
         <div class="flex gap-3">
+              <!-- Admin link -->
+        <router-link
+          to="/login"
+          class="text-black font-bold text-xs tracking-wider hover:text-black/70 transition-colors"
+          title="Administración"
+        >
+          <UserCircleIcon class="w-6 h-6" />
+        </router-link>
           <a 
             href="https://wa.me/YOUR_PHONE"
             target="_blank"
@@ -90,6 +90,27 @@
         >
           <component :is="link.icon" class="w-5 h-5" />
           {{ link.label }}
+        </router-link>
+
+        <!-- Separador -->
+        <div class="border-t border-black/20 my-2"></div>
+
+        <!-- Acceso Jugadora -->
+        <router-link
+          to="/login-jugadora"
+          class="px-4 py-3 text-black font-bold text-sm tracking-wider uppercase hover:bg-black/10 rounded transition-colors flex items-center gap-3"
+          @click="isMenuOpen = false"
+        >
+          🏐 Acceso Jugadora
+        </router-link>
+
+        <!-- Admin -->
+        <router-link
+          to="/login"
+          class="px-4 py-3 text-black font-bold text-sm tracking-wider uppercase hover:bg-black/10 rounded transition-colors flex items-center gap-3"
+          @click="isMenuOpen = false"
+        >
+          👤 Administración
         </router-link>
       </div>
     </div>
