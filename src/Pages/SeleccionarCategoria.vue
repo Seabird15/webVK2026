@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden">
+  <div class="min-h-screen bg-black relative overflow-hidden">
     <!-- Elementos decorativos de fondo -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <div class="absolute top-20 -left-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl"></div>
