@@ -1,89 +1,121 @@
 <template>
-  <div class="w-full bg-linear-to-r from-black via-primary-dark to-primary py-16 px-4">
+  <div class="w-full bg-gradient-to-r from-black via-primary-dark to-primary py-16 md:py-20 px-4">
     <div class="max-w-6xl mx-auto">
       <!-- Encabezado -->
       <div class="text-center mb-12">
-        <h2 style="font-family: 'Gobold High', sans-serif;" class="text-lg lg:text-6xl md:text-4xl tracking-wider leading-2 font-bold text-white mb-4">
+        <h2 style="font-family: 'Gobold High', sans-serif;" class="text-3xl lg:text-6xl md:text-5xl tracking-wider leading-tight font-bold text-white mb-4">
           ¿Eres parte de la comunidad Vikingas?
         </h2>
-        <p class="text-white/80 text-md my-7">
-          Accede a los entrenamientos y crea tu perfil
+        <p class="text-white/90 text-lg md:text-xl my-7 font-medium">
+          Accede a entrenamientos, gestiona tu perfil y conecta con el equipo
         </p>
       </div>
 
-      <!-- Grid de opciones -->
-      <div class="lg:w-2/6 mx-auto">
-        <!-- Opción Jugadora -->
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-          <div class="bg-black p-6 text-white text-center">
-          <img src="../assets/logoVk.png" alt="" class="w-24 mx-auto my-2 opacity-80">
-            <h3 class="text-xl font-300  tracking-widest" style="font-family: 'Collegiate Black', sans-serif;">SOY JUGADORA VK</h3>
+      <!-- Tarjeta de acceso -->
+      <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02]">
+          <!-- Header de la tarjeta -->
+          <div class="bg-gradient-to-r from-black to-gray-900 p-8 text-white text-center relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 left-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
+            
+            <div class="relative z-10">
+              <img src="../assets/logoVk.png" alt="VK Vikingas" class="w-28 mx-auto mb-4 opacity-90 drop-shadow-lg">
+              <h3 class="text-2xl md:text-3xl font-bold tracking-widest" style="font-family: 'Collegiate Black', sans-serif;">
+                PORTAL JUGADORAS
+              </h3>
+              <div class="mt-2 h-1 w-24 bg-primary mx-auto rounded-full"></div>
+            </div>
           </div>
 
-          <div class="p-8 space-y-6">
-            <div class="space-y-3">
-              <h4 class="font-bold text-gray-900 text-lg">Con esta opción puedes:</h4>
-              <ul class="space-y-2 text-gray-700">
-                <li class="flex items-center gap-2">
-                  <span class="text-secondary font-bold">✓</span> Solicitar acceso al sistema
-                </li>
-                <li class="flex items-center gap-2">
-                  <span class="text-secondary font-bold">✓</span> Ver entrenamientos
-                </li>
-                <li class="flex items-center gap-2">
-                  <span class="text-secondary font-bold">✓</span> Inscribirse a entrenamientos
-                </li>
-                <li class="flex items-center gap-2">
-                  <span class="text-secondary font-bold">✓</span> Gestionar tu perfil
-                </li>
-              </ul>
+          <!-- Contenido de la tarjeta -->
+          <div class="p-8 md:p-10 space-y-8">
+            <!-- Beneficios -->
+            <div class="space-y-4">
+              <h4 class="font-bold text-gray-900 text-xl mb-4 flex items-center gap-2">
+                <SparklesIcon class="w-6 h-6 text-primary" />
+                Beneficios del Portal
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-colors">
+                  <CheckCircleIcon class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
+                  <span class="text-gray-700 font-medium">Ver entrenamientos programados</span>
+                </div>
+                <div class="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-colors">
+                  <CheckCircleIcon class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
+                  <span class="text-gray-700 font-medium">Confirmar asistencia</span>
+                </div>
+                <div class="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-colors">
+                  <CheckCircleIcon class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
+                  <span class="text-gray-700 font-medium">Gestionar tu perfil</span>
+                </div>
+                <div class="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-colors">
+                  <CheckCircleIcon class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
+                  <span class="text-gray-700 font-medium">Acceso exclusivo</span>
+                </div>
+              </div>
             </div>
 
-            <div class="pt-4 border-t border-gray-200 space-y-2">
+            <!-- Acciones -->
+            <div class="pt-6 border-t border-gray-200 space-y-3">
               <!-- Si está autenticada -->
               <router-link
                 v-if="esJugadoraAutenticada"
                 to="/entrenamientos"
-                class="block w-full bg-blue-500 text-white py-3 rounded-lg font-bold text-center hover:bg-blue-600 transition-colors"
+                class="flex items-center justify-center gap-2 w-full bg-primary text-white py-4 rounded-xl font-bold text-lg hover:from-green-700 hover:to-green-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
               >
-                Ir a Entrenamientos
+                <CalendarDaysIcon class="w-6 h-6" />
+                Ir a mi perfil
               </router-link>
 
               <!-- Si no está autenticada pero tiene acceso aprobado -->
               <router-link
                 v-else-if="tieneAccesoAprobado"
                 to="/login-jugadora"
-                class="block w-full bg-primary text-white py-3 rounded-lg font-bold text-center hover:bg-blue-600 transition-colors"
+                class="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-primary to-primary-dark text-white py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
               >
+                <ArrowRightOnRectangleIcon class="w-6 h-6" />
                 Inicia Sesión
               </router-link>
 
               <!-- Si es nueva -->
-              <div v-else class="space-y-2">
+              <div v-else class="space-y-3">
                 <router-link
                   to="/solicitud-acceso"
-                  class="block w-full bg-primary-dark text-white py-3 rounded-lg font-bold text-center hover:bg-primary-dark/80 transition-colors"
+                  class="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-primary-dark to-primary text-white py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                 >
+                  <UserPlusIcon class="w-6 h-6" />
                   Solicitar Acceso
                 </router-link>
-                <p class="text-xs text-gray-600 text-center">
-                  O <router-link to="/login-jugadora" class="text-blue-500 font-bold hover:underline">inicia sesión</router-link> si ya fuiste aprobada
-                </p>
+                
+                <div class="text-center">
+                  <p class="text-sm text-gray-600">
+                    ¿Ya tienes cuenta? 
+                    <router-link to="/login-jugadora" class="text-primary font-bold hover:underline inline-flex items-center gap-1">
+                      Inicia sesión aquí
+                      <ArrowRightIcon class="w-4 h-4" />
+                    </router-link>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-      
       </div>
-
-    
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue';
+import { 
+  CheckCircleIcon, 
+  SparklesIcon, 
+  CalendarDaysIcon, 
+  ArrowRightOnRectangleIcon,
+  UserPlusIcon,
+  ArrowRightIcon
+} from '@heroicons/vue/24/outline';
 import { jugadoraAuthUser } from '../firebase/jugadorasAuth';
 
 const esJugadoraAutenticada = computed(() => jugadoraAuthUser.value !== null);
