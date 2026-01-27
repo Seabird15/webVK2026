@@ -25,17 +25,7 @@
         >
           Datos Personales
         </button>
-        <button
-          @click="tabActivo = 'categorias'"
-          :class="[
-            'px-6 py-3 font-bold uppercase text-sm transition-colors',
-            tabActivo === 'categorias'
-              ? 'text-primary border-b-2 border-primary'
-              : 'text-gray-600 hover:text-gray-900'
-          ]"
-        >
-          Mis Categorías
-        </button>
+      
       </div>
 
       <!-- Tab: Datos Personales -->
@@ -300,6 +290,19 @@ if (!jugadoraAuthUser.value) {
 
 const formatearFecha = (date) => {
   if (!date) return '-';
+  
+  // Si es un string en formato YYYY-MM-DD, parsearlo manualmente
+  if (typeof date === 'string' && date.includes('-')) {
+    const [year, month, day] = date.split('-').map(Number);
+    const d = new Date(year, month - 1, day); // month es 0-indexed
+    return d.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+  
+  // Para otros formatos
   const d = new Date(date);
   return d.toLocaleDateString('es-ES', {
     year: 'numeric',

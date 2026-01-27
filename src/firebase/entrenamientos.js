@@ -61,20 +61,57 @@ export const crearEntrenamiento = async (entrenamientoData) => {
   }
 };
 
-// Obtener entrenamientos por equipo
-export const fetchEntrenamientosPorEquipo = async (equipo) => {
+// Obtener TODOS los entrenamientos (sin filtro)
+export const fetchTodosEntrenamientos = async () => {
   isLoadingEntrenamientos.value = true;
   errorEntrenamientos.value = null;
   try {
-    const q = query(
-      collection(db, 'entrenamientos'),
-      where('equipo', '==', equipo)
-    );
-    const snapshot = await getDocs(q);
+    const snapshot = await getDocs(collection(db, 'entrenamientos'));
     entrenamientos.value = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
+    return entrenamientos.value;
+  } catch (err) {
+    console.error('Error obteniendo entrenamientos:', err);
+    errorEntrenamientos.value = err.message;
+    return [];
+  } finally {
+    isLoadingEntrenamientos.value = false;
+  }
+};
+
+// Obtener entrenamientos por equipo (incluye los de 'ambos')
+export const fetchEntrenamientosPorEquipo = async (equipo) => {
+  isLoadingEntrenamientos.value = true;
+  errorEntrenamientos.value = null;
+  try {
+    // Obtener entrenamientos específicos del equipo
+    const q1 = query(
+      collection(db, 'entrenamientos'),
+      where('equipo', '==', equipo)
+    );
+    const snapshot1 = await getDocs(q1);
+    
+    // Obtener entrenamientos que son para ambos equipos
+    const q2 = query(
+      collection(db, 'entrenamientos'),
+      where('equipo', '==', 'ambos')
+    );
+    const snapshot2 = await getDocs(q2);
+    
+    // Combinar ambos resultados
+    const entrenamientosEquipo = snapshot1.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    const entrenamientosAmbos = snapshot2.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    entrenamientos.value = [...entrenamientosEquipo, ...entrenamientosAmbos];
     return entrenamientos.value;
   } catch (err) {
     console.error('Error obteniendo entrenamientos:', err);

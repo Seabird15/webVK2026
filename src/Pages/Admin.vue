@@ -61,11 +61,6 @@
           <GestionarJugadoras />
         </div> -->
 
-        <!-- Eventos -->
-        <div v-if="activeTab === 'eventos'">
-          <GestionarEventos />
-        </div>
-
         <!-- Entrenamientos -->
         <div v-if="activeTab === 'entrenamientos'">
           <GestionarEntrenamientos />
@@ -102,7 +97,6 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { logout, authUser, userRole } from '../firebase/auth';
 import GestionarJugadoras from '../components/GestionarJugadoras.vue';
-import GestionarEventos from '../components/GestionarEventos.vue';
 import GestionarGalerias from '../components/GestionarGalerias.vue';
 import GestionarEventosEspeciales from '../components/GestionarEventosEspeciales.vue';
 import GestionarEstadisticas from '../components/GestionarEstadisticas.vue';
@@ -127,7 +121,6 @@ const tabs = [
   { id: 'equipo', label: 'Equipos' },
   { id: 'jugadoras', label: 'Jugadoras' },
   { id: 'entrenamientos', label: 'Entrenamientos' },
-  { id: 'eventos', label: 'Eventos' },
   { id: 'eventos-especiales', label: 'Próximo/Último Partido' },
   { id: 'galeria', label: 'Galería' },
   { id: 'estadisticas', label: 'Estadísticas' },

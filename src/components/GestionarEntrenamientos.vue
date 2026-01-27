@@ -259,7 +259,11 @@
     </div>
 
     <!-- Lista de Entrenamientos -->
-    <div v-if="entrenamientosFiltrados.length > 0" class="space-y-4">
+    <div v-if="isLoadingEntrenamientos" class="text-center py-12">
+      <p class="text-gray-600 text-lg">Cargando entrenamientos...</p>
+    </div>
+    
+    <div v-else-if="entrenamientosFiltrados.length > 0" class="space-y-4">
       <div
         v-for="entrenamiento in entrenamientosFiltrados"
         :key="entrenamiento.id"
@@ -350,6 +354,17 @@
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- Sin resultados -->
+    <div v-else class="text-center py-12">
+      <p class="text-gray-600 text-lg">No hay entrenamientos disponibles</p>
+      <button
+        @click="mostrarFormularioNuevo"
+        class="mt-4 text-primary-dark font-bold hover:text-primary"
+      >
+        Crear el primer entrenamiento
+      </button>
     </div>
 
     <!-- Modal de detalles de inscripciones -->
@@ -527,17 +542,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Sin resultados -->
-    <div v-else class="text-center py-12">
-      <p class="text-gray-600 text-lg">No hay entrenamientos disponibles</p>
-      <button
-        @click="mostrarFormularioNuevo"
-        class="mt-4 text-primary-dark font-bold hover:text-primary"
-      >
-        Crear el primer entrenamiento
-      </button>
-    </div>
   </div>
 </template>
 
@@ -546,6 +550,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import {
   crearEntrenamiento,
   fetchEntrenamientosPorEquipo,
+  fetchTodosEntrenamientos,
   actualizarEntrenamiento,
   eliminarEntrenamiento,
   isLoadingEntrenamientos,
@@ -592,7 +597,11 @@ const jugadorasParaConvocar = ref([]);
 
 const entrenamientosFiltrados = computed(() => {
   return entrenamientos.value
-    .filter(e => !filtroEquipo.value || e.equipo === filtroEquipo.value)
+    .filter(e => {
+      if (!filtroEquipo.value) return true; // Sin filtro, mostrar todos
+      // Si hay filtro, mostrar los del equipo seleccionado Y los de 'ambos'
+      return e.equipo === filtroEquipo.value || e.equipo === 'ambos';
+    })
     .filter(e => {
       const termino = busqueda.value.toLowerCase();
       return (
@@ -878,10 +887,8 @@ const guardarEntrenamiento = async () => {
     if (filtroEquipo.value) {
       await fetchEntrenamientosPorEquipo(filtroEquipo.value);
     } else {
-      // Cargar todos (combinar ascenso y escuela)
-      const ascenso = await fetchEntrenamientosPorEquipo('ascenso');
-      const escuela = await fetchEntrenamientosPorEquipo('escuela');
-      entrenamientos.value = [...ascenso, ...escuela];
+      // Cargar todos los entrenamientos
+      await fetchTodosEntrenamientos();
     }
 
     cerrarFormulario();
@@ -902,9 +909,7 @@ const confirmarEliminar = async (entrenamientoId) => {
       if (filtroEquipo.value) {
         await fetchEntrenamientosPorEquipo(filtroEquipo.value);
       } else {
-        const ascenso = await fetchEntrenamientosPorEquipo('ascenso');
-        const escuela = await fetchEntrenamientosPorEquipo('escuela');
-        entrenamientos.value = [...ascenso, ...escuela];
+        await fetchTodosEntrenamientos();
       }
     } catch (err) {
       alert('Error al eliminar: ' + err.message);
@@ -953,9 +958,8 @@ const fechaPasada = (entrenamiento) => {
 // Cargar entrenamientos al montar
 onMounted(async () => {
   try {
-    const ascenso = await fetchEntrenamientosPorEquipo('ascenso');
-    const escuela = await fetchEntrenamientosPorEquipo('escuela');
-    entrenamientos.value = [...ascenso, ...escuela];
+    // Cargar todos los entrenamientos (partidos, entrenamientos, eventos, ambos equipos)
+    await fetchTodosEntrenamientos();
     
     // Inicializar conteo para cada entrenamiento
     entrenamientos.value.forEach(ent => {
