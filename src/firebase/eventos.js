@@ -26,7 +26,7 @@ export const obtenerEventosMes = async (year, month) => {
     const fechaFin = new Date(year, month + 1, 0, 23, 59, 59);
     
     const q = query(
-      collection(db, 'eventos'),
+      collection(db, 'entrenamientos'),
       where('fecha', '>=', fechaInicio),
       where('fecha', '<=', fechaFin),
       orderBy('fecha', 'asc')
@@ -53,7 +53,7 @@ export const obtenerTodosEventos = async () => {
   error.value = null;
   try {
     const q = query(
-      collection(db, 'eventos'),
+      collection(db, 'entrenamientos'),
       orderBy('fecha', 'asc')
     );
     
@@ -90,7 +90,7 @@ export const crearEvento = async (datos) => {
       updatedAt: new Date()
     };
     
-    const docRef = await addDoc(collection(db, 'eventos'), evento);
+    const docRef = await addDoc(collection(db, 'entrenamientos'), evento);
     console.log('Evento creado:', docRef.id);
     return docRef.id;
   } catch (err) {

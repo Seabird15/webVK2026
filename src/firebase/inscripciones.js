@@ -276,6 +276,51 @@ export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
   }
 };
 
+// Crear inscripciones solo para jugadoras convocadas (convocatoria/nómina)
+export const crearInscripcionesConvocadas = async (entrenamientoId, jugadorasConvocadas) => {
+  try {
+    console.log(`Creando inscripciones de convocatoria para ${jugadorasConvocadas.length} jugadoras`);
+    
+    if (jugadorasConvocadas.length === 0) {
+      console.warn('No hay jugadoras convocadas');
+      return false;
+    }
+    
+    // Crear inscripción pendiente para cada jugadora convocada
+    const batch = [];
+    for (const jugadora of jugadorasConvocadas) {
+      // Verificar si ya existe una inscripción
+      const q = query(
+        collection(db, 'inscripcionesEntrenamientos'),
+        where('entrenamientoId', '==', entrenamientoId),
+        where('jugadoraId', '==', jugadora.id)
+      );
+      const existing = await getDocs(q);
+      
+      if (existing.size === 0) {
+        // Solo crear si no existe
+        const inscripcion = addDoc(collection(db, 'inscripcionesEntrenamientos'), {
+          entrenamientoId: entrenamientoId,
+          jugadoraId: jugadora.id,
+          jugadoraNombre: jugadora.nombre,
+          estado: 'pendiente',
+          esConvocada: true, // Marcar que es parte de una convocatoria
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+        batch.push(inscripcion);
+      }
+    }
+    
+    await Promise.all(batch);
+    console.log(`Creadas ${batch.length} inscripciones de convocatoria para entrenamiento ${entrenamientoId}`);
+    return true;
+  } catch (err) {
+    console.error('Error creando inscripciones de convocatoria:', err);
+    return false;
+  }
+};
+
 // Inscribir jugadora manualmente (admin)
 export const inscribirJugadoraManual = async (entrenamientoId, jugadoraId, jugadoraNombre, estado = 'confirmada') => {
   isLoadingInscripciones.value = true;

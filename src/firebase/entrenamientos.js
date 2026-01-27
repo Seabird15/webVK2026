@@ -29,13 +29,23 @@ export const crearEntrenamiento = async (entrenamientoData) => {
 
     const entrenamientoId = docRef.id;
 
-    // Crear inscripciones pendientes para todas las jugadoras del equipo
-    try {
-      const { crearInscripcionesPendientes } = await import('./inscripciones');
-      await crearInscripcionesPendientes(entrenamientoId, entrenamientoData.equipo);
-    } catch (err) {
-      console.error('Error creando inscripciones pendientes:', err);
-      // No lanzar error, el entrenamiento ya fue creado exitosamente
+    // Si es una convocatoria, crear inscripciones solo para las jugadoras convocadas
+    if (entrenamientoData.esConvocatoria && entrenamientoData.jugadorasConvocadas && entrenamientoData.jugadorasConvocadas.length > 0) {
+      try {
+        const { crearInscripcionesConvocadas } = await import('./inscripciones');
+        await crearInscripcionesConvocadas(entrenamientoId, entrenamientoData.jugadorasConvocadas);
+      } catch (err) {
+        console.error('Error creando inscripciones de convocatoria:', err);
+      }
+    } else {
+      // Crear inscripciones pendientes para todas las jugadoras del equipo
+      try {
+        const { crearInscripcionesPendientes } = await import('./inscripciones');
+        await crearInscripcionesPendientes(entrenamientoId, entrenamientoData.equipo);
+      } catch (err) {
+        console.error('Error creando inscripciones pendientes:', err);
+        // No lanzar error, el entrenamiento ya fue creado exitosamente
+      }
     }
 
     return {

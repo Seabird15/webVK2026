@@ -109,6 +109,10 @@
             <div class="flex justify-between items-start mb-4">
               <div>
                 <h3 class="text-xl font-bold text-gray-900 mb-1">{{ entrenamiento.nombre }}</h3>
+                <!-- Indicador de convocatoria -->
+                <span v-if="entrenamiento.esConvocatoria" class="inline-block mt-1 text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded font-semibold">
+                  📋 Convocatoria
+                </span>
               </div>
               <span
                 :class="[
@@ -155,6 +159,13 @@
             <p class="text-gray-600 text-sm mb-6 line-clamp-3">
               {{ entrenamiento.descripcion }}
             </p>
+
+            <!-- Mensaje informativo para convocatorias -->
+            <div v-if="entrenamiento.esConvocatoria && !estaInscrita(entrenamiento.id)" class="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
+              <p class="text-xs text-purple-800 font-semibold">
+                ℹ️ Este es un partido con convocatoria. Solo las jugadoras convocadas pueden confirmar asistencia.
+              </p>
+            </div>
 
             <!-- Botones -->
             <div class="flex gap-2">
@@ -212,6 +223,16 @@
         </div>
 
         <div class="p-6 space-y-4">
+          <!-- Indicador de convocatoria -->
+          <div v-if="entrenamientoSeleccionado.esConvocatoria" class="p-4 bg-purple-50 rounded-lg border-2 border-purple-200">
+            <h3 class="font-bold text-purple-900 mb-2 flex items-center gap-2">
+              📋 Partido con Convocatoria
+            </h3>
+            <p class="text-sm text-purple-800">
+              Solo las jugadoras convocadas pueden confirmar su asistencia a este partido.
+            </p>
+          </div>
+
           <div>
             <h3 class="font-bold text-gray-700 mb-1">Descripción</h3>
             <p class="text-gray-600">{{ entrenamientoSeleccionado.descripcion }}</p>

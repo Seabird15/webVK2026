@@ -66,14 +66,15 @@
                 v-for="(evento, idx) in obtenerEventosDia(dia)"
                 :key="evento.id"
                 :class="[
-                  'text-xs px-1 md:px-2 py-0.5 md:py-1 rounded font-semibold truncate cursor-pointer hover:opacity-80 border',
+                  'text-xs px-1 md:px-2 py-0.5 md:py-1 rounded font-semibold truncate cursor-pointer hover:opacity-80 border flex items-center gap-0.5 md:gap-1',
                   obtenerColorEvento(evento.equipo)
                 ]"
                 @click="seleccionarEvento(evento)"
                 :title="evento.titulo"
               >
-                <span class="hidden md:inline">{{ evento.titulo }}</span>
-                <span class="md:hidden">{{ evento.titulo.substring(0, 8) }}...</span>
+                <component :is="obtenerIconoTipo(evento.tipo)" class="w-3 h-3 shrink-0" />
+                <span class="hidden md:inline truncate">{{ evento.titulo }}</span>
+                <span class="md:hidden truncate">{{ evento.titulo.substring(0, 6) }}...</span>
               </div>
               <!-- Indicador de más eventos en mobile -->
               <div v-if="obtenerEventosDia(dia).length > 2" class="text-xs text-gray-500 px-1">
@@ -88,10 +89,17 @@
       <div v-if="eventoSeleccionado" class="fixed md:relative inset-0 md:inset-auto bg-black/50 md:bg-transparent z-50 md:z-auto flex items-end md:items-start rounded-none md:rounded-lg">
         <div class="bg-white rounded-t-2xl md:rounded-lg p-4 md:p-6 border-l-4 border-primary w-full md:max-w-2xl mx-0 md:mx-auto max-h-[85vh] overflow-y-auto">
           <div class="flex justify-between items-start mb-4">
-            <h3 class="text-xl md:text-2xl font-bold text-gray-900">{{ eventoSeleccionado.titulo }}</h3>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-xl md:text-2xl font-bold text-gray-900 wrap-break-word">{{ eventoSeleccionado.titulo }}</h3>
+              <!-- Indicador de convocatoria -->
+              <span v-if="eventoSeleccionado.esConvocatoria" class="inline-flex items-center gap-1 mt-2 text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded font-semibold">
+                <ClipboardDocumentListIcon class="w-4 h-4" />
+                Convocatoria - {{ eventoSeleccionado.jugadorasConvocadas?.length || 0 }} jugadoras
+              </span>
+            </div>
             <button
               @click="eventoSeleccionado = null"
-              class="text-gray-500 hover:text-gray-700 text-2xl md:text-3xl font-bold"
+              class="text-gray-500 hover:text-gray-700 text-2xl md:text-3xl font-bold shrink-0 ml-2"
             >
               ✕
             </button>
@@ -157,7 +165,10 @@
             @click="seleccionarEvento(evento)"
           >
             <div class="flex items-start justify-between gap-2 mb-2">
-              <h4 class="text-base md:text-lg font-bold text-gray-900 flex-1">{{ evento.titulo }}</h4>
+              <h4 class="text-base md:text-lg font-bold text-gray-900 flex-1 wrap-break-word flex items-center gap-1.5">
+                <component :is="obtenerIconoTipo(evento.tipo)" class="w-5 h-5 shrink-0" />
+                <span class="truncate">{{ evento.titulo }}</span>
+              </h4>
               <span
                 :class="[
                   'text-xs px-2 py-1 rounded font-semibold border whitespace-nowrap',
@@ -167,6 +178,11 @@
                 {{ evento.equipo || 'general' }}
               </span>
             </div>
+            <!-- Indicador de convocatoria -->
+            <p v-if="evento.esConvocatoria" class="text-xs text-purple-600 font-semibold mb-2 flex items-center gap-1">
+              <ClipboardDocumentListIcon class="w-4 h-4" />
+              Convocatoria ({{ evento.jugadorasConvocadas?.length || 0 }} jugadoras)
+            </p>
             <p class="text-xs md:text-sm text-gray-600 mb-2">
               <CalendarIcon class="w-4 h-4 inline mr-1" />
               {{ formatearFecha(evento.fecha) }} <br class="md:hidden" /> a las {{ evento.hora }}
@@ -185,9 +201,17 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { isAdmin } from '../firebase/auth';
-import { obtenerEventosMes, obtenerTodosEventos, eliminarEvento } from '../firebase/eventos';
+import { fetchEntrenamientosPorEquipo } from '../firebase/entrenamientos';
 import { useLoader } from '../composables/useLoader.js';
-import { CalendarIcon, MapPinIcon } from '@heroicons/vue/24/outline';
+import { 
+  CalendarIcon, 
+  MapPinIcon, 
+  TrophyIcon,
+  UserGroupIcon,
+  SparklesIcon,
+  BoltIcon,
+  ClipboardDocumentListIcon
+} from '@heroicons/vue/24/outline';
 
 const { show, hide } = useLoader();
 const mesActual = ref(new Date().getMonth());
@@ -226,8 +250,10 @@ const diasCalendario = computed(() => {
 // Obtener eventos de un día específico
 const obtenerEventosDia = (dia) => {
   return eventosDelMes.value.filter(evento => {
-    const fecha = new Date(evento.fecha.seconds ? evento.fecha.seconds * 1000 : evento.fecha);
-    return fecha.getDate() === dia;
+    const fecha = new Date(evento.fecha);
+    return fecha.getDate() === dia && 
+           fecha.getMonth() === mesActual.value && 
+           fecha.getFullYear() === anioActual.value;
   });
 };
 
@@ -238,12 +264,12 @@ const proximosEventos = computed(() => {
   
   return eventosDelMes.value
     .filter(evento => {
-      const fecha = new Date(evento.fecha.seconds ? evento.fecha.seconds * 1000 : evento.fecha);
+      const fecha = new Date(evento.fecha);
       return fecha >= hoy;
     })
     .sort((a, b) => {
-      const fechaA = new Date(a.fecha.seconds ? a.fecha.seconds * 1000 : a.fecha);
-      const fechaB = new Date(b.fecha.seconds ? b.fecha.seconds * 1000 : b.fecha);
+      const fechaA = new Date(a.fecha);
+      const fechaB = new Date(b.fecha);
       return fechaA - fechaB;
     });
 });
@@ -251,22 +277,36 @@ const proximosEventos = computed(() => {
 // Formatear fecha
 const formatearFecha = (fecha) => {
   if (!fecha) return '';
-  const date = new Date(fecha.seconds ? fecha.seconds * 1000 : fecha);
+  const date = new Date(fecha);
   const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   return date.toLocaleDateString('es-ES', opciones);
 };
 
-// Obtener color del evento según el equipo
+// Obtener color del evento según el equipo o tipo
 const obtenerColorEvento = (equipo) => {
   switch (equipo) {
     case 'ascenso':
       return 'bg-red-100 text-red-800 border-red-300';
     case 'escuela':
       return 'bg-blue-100 text-blue-800 border-blue-300';
-    case 'futsal':
-      return 'bg-green-100 text-green-800 border-green-300';
+    case 'ambos':
+      return 'bg-purple-100 text-purple-800 border-purple-300';
     default:
       return 'bg-gray-100 text-gray-800 border-gray-300';
+  }
+};
+
+// Obtener componente de icono según el tipo de evento
+const obtenerIconoTipo = (tipo) => {
+  switch (tipo) {
+    case 'partido':
+      return TrophyIcon;
+    case 'amistoso':
+      return UserGroupIcon;
+    case 'evento':
+      return SparklesIcon;
+    default:
+      return BoltIcon;
   }
 };
 
@@ -291,11 +331,29 @@ const mesSiguiente = () => {
   cargarEventos();
 };
 
-// Cargar eventos
+// Cargar eventos (entrenamientos)
 const cargarEventos = async () => {
   try {
     show('Cargando eventos...');
-    eventosDelMes.value = await obtenerEventosMes(anioActual.value, mesActual.value);
+    // Obtener entrenamientos de ambos equipos
+    const entrenamientosAscenso = await fetchEntrenamientosPorEquipo('ascenso');
+    const entrenamientosEscuela = await fetchEntrenamientosPorEquipo('escuela');
+    
+    // Combinar y transformar los datos para el calendario
+    const todosEntrenamientos = [...entrenamientosAscenso, ...entrenamientosEscuela];
+    
+    // Filtrar por mes y año actual
+    eventosDelMes.value = todosEntrenamientos
+      .filter(ent => {
+        const fecha = new Date(ent.fecha);
+        return fecha.getMonth() === mesActual.value && 
+               fecha.getFullYear() === anioActual.value;
+      })
+      .map(ent => ({
+        ...ent,
+        titulo: ent.nombre,  // Mapear 'nombre' a 'titulo' para compatibilidad
+        tipo: ent.tipo || 'entrenamiento'
+      }));
   } catch (err) {
     console.error('Error cargando eventos:', err);
   } finally {
@@ -311,20 +369,23 @@ const seleccionarEvento = (evento) => {
 // Editar evento (redirigir al admin)
 const editarEvento = (evento) => {
   console.log('Editar evento:', evento);
-  // TODO: Implementar formulario de edición
+  // TODO: Implementar formulario de edición o redirigir a la sección de admin
+  alert('Para editar este evento, ve a la sección de Administración');
 };
 
 // Confirmar y eliminar evento
 const confirmarEliminar = async (id) => {
-  if (confirm('¿Estás seguro de que deseas eliminar este evento?')) {
-    try {
-      await eliminarEvento(id);
-      eventoSeleccionado.value = null;
-      cargarEventos();
-    } catch (err) {
-      console.error('Error eliminando evento:', err);
-    }
-  }
+  alert('Para eliminar este evento, ve a la sección de Administración');
+  // TODO: Implementar eliminación desde el calendario si es necesario
+  // if (confirm('¿Estás seguro de que deseas eliminar este evento?')) {
+  //   try {
+  //     await eliminarEntrenamiento(id);
+  //     eventoSeleccionado.value = null;
+  //     cargarEventos();
+  //   } catch (err) {
+  //     console.error('Error eliminando evento:', err);
+  //   }
+  // }
 };
 
 // Cargar eventos al montar

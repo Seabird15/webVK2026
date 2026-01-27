@@ -6,23 +6,25 @@
     </div>
 
     <!-- Tabs de estado -->
-    <div class="flex gap-4 border-b border-gray-200 mb-6">
-      <button
-        v-for="tab in tabs"
-        :key="tab.value"
-        @click="filtroEstado = tab.value"
-        :class="[
-          'px-4 py-2 font-bold text-sm uppercase transition-colors',
-          filtroEstado === tab.value
-            ? 'text-primary border-b-2 border-primary -mb-[2px]'
-            : 'text-gray-600 hover:text-gray-900'
-        ]"
-      >
-        {{ tab.label }}
-        <span class="ml-2 text-xs bg-gray-200 px-2 py-1 rounded-full">
-          {{ contarSolicitudes(tab.value) }}
-        </span>
-      </button>
+    <div class="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+      <div class="flex gap-2 md:gap-4 border-b border-gray-200 mb-6 min-w-max md:min-w-0">
+        <button
+          v-for="tab in tabs"
+          :key="tab.value"
+          @click="filtroEstado = tab.value"
+          :class="[
+            'px-3 md:px-4 py-2 font-bold text-xs md:text-sm uppercase transition-colors whitespace-nowrap',
+            filtroEstado === tab.value
+              ? 'text-primary border-b-2 border-primary -mb-0.5'
+              : 'text-gray-600 hover:text-gray-900'
+          ]"
+        >
+          {{ tab.label }}
+          <span class="ml-1 md:ml-2 text-xs bg-gray-200 px-1.5 md:px-2 py-0.5 md:py-1 rounded-full">
+            {{ contarSolicitudes(tab.value) }}
+          </span>
+        </button>
+      </div>
     </div>
 
     <!-- Loading -->
@@ -35,69 +37,115 @@
       <p class="text-gray-500">No hay solicitudes en este estado</p>
     </div>
 
-    <!-- Tabla de solicitudes -->
-    <div v-else class="overflow-x-auto">
-      <table class="w-full">
-        <thead>
-          <tr class="border-b border-gray-200 bg-gray-50">
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Email</th>
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Estado</th>
-            <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Fecha</th>
-            <th class="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="solicitud in solicitudesFiltradas"
-            :key="solicitud.id"
-            class="border-b border-gray-200 hover:bg-gray-50 transition-colors"
-          >
-            <td class="px-6 py-4">{{ solicitud.email }}</td>
-            <td class="px-6 py-4">
-              <span
-                :class="[
-                  'px-3 py-1 rounded-full text-xs font-bold uppercase',
-                  solicitud.estado === 'pendiente'
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : solicitud.estado === 'aprobada'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
-                ]"
-              >
-                {{ solicitud.estado }}
-              </span>
-            </td>
-            <td class="px-6 py-4 text-sm text-gray-500">
-              {{ formatearFecha(solicitud.createdAt) }}
-            </td>
-            <td class="px-6 py-4 text-right space-x-2">
-              <button
-                v-if="solicitud.estado === 'pendiente'"
-                @click="abrirModal('aprobar', solicitud)"
-                class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors"
-              >
-                Aprobar
-              </button>
-              <button
-                v-if="solicitud.estado === 'pendiente'"
-                @click="abrirModal('rechazar', solicitud)"
-                class="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
-              >
-                Rechazar
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Vista de solicitudes -->
+    <div v-else>
+      <!-- Vista Mobile (Tarjetas) -->
+      <div class="md:hidden space-y-4">
+        <div
+          v-for="solicitud in solicitudesFiltradas"
+          :key="solicitud.id"
+          class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+        >
+          <div class="flex justify-between items-start mb-3">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-gray-900 break-all">{{ solicitud.email }}</p>
+              <p class="text-xs text-gray-500 mt-1">{{ formatearFecha(solicitud.createdAt) }}</p>
+            </div>
+            <span
+              :class="[
+                'ml-2 px-2 py-1 rounded-full text-xs font-bold uppercase whitespace-nowrap',
+                solicitud.estado === 'pendiente'
+                  ? 'bg-yellow-100 text-yellow-800'
+                  : solicitud.estado === 'aprobada'
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-red-100 text-red-800'
+              ]"
+            >
+              {{ solicitud.estado }}
+            </span>
+          </div>
+          
+          <div v-if="solicitud.estado === 'pendiente'" class="flex gap-2 mt-3">
+            <button
+              @click="abrirModal('aprobar', solicitud)"
+              class="flex-1 px-3 py-2 bg-green-500 text-white text-sm font-bold rounded-lg hover:bg-green-600 transition-colors"
+            >
+              ✓ Aprobar
+            </button>
+            <button
+              @click="abrirModal('rechazar', solicitud)"
+              class="flex-1 px-3 py-2 bg-red-500 text-white text-sm font-bold rounded-lg hover:bg-red-600 transition-colors"
+            >
+              ✕ Rechazar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vista Desktop (Tabla) -->
+      <div class="hidden md:block overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-200 bg-gray-50">
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Email</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Estado</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Fecha</th>
+              <th class="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="solicitud in solicitudesFiltradas"
+              :key="solicitud.id"
+              class="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              <td class="px-6 py-4">{{ solicitud.email }}</td>
+              <td class="px-6 py-4">
+                <span
+                  :class="[
+                    'px-3 py-1 rounded-full text-xs font-bold uppercase',
+                    solicitud.estado === 'pendiente'
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : solicitud.estado === 'aprobada'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                  ]"
+                >
+                  {{ solicitud.estado }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500">
+                {{ formatearFecha(solicitud.createdAt) }}
+              </td>
+              <td class="px-6 py-4 text-right space-x-2">
+                <button
+                  v-if="solicitud.estado === 'pendiente'"
+                  @click="abrirModal('aprobar', solicitud)"
+                  class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors"
+                >
+                  Aprobar
+                </button>
+                <button
+                  v-if="solicitud.estado === 'pendiente'"
+                  @click="abrirModal('rechazar', solicitud)"
+                  class="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
+                >
+                  Rechazar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Modal de confirmación -->
-    <div v-if="modalAbierto" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 class="text-xl font-bold mb-4">
+    <div v-if="modalAbierto" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg p-4 md:p-6 max-w-md w-full">
+        <h3 class="text-lg md:text-xl font-bold mb-3 md:mb-4">
           {{ tipoAccion === 'aprobar' ? '¿Aprobar solicitud?' : '¿Rechazar solicitud?' }}
         </h3>
-        <p class="text-gray-600 mb-4">
+        <p class="text-sm md:text-base text-gray-600 mb-4 break-all">
           Email: <strong>{{ solicitudSeleccionada?.email }}</strong>
         </p>
 
@@ -120,10 +168,10 @@
         </div>
 
         <!-- Botones -->
-        <div class="flex gap-3">
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <button
             @click="cerrarModal"
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            class="flex-1 px-4 py-2.5 md:py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-50 transition-colors order-2 sm:order-1"
           >
             Cancelar
           </button>
@@ -131,7 +179,7 @@
             @click="ejecutarAccion"
             :disabled="isLoading"
             :class="[
-              'flex-1 px-4 py-2 text-white rounded-lg transition-colors disabled:opacity-50',
+              'flex-1 px-4 py-2.5 md:py-2 text-white font-bold rounded-lg transition-colors disabled:opacity-50 order-1 sm:order-2',
               tipoAccion === 'aprobar'
                 ? 'bg-green-500 hover:bg-green-600'
                 : 'bg-red-500 hover:bg-red-600'

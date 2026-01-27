@@ -2,10 +2,10 @@
   <div class="min-h-screen bg-gray-50">
     <!-- Header -->
     <div class="bg-primary text-white p-6">
-      <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <div class="max-w-6xl mx-auto flex flex-col lg:flex-row justify-between items-center">
         <div>
           <h1 class="text-3xl font-bold">Panel de Administración</h1>
-          <p class="text-sm text-primary-light mt-1">{{ userGreeting }}</p>
+          <p class="text-sm text-whitet mt-1">{{ userGreeting }}</p>
         </div>
         <button
           @click="handleLogout"
@@ -52,14 +52,14 @@
         <!-- Equipo -->
         <div v-if="activeTab === 'equipo'" class="space-y-6">
           <h2 class="text-2xl font-bold text-gray-900 mb-6">Gestionar Equipos</h2>
-          <p class="text-gray-600">Aquí puedes editar la información de los equipos (Ascenso, Escuela, Futsal)</p>
+          <p class="text-gray-600">En proceso.....</p>
           <!-- Las funcionalidades de edición irán aquí -->
         </div>
 
         <!-- Jugadoras -->
-        <div v-if="activeTab === 'jugadoras'">
+        <!-- <div v-if="activeTab === 'jugadoras'">
           <GestionarJugadoras />
-        </div>
+        </div> -->
 
         <!-- Eventos -->
         <div v-if="activeTab === 'eventos'">
@@ -116,7 +116,7 @@ const activeTab = ref('solicitudes');
 const userGreeting = computed(() => {
   if (authUser.value) {
     const rol = userRole.value === 'admin' ? '(Admin)' : '(Coach)';
-    return `Bienvenido, ${authUser.value.email} ${rol}`;
+    return `Bienvenida, ${authUser.value.email} ${rol}`;
   }
   return '';
 });
