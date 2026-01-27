@@ -1,0 +1,26 @@
+{
+  "name": "CD VIKINGAS - Fútbol Femenino",
+  "short_name": "CD VIKINGAS",
+  "description": "Club Deportivo de Fútbol Femenino - Puente Alto",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#00ECB1",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/fitapp-4fa5d.firebasestorage.app/o/VK%20LOGO%20COLOR.png?alt=media&token=ab878fc2-6dc0-4e90-9608-04acfb146b27",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/fitapp-4fa5d.firebasestorage.app/o/VK%20LOGO%20COLOR.png?alt=media&token=ab878fc2-6dc0-4e90-9608-04acfb146b27",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["sports", "lifestyle"],
+  "lang": "es-CL"
+}
