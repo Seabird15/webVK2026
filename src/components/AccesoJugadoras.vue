@@ -2,14 +2,7 @@
   <div class="w-full bg-gradient-to-r from-black via-primary-dark to-primary py-16 md:py-20 px-4">
     <div class="max-w-6xl mx-auto">
       <!-- Encabezado -->
-      <div class="text-center mb-12">
-        <h2 style="font-family: 'Gobold High', sans-serif;" class="text-3xl lg:text-6xl md:text-5xl tracking-wider leading-tight font-bold text-white mb-4">
-          ¿Eres parte de la comunidad Vikingas?
-        </h2>
-        <p class="text-white/90 text-lg md:text-xl my-7 font-medium">
-          Accede a entrenamientos, gestiona tu perfil y conecta con el equipo
-        </p>
-      </div>
+  
 
       <!-- Tarjeta de acceso -->
       <div class="max-w-2xl mx-auto">
@@ -32,14 +25,14 @@
           <div class="p-8 md:p-10 space-y-8">
             <!-- Beneficios -->
             <div class="space-y-4">
-              <h4 class="font-bold text-gray-900 text-xl mb-4 flex items-center gap-2">
+              <h4 class="font-bold text-gray-900 text-md mb-4 flex items-center gap-2">
                 <SparklesIcon class="w-6 h-6 text-primary" />
-                Beneficios del Portal
+                Exclusivo para jugadoras
               </h4>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div class="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-colors">
                   <CheckCircleIcon class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
-                  <span class="text-gray-700 font-medium">Ver entrenamientos programados</span>
+                  <span class="text-gray-700 font-medium">Ver entrenamientos </span>
                 </div>
                 <div class="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-colors">
                   <CheckCircleIcon class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
@@ -49,10 +42,7 @@
                   <CheckCircleIcon class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
                   <span class="text-gray-700 font-medium">Gestionar tu perfil</span>
                 </div>
-                <div class="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-colors">
-                  <CheckCircleIcon class="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
-                  <span class="text-gray-700 font-medium">Acceso exclusivo</span>
-                </div>
+             
               </div>
             </div>
 

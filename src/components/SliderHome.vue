@@ -78,7 +78,7 @@
 
     <!-- Indicador de swipe en móvil -->
     <div v-if="!cargando" class="md:hidden text-center mt-4 text-xs text-gray-400">
-      👆 Desliza para cambiar
+     Desliza para cambiar
     </div>
   </div>
 </template>

@@ -101,7 +101,8 @@
           class="px-4 py-3 text-black font-bold text-sm tracking-wider uppercase hover:bg-black/10 rounded transition-colors flex items-center gap-3"
           @click="isMenuOpen = false"
         >
-          🏐 Acceso Jugadora
+          <UserIcon class="w-5 h-5" />
+          Acceso Jugadora
         </router-link>
 
         <!-- Admin -->
@@ -110,7 +111,8 @@
           class="px-4 py-3 text-black font-bold text-sm tracking-wider uppercase hover:bg-black/10 rounded transition-colors flex items-center gap-3"
           @click="isMenuOpen = false"
         >
-          👤 Administración
+          <ShieldCheckIcon class="w-5 h-5" />
+          Administración
         </router-link>
       </div>
     </div>
@@ -129,7 +131,9 @@ import {
   UserCircleIcon,
   PhoneIcon,
   GlobeAltIcon,
-  TrophyIcon
+  TrophyIcon,
+  UserIcon,
+  ShieldCheckIcon
 } from '@heroicons/vue/24/outline';
 
 const isMenuOpen = ref(false);
