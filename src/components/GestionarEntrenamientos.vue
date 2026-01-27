@@ -2,12 +2,12 @@
   <div class="space-y-6">
     <!-- Encabezado -->
     <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold text-gray-900">Gestionar Entrenamientos</h2>
+      <h2 class="text-2xl font-bold text-gray-900">Gestionar Entrenamientos y Eventos</h2>
       <button
         @click="mostrarFormularioNuevo"
         class="bg-primary-dark text-white px-6 py-2 rounded-lg font-bold hover:bg-primary transition-colors"
       >
-        + Nuevo Entrenamiento
+        + Crear nuevo
       </button>
     </div>
 
@@ -38,8 +38,8 @@
     </div>
 
     <!-- Modal Nuevo/Editar Entrenamiento -->
-    <div v-if="mostrarFormulario" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-96 overflow-y-auto">
+    <div v-if="mostrarFormulario" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-120 overflow-y-auto">
         <!-- Encabezado Modal -->
         <div class="bg-primary text-white p-6 border-b border-gray-200">
           <h3 class="text-xl font-bold">
@@ -72,6 +72,23 @@
               <option value="">Selecciona equipo</option>
               <option value="ascenso">Ascenso</option>
               <option value="escuela">Escuela</option>
+              <option value="ambos">Ambos Equipos</option>
+            </select>
+          </div>
+
+          <!-- Tipo de actividad -->
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Tipo de actividad *</label>
+            <select
+              v-model="formulario.tipo"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="">Selecciona tipo</option>
+              <option value="entrenamiento">Entrenamiento</option>
+              <option value="partido">Partido</option>
+              <option value="amistoso">Amistoso</option>
+              <option value="evento">Evento</option>
             </select>
           </div>
 
@@ -172,6 +189,10 @@
             <p class="text-sm text-gray-600 mt-1">
               {{ formatearFecha(entrenamiento.fecha) }} a las {{ entrenamiento.hora }}
             </p>
+            <!-- Indicador de fecha pasada -->
+            <span v-if="fechaPasada(entrenamiento)" class="inline-block mt-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded font-semibold">
+              ⏰ Fecha pasada - Solo edición admin
+            </span>
           </div>
           <span class="bg-primary text-white px-3 py-1 rounded-full text-xs font-bold capitalize">
             {{ entrenamiento.equipo }}
@@ -221,6 +242,13 @@
             Ver Detalles
           </button>
           <button
+            @click="regenerarInscripciones(entrenamiento)"
+            class="px-3 py-2 bg-yellow-50 text-yellow-700 rounded-lg font-bold hover:bg-yellow-100 transition-colors text-xs"
+            title="Crear inscripciones pendientes para jugadoras que faltan"
+          >
+            🔄
+          </button>
+          <button
             @click="editarEntrenamiento(entrenamiento)"
             class="flex-1 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg font-bold hover:bg-blue-100 transition-colors"
           >
@@ -268,7 +296,17 @@
                   class="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200 transition-all"
                 >
                   <span class="text-gray-900 font-semibold">{{ inscrita.jugadoraNombre }}</span>
-                  <span class="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-bold">Confirmada</span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-bold">Confirmada</span>
+                    <!-- Botones de admin -->
+                    <button
+                      @click="cambiarEstado(inscrita.id, 'baja')"
+                      class="text-xs px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                      title="Marcar como baja"
+                    >
+                      Baja
+                    </button>
+                  </div>
                 </div>
               </transition-group>
             </div>
@@ -287,7 +325,17 @@
                   class="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200 transition-all"
                 >
                   <span class="text-gray-900 font-semibold">{{ inscrita.jugadoraNombre }}</span>
-                  <span class="text-xs bg-red-200 text-red-800 px-2 py-1 rounded font-bold">Baja</span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs bg-red-200 text-red-800 px-2 py-1 rounded font-bold">Baja</span>
+                    <!-- Botones de admin -->
+                    <button
+                      @click="cambiarEstado(inscrita.id, 'confirmada')"
+                      class="text-xs px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                      title="Marcar como confirmada"
+                    >
+                      Confirmar
+                    </button>
+                  </div>
                 </div>
               </transition-group>
             </div>
@@ -306,7 +354,24 @@
                   class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200 transition-all"
                 >
                   <span class="text-gray-900 font-semibold">{{ inscrita.jugadoraNombre }}</span>
-                  <span class="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded font-bold">Pendiente</span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded font-bold">Pendiente</span>
+                    <!-- Botones de admin -->
+                    <button
+                      @click="cambiarEstado(inscrita.id, 'confirmada')"
+                      class="text-xs px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                      title="Marcar como confirmada"
+                    >
+                      Confirmar
+                    </button>
+                    <button
+                      @click="cambiarEstado(inscrita.id, 'baja')"
+                      class="text-xs px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                      title="Marcar como baja"
+                    >
+                      Baja
+                    </button>
+                  </div>
                 </div>
               </transition-group>
             </div>
@@ -315,6 +380,52 @@
           <!-- Sin inscritas -->
           <div v-if="inscritasOrganizadasAdmin.confirmadas.length === 0 && inscritasOrganizadasAdmin.bajas.length === 0 && inscritasOrganizadasAdmin.pendientes.length === 0" class="text-center py-8">
             <p class="text-gray-500 text-lg">No hay inscritas en este entrenamiento aún</p>
+          </div>
+
+          <!-- Sección para agregar jugadora manualmente -->
+          <div class="mt-6 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+            <h3 class="font-bold text-blue-900 text-lg mb-3">➕ Agregar jugadora manualmente</h3>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">Buscar jugadora:</label>
+                <input
+                  v-model="busquedaJugadora"
+                  type="text"
+                  placeholder="Nombre de la jugadora..."
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  @input="buscarJugadoras"
+                />
+              </div>
+              <div v-if="jugadorasDisponibles.length > 0" class="max-h-48 overflow-y-auto space-y-2">
+                <div
+                  v-for="jugadora in jugadorasDisponibles"
+                  :key="jugadora.id"
+                  class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-primary transition-colors"
+                >
+                  <div>
+                    <p class="font-semibold text-gray-900">{{ jugadora.nombre }} {{ jugadora.apellido }}</p>
+                    <p class="text-xs text-gray-500">{{ jugadora.posicion }} - #{{ jugadora.dorsal }}</p>
+                  </div>
+                  <div class="flex gap-2">
+                    <button
+                      @click="agregarJugadoraManual(jugadora, 'confirmada')"
+                      class="text-xs px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                    >
+                      Presente
+                    </button>
+                    <button
+                      @click="agregarJugadoraManual(jugadora, 'baja')"
+                      class="text-xs px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                    >
+                      Ausente
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <p v-else-if="busquedaJugadora.length > 0" class="text-sm text-gray-500 text-center py-2">
+                No se encontraron jugadoras
+              </p>
+            </div>
           </div>
         </div>
 
@@ -353,7 +464,8 @@ import {
   errorEntrenamientos,
   entrenamientos
 } from '../firebase/entrenamientos';
-import { escucharInscripcionesEntrenamiento } from '../firebase/inscripciones';
+import { escucharInscripcionesEntrenamiento, cambiarEstadoInscripcion, inscribirJugadoraManual, crearInscripcionesPendientes } from '../firebase/inscripciones';
+import { fetchJugadorasRegistradasPorEquipo } from '../firebase/jugadorasAuth';
 
 const mostrarFormulario = ref(false);
 const isLoading = ref(false);
@@ -368,6 +480,8 @@ const inscritasOrganizadasAdmin = ref({
   pendientes: []
 });
 const unsubscribers = ref([]);
+const busquedaJugadora = ref('');
+const jugadorasDisponibles = ref([]);
 
 // Mapeo para contar inscritas por estado
 const conteoInscritas = ref({});
@@ -375,6 +489,7 @@ const conteoInscritas = ref({});
 const formulario = ref({
   nombre: '',
   equipo: '',
+  tipo: '',
   fecha: '',
   hora: '',
   lugar: '',
@@ -400,6 +515,7 @@ const mostrarFormularioNuevo = () => {
   formulario.value = {
     nombre: '',
     equipo: '',
+    tipo: '',
     fecha: '',
     hora: '',
     lugar: '',
@@ -412,10 +528,22 @@ const mostrarFormularioNuevo = () => {
 
 const editarEntrenamiento = (entrenamiento) => {
   entrenamientoEditando.value = entrenamiento;
+  
+  // Convertir fecha a formato YYYY-MM-DD para el input date
+  let fechaFormato = entrenamiento.fecha;
+  if (typeof fechaFormato === 'string' && fechaFormato.includes('T')) {
+    // Si ya tiene hora, extraer solo la fecha
+    fechaFormato = fechaFormato.split('T')[0];
+  } else if (fechaFormato instanceof Date) {
+    // Si es un objeto Date
+    fechaFormato = fechaFormato.toISOString().split('T')[0];
+  }
+  
   formulario.value = {
     nombre: entrenamiento.nombre,
     equipo: entrenamiento.equipo,
-    fecha: entrenamiento.fecha,
+    tipo: entrenamiento.tipo || 'entrenamiento',
+    fecha: fechaFormato,
     hora: entrenamiento.hora,
     lugar: entrenamiento.lugar,
     descripcion: entrenamiento.descripcion || '',
@@ -464,11 +592,80 @@ const contarPorEstado = (entrenamientoId, estado) => {
   return conteo[estado + 's'] || 0;
 };
 
+// Cambiar estado de inscripción (admin)
+const cambiarEstado = async (inscripcionId, nuevoEstado) => {
+  try {
+    const success = await cambiarEstadoInscripcion(inscripcionId, nuevoEstado);
+    if (success) {
+      console.log('Estado actualizado correctamente');
+    } else {
+      alert('Error al cambiar el estado');
+    }
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+};
+
+// Buscar jugadoras
+const buscarJugadoras = async () => {
+  if (!busquedaJugadora.value || busquedaJugadora.value.length < 2) {
+    jugadorasDisponibles.value = [];
+    return;
+  }
+
+  if (!entrenamientoDetallado.value) return;
+
+  try {
+    // Cargar jugadoras registradas del equipo del entrenamiento
+    const jugadorasRegistradas = await fetchJugadorasRegistradasPorEquipo(entrenamientoDetallado.value.equipo);
+    
+    // Filtrar jugadoras que ya están inscritas
+    const idsInscritas = [
+      ...inscritasOrganizadasAdmin.value.confirmadas,
+      ...inscritasOrganizadasAdmin.value.bajas,
+      ...inscritasOrganizadasAdmin.value.pendientes
+    ].map(i => i.jugadoraId);
+    
+    // Filtrar por búsqueda y excluir inscritas
+    jugadorasDisponibles.value = jugadorasRegistradas.filter(j => {
+      const nombreCompleto = `${j.nombre} ${j.apellido}`.toLowerCase();
+      return nombreCompleto.includes(busquedaJugadora.value.toLowerCase()) && 
+             !idsInscritas.includes(j.id);
+    });
+  } catch (err) {
+    console.error('Error buscando jugadoras:', err);
+  }
+};
+
+// Agregar jugadora manualmente
+const agregarJugadoraManual = async (jugadora, estado) => {
+  if (!entrenamientoDetallado.value) return;
+  
+  try {
+    const success = await inscribirJugadoraManual(
+      entrenamientoDetallado.value.id,
+      jugadora.id,
+      `${jugadora.nombre} ${jugadora.apellido}`,
+      estado
+    );
+    
+    if (success) {
+      console.log('Jugadora agregada correctamente');
+      busquedaJugadora.value = '';
+      jugadorasDisponibles.value = [];
+    } else {
+      alert('Error al agregar la jugadora');
+    }
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+};
+
 const guardarEntrenamiento = async () => {
   error.value = null;
 
   // Validar campos
-  if (!formulario.value.nombre || !formulario.value.equipo || !formulario.value.fecha || !formulario.value.hora || !formulario.value.lugar) {
+  if (!formulario.value.nombre || !formulario.value.equipo || !formulario.value.tipo || !formulario.value.fecha || !formulario.value.hora || !formulario.value.lugar) {
     error.value = 'Por favor completa todos los campos requeridos';
     return;
   }
@@ -476,12 +673,17 @@ const guardarEntrenamiento = async () => {
   isLoading.value = true;
 
   try {
+    // Convertir la fecha a formato correcto evitando problemas de zona horaria
+    // Agregar 'T12:00:00' para asegurar que se guarde el día correcto sin importar la zona horaria
+    const fechaCorrecta = formulario.value.fecha + 'T12:00:00';
+    
     if (entrenamientoEditando.value) {
       // Actualizar
       await actualizarEntrenamiento(entrenamientoEditando.value.id, {
         nombre: formulario.value.nombre,
         equipo: formulario.value.equipo,
-        fecha: formulario.value.fecha,
+        tipo: formulario.value.tipo,
+        fecha: fechaCorrecta,
         hora: formulario.value.hora,
         lugar: formulario.value.lugar,
         descripcion: formulario.value.descripcion,
@@ -493,7 +695,8 @@ const guardarEntrenamiento = async () => {
       await crearEntrenamiento({
         nombre: formulario.value.nombre,
         equipo: formulario.value.equipo,
-        fecha: formulario.value.fecha,
+        tipo: formulario.value.tipo,
+        fecha: fechaCorrecta,
         hora: formulario.value.hora,
         lugar: formulario.value.lugar,
         descripcion: formulario.value.descripcion,
@@ -540,6 +743,25 @@ const confirmarEliminar = async (entrenamientoId) => {
   }
 };
 
+// Regenerar inscripciones pendientes para un entrenamiento
+const regenerarInscripciones = async (entrenamiento) => {
+  if (confirm(`¿Crear inscripciones pendientes para todas las jugadoras del equipo ${entrenamiento.equipo}?`)) {
+    try {
+      isLoading.value = true;
+      const success = await crearInscripcionesPendientes(entrenamiento.id, entrenamiento.equipo);
+      if (success) {
+        alert('Inscripciones pendientes creadas correctamente');
+      } else {
+        alert('No se pudieron crear las inscripciones. Verifica la consola.');
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+};
+
 const formatearFecha = (fecha) => {
   const date = new Date(fecha);
   return date.toLocaleDateString('es-ES', {
@@ -548,6 +770,15 @@ const formatearFecha = (fecha) => {
     month: 'short',
     day: 'numeric'
   });
+};
+
+// Verificar si la fecha del entrenamiento ya pasó
+const fechaPasada = (entrenamiento) => {
+  if (!entrenamiento.fecha) return false;
+  const fechaEntrenamiento = new Date(entrenamiento.fecha);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  return fechaEntrenamiento < hoy;
 };
 
 // Cargar entrenamientos al montar

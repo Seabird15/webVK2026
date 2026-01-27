@@ -22,7 +22,9 @@ export const inscribirseEntrenamiento = async (entrenamientoId, jugadoraId, juga
   isLoadingInscripciones.value = true;
   errorInscripciones.value = null;
   try {
-    // Verificar si ya está inscrita
+    console.log('inscribirseEntrenamiento llamado con:', { entrenamientoId, jugadoraId, jugadoraNombre });
+    
+    // Verificar si ya existe un registro
     const q = query(
       collection(db, 'inscripcionesEntrenamientos'),
       where('entrenamientoId', '==', entrenamientoId),
@@ -31,19 +33,28 @@ export const inscribirseEntrenamiento = async (entrenamientoId, jugadoraId, juga
     const snapshot = await getDocs(q);
 
     if (snapshot.size > 0) {
-      errorInscripciones.value = 'Ya estás inscrita en este entrenamiento';
-      return false;
+      // Si ya existe, actualizar estado a confirmada
+      const docId = snapshot.docs[0].id;
+      console.log('Actualizando inscripción existente:', docId, 'con nombre:', jugadoraNombre);
+      await updateDoc(doc(db, 'inscripcionesEntrenamientos', docId), {
+        estado: 'confirmada',
+        jugadoraNombre: jugadoraNombre,
+        updatedAt: new Date()
+      });
+      console.log('Inscripción actualizada correctamente');
+    } else {
+      // Si no existe, crear nueva inscripción confirmada
+      console.log('Creando nueva inscripción con nombre:', jugadoraNombre);
+      await addDoc(collection(db, 'inscripcionesEntrenamientos'), {
+        entrenamientoId: entrenamientoId,
+        jugadoraId: jugadoraId,
+        jugadoraNombre: jugadoraNombre,
+        estado: 'confirmada',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      console.log('Nueva inscripción creada');
     }
-
-    // Crear inscripción
-    await addDoc(collection(db, 'inscripcionesEntrenamientos'), {
-      entrenamientoId: entrenamientoId,
-      jugadoraId: jugadoraId,
-      jugadoraNombre: jugadoraNombre,
-      estado: 'confirmada',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
 
     return true;
   } catch (err) {
@@ -55,7 +66,7 @@ export const inscribirseEntrenamiento = async (entrenamientoId, jugadoraId, juga
   }
 };
 
-// Desuscribirse de entrenamiento
+// Desuscribirse de entrenamiento (cambiar estado a baja)
 export const desuscribirseEntrenamiento = async (entrenamientoId, jugadoraId) => {
   isLoadingInscripciones.value = true;
   errorInscripciones.value = null;
@@ -72,10 +83,12 @@ export const desuscribirseEntrenamiento = async (entrenamientoId, jugadoraId) =>
       return false;
     }
 
-    // Eliminar inscripción
-    for (const doc of snapshot.docs) {
-      await deleteDoc(doc.ref);
-    }
+    // Cambiar estado a baja en lugar de eliminar
+    const docId = snapshot.docs[0].id;
+    await updateDoc(doc(db, 'inscripcionesEntrenamientos', docId), {
+      estado: 'baja',
+      updatedAt: new Date()
+    });
 
     return true;
   } catch (err) {
@@ -207,6 +220,93 @@ export const cambiarEstadoInscripcion = async (inscripcionId, nuevoEstado) => {
     return true;
   } catch (err) {
     console.error('Error cambiando estado:', err);
+    errorInscripciones.value = err.message;
+    return false;
+  } finally {
+    isLoadingInscripciones.value = false;
+  }
+};
+
+// Crear inscripciones pendientes para todas las jugadoras del equipo
+export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
+  try {
+    // Importar la función para obtener jugadoras
+    const { fetchJugadorasRegistradasPorEquipo } = await import('./jugadorasAuth');
+    
+    // Obtener todas las jugadoras del equipo
+    const jugadoras = await fetchJugadorasRegistradasPorEquipo(equipo);
+    console.log(`Creando inscripciones para ${jugadoras.length} jugadoras del equipo ${equipo}`);
+    
+    if (jugadoras.length === 0) {
+      console.warn('No se encontraron jugadoras para el equipo:', equipo);
+      return false;
+    }
+    
+    // Crear inscripción pendiente para cada jugadora
+    const batch = [];
+    for (const jugadora of jugadoras) {
+      // Verificar si ya existe una inscripción
+      const q = query(
+        collection(db, 'inscripcionesEntrenamientos'),
+        where('entrenamientoId', '==', entrenamientoId),
+        where('jugadoraId', '==', jugadora.id)
+      );
+      const existing = await getDocs(q);
+      
+      if (existing.size === 0) {
+        // Solo crear si no existe
+        const inscripcion = addDoc(collection(db, 'inscripcionesEntrenamientos'), {
+          entrenamientoId: entrenamientoId,
+          jugadoraId: jugadora.id,
+          jugadoraNombre: `${jugadora.nombre} ${jugadora.apellido}`,
+          estado: 'pendiente',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+        batch.push(inscripcion);
+      }
+    }
+    
+    await Promise.all(batch);
+    console.log(`Creadas ${batch.length} inscripciones pendientes para entrenamiento ${entrenamientoId}`);
+    return true;
+  } catch (err) {
+    console.error('Error creando inscripciones pendientes:', err);
+    return false;
+  }
+};
+
+// Inscribir jugadora manualmente (admin)
+export const inscribirJugadoraManual = async (entrenamientoId, jugadoraId, jugadoraNombre, estado = 'confirmada') => {
+  isLoadingInscripciones.value = true;
+  errorInscripciones.value = null;
+  try {
+    // Verificar si ya está inscrita
+    const q = query(
+      collection(db, 'inscripcionesEntrenamientos'),
+      where('entrenamientoId', '==', entrenamientoId),
+      where('jugadoraId', '==', jugadoraId)
+    );
+    const snapshot = await getDocs(q);
+
+    if (snapshot.size > 0) {
+      errorInscripciones.value = 'La jugadora ya está inscrita en este entrenamiento';
+      return false;
+    }
+
+    // Crear inscripción
+    await addDoc(collection(db, 'inscripcionesEntrenamientos'), {
+      entrenamientoId: entrenamientoId,
+      jugadoraId: jugadoraId,
+      jugadoraNombre: jugadoraNombre,
+      estado: estado,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    return true;
+  } catch (err) {
+    console.error('Error inscribiendo jugadora:', err);
     errorInscripciones.value = err.message;
     return false;
   } finally {

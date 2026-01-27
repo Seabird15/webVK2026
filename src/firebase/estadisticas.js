@@ -4,7 +4,9 @@ import {
   query, 
   where, 
   updateDoc, 
-  doc 
+  doc,
+  addDoc,
+  deleteDoc 
 } from 'firebase/firestore';
 import { db } from './config';
 import { ref } from 'vue';
@@ -13,22 +15,20 @@ export const estadisticas = ref([]);
 export const isLoading = ref(false);
 export const error = ref(null);
 
-// Obtener estadísticas de jugadoras por equipo
+// Obtener estadísticas por equipo
 export const obtenerEstadisticasPorEquipo = async (equipo) => {
   isLoading.value = true;
   error.value = null;
   try {
     const q = query(
-      collection(db, 'jugadoras'),
+      collection(db, 'estadisticas'),
       where('equipo', '==', equipo)
     );
     const snapshot = await getDocs(q);
     
     estadisticas.value = snapshot.docs.map(doc => ({
       id: doc.id,
-      ...doc.data(),
-      goles: doc.data().goles || 0,
-      asistencias: doc.data().asistencias || 0
+      ...doc.data()
     }));
     
     return estadisticas.value;
@@ -41,34 +41,46 @@ export const obtenerEstadisticasPorEquipo = async (equipo) => {
   }
 };
 
-// Actualizar goles de una jugadora
-export const actualizarGoles = async (jugadoraId, goles) => {
+// Agregar nueva jugadora a estadísticas
+export const agregarEstadistica = async (data) => {
   try {
-    const docRef = doc(db, 'jugadoras', jugadoraId);
-    await updateDoc(docRef, {
-      goles: parseInt(goles) || 0,
+    const docRef = await addDoc(collection(db, 'estadisticas'), {
+      ...data,
+      createdAt: new Date(),
       updatedAt: new Date()
     });
-    return true;
+    return docRef.id;
   } catch (err) {
     error.value = err.message;
-    console.error('Error actualizando goles:', err);
+    console.error('Error agregando estadística:', err);
     throw err;
   }
 };
 
-// Actualizar asistencias de una jugadora
-export const actualizarAsistencias = async (jugadoraId, asistencias) => {
+// Actualizar estadística existente
+export const actualizarEstadistica = async (id, data) => {
   try {
-    const docRef = doc(db, 'jugadoras', jugadoraId);
+    const docRef = doc(db, 'estadisticas', id);
     await updateDoc(docRef, {
-      asistencias: parseInt(asistencias) || 0,
+      ...data,
       updatedAt: new Date()
     });
     return true;
   } catch (err) {
     error.value = err.message;
-    console.error('Error actualizando asistencias:', err);
+    console.error('Error actualizando estadística:', err);
+    throw err;
+  }
+};
+
+// Eliminar estadística
+export const eliminarEstadistica = async (id) => {
+  try {
+    await deleteDoc(doc(db, 'estadisticas', id));
+    return true;
+  } catch (err) {
+    error.value = err.message;
+    console.error('Error eliminando estadística:', err);
     throw err;
   }
 };

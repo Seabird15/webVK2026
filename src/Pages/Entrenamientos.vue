@@ -72,6 +72,17 @@
             >
               Escuela
             </button>
+                   <button
+              @click="cambiarEquipo('ambos')"
+              :class="[
+                'px-6 py-2 rounded-lg font-bold transition-colors',
+                equipoSeleccionado === 'ambos'
+                  ? 'bg-primary text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ]"
+            >
+             Eventos
+            </button>
           </div>
         </div>
       </div>
@@ -83,7 +94,7 @@
 
       <!-- Sin entrenamientos -->
       <div v-else-if="entrenamientosFiltered.length === 0" class="bg-white rounded-lg shadow p-12 text-center">
-        <p class="text-gray-500 text-lg">No hay entrenamientos disponibles en este momento</p>
+        <p class="text-gray-500 text-lg">No hay eventos disponibles en este momento</p>
       </div>
 
       <!-- Lista de entrenamientos -->
@@ -97,8 +108,7 @@
           <div class="p-6">
             <div class="flex justify-between items-start mb-4">
               <div>
-                <h3 class="text-xl font-bold text-gray-900 mb-1">{{ entrenamiento.titulo }}</h3>
-                <p class="text-sm text-gray-500">{{ entrenamiento.equipo }}</p>
+                <h3 class="text-xl font-bold text-gray-900 mb-1">{{ entrenamiento.nombre }}</h3>
               </div>
               <span
                 :class="[
@@ -112,7 +122,12 @@
                     : 'bg-gray-100 text-gray-800'
                 ]"
               >
-                {{ estadoInscripcion[entrenamiento.id] || 'Sin inscribirse' }}
+                {{ 
+                  estadoInscripcion[entrenamiento.id] === 'confirmada' ? 'Confirmada' :
+                  estadoInscripcion[entrenamiento.id] === 'baja' ? 'Baja' :
+                  estadoInscripcion[entrenamiento.id] === 'pendiente' ? 'Pendiente' :
+                  'Sin inscribirse'
+                }}
               </span>
             </div>
 
@@ -146,18 +161,30 @@
               <button
                 v-if="!estaInscrita(entrenamiento.id)"
                 @click="handleInscribirse(entrenamiento)"
-                :disabled="isLoadingAccion"
-                class="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg font-bold hover:bg-green-600 transition-colors disabled:opacity-50"
+                :disabled="isLoadingAccion || fechaPasada(entrenamiento)"
+                :class="[
+                  'flex-1 px-4 py-2 rounded-lg font-bold transition-colors',
+                  fechaPasada(entrenamiento)
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-green-500 text-white hover:bg-green-600 disabled:opacity-50'
+                ]"
+                :title="fechaPasada(entrenamiento) ? 'El entrenamiento ya pasó' : ''"
               >
-                Inscribirse
+                {{ fechaPasada(entrenamiento) ? 'Fecha pasada' : 'Confirmar Asistencia' }}
               </button>
               <button
                 v-else
                 @click="handleDesuscribirse(entrenamiento)"
-                :disabled="isLoadingAccion"
-                class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors disabled:opacity-50"
+                :disabled="isLoadingAccion || fechaPasada(entrenamiento)"
+                :class="[
+                  'flex-1 px-4 py-2 rounded-lg font-bold transition-colors',
+                  fechaPasada(entrenamiento)
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-red-500 text-white hover:bg-red-600 disabled:opacity-50'
+                ]"
+                :title="fechaPasada(entrenamiento) ? 'El entrenamiento ya pasó' : ''"
               >
-                Darse de baja
+                {{ fechaPasada(entrenamiento) ? 'Fecha pasada' : 'Dar de Baja' }}
               </button>
               <button
                 @click="verDetalles(entrenamiento)"
@@ -210,14 +237,14 @@
           </div>
 
           <div>
-            <h3 class="font-bold text-gray-700 mb-2">Inscritas ({{ contarInscritas(entrenamientoSeleccionado.id) }})</h3>
+            <h3 class="font-bold text-gray-700 mb-4">Estado de Asistencia</h3>
             <div class="space-y-4">
               <!-- Confirmadas -->
-              <div v-if="inscritasOrganizadas.confirmadas.length > 0">
+              <div>
                 <h4 class="font-semibold text-green-700 text-sm mb-2 flex items-center gap-2">
                   <span class="text-lg">✓</span> Confirmadas ({{ inscritasOrganizadas.confirmadas.length }})
                 </h4>
-                <div class="bg-green-50 rounded-lg p-3 max-h-40 overflow-y-auto">
+                <div v-if="inscritasOrganizadas.confirmadas.length > 0" class="bg-green-50 rounded-lg p-3 max-h-40 overflow-y-auto">
                   <transition-group name="fade" tag="ul" class="space-y-2">
                     <li
                       v-for="inscrita in inscritasOrganizadas.confirmadas"
@@ -229,14 +256,17 @@
                     </li>
                   </transition-group>
                 </div>
+                <div v-else class="text-gray-400 text-sm italic py-2">
+                  No hay jugadoras confirmadas
+                </div>
               </div>
 
               <!-- Bajas -->
-              <div v-if="inscritasOrganizadas.bajas.length > 0">
+              <div>
                 <h4 class="font-semibold text-red-700 text-sm mb-2 flex items-center gap-2">
-                  <span class="text-lg">✕</span> Baja ({{ inscritasOrganizadas.bajas.length }})
+                  <span class="text-lg">✕</span> Bajas ({{ inscritasOrganizadas.bajas.length }})
                 </h4>
-                <div class="bg-red-50 rounded-lg p-3 max-h-40 overflow-y-auto">
+                <div v-if="inscritasOrganizadas.bajas.length > 0" class="bg-red-50 rounded-lg p-3 max-h-40 overflow-y-auto">
                   <transition-group name="fade" tag="ul" class="space-y-2">
                     <li
                       v-for="inscrita in inscritasOrganizadas.bajas"
@@ -248,14 +278,17 @@
                     </li>
                   </transition-group>
                 </div>
+                <div v-else class="text-gray-400 text-sm italic py-2">
+                  No hay jugadoras dadas de baja
+                </div>
               </div>
 
               <!-- Pendientes -->
-              <div v-if="inscritasOrganizadas.pendientes.length > 0">
+              <div>
                 <h4 class="font-semibold text-yellow-700 text-sm mb-2 flex items-center gap-2">
-                  <span class="text-lg">?</span> Sin respuesta ({{ inscritasOrganizadas.pendientes.length }})
+                  <span class="text-lg">?</span> Pendientes ({{ inscritasOrganizadas.pendientes.length }})
                 </h4>
-                <div class="bg-yellow-50 rounded-lg p-3 max-h-40 overflow-y-auto">
+                <div v-if="inscritasOrganizadas.pendientes.length > 0" class="bg-yellow-50 rounded-lg p-3 max-h-40 overflow-y-auto">
                   <transition-group name="fade" tag="ul" class="space-y-2">
                     <li
                       v-for="inscrita in inscritasOrganizadas.pendientes"
@@ -267,39 +300,56 @@
                     </li>
                   </transition-group>
                 </div>
-              </div>
-
-              <!-- Si no hay inscritas -->
-              <div v-if="inscritasOrganizadas.confirmadas.length === 0 && inscritasOrganizadas.bajas.length === 0 && inscritasOrganizadas.pendientes.length === 0" class="text-gray-500 text-sm text-center py-4">
-                No hay inscritas aún
+                <div v-else class="text-gray-400 text-sm italic py-2">
+                  Todas han respondido
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="sticky bottom-0 bg-gray-50 p-6 border-t border-gray-200 flex gap-2">
-          <button
-            @click="entrenamientoSeleccionado = null"
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-100 transition-colors"
-          >
-            Cerrar
-          </button>
-          <button
-            v-if="!estaInscrita(entrenamientoSeleccionado.id)"
-            @click="handleInscribirse(entrenamientoSeleccionado)"
-            :disabled="isLoadingAccion"
-            class="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg font-bold hover:bg-green-600 transition-colors disabled:opacity-50"
-          >
-            Inscribirse
-          </button>
-          <button
-            v-else
-            @click="handleDesuscribirse(entrenamientoSeleccionado)"
-            :disabled="isLoadingAccion"
-            class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors disabled:opacity-50"
-          >
-            Darse de baja
-          </button>
+        <div class="sticky bottom-0 bg-gray-50 p-6 border-t border-gray-200">
+          <!-- Mensaje si la fecha pasó -->
+          <div v-if="fechaPasada(entrenamientoSeleccionado)" class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p class="text-sm text-yellow-800 font-semibold">
+              ⚠️ El entrenamiento ya pasó. No se pueden hacer cambios en la inscripción.
+            </p>
+          </div>
+          
+          <div class="flex gap-2">
+            <button
+              @click="entrenamientoSeleccionado = null"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+            >
+              Cerrar
+            </button>
+            <button
+              v-if="!estaInscrita(entrenamientoSeleccionado.id)"
+              @click="handleInscribirse(entrenamientoSeleccionado)"
+              :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado)"
+              :class="[
+                'flex-1 px-4 py-2 rounded-lg font-bold transition-colors',
+                fechaPasada(entrenamientoSeleccionado)
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-green-500 text-white hover:bg-green-600 disabled:opacity-50'
+              ]"
+            >
+              {{ fechaPasada(entrenamientoSeleccionado) ? 'Fecha pasada' : 'Confirmar Asistencia' }}
+            </button>
+            <button
+              v-else
+              @click="handleDesuscribirse(entrenamientoSeleccionado)"
+              :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado)"
+              :class="[
+                'flex-1 px-4 py-2 rounded-lg font-bold transition-colors',
+                fechaPasada(entrenamientoSeleccionado)
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-red-500 text-white hover:bg-red-600 disabled:opacity-50'
+              ]"
+            >
+              {{ fechaPasada(entrenamientoSeleccionado) ? 'Fecha pasada' : 'Dar de Baja' }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -357,6 +407,15 @@ const entrenamientosFiltered = computed(() => {
 
 const isLoading = computed(() => isLoadingEntrenamientos.value);
 
+// Verificar si la fecha del entrenamiento ya pasó
+const fechaPasada = (entrenamiento) => {
+  if (!entrenamiento.fecha) return false;
+  const fechaEntrenamiento = new Date(entrenamiento.fecha.seconds ? entrenamiento.fecha.seconds * 1000 : entrenamiento.fecha);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  return fechaEntrenamiento < hoy;
+};
+
 const cambiarEquipo = (equipo) => {
   equipoSeleccionado.value = equipo;
   localStorage.setItem('categoriaSeleccionada', equipo);
@@ -383,7 +442,9 @@ const contarInscritas = (entrenamientoId) => {
 };
 
 const estaInscrita = (entrenamientoId) => {
-  return estadoInscripcion.value[entrenamientoId] !== null && estadoInscripcion.value[entrenamientoId] !== undefined;
+  const estado = estadoInscripcion.value[entrenamientoId];
+  // Considera inscrita si está confirmada (no pendiente ni baja)
+  return estado === 'confirmada';
 };
 
 const verDetalles = async (entrenamiento) => {
@@ -416,15 +477,25 @@ const verDetalles = async (entrenamiento) => {
 const handleInscribirse = async (entrenamiento) => {
   if (!jugadoraData.value) return;
   
+  // Validar que tengamos los datos necesarios
+  const nombreCompleto = `${jugadoraData.value.nombre || ''} ${jugadoraData.value.apellido || ''}`.trim();
+  if (!nombreCompleto) {
+    console.error('Datos de jugadora incompletos:', jugadoraData.value);
+    mostrarToast('Error: datos de perfil incompletos', 'error');
+    return;
+  }
+  
+  console.log('Inscribiendo con nombre:', nombreCompleto);
+  
   isLoadingAccion.value = true;
   const success = await inscribirseEntrenamiento(
     entrenamiento.id,
     jugadoraAuthUser.value.uid,
-    `${jugadoraData.value.nombre} ${jugadoraData.value.apellido}`
+    nombreCompleto
   );
 
   if (success) {
-    mostrarToast('¡Inscrita correctamente!', 'success');
+    mostrarToast('¡Asistencia confirmada!', 'success');
     await actualizarEstados();
   } else {
     mostrarToast(errorInscripciones.value || 'Error al inscribirse', 'error');

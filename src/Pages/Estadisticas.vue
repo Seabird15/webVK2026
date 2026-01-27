@@ -209,7 +209,7 @@ const cargarJugadoras = async () => {
   isLoading.value = true;
   try {
     const q = query(
-      collection(db, 'jugadoras'),
+      collection(db, 'estadisticas'),
       where('equipo', '==', equipoActivo.value)
     );
     const snapshot = await getDocs(q);
@@ -218,7 +218,7 @@ const cargarJugadoras = async () => {
       ...doc.data()
     }));
   } catch (err) {
-    console.error('Error cargando jugadoras:', err);
+    console.error('Error cargando estadísticas:', err);
     jugadoras.value = [];
   } finally {
     isLoading.value = false;

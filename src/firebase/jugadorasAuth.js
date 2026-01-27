@@ -7,7 +7,7 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { auth, db, storage } from './config';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export const jugadoraAuthUser = ref(null);
@@ -80,6 +80,103 @@ export const fetchJugadoraData = async (uid, coleccion = 'jugadoraRegistro') => 
     console.error('Error obteniendo datos de jugadora:', err);
     jugadoraData.value = null;
     return null;
+  }
+};
+
+// Obtener todas las jugadoras registradas por equipo
+export const fetchJugadorasRegistradasPorEquipo = async (equipo) => {
+  try {
+    let q;
+    if (equipo === 'ambos') {
+      // Si el equipo es "ambos", traer todas las jugadoras
+      q = collection(db, 'jugadoraRegistro');
+    } else {
+      // Filtrar por equipo específico O jugadoras que juegan en ambos equipos
+      q = query(
+        collection(db, 'jugadoraRegistro'),
+        where('equipo', 'in', [equipo, 'ambos'])
+      );
+    }
+    
+    const snapshot = await getDocs(q);
+    const jugadoras = snapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    }));
+    
+    console.log(`Jugadoras registradas del equipo ${equipo}:`, jugadoras.length, jugadoras);
+    return jugadoras;
+  } catch (err) {
+    console.error('Error obteniendo jugadoras registradas:', err);
+    return [];
+  }
+};
+
+// Obtener jugadoras por equipo y posición desde jugadoraRegistro
+export const obtenerJugadorasPorPosicionRegistro = async (equipo, posicion) => {
+  try {
+    let q;
+    if (equipo === 'ambos') {
+      // Solo filtrar por posición
+      q = query(
+        collection(db, 'jugadoraRegistro'),
+        where('posicion', '==', posicion)
+      );
+    } else {
+      // Filtrar por equipo (específico o ambos) y posición
+      q = query(
+        collection(db, 'jugadoraRegistro'),
+        where('equipo', 'in', [equipo, 'ambos']),
+        where('posicion', '==', posicion)
+      );
+    }
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      foto: doc.data().fotoPerfil || null, // Mapear fotoPerfil a foto
+      numero: doc.data().dorsal || null // Mapear dorsal a numero
+    }));
+  } catch (err) {
+    console.error(`Error obteniendo ${posicion}:`, err);
+    return [];
+  }
+};
+
+// Obtener toda la estructura de un equipo desde jugadoraRegistro
+export const obtenerEquipoCompletoRegistro = async (equipo) => {
+  try {
+    const [dt, pa, porteras, defensas, alas, medio, delanteras] = await Promise.all([
+      obtenerJugadorasPorPosicionRegistro(equipo, 'Directora Técnica'),
+      obtenerJugadorasPorPosicionRegistro(equipo, 'Preparador Porteras'),
+      obtenerJugadorasPorPosicionRegistro(equipo, 'Portera'),
+      obtenerJugadorasPorPosicionRegistro(equipo, 'Defensa'),
+      obtenerJugadorasPorPosicionRegistro(equipo, 'Ala'),
+      obtenerJugadorasPorPosicionRegistro(equipo, 'Medio'),
+      obtenerJugadorasPorPosicionRegistro(equipo, 'Delantera')
+    ]);
+
+    return {
+      directoraTecnica: dt[0] || null,
+      preparadorPorteras: pa[0] || null,
+      porteras: porteras,
+      defensas: defensas,
+      alas: alas,
+      medio: medio,
+      delanteras: delanteras
+    };
+  } catch (err) {
+    console.error('Error obteniendo equipo completo:', err);
+    return {
+      directoraTecnica: null,
+      preparadorPorteras: null,
+      porteras: [],
+      defensas: [],
+      alas: [],
+      medio: [],
+      delanteras: []
+    };
   }
 };
 

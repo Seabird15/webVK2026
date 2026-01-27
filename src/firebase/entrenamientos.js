@@ -27,8 +27,19 @@ export const crearEntrenamiento = async (entrenamientoData) => {
       updatedAt: new Date()
     });
 
+    const entrenamientoId = docRef.id;
+
+    // Crear inscripciones pendientes para todas las jugadoras del equipo
+    try {
+      const { crearInscripcionesPendientes } = await import('./inscripciones');
+      await crearInscripcionesPendientes(entrenamientoId, entrenamientoData.equipo);
+    } catch (err) {
+      console.error('Error creando inscripciones pendientes:', err);
+      // No lanzar error, el entrenamiento ya fue creado exitosamente
+    }
+
     return {
-      id: docRef.id,
+      id: entrenamientoId,
       ...entrenamientoData
     };
   } catch (err) {

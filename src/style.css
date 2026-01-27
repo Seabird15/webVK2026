@@ -26,9 +26,12 @@
 }
 
 @theme {
-  --color-primary: #00ECB1;
-  --color-primary-dark: #05AB90;
-  --color-primary-light: #33f5c7;
+  --color-primary: #00A896;
+  --color-primary-dark: #028A7A;
+  --color-primary-light: #00BFA8;
+  --color-secondary: #FFD700;
+  --color-secondary-dark: #E6C200;
+  --color-secondary-light: #FFEB33;
 }
 
 * {
