@@ -3,8 +3,8 @@ import Home from '../Pages/Home.vue';
 import Equipo from '../Pages/Equipo.vue';
 import Login from '../Pages/Login.vue';
 import Admin from '../Pages/Admin.vue';
-import { authUser, userRole } from '../firebase/auth';
-import { jugadoraAuthUser, authReady } from '../firebase/jugadorasAuth';
+import { authUser, userRole, authReady } from '../firebase/auth';
+import { jugadoraAuthUser, authReady as jugadoraAuthReady } from '../firebase/jugadorasAuth';
 
 const routes = [
   {
@@ -123,6 +123,18 @@ router.beforeEach(async (to, from, next) => {
   const requiresJugadora = to.matched.some(record => record.meta.requiresJugadora);
   
   if (requiresAuth) {
+    // Esperar a que Firebase Auth esté listo
+    let intentos = 0;
+    while (!authReady.value && intentos < 50) {
+      console.log('Esperando a que Admin Auth esté listo... intento', intentos + 1);
+      await new Promise(resolve => setTimeout(resolve, 100));
+      intentos++;
+    }
+    
+    if (!authReady.value) {
+      console.warn('Timeout esperando Admin Auth');
+    }
+    
     // Verificar si está autenticado y tiene rol admin o coach
     if (authUser.value && (userRole.value === 'admin' || userRole.value === 'coach')) {
       next();
@@ -132,13 +144,13 @@ router.beforeEach(async (to, from, next) => {
   } else if (requiresJugadora) {
     // Esperar a que Firebase Auth esté listo
     let intentos = 0;
-    while (!authReady.value && intentos < 50) {
+    while (!jugadoraAuthReady.value && intentos < 50) {
       console.log('Esperando a que Auth esté listo... intento', intentos + 1);
       await new Promise(resolve => setTimeout(resolve, 100));
       intentos++;
     }
     
-    if (!authReady.value) {
+    if (!jugadoraAuthReady.value) {
       console.warn('Timeout esperando Auth, permitiendo acceso pero puede haber problemas');
     }
     

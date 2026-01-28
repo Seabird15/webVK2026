@@ -11,6 +11,7 @@ export const authUser = ref(null);
 export const userRole = ref(null);
 export const isLoading = ref(false);
 export const error = ref(null);
+export const authReady = ref(false);
 
 // Obtener rol del usuario desde Firestore
 const fetchUserRole = async (uid) => {
@@ -39,6 +40,7 @@ onAuthStateChanged(auth, async (user) => {
   } else {
     userRole.value = null;
   }
+  authReady.value = true; // Marcar que Auth está listo
 });
 
 // Login
