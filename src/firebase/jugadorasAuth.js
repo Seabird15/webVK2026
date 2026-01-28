@@ -151,10 +151,10 @@ export const obtenerEquipoCompletoRegistro = async (equipo) => {
       obtenerJugadorasPorPosicionRegistro(equipo, 'Directora Técnica'),
       obtenerJugadorasPorPosicionRegistro(equipo, 'Preparador Porteras'),
       obtenerJugadorasPorPosicionRegistro(equipo, 'Portera'),
-      obtenerJugadorasPorPosicionRegistro(equipo, 'Defensa'),
+      obtenerJugadorasPorPosicionRegistro(equipo, 'Cierre'),
       obtenerJugadorasPorPosicionRegistro(equipo, 'Ala'),
       obtenerJugadorasPorPosicionRegistro(equipo, 'Medio'),
-      obtenerJugadorasPorPosicionRegistro(equipo, 'Delantera')
+      obtenerJugadorasPorPosicionRegistro(equipo, 'Pívot')
     ]);
 
     return {

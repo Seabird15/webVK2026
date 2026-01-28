@@ -112,7 +112,7 @@
                 <option value="">Selecciona posición</option>
                 <option value="Profe">Profe</option>
                 <option value="Portera">Portera</option>
-                <option value="Defensa">Defensa</option>
+                <option value="Cierre">Cierre</option>
                 <option value="Medio">Medio</option>
                 <option value="Pívot">Pívot</option>
                 <option value="Ala">Ala</option>

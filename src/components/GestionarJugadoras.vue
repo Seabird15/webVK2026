@@ -71,10 +71,10 @@
             <option value="Directora Técnica">Directora Técnica</option>
             <option value="Preparador Porteras">Preparador Porteras</option>
             <option value="Portera">Portera</option>
-            <option value="Defensa">Defensa</option>
+            <option value="Cierre">Cierre</option>
             <option value="Ala">Ala</option>
             <option value="Medio">Medio</option>
-            <option value="Delantera">Delantera</option>
+            <option value="Pívot">Pívot</option>
           </select>
         </div>
 
