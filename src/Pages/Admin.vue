@@ -66,6 +66,11 @@
           <GestionarEntrenamientos />
         </div>
 
+        <!-- Vista Jugadoras -->
+        <div v-if="activeTab === 'vista-jugadoras'">
+          <VistaJugadorasAdmin />
+        </div>
+
         <!-- Galería -->
         <div v-if="activeTab === 'galeria'">
           <GestionarGalerias />
@@ -103,6 +108,7 @@ import GestionarEstadisticas from '../components/GestionarEstadisticas.vue';
 import GestionarSliderHome from '../components/GestionarSliderHome.vue';
 import GestionarSolicitudesRegistro from '../components/GestionarSolicitudesRegistro.vue';
 import GestionarEntrenamientos from '../components/GestionarEntrenamientos.vue';
+import VistaJugadorasAdmin from '../components/VistaJugadorasAdmin.vue';
 
 const router = useRouter();
 const activeTab = ref('solicitudes');
@@ -121,6 +127,7 @@ const tabs = [
   { id: 'equipo', label: 'Equipos' },
   { id: 'jugadoras', label: 'Jugadoras' },
   { id: 'entrenamientos', label: 'Entrenamientos' },
+  { id: 'vista-jugadoras', label: 'Vista Jugadoras' },
   { id: 'eventos-especiales', label: 'Próximo/Último Partido' },
   { id: 'galeria', label: 'Galería' },
   { id: 'estadisticas', label: 'Estadísticas' },

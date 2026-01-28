@@ -67,7 +67,7 @@ export const inscribirseEntrenamiento = async (entrenamientoId, jugadoraId, juga
 };
 
 // Desuscribirse de entrenamiento (cambiar estado a baja)
-export const desuscribirseEntrenamiento = async (entrenamientoId, jugadoraId) => {
+export const desuscribirseEntrenamiento = async (entrenamientoId, jugadoraId, motivoBaja = '') => {
   isLoadingInscripciones.value = true;
   errorInscripciones.value = null;
   try {
@@ -87,6 +87,8 @@ export const desuscribirseEntrenamiento = async (entrenamientoId, jugadoraId) =>
     const docId = snapshot.docs[0].id;
     await updateDoc(doc(db, 'inscripcionesEntrenamientos', docId), {
       estado: 'baja',
+      motivoBaja: motivoBaja,
+      fechaBaja: new Date(),
       updatedAt: new Date()
     });
 

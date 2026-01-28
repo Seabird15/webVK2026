@@ -86,6 +86,21 @@ export const fetchEntrenamientosPorEquipo = async (equipo) => {
   isLoadingEntrenamientos.value = true;
   errorEntrenamientos.value = null;
   try {
+    // Si el equipo es 'ambos', solo obtener los entrenamientos marcados como 'ambos'
+    if (equipo === 'ambos') {
+      const q = query(
+        collection(db, 'entrenamientos'),
+        where('equipo', '==', 'ambos')
+      );
+      const snapshot = await getDocs(q);
+      entrenamientos.value = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      return entrenamientos.value;
+    }
+    
+    // Para equipos específicos (ascenso/escuela), obtener los del equipo + los de ambos
     // Obtener entrenamientos específicos del equipo
     const q1 = query(
       collection(db, 'entrenamientos'),

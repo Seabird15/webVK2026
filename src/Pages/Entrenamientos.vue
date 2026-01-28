@@ -170,38 +170,36 @@
             <!-- Botones -->
             <div class="flex gap-2">
               <button
-                v-if="!estaInscrita(entrenamiento.id)"
                 @click="handleInscribirse(entrenamiento)"
                 :disabled="isLoadingAccion || fechaPasada(entrenamiento)"
                 :class="[
-                  'flex-1 px-4 py-2 rounded-lg font-bold transition-colors',
+                  'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm',
                   fechaPasada(entrenamiento)
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-green-500 text-white hover:bg-green-600 disabled:opacity-50'
                 ]"
-                :title="fechaPasada(entrenamiento) ? 'El entrenamiento ya pasó' : ''"
+                :title="fechaPasada(entrenamiento) ? 'El entrenamiento ya pasó' : 'Confirmar tu asistencia'"
               >
-                {{ fechaPasada(entrenamiento) ? 'Fecha pasada' : 'Confirmar Asistencia' }}
+                ✓ Confirmar
               </button>
               <button
-                v-else
-                @click="handleDesuscribirse(entrenamiento)"
+                @click="abrirModalBaja(entrenamiento)"
                 :disabled="isLoadingAccion || fechaPasada(entrenamiento)"
                 :class="[
-                  'flex-1 px-4 py-2 rounded-lg font-bold transition-colors',
+                  'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm',
                   fechaPasada(entrenamiento)
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-red-500 text-white hover:bg-red-600 disabled:opacity-50'
                 ]"
-                :title="fechaPasada(entrenamiento) ? 'El entrenamiento ya pasó' : ''"
+                :title="fechaPasada(entrenamiento) ? 'El entrenamiento ya pasó' : 'Dar de baja tu asistencia'"
               >
-                {{ fechaPasada(entrenamiento) ? 'Fecha pasada' : 'Dar de Baja' }}
+                ✕ Baja
               </button>
               <button
                 @click="verDetalles(entrenamiento)"
-                class="px-4 py-2 border border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors"
+                class="flex-1 px-3 py-2 border border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors text-sm"
               >
-                Detalles
+                📋 Detalles
               </button>
             </div>
           </div>
@@ -292,10 +290,15 @@
                     <li
                       v-for="inscrita in inscritasOrganizadas.bajas"
                       :key="inscrita.id"
-                      class="text-sm text-gray-700 py-1 px-2 rounded bg-red-100 flex items-center gap-2 transition-all"
+                      class="text-sm text-gray-700 py-1 px-2 rounded bg-red-100 transition-all"
                     >
-                      <span class="text-red-600 font-bold">✕</span>
-                      {{ inscrita.jugadoraNombre }}
+                      <div class="flex items-center gap-2">
+                        <span class="text-red-600 font-bold">✕</span>
+                        <span class="font-semibold">{{ inscrita.jugadoraNombre }}</span>
+                      </div>
+                      <div v-if="inscrita.motivoBaja" class="mt-1 ml-6 text-xs text-gray-600 italic">
+                        Motivo: {{ inscrita.motivoBaja }}
+                      </div>
                     </li>
                   </transition-group>
                 </div>
@@ -359,7 +362,7 @@
             </button>
             <button
               v-else
-              @click="handleDesuscribirse(entrenamientoSeleccionado)"
+              @click="abrirModalBaja(entrenamientoSeleccionado)"
               :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado)"
               :class="[
                 'flex-1 px-4 py-2 rounded-lg font-bold transition-colors',
@@ -371,6 +374,45 @@
               {{ fechaPasada(entrenamientoSeleccionado) ? 'Fecha pasada' : 'Dar de Baja' }}
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de motivo de baja -->
+    <div v-if="mostrarModalBaja" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg max-w-md w-full">
+        <div class="p-6 border-b border-gray-200">
+          <h2 class="text-2xl font-bold text-gray-900">Dar de Baja</h2>
+          <p class="text-sm text-gray-600 mt-1">Por favor indica el motivo de tu ausencia</p>
+        </div>
+
+        <div class="p-6">
+          <label class="block text-sm font-bold text-gray-700 mb-2">Motivo (opcional):</label>
+          <textarea
+            v-model="motivoBaja"
+            placeholder="Ej: Tengo un examen, Estoy enferma, Compromiso familiar..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+            rows="4"
+            maxlength="200"
+          ></textarea>
+          <p class="text-xs text-gray-500 mt-1">{{ motivoBaja.length }}/200 caracteres</p>
+        </div>
+
+        <div class="p-6 bg-gray-50 border-t border-gray-200 flex gap-3">
+          <button
+            @click="cerrarModalBaja"
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+            :disabled="isLoadingAccion"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="confirmarBaja"
+            class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors disabled:opacity-50"
+            :disabled="isLoadingAccion"
+          >
+            {{ isLoadingAccion ? 'Procesando...' : 'Confirmar Baja' }}
+          </button>
         </div>
       </div>
     </div>
@@ -416,6 +458,9 @@ const toastMensaje = ref(null);
 const toastTipo = ref('success');
 const isLoadingAccion = ref(false);
 const unsubscribers = ref([]);
+const mostrarModalBaja = ref(false);
+const motivoBaja = ref('');
+const entrenamientoParaBaja = ref(null);
 
 // Verificar autenticación
 if (!jugadoraAuthUser.value) {
@@ -524,16 +569,33 @@ const handleInscribirse = async (entrenamiento) => {
   isLoadingAccion.value = false;
 };
 
-const handleDesuscribirse = async (entrenamiento) => {
+const abrirModalBaja = (entrenamiento) => {
+  entrenamientoParaBaja.value = entrenamiento;
+  motivoBaja.value = '';
+  mostrarModalBaja.value = true;
+};
+
+const cerrarModalBaja = () => {
+  mostrarModalBaja.value = false;
+  entrenamientoParaBaja.value = null;
+  motivoBaja.value = '';
+};
+
+const confirmarBaja = async () => {
+  if (!entrenamientoParaBaja.value) return;
+  
   isLoadingAccion.value = true;
   const success = await desuscribirseEntrenamiento(
-    entrenamiento.id,
-    jugadoraAuthUser.value.uid
+    entrenamientoParaBaja.value.id,
+    jugadoraAuthUser.value.uid,
+    motivoBaja.value
   );
 
   if (success) {
     mostrarToast('Te diste de baja correctamente', 'success');
     await actualizarEstados();
+    cerrarModalBaja();
+    entrenamientoSeleccionado.value = null;
   } else {
     mostrarToast(errorInscripciones.value || 'Error al darse de baja', 'error');
   }

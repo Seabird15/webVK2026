@@ -14,7 +14,7 @@
           <div v-if="galeria.orden === 2 && galeria.fotos && galeria.fotos.length > 0" class="mb-16 p-7">
             <!-- Encabezado con barra de color -->
             <div class="flex items-center gap-4 mb-8">
-              <h2 class="text-3xl md:text-4xl font-bold text-black whitespace-nowrap">{{ galeria.titulo }}</h2>
+              <h2 class="text-3xl md:text-4xl font-bold text-black ">{{ galeria.titulo }}</h2>
               <div class="flex-1 h-3 bg-primary rounded-full"></div>
             </div>
 
@@ -24,7 +24,7 @@
                 <img 
                   :src="foto.url"
                   :alt="galeria.titulo"
-                  class="w-full h-64 md:h-80 object-cover group-hover:scale-105 transition-transform duration-300"
+                  class="w-full h-80 md:h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
             </div>
