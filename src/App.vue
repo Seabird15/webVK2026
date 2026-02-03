@@ -4,20 +4,36 @@
     import Footer from './components/Footer.vue';
 
     import { watch, onMounted } from 'vue';
-import { jugadoraData } from './firebase/jugadorasAuth'; // Asegúrate que la ruta sea correcta
+import { jugadoraData, authReady } from './firebase/jugadorasAuth'; // Importar authReady
 import { requestPermissionAndSubscribe } from './firebase/messaging'; // La función que creamos
 
 // Ejecutar al montar el componente si ya hay datos de jugadora
 onMounted(() => {
-  if (jugadoraData.value && jugadoraData.value.equipo) {
-    console.log(`App montada con datos de jugadora. Equipo: ${jugadoraData.value.equipo}. Suscribiendo...`);
-    requestPermissionAndSubscribe(jugadoraData.value.equipo);
-    
-    if (jugadoraData.value.equipo === 'ambos') {
-      requestPermissionAndSubscribe('ascenso');
-      requestPermissionAndSubscribe('escuela');
+  // Esperar a que la autenticación esté lista
+  const checkAndSubscribe = () => {
+    if (authReady.value && jugadoraData.value && jugadoraData.value.equipo) {
+      console.log(`App montada con datos de jugadora. Equipo: ${jugadoraData.value.equipo}. Suscribiendo...`);
+      requestPermissionAndSubscribe(jugadoraData.value.equipo);
+      
+      if (jugadoraData.value.equipo === 'ambos') {
+        requestPermissionAndSubscribe('ascenso');
+        requestPermissionAndSubscribe('escuela');
+      }
+    } else {
+      console.log('Esperando auth o datos de jugadora...', { authReady: authReady.value, hasData: !!jugadoraData.value });
     }
-  }
+  };
+  
+  // Intentar inmediatamente
+  checkAndSubscribe();
+  
+  // Y también observar cambios en authReady por si aún no está listo
+  watch(authReady, (ready) => {
+    if (ready) {
+      console.log('Auth ready - verificando suscripción');
+      checkAndSubscribe();
+    }
+  }, { immediate: true });
 });
 
 watch(jugadoraData, (newData, oldData) => {
