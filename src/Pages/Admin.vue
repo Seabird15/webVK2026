@@ -17,7 +17,7 @@
     </div>
 
     <!-- Contenido -->
-    <div class="max-w-6xl mx-auto p-6">
+    <div class="w-full mx-auto ">
       <!-- Tabs -->
       <div class="bg-white rounded-lg shadow mb-6">
         <div class="flex border-b border-gray-200 overflow-x-auto">

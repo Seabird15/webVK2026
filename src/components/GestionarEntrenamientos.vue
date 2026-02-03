@@ -1,41 +1,47 @@
 <template>
-  <div class="space-y-6">
-    <!-- Encabezado -->
-    <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4 mb-6">
-      <h2 class="text-xl sm:text-2xl font-bold text-gray-900">Gestionar Entrenamientos y Eventos</h2>
-      <button
-        @click="mostrarFormularioNuevo"
-        class="bg-primary-dark text-white px-4 sm:px-6 py-2.5 sm:py-2 rounded-lg font-bold hover:bg-primary transition-colors whitespace-nowrap"
-      >
-        + Crear nuevo
-      </button>
-    </div>
-
-    <!-- Filtros -->
-    <div class="bg-gray-50 p-4 rounded-lg">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div class="rounded-xl overflow-hidden bg-black">
+    <!-- Header estilo jugadoras -->
+    <div class="bg-linear-to-b from-primary-dark to-transparent text-white p-6">
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">Equipo</label>
-          <select
-            v-model="filtroEquipo"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="">Todos los equipos</option>
-            <option value="ascenso">Ascenso</option>
-            <option value="escuela">Escuela</option>
-          </select>
+          <h2 class="text-3xl font-bold">Entrenamientos</h2>
+          <p class="text-sm opacity-90 tracking-widest mt-1">Panel Admin</p>
         </div>
-        <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">Buscar</label>
-          <input
-            v-model="busqueda"
-            type="text"
-            placeholder="Buscar por nombre o lugar..."
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
+        <button
+          @click="mostrarFormularioNuevo"
+          class="bg-white text-primary-dark px-4 sm:px-6 py-2.5 sm:py-2 rounded-lg font-bold hover:bg-opacity-90 transition-colors whitespace-nowrap"
+        >
+          + Crear nuevo
+        </button>
       </div>
     </div>
+
+    <div class="p-6 space-y-6">
+      <!-- Filtros -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Equipo</label>
+            <select
+              v-model="filtroEquipo"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50"
+            >
+              <option value="">Todos los equipos</option>
+              <option value="ascenso">Ascenso</option>
+              <option value="escuela">Escuela</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Buscar</label>
+            <input
+              v-model="busqueda"
+              type="text"
+              placeholder="Buscar por nombre o lugar..."
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50"
+            />
+          </div>
+        </div>
+      </div>
 
     <!-- Modal Nuevo/Editar Entrenamiento -->
     <div v-if="mostrarFormulario" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
@@ -100,7 +106,7 @@
                 v-model="formulario.esConvocatoria"
                 type="checkbox"
                 @change="onConvocatoriaChange"
-                class="w-5 h-5 mt-0.5 sm:mt-0 text-primary-dark focus:ring-2 focus:ring-primary rounded flex-shrink-0"
+                class="w-5 h-5 mt-0.5 sm:mt-0 text-primary-dark focus:ring-2 focus:ring-primary rounded shrink-0"
               />
               <div class="flex-1">
                 <span class="text-sm font-bold text-gray-700 block">Crear convocatoria/nómina</span>
@@ -258,289 +264,410 @@
       </div>
     </div>
 
-    <!-- Lista de Entrenamientos -->
-    <div v-if="isLoadingEntrenamientos" class="text-center py-12">
-      <p class="text-gray-600 text-lg">Cargando entrenamientos...</p>
-    </div>
-    
-    <div v-else-if="entrenamientosFiltrados.length > 0" class="space-y-4">
-      <div
-        v-for="entrenamiento in entrenamientosFiltrados"
-        :key="entrenamiento.id"
-        class="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow"
-      >
-        <div class="flex flex-col sm:flex-row justify-between items-start gap-3 mb-4">
-          <div class="flex-1 min-w-0">
-            <h3 class="text-base sm:text-lg font-bold text-gray-900 break-words">{{ entrenamiento.nombre }}</h3>
-            <p class="text-xs sm:text-sm text-gray-600 mt-1">
-              {{ formatearFecha(entrenamiento.fecha) }} a las {{ entrenamiento.hora }}
-            </p>
-            <div class="flex flex-wrap gap-2 mt-2">
-              <!-- Indicador de convocatoria -->
-              <span v-if="entrenamiento.esConvocatoria" class="inline-block text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded font-semibold whitespace-nowrap">
-                📋 Convocatoria - {{ entrenamiento.jugadorasConvocadas?.length || 0 }} jugadoras
-              </span>
-              <!-- Indicador de fecha pasada -->
-              <span v-if="fechaPasada(entrenamiento)" class="inline-block text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded font-semibold whitespace-nowrap">
-                ⏰ Fecha pasada - Solo edición admin
+      <!-- Lista de Entrenamientos -->
+      <div v-if="isLoadingEntrenamientos" class="text-center py-12">
+        <p class="text-gray-200 text-lg">Cargando entrenamientos...</p>
+      </div>
+
+      <div v-else-if="entrenamientosFiltrados.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          v-for="entrenamiento in entrenamientosFiltrados"
+          :key="entrenamiento.id"
+          class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden"
+        >
+          <div class="p-6">
+            <div class="flex flex-col  justify-between items-start mb-4 gap-2">
+              <div class="min-w-0 ">
+                <h3 class="text-xl font-bold text-gray-900 mb-1 wrap-break-word">{{ entrenamiento.nombre }}</h3>
+                <div class="flex flex-wrap gap-2 mt-1">
+                  <span
+                    v-if="entrenamiento.tipo"
+                    :class="[
+                      'inline-block text-xs px-2 py-1 rounded font-semibold whitespace-nowrap',
+                      entrenamiento.tipo === 'partido' || entrenamiento.tipo === 'amistoso'
+                        ? 'bg-blue-100 text-blue-800'
+                        : entrenamiento.tipo === 'evento'
+                        ? 'bg-indigo-100 text-indigo-800'
+                        : 'bg-green-100 text-green-800'
+                    ]"
+                  >
+                    {{ entrenamiento.tipo }}
+                  </span>
+                  <span v-if="entrenamiento.esConvocatoria" class="inline-block text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded font-semibold whitespace-nowrap">
+                    📋 Convocatoria ({{ entrenamiento.jugadorasConvocadas?.length || 0 }})
+                  </span>
+                  <span v-if="fechaPasada(entrenamiento)" class="inline-block text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded font-semibold whitespace-nowrap">
+                    ⏰ Finalizado
+                  </span>
+                </div>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-bold capitalize whitespace-nowrap bg-primary text-white shrink-0">
+                {{ entrenamiento.equipo }}
               </span>
             </div>
-          </div>
-          <span class="bg-primary text-white px-3 py-1 rounded-full text-xs font-bold capitalize whitespace-nowrap self-start">
-            {{ entrenamiento.equipo }}
-          </span>
-        </div>
 
-        <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-4 text-xs sm:text-sm">
-          <div class="min-w-0">
-            <p class="text-gray-600 font-semibold">Lugar</p>
-            <p class="text-gray-900 truncate" :title="entrenamiento.lugar">{{ entrenamiento.lugar }}</p>
-          </div>
-          <div v-if="entrenamiento.capacidadMaxima" class="min-w-0">
-            <p class="text-gray-600 font-semibold">Capacidad</p>
-            <p class="text-gray-900">{{ entrenamiento.capacidadMaxima }} personas</p>
-          </div>
-          <div v-if="entrenamiento.descripcion" class="min-w-0">
-            <p class="text-gray-600 font-semibold">Descripción</p>
-            <p class="text-gray-900 truncate" :title="entrenamiento.descripcion">{{ entrenamiento.descripcion.substring(0, 30) }}...</p>
-          </div>
-          <div class="min-w-0">
-            <p class="text-gray-600 font-semibold">Inscritas</p>
-            <p class="text-gray-900">{{ contarInscriptasEntrenamiento(entrenamiento.id) }}</p>
-          </div>
-        </div>
+            <div class="space-y-2 mb-4 text-sm text-gray-600">
+              <div class="flex items-center gap-2">
+                <span class="font-bold w-24">📅 Fecha:</span>
+                <span>{{ formatearFecha(entrenamiento.fecha) }}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold w-24">🕐 Hora:</span>
+                <span>{{ entrenamiento.hora }}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold w-24">📍 Lugar:</span>
+                <span class="truncate" :title="entrenamiento.lugar">{{ entrenamiento.lugar }}</span>
+              </div>
+          
+            </div>
 
-        <!-- Resumen de estados -->
-        <div class="grid grid-cols-3 gap-2 mb-4 text-xs">
-          <div class="bg-green-50 p-2 rounded border border-green-200">
-            <p class="text-green-700 font-bold">✓ {{ contarPorEstado(entrenamiento.id, 'confirmada') }}</p>
-            <p class="text-green-600">Confirmadas</p>
-          </div>
-          <div class="bg-red-50 p-2 rounded border border-red-200">
-            <p class="text-red-700 font-bold">✕ {{ contarPorEstado(entrenamiento.id, 'baja') }}</p>
-            <p class="text-red-600">Bajas</p>
-          </div>
-          <div class="bg-yellow-50 p-2 rounded border border-yellow-200">
-            <p class="text-yellow-700 font-bold">? {{ contarPorEstado(entrenamiento.id, 'pendiente') }}</p>
-            <p class="text-yellow-600">Sin respuesta</p>
-          </div>
-        </div>
+            <p v-if="entrenamiento.descripcion" class="text-gray-600 text-sm mb-4 line-clamp-2">
+              {{ entrenamiento.descripcion }}
+            </p>
 
-        <div class="flex flex-col sm:flex-row gap-2">
-          <button
-            @click="verDetallesEntrenamiento(entrenamiento)"
-            class="flex-1 px-3 sm:px-4 py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-bold hover:bg-gray-100 transition-colors order-1"
-          >
-            Ver Detalles
-          </button>
-          <button
-            @click="regenerarInscripciones(entrenamiento)"
-            class="sm:px-3 px-4 py-2 bg-yellow-50 text-yellow-700 rounded-lg font-bold hover:bg-yellow-100 transition-colors text-xs sm:text-sm order-4 sm:order-2"
-            title="Crear inscripciones pendientes para jugadoras que faltan"
-          >
-            🔄 <span class="sm:hidden">Regenerar</span>
-          </button>
-          <button
-            @click="editarEntrenamiento(entrenamiento)"
-            class="flex-1 px-3 sm:px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-bold hover:bg-blue-100 transition-colors order-2 sm:order-3"
-          >
-            Editar
-          </button>
-          <button
-            @click="confirmarEliminar(entrenamiento.id)"
-            class="flex-1 px-3 sm:px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-bold hover:bg-red-100 transition-colors order-3 sm:order-4"
-          >
-            Eliminar
-          </button>
+            <!-- Resumen de estados -->
+            <div class="grid grid-cols-1 gap-2 mb-4 text-xs">
+              <div class="bg-green-50 p-2 rounded border border-green-200">
+                <p class="text-green-700 font-bold">✓ {{ contarPorEstado(entrenamiento.id, 'confirmada') }}</p>
+                <p class="text-green-600">Confirmadas</p>
+              </div>
+              <div class="bg-red-50 p-2 rounded border border-red-200">
+                <p class="text-red-700 font-bold">✕ {{ contarPorEstado(entrenamiento.id, 'baja') }}</p>
+                <p class="text-red-600">Bajas</p>
+              </div>
+              <div class="bg-yellow-50 p-2 rounded border border-yellow-200">
+                <p class="text-yellow-700 font-bold">? {{ contarPorEstado(entrenamiento.id, 'pendiente') }}</p>
+                <p class="text-yellow-600">Sin respuesta</p>
+              </div>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-2">
+              <button
+                @click="verDetallesEntrenamiento(entrenamiento)"
+                class="flex-1 px-3 py-2 border border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors text-sm"
+              >
+                Ver Detalles
+              </button>
+              <button
+                @click="editarEntrenamiento(entrenamiento)"
+                class="flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm bg-blue-500 text-white hover:bg-blue-600"
+              >
+                Editar
+              </button>
+              <button
+                @click="confirmarEliminar(entrenamiento.id)"
+                class="flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm bg-red-500 text-white hover:bg-red-600"
+              >
+                Eliminar
+              </button>
+            </div>
+
+            <button
+              @click="regenerarInscripciones(entrenamiento)"
+              class="w-full mt-2 px-3 py-2 rounded-lg font-bold transition-colors text-sm bg-yellow-500 text-white hover:bg-yellow-600"
+              title="Crear inscripciones pendientes para jugadoras que faltan"
+            >
+              🔄 Regenerar inscripciones
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Sin resultados -->
-    <div v-else class="text-center py-12">
-      <p class="text-gray-600 text-lg">No hay entrenamientos disponibles</p>
-      <button
-        @click="mostrarFormularioNuevo"
-        class="mt-4 text-primary-dark font-bold hover:text-primary"
-      >
-        Crear el primer entrenamiento
-      </button>
-    </div>
+      <!-- Sin resultados -->
+      <div v-else class="bg-white rounded-lg shadow p-12 text-center">
+        <p class="text-gray-500 text-lg">No hay entrenamientos disponibles</p>
+        <button
+          @click="mostrarFormularioNuevo"
+          class="mt-4 px-6 py-2 bg-primary-dark text-white rounded-lg font-bold hover:bg-primary transition-colors"
+        >
+          Crear el primer entrenamiento
+        </button>
+      </div>
 
     <!-- Modal de detalles de inscripciones -->
     <div v-if="entrenamientoDetallado" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
-      <div class="bg-white rounded-lg max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
-        <div class="sticky top-0 bg-white p-4 sm:p-6 border-b border-gray-200 flex justify-between items-start sm:items-center gap-3 z-10">
-          <div class="flex-1 min-w-0">
-            <h2 class="text-lg sm:text-2xl font-bold break-words">{{ entrenamientoDetallado.nombre }}</h2>
-            <p class="text-xs sm:text-sm text-gray-600 mt-1">
-              {{ formatearFecha(entrenamientoDetallado.fecha) }} a las {{ entrenamientoDetallado.hora }}
-            </p>
+      <div class="bg-white rounded-xl shadow-xl max-w-5xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+        <!-- Header del modal -->
+        <div class="sticky top-0 bg-linear-to-b from-primary-dark to-primary text-white p-4 sm:p-6 z-10">
+          <div class="flex justify-between items-start gap-4">
+            <div class="flex-1 min-w-0">
+              <h2 class="text-lg sm:text-2xl font-black uppercase tracking-wide wrap-break-word">{{ entrenamientoDetallado.nombre }}</h2>
+              <div class="text-xs sm:text-sm mt-1 opacity-90">
+                {{ formatearFecha(entrenamientoDetallado.fecha) }} • {{ entrenamientoDetallado.hora }}
+              </div>
+              <div class="flex flex-wrap gap-2 mt-3">
+                <span class="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-bold capitalize">{{ entrenamientoDetallado.equipo }}</span>
+                <span v-if="entrenamientoDetallado.tipo" class="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-bold capitalize">{{ entrenamientoDetallado.tipo }}</span>
+                <span v-if="entrenamientoDetallado.esConvocatoria" class="bg-purple-500/80 text-white px-3 py-1 rounded-full text-xs font-bold">📋 Convocatoria</span>
+              </div>
+            </div>
+            <button
+              @click="entrenamientoDetallado = null"
+              class="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors shrink-0"
+              aria-label="Cerrar"
+            >
+              ✕
+            </button>
           </div>
-          <button
-            @click="entrenamientoDetallado = null"
-            class="text-gray-500 hover:text-gray-700 text-2xl flex-shrink-0"
-          >
-            ✕
-          </button>
         </div>
 
-        <div class="p-4 sm:p-6 space-y-6">
-          <!-- Confirmadas -->
-          <div v-if="inscritasOrganizadasAdmin.confirmadas.length > 0">
-            <h3 class="font-bold text-green-700 text-base sm:text-lg mb-3 flex items-center gap-2">
-              <span class="text-xl sm:text-2xl">✓</span> Confirmadas ({{ inscritasOrganizadasAdmin.confirmadas.length }})
-            </h3>
-            <div class="space-y-2">
-              <transition-group name="fade" tag="div">
+        <!-- Contenido -->
+        <div class="p-2 sm:p-6 bg-gray-50">
+          <!-- Resumen -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <div class="bg-white rounded-lg border border-primary-dark p-4">
+              <div class="text-xs text-gray-500 font-bold uppercase">📍 Lugar</div>
+              <div class="text-sm font-semibold text-gray-900 mt-1">{{ entrenamientoDetallado.lugar || '-' }}</div>
+            </div>
+            <div class="bg-white rounded-lg border border-primary-dark p-4">
+              <div class="text-xs text-gray-500 font-bold uppercase">👥 Total inscritas</div>
+              <div class="text-sm font-semibold text-gray-900 mt-1">
+                {{ inscritasOrganizadasAdmin.confirmadas.length + inscritasOrganizadasAdmin.bajas.length + inscritasOrganizadasAdmin.pendientes.length }}
+                <span v-if="entrenamientoDetallado.capacidadMaxima" class="text-gray-400">/ {{ entrenamientoDetallado.capacidadMaxima }}</span>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border border-primary-dark p-4">
+              <div class="text-xs text-gray-500 font-bold uppercase">⚡ Acciones rápidas</div>
+              <button
+                @click="regenerarInscripciones(entrenamientoDetallado)"
+                class="mt-2 w-full px-3 py-2 rounded-lg font-bold transition-colors text-sm bg-yellow-500 text-white hover:bg-yellow-600"
+                title="Crear inscripciones pendientes para jugadoras que faltan"
+              >
+                🔄 Regenerar pendientes
+              </button>
+            </div>
+          </div>
+
+          <!-- Tabs -->
+          <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="flex bg-gray-100 border-b-2 border-gray-200 overflow-visible">
+              <button
+                @click="tabDetalleAdmin = 'confirmadas'"
+                :class="[
+                  'flex-1 py-3 px-4 text-xs font-bold uppercase tracking-wide transition-all relative min-h-11',
+                  tabDetalleAdmin === 'confirmadas'
+                    ? 'text-green-700 bg-white'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                ]"
+              >
+                <span class="flex flex-col items-center justify-center gap-2">
+                  <span class="bg-green-700 text-white rounded-full px-2 py-0.5 text-[10px]">{{ inscritasOrganizadasAdmin.confirmadas.length }}</span>
+
+                  ✓ Confirmadas
+                </span>
+                <div v-if="tabDetalleAdmin === 'confirmadas'" class="absolute bottom-0 left-0 right-0 h-1 bg-green-700"></div>
+              </button>
+              <button
+                @click="tabDetalleAdmin = 'bajas'"
+                :class="[
+                  'flex-1 py-3 px-4 text-xs font-bold uppercase tracking-wide transition-all relative min-h-11',
+                  tabDetalleAdmin === 'bajas'
+                    ? 'text-red-700 bg-white'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                ]"
+              >
+                <span class="flex flex-col items-center justify-center gap-2">
+                  ✕ Ausentes
+                  <span class="bg-red-700 text-white rounded-full px-2 py-0.5 text-[10px]">{{ inscritasOrganizadasAdmin.bajas.length }}</span>
+                </span>
+                <div v-if="tabDetalleAdmin === 'bajas'" class="absolute bottom-0 left-0 right-0 h-1 bg-red-700"></div>
+              </button>
+              <button
+                @click="tabDetalleAdmin = 'pendientes'"
+                :class="[
+                  'flex-1 py-3 px-4 text-xs font-bold uppercase tracking-wide transition-all relative min-h-11',
+                  tabDetalleAdmin === 'pendientes'
+                    ? 'text-yellow-700 bg-white'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                ]"
+              >
+                <span class="flex flex-col  items-center justify-center gap-2">
+                  ? Pendientes
+                  <span class="bg-yellow-700 text-white rounded-full px-2 py-0.5 text-[10px]">{{ inscritasOrganizadasAdmin.pendientes.length }}</span>
+                </span>
+                <div v-if="tabDetalleAdmin === 'pendientes'" class="absolute bottom-0 left-0 right-0 h-1 bg-yellow-500"></div>
+              </button>
+             
+            </div>
+
+            <!-- Contenido tabs -->
+            <div class=" min-h-60">
+              <!-- Empty global -->
+              <div
+                v-if="
+                  inscritasOrganizadasAdmin.confirmadas.length === 0 &&
+                  inscritasOrganizadasAdmin.bajas.length === 0 &&
+                  inscritasOrganizadasAdmin.pendientes.length === 0 &&
+                  tabDetalleAdmin !== 'agregar'
+                "
+                class="text-center py-12 text-gray-400"
+              >
+                <div class="text-4xl mb-3">👥</div>
+                <p class="text-sm font-medium">Aún no hay inscripciones</p>
+              </div>
+
+              <!-- Confirmadas -->
+              <div v-show="tabDetalleAdmin === 'confirmadas'" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div v-if="inscritasOrganizadasAdmin.confirmadas.length === 0" class="col-span-2 text-center py-12 text-gray-400">
+                  <div class="text-4xl mb-3">✓</div>
+                  <p class="text-sm font-medium">Aún no hay confirmaciones</p>
+                </div>
                 <div
                   v-for="inscrita in inscritasOrganizadasAdmin.confirmadas"
                   :key="inscrita.id"
-                  class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2 sm:p-3 bg-green-50 rounded-lg border border-green-200 transition-all"
+                  class="flex items-center gap-3 bg-white p-3 rounded-lg border-2 border-green-200 hover:border-green-400 hover:shadow-lg transition-all"
                 >
-                  <span class="text-sm sm:text-base text-gray-900 font-semibold break-words">{{ inscrita.jugadoraNombre }}</span>
-                  <div class="flex items-center gap-2 self-end sm:self-auto">
-                    <span class="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-bold whitespace-nowrap">Confirmada</span>
-                    <!-- Botones de admin -->
-                    <button
-                      @click="cambiarEstado(inscrita.id, 'baja')"
-                      class="text-xs px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors whitespace-nowrap"
-                      title="Marcar como baja"
-                    >
-                      Baja
-                    </button>
+                  <div class="w-12 h-12 bg-linear-to-br from-primary-dark to-primary-light rounded-full flex items-center justify-center text-white font-black shadow-md">
+                    {{ obtenerIniciales(inscrita.jugadoraNombre) }}
                   </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-bold text-gray-900 wrap-break-word">{{ inscrita.jugadoraNombre }}</div>
+                    <div v-if="inscrita.updatedAt || inscrita.createdAt" class="text-xs text-gray-400 mt-1">
+                      Anotada: {{ formatFechaHora(inscrita.updatedAt || inscrita.createdAt) }}
+                    </div>
+                  </div>
+                  <button
+                    @click="cambiarEstado(inscrita.id, 'baja')"
+                    class="px-3 py-2 text-xs bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors whitespace-nowrap"
+                    title="Marcar como ausente"
+                  >
+                    Ausente
+                  </button>
                 </div>
-              </transition-group>
-            </div>
-          </div>
+              </div>
 
-          <!-- Bajas -->
-          <div v-if="inscritasOrganizadasAdmin.bajas.length > 0">
-            <h3 class="font-bold text-red-700 text-base sm:text-lg mb-3 flex items-center gap-2">
-              <span class="text-xl sm:text-2xl">✕</span> Bajas ({{ inscritasOrganizadasAdmin.bajas.length }})
-            </h3>
-            <div class="space-y-2">
-              <transition-group name="fade" tag="div">
+              <!-- Bajas -->
+              <div v-show="tabDetalleAdmin === 'bajas'" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div v-if="inscritasOrganizadasAdmin.bajas.length === 0" class="col-span-2 text-center py-12 text-gray-400">
+                  <div class="text-4xl mb-3">✕</div>
+                  <p class="text-sm font-medium">No hay ausentes</p>
+                </div>
                 <div
                   v-for="inscrita in inscritasOrganizadasAdmin.bajas"
                   :key="inscrita.id"
-                  class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2 sm:p-3 bg-red-50 rounded-lg border border-red-200 transition-all"
+                  class="flex items-center gap-3 bg-white p-3 rounded-lg border-2 border-red-200 hover:border-red-400 hover:shadow-lg transition-all"
                 >
-                  <span class="text-sm sm:text-base text-gray-900 font-semibold break-words">{{ inscrita.jugadoraNombre }}</span>
-                  <div class="flex items-center gap-2 self-end sm:self-auto">
-                    <span class="text-xs bg-red-200 text-red-800 px-2 py-1 rounded font-bold whitespace-nowrap">Baja</span>
-                    <!-- Botones de admin -->
-                    <button
-                      @click="cambiarEstado(inscrita.id, 'confirmada')"
-                      class="text-xs px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors whitespace-nowrap"
-                      title="Marcar como confirmada"
-                    >
-                      Confirmar
-                    </button>
+                  <div class="w-12 h-12 bg-linear-to-br from-primary-dark to-primary-light rounded-full flex items-center justify-center text-white font-black shadow-md">
+                    {{ obtenerIniciales(inscrita.jugadoraNombre) }}
                   </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-bold text-gray-900 wrap-break-word">{{ inscrita.jugadoraNombre }}</div>
+                    <div v-if="inscrita.updatedAt || inscrita.createdAt" class="text-xs text-gray-400 mt-1">
+                      Anotada: {{ formatFechaHora(inscrita.updatedAt || inscrita.createdAt) }}
+                    </div>
+                  </div>
+                  <button
+                    @click="cambiarEstado(inscrita.id, 'confirmada')"
+                    class="px-3 py-2 text-xs bg-green-700 text-white rounded-lg font-bold hover:bg-green-800 transition-colors whitespace-nowrap"
+                    title="Marcar como presente"
+                  >
+                    Presente
+                  </button>
                 </div>
-              </transition-group>
-            </div>
-          </div>
+              </div>
 
-          <!-- Pendientes -->
-          <div v-if="inscritasOrganizadasAdmin.pendientes.length > 0">
-            <h3 class="font-bold text-yellow-700 text-base sm:text-lg mb-3 flex items-center gap-2">
-              <span class="text-xl sm:text-2xl">?</span> Sin respuesta ({{ inscritasOrganizadasAdmin.pendientes.length }})
-            </h3>
-            <div class="space-y-2">
-              <transition-group name="fade" tag="div">
+              <!-- Pendientes -->
+              <div v-show="tabDetalleAdmin === 'pendientes'" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div v-if="inscritasOrganizadasAdmin.pendientes.length === 0" class="col-span-2 text-center py-12 text-gray-400">
+                  <div class="text-4xl mb-3">?</div>
+                  <p class="text-sm font-medium">No hay pendientes</p>
+                </div>
                 <div
                   v-for="inscrita in inscritasOrganizadasAdmin.pendientes"
                   :key="inscrita.id"
-                  class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2 sm:p-3 bg-yellow-50 rounded-lg border border-yellow-200 transition-all"
+                  class="flex items-center gap-3 bg-white p-3 rounded-lg border-2 border-yellow-200 hover:border-yellow-400 hover:shadow-lg transition-all"
                 >
-                  <span class="text-sm sm:text-base text-gray-900 font-semibold break-words">{{ inscrita.jugadoraNombre }}</span>
-                  <div class="flex items-center gap-2 self-end sm:self-auto flex-wrap">
-                    <span class="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded font-bold whitespace-nowrap">Pendiente</span>
-                    <!-- Botones de admin -->
+                  <div class="w-12 h-12 bg-linear-to-br from-primary-dark to-primary-light rounded-full flex items-center justify-center text-white font-black shadow-md">
+                    {{ obtenerIniciales(inscrita.jugadoraNombre) }}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-bold text-gray-900 wrap-break-word">{{ inscrita.jugadoraNombre }}</div>
+                    <div v-if="inscrita.updatedAt || inscrita.createdAt" class="text-xs text-gray-400 mt-1">
+                      Anotada: {{ formatFechaHora(inscrita.updatedAt || inscrita.createdAt) }}
+                    </div>
+                  </div>
+                  <div class="flex gap-2">
                     <button
                       @click="cambiarEstado(inscrita.id, 'confirmada')"
-                      class="text-xs px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors whitespace-nowrap"
-                      title="Marcar como confirmada"
-                    >
-                      Confirmar
-                    </button>
-                    <button
-                      @click="cambiarEstado(inscrita.id, 'baja')"
-                      class="text-xs px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors whitespace-nowrap"
-                      title="Marcar como baja"
-                    >
-                      Baja
-                    </button>
-                  </div>
-                </div>
-              </transition-group>
-            </div>
-          </div>
-
-          <!-- Sin inscritas -->
-          <div v-if="inscritasOrganizadasAdmin.confirmadas.length === 0 && inscritasOrganizadasAdmin.bajas.length === 0 && inscritasOrganizadasAdmin.pendientes.length === 0" class="text-center py-8">
-            <p class="text-gray-500 text-lg">No hay inscritas en este entrenamiento aún</p>
-          </div>
-
-          <!-- Sección para agregar jugadora manualmente -->
-          <div class="mt-6 p-3 sm:p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-            <h3 class="font-bold text-blue-900 text-base sm:text-lg mb-3">➕ Agregar jugadora manualmente</h3>
-            <div class="space-y-3">
-              <div>
-                <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-2">Buscar jugadora:</label>
-                <input
-                  v-model="busquedaJugadora"
-                  type="text"
-                  placeholder="Nombre de la jugadora..."
-                  class="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                  @input="buscarJugadoras"
-                />
-              </div>
-              <div v-if="jugadorasDisponibles.length > 0" class="max-h-48 overflow-y-auto space-y-2">
-                <div
-                  v-for="jugadora in jugadorasDisponibles"
-                  :key="jugadora.id"
-                  class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2 sm:p-3 bg-white rounded-lg border border-gray-200 hover:border-primary transition-colors"
-                >
-                  <div class="min-w-0">
-                    <p class="text-sm font-semibold text-gray-900 break-words">{{ jugadora.nombre }} {{ jugadora.apellido }}</p>
-                    <p class="text-xs text-gray-500">{{ jugadora.posicion }} - #{{ jugadora.dorsal }}</p>
-                  </div>
-                  <div class="flex gap-2 self-end sm:self-auto">
-                    <button
-                      @click="agregarJugadoraManual(jugadora, 'confirmada')"
-                      class="text-xs px-2 sm:px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors whitespace-nowrap"
+                      class="px-3 py-2 text-xs bg-green-700 text-white rounded-lg font-bold hover:bg-green-800 transition-colors whitespace-nowrap"
+                      title="Marcar como presente"
                     >
                       Presente
                     </button>
                     <button
-                      @click="agregarJugadoraManual(jugadora, 'baja')"
-                      class="text-xs px-2 sm:px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors whitespace-nowrap"
+                      @click="cambiarEstado(inscrita.id, 'baja')"
+                      class="px-3 py-2 text-xs bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors whitespace-nowrap"
+                      title="Marcar como ausente"
                     >
                       Ausente
                     </button>
                   </div>
                 </div>
               </div>
-              <p v-else-if="busquedaJugadora.length > 0" class="text-sm text-gray-500 text-center py-2">
-                No se encontraron jugadoras
-              </p>
+
+              <!-- Agregar -->
+                 <div class="p-4 mt-7 bg-white rounded-lg border">
+                  <h3 class="font-black text-sm uppercase tracking-wide text-gray-900 mb-3">➕ Agregar jugadora manualmente</h3>
+                  <div class="space-y-3">
+                    <div>
+                      <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-2">Buscar jugadora:</label>
+                      <input
+                        v-model="busquedaJugadora"
+                        type="text"
+                        placeholder="Nombre de la jugadora..."
+                        class="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm bg-gray-50"
+                        @input="buscarJugadoras"
+                      />
+                      <p class="text-[11px] text-gray-500 mt-1">Escribe al menos 2 letras.</p>
+                    </div>
+                    <div v-if="jugadorasDisponibles.length > 0" class="max-h-60 overflow-y-auto space-y-2">
+                      <div
+                        v-for="jugadora in jugadorasDisponibles"
+                        :key="jugadora.id"
+                        class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-white rounded-lg border border-gray-200 hover:border-primary transition-colors"
+                      >
+                        <div class="min-w-0">
+                          <p class="text-sm font-semibold text-gray-900 wrap-break-word">{{ jugadora.nombre }} {{ jugadora.apellido }}</p>
+                          <p class="text-xs text-gray-500">{{ jugadora.posicion }} - #{{ jugadora.dorsal }}</p>
+                        </div>
+                        <div class="flex gap-2 self-end sm:self-auto">
+                          <button
+                            @click="agregarJugadoraManual(jugadora, 'confirmada')"
+                            class="text-xs px-3 py-2 bg-green-700 text-white rounded-lg font-bold hover:bg-green-800 transition-colors whitespace-nowrap"
+                          >
+                            Presente
+                          </button>
+                          <button
+                            @click="agregarJugadoraManual(jugadora, 'baja')"
+                            class="text-xs px-3 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors whitespace-nowrap"
+                          >
+                            Ausente
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <p v-else-if="busquedaJugadora.length > 0" class="text-sm text-gray-500 text-center py-6">
+                      No se encontraron jugadoras
+                    </p>
+                  </div>
+                </div>
+            
             </div>
+           
           </div>
         </div>
 
-        <div class="sticky bottom-0 bg-gray-50 p-6 border-t border-gray-200">
+        <div class="sticky bottom-0 bg-white p-4 sm:p-6 border-t border-gray-200">
           <button
             @click="entrenamientoDetallado = null"
-            class="w-full px-4 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-dark transition-colors"
+            class="w-full px-4 py-3 bg-primary-dark text-white rounded-lg font-bold hover:bg-primary transition-colors"
           >
             Cerrar
           </button>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </template>
@@ -567,6 +694,7 @@ const filtroEquipo = ref('');
 const busqueda = ref('');
 const entrenamientoEditando = ref(null);
 const entrenamientoDetallado = ref(null);
+const tabDetalleAdmin = ref('confirmadas');
 const inscritasOrganizadasAdmin = ref({
   confirmadas: [],
   bajas: [],
@@ -707,6 +835,9 @@ const cerrarFormulario = () => {
 
 const verDetallesEntrenamiento = (entrenamiento) => {
   entrenamientoDetallado.value = entrenamiento;
+  tabDetalleAdmin.value = 'confirmadas';
+  busquedaJugadora.value = '';
+  jugadorasDisponibles.value = [];
 
   // Desuscribir de listeners anteriores
   unsubscribers.value.forEach(unsub => unsub());
@@ -725,6 +856,28 @@ const verDetallesEntrenamiento = (entrenamiento) => {
   });
 
   unsubscribers.value.push(unsubscribe);
+};
+
+const obtenerIniciales = (nombreCompleto) => {
+  const s = (nombreCompleto || '').trim();
+  if (!s) return '??';
+  const partes = s.split(/\s+/).filter(Boolean);
+  const a = partes[0]?.[0] || '';
+  const b = (partes.length > 1 ? partes[1]?.[0] : partes[0]?.[1]) || '';
+  return (a + b).toUpperCase();
+};
+
+const formatFechaHora = (ts) => {
+  if (!ts) return '-';
+  const date = ts?.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+  if (Number.isNaN(date.getTime())) return '-';
+  return date.toLocaleString('es-ES', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 };
 
 const contarInscriptasEntrenamiento = (entrenamientoId) => {
@@ -974,8 +1127,9 @@ const regenerarInscripciones = async (entrenamiento) => {
 };
 
 const formatearFecha = (fecha) => {
-  const date = new Date(fecha);
-  return date.toLocaleDateString('es-ES', {
+  const base = parseFechaBase(fecha);
+  if (!base) return '-';
+  return base.toLocaleDateString('es-ES', {
     weekday: 'short',
     year: 'numeric',
     month: 'short',
