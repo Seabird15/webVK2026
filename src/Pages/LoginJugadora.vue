@@ -96,7 +96,8 @@ const handleLogin = async () => {
   if (success) {
     console.log('Login exitoso');
     // Verificar si tiene perfil completo
-    if (!tienePerfılCompleto()) {
+    const perfilCompleto = await tienePerfılCompleto();
+    if (!perfilCompleto) {
       console.log('Perfil incompleto, redirigiendo a completar-perfil');
       // Ir a completar perfil
       router.push('/completar-perfil');

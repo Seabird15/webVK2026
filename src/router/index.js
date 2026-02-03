@@ -5,6 +5,8 @@ import Login from '../Pages/Login.vue';
 import Admin from '../Pages/Admin.vue';
 import { authUser, userRole, authReady } from '../firebase/auth';
 import { jugadoraAuthUser, authReady as jugadoraAuthReady } from '../firebase/jugadorasAuth';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase/config';
 
 const routes = [
   {
@@ -123,69 +125,66 @@ const router = createRouter({
   }
 });
 
+// Esperar el primer evento de Firebase Auth (restauración de sesión)
+const waitForAuthReady = (maxMs = 8000) => {
+  return new Promise((resolve) => {
+    let resolved = false;
+    const timeout = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        resolve();
+      }
+    }, maxMs);
+
+    const unsubscribe = onAuthStateChanged(auth, () => {
+      if (!resolved) {
+        clearTimeout(timeout);
+        resolved = true;
+        unsubscribe();
+        resolve();
+      }
+    });
+  });
+};
+
 // Guard para rutas protegidas
 router.beforeEach(async (to, from, next) => {
+  // Esperar a que ambos estados de autenticación estén listos
+  await waitForAuthReady();
+
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresJugadora = to.matched.some(record => record.meta.requiresJugadora);
-  
+
+  // Rutas que requieren admin/coach
   if (requiresAuth) {
-    // Esperar a que Firebase Auth esté listo
-    let intentos = 0;
-    while (!authReady.value && intentos < 50) {
-      console.log('Esperando a que Admin Auth esté listo... intento', intentos + 1);
-      await new Promise(resolve => setTimeout(resolve, 100));
-      intentos++;
-    }
-    
-    if (!authReady.value) {
-      console.warn('Timeout esperando Admin Auth');
-    }
-    
-    // Verificar si está autenticado y tiene rol admin o coach
     if (authUser.value && (userRole.value === 'admin' || userRole.value === 'coach')) {
       next();
     } else {
       next('/login');
     }
-  } else if (requiresJugadora) {
+  } 
+  // Rutas que requieren jugadora
+  else if (requiresJugadora) {
     // Permitir a Admin/Coach ver el detalle si viene desde el panel admin
-    if (to.name === 'DetalleEntrenamiento' && to.query?.from === 'admin') {
-      // Esperar a que Admin Auth esté listo (best-effort)
-      let intentos = 0;
-      while (!authReady.value && intentos < 50) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        intentos++;
-      }
-
-      if (authUser.value && (userRole.value === 'admin' || userRole.value === 'coach')) {
-        next();
-        return;
-      }
+    if (to.name === 'DetalleEntrenamiento' && to.query?.from === 'admin' && authUser.value && (userRole.value === 'admin' || userRole.value === 'coach')) {
+      next();
+      return;
     }
 
-    // Esperar a que Firebase Auth esté listo
-    let intentos = 0;
-    while (!jugadoraAuthReady.value && intentos < 50) {
-      console.log('Esperando a que Auth esté listo... intento', intentos + 1);
-      await new Promise(resolve => setTimeout(resolve, 100));
-      intentos++;
-    }
-    
-    if (!jugadoraAuthReady.value) {
-      console.warn('Timeout esperando Auth, permitiendo acceso pero puede haber problemas');
-    }
-    
-    // Ahora sí, verificar si jugadora está autenticada
     if (jugadoraAuthUser.value) {
-      console.log('Jugadora autenticada, permitiendo acceso');
       next();
     } else {
-      console.log('Jugadora no autenticada, redirigiendo a login');
       next('/login-jugadora');
     }
-  } else if (to.path === '/login' && authUser.value && (userRole.value === 'admin' || userRole.value === 'coach')) {
+  } 
+  // Redirigir si ya está logueado
+  else if (to.path === '/login' && authUser.value && (userRole.value === 'admin' || userRole.value === 'coach')) {
     next('/admin');
-  } else {
+  } else if (to.path === '/login-jugadora' && jugadoraAuthUser.value) {
+    next('/perfil'); // O a la ruta que consideres principal para jugadoras
+  }
+  // Permitir acceso a rutas públicas
+  else {
     next();
   }
 });

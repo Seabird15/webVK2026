@@ -73,7 +73,7 @@ exports.sendPushNotification = functions.https.onCall(async (data, context) => {
         body: body,
       },
       fcmOptions: {
-        link: `https://vikingas-web.vercel.app/entrenamientos`,
+        link: `https://www.clubdeportivovikingas/entrenamientos`,
       },
     },
   };

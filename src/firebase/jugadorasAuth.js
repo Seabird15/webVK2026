@@ -4,7 +4,9 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  updateProfile
+  updateProfile,
+  setPersistence,
+  browserLocalPersistence
 } from 'firebase/auth';
 import { auth, db, storage } from './config';
 import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where } from 'firebase/firestore';
@@ -59,6 +61,37 @@ onAuthStateChanged(auth, async (user) => {
   // Marcar que Auth está listo
   authReady.value = true;
 });
+
+// Login de jugadora
+export const loginJugadora = async (email, password) => {
+  isLoadingJugadora.value = true;
+  errorJugadora.value = null;
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    const uid = result.user.uid;
+    console.log('Jugadora autenticada. UID:', uid);
+    
+    // Cargar datos de la jugadora
+    await fetchJugadoraData(uid);
+    
+    return true;
+  } catch (err) {
+    console.error('Error en login de jugadora:', err);
+    if (err.code === 'auth/user-not-found') {
+      errorJugadora.value = 'Usuario no encontrado';
+    } else if (err.code === 'auth/wrong-password') {
+      errorJugadora.value = 'Contraseña incorrecta';
+    } else if (err.code === 'auth/invalid-email') {
+      errorJugadora.value = 'Email inválido';
+    } else {
+      errorJugadora.value = err.message;
+    }
+    return false;
+  } finally {
+    isLoadingJugadora.value = false;
+  }
+};
 
 // Obtener datos de la jugadora desde Firestore
 export const fetchJugadoraData = async (uid, coleccion = 'jugadoraRegistro') => {
@@ -231,78 +264,6 @@ export const solicitarAcceso = async (email, password) => {
       errorJugadora.value = 'Email inválido';
     } else {
       errorJugadora.value = err.message;
-    }
-    return false;
-  } finally {
-    isLoadingJugadora.value = false;
-  }
-};
-
-// Login para jugadoras
-export const loginJugadora = async (email, password) => {
-  isLoadingJugadora.value = true;
-  errorJugadora.value = null;
-  try {
-    console.log('Intentando login con:', email);
-    const result = await signInWithEmailAndPassword(auth, email, password);
-    const uid = result.user.uid;
-    console.log('Usuario autenticado en Auth:', uid);
-
-    // Verificar si está aprobada en Firestore (en jugadorasLogin)
-    const jugadorasLoginDoc = await getDoc(doc(db, 'jugadorasLogin', uid));
-    if (!jugadorasLoginDoc.exists()) {
-      console.error('Documento de jugadora no existe en jugadorasLogin');
-      await signOut(auth);
-      errorJugadora.value = 'Solicitud de acceso no encontrada';
-      return false;
-    }
-
-    const loginData = jugadorasLoginDoc.data();
-    console.log('Estado en jugadorasLogin:', loginData.estado);
-    
-    if (loginData.estado !== 'aprobada') {
-      console.log('Usuario no aprobado, estado:', loginData.estado);
-      await signOut(auth);
-      errorJugadora.value = loginData.estado === 'rechazada' 
-        ? 'Tu solicitud fue rechazada' 
-        : 'Tu solicitud aún está pendiente de aprobación';
-      return false;
-    }
-
-    // Intentar cargar datos del perfil completo desde jugadoraRegistro
-    // Si no existe, significa que aún no completó el perfil (es normal)
-    const jugadoraRegistroDoc = await getDoc(doc(db, 'jugadoraRegistro', uid));
-    
-    if (jugadoraRegistroDoc.exists()) {
-      // Si existe el perfil, cargarlo
-      jugadoraData.value = {
-        id: uid,
-        ...jugadoraRegistroDoc.data()
-      };
-      console.log('Datos del perfil cargados desde jugadoraRegistro:', jugadoraData.value);
-    } else {
-      // Si no existe aún, crear un documento vacío (será completado después)
-      jugadoraData.value = {
-        id: uid,
-        email: email,
-        perfilCompleto: false
-      };
-      console.log('Perfil aún no completado. Usuario puede completarlo en /completar-perfil');
-    }
-    
-    return true;
-  } catch (err) {
-    console.error('Error en login jugadora:', err);
-    if (err.code === 'auth/user-not-found') {
-      errorJugadora.value = 'Usuario no encontrado';
-    } else if (err.code === 'auth/wrong-password') {
-      errorJugadora.value = 'Contraseña incorrecta';
-    } else if (err.code === 'auth/invalid-credential') {
-      errorJugadora.value = 'Email o contraseña incorrectos';
-    } else if (err.code === 'auth/invalid-email') {
-      errorJugadora.value = 'Email inválido';
-    } else {
-      errorJugadora.value = err.message || 'Error al iniciar sesión';
     }
     return false;
   } finally {
