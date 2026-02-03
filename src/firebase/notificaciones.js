@@ -33,15 +33,21 @@ export const sendPushNotification = async (topic, title, body) => {
  */
 export const guardarTokenNotificacion = async (uid, token) => {
   if (!uid || !token) {
-    console.error("UID o token de notificación no proporcionado.");
+    console.error("UID o token de notificación no proporcionado.", { uid, token: token ? 'exists' : 'missing' });
     return;
   }
 
   try {
+    console.log('Intentando guardar token en Firestore...', { uid, tokenPreview: token.substring(0, 20) + '...' });
     const notificacionRef = doc(db, 'notificaciones', uid);
-    await setDoc(notificacionRef, { token: token }, { merge: true });
-    console.log('Token de notificación guardado en Firestore para el UID:', uid);
+    await setDoc(notificacionRef, { 
+      token: token,
+      updatedAt: new Date().toISOString(),
+      userAgent: navigator.userAgent
+    }, { merge: true });
+    console.log('✓ Token de notificación guardado exitosamente en Firestore para el UID:', uid);
   } catch (error) {
-    console.error("Error al guardar el token de notificación:", error);
+    console.error("✗ Error al guardar el token de notificación:", error);
+    throw error; // Re-lanzar el error para que el llamador lo sepa
   }
 };

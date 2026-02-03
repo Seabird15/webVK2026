@@ -15,7 +15,7 @@
         />
         <button
           @click="cargar"
-          class="px-3 py-2 bg-gray-100 rounded-lg text-sm font-semibold hover:bg-gray-200"
+          class="px-3 py-2 bg-gray-100 rounded-lg text-sm font-semibold hover:bg-gray-200 cursor-pointer"
           :disabled="isLoading"
         >
           Refrescar

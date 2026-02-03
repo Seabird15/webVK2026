@@ -6,7 +6,7 @@
         <div class="flex items-center gap-4">
           <button
             @click="volver"
-            class="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors"
+            class="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors cursor-pointer"
           >
             <ChevronLeftIcon class="w-5 h-5" />
           </button>
@@ -125,7 +125,7 @@
                     v-if="estadoInscripcion === 'confirmada' && !fechaPasada(entrenamiento)"
                     @click="abrirModalBaja"
                     :disabled="isLoadingAccion"
-                    class="w-full px-4 py-3 rounded-lg font-bold transition-all text-sm bg-orange-500 text-white hover:bg-orange-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center gap-2"
+                    class="w-full px-4 py-3 rounded-lg font-bold transition-all text-sm bg-orange-500 text-white hover:bg-orange-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <ArrowPathIcon class="w-5 h-5" />
                     Cambiar a Ausente
@@ -135,7 +135,7 @@
                     v-else-if="estadoInscripcion === 'baja' && !fechaPasada(entrenamiento)"
                     @click="handleInscribirse"
                     :disabled="isLoadingAccion"
-                    class="w-full px-4 py-3 rounded-lg font-bold transition-all text-sm bg-blue-500 text-white hover:bg-blue-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center gap-2"
+                    class="w-full px-4 py-3 rounded-lg font-bold transition-all text-sm bg-blue-500 text-white hover:bg-blue-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <ArrowPathIcon class="w-5 h-5" />
                     Cambiar a Confirmada
@@ -145,7 +145,7 @@
                     <button
                       @click="handleInscribirse"
                       :disabled="isLoadingAccion"
-                      class="w-full px-4 py-3 rounded-lg font-bold transition-all text-sm bg-green-700 text-white hover:bg-green-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center gap-2"
+                      class="w-full px-4 py-3 rounded-lg font-bold transition-all text-sm bg-green-700 text-white hover:bg-green-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <CheckIcon class="w-5 h-5" />
                       Confirmar Asistencia
@@ -153,7 +153,7 @@
                     <button
                       @click="abrirModalBaja"
                       :disabled="isLoadingAccion"
-                      class="w-full px-4 py-3 rounded-lg font-bold transition-all text-sm bg-red-700 text-white hover:bg-red-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center gap-2"
+                      class="w-full px-4 py-3 rounded-lg font-bold transition-all text-sm bg-red-700 text-white hover:bg-red-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <XMarkIcon class="w-5 h-5" />
                       Darme de Baja
@@ -190,7 +190,7 @@
               <button
                 @click="tabActivo = 'confirmadas'"
                 :class="[
-                  'flex-1 py-2 px-2 sm:py-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wide transition-all relative min-h-[44px]',
+                  'flex-1 py-2 px-2 sm:py-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wide transition-all relative min-h-[44px] cursor-pointer',
                   tabActivo === 'confirmadas'
                     ? 'text-green-700 bg-white'
                     : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -206,7 +206,7 @@
               <button
                 @click="tabActivo = 'bajas'"
                 :class="[
-                  'flex-1 py-2 px-2 sm:py-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wide transition-all relative min-h-[44px]',
+                  'flex-1 py-2 px-2 sm:py-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wide transition-all relative min-h-[44px] cursor-pointer',
                   tabActivo === 'bajas'
                     ? 'text-red-700 bg-white'
                     : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -222,7 +222,7 @@
               <button
                 @click="tabActivo = 'pendientes'"
                 :class="[
-                  'flex-1 py-2 px-2 sm:py-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wide transition-all relative min-h-[44px]',
+                  'flex-1 py-2 px-2 sm:py-3 sm:px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wide transition-all relative min-h-[44px] cursor-pointer',
                   tabActivo === 'pendientes'
                     ? 'text-yellow-700 bg-white'
                     : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -362,14 +362,14 @@
         <div class="p-6 bg-gray-50 border-t border-gray-200 flex gap-3">
           <button
             @click="cerrarModalBaja"
-            class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+            class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg font-bold hover:bg-gray-100 transition-colors cursor-pointer"
             :disabled="isLoadingAccion"
           >
             Cancelar
           </button>
           <button
             @click="confirmarBaja"
-            class="flex-1 px-4 py-3 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors disabled:opacity-50"
+            class="flex-1 px-4 py-3 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors disabled:opacity-50 cursor-pointer"
             :disabled="isLoadingAccion"
           >
             {{ isLoadingAccion ? 'Procesando...' : 'Confirmar Baja' }}
@@ -517,12 +517,21 @@ const cargarDatos = async () => {
     estadoInscripcion.value = await obtenerEstadoInscripcion(id, jugadoraAuthUser.value.uid);
   }
 
+  console.log('📋 DEBUG - Entrenamiento cargado:', {
+    id: entrenamiento.value.id,
+    nombre: entrenamiento.value.nombre,
+    esConvocatoria: entrenamiento.value.esConvocatoria,
+    convocadas: entrenamiento.value.convocadas,
+    tieneConvocadas: !!entrenamiento.value.convocadas,
+    cantidadConvocadas: entrenamiento.value.convocadas?.length
+  });
+
   // Escuchar cambios en inscripciones
   const unsubscribe = escucharInscripcionesEntrenamiento(id, (organizadas) => {
     inscritasOrganizadas.value = organizadas;
     // Actualizar si la jugadora actual forma parte de la convocatoria (si aplica)
     actualizarConvocatoriaUsuario(organizadas);
-  });
+  }, entrenamiento.value); // Pasar el entrenamiento completo
 
   unsubscribers.value.push(unsubscribe);
 };

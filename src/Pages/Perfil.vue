@@ -6,7 +6,7 @@
         <h1 class="text-3xl font-bold text-primary-dark">Mi Perfil</h1>
         <button
           @click="handleBack"
-          class="px-4 my-2 py-2 text-primary-dark border border-primary-dark rounded-lg hover:bg-primary-dark hover:text-white transition-colors"
+          class="px-4 my-2 py-2 text-primary-dark border border-primary-dark rounded-lg hover:bg-primary-dark hover:text-white transition-colors cursor-pointer"
         >
           ← Volver
         </button>
@@ -17,7 +17,7 @@
         <button
           @click="tabActivo = 'datos'"
           :class="[
-            'px-6 py-3 font-bold uppercase text-sm transition-colors',
+            'px-6 py-3 font-bold uppercase text-sm transition-colors cursor-pointer',
             tabActivo === 'datos'
               ? 'text-primary border-b-2 border-primary'
               : 'text-gray-600 hover:text-gray-900'
@@ -54,7 +54,7 @@
           <div class="pt-6 border-t border-gray-200">
             <button
               @click="activarEdicion"
-              class="px-6 py-2 bg-primary-dark text-white rounded-lg font-bold hover:bg-primary transition-colors"
+              class="px-6 py-2 bg-primary-dark text-white rounded-lg font-bold hover:bg-primary transition-colors cursor-pointer"
             >
               Editar Perfil
             </button>
@@ -179,14 +179,14 @@
               type="button"
               @click="cancelarEdicion"
               :disabled="isLoading"
-              class="flex-1 px-6 py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-50 transition-colors disabled:opacity-50"
+              class="flex-1 px-6 py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               :disabled="isLoading"
-              class="flex-1 px-6 py-2 bg-primary-dark text-white rounded-lg font-bold hover:bg-primary transition-colors disabled:opacity-50"
+              class="flex-1 px-6 py-2 bg-primary-dark text-white rounded-lg font-bold hover:bg-primary transition-colors disabled:opacity-50 cursor-pointer"
             >
               {{ isLoading ? 'Guardando...' : 'Guardar cambios' }}
             </button>
@@ -209,7 +209,7 @@
               <button
                 @click="cambiarEquipoDesdePerf('ascenso')"
                 :class="[
-                  'p-6 rounded-lg font-bold transition-colors',
+                  'p-6 rounded-lg font-bold transition-colors cursor-pointer',
                   categoriaSeleccionada === 'ascenso'
                     ? 'bg-primary text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -220,7 +220,7 @@
               <button
                 @click="cambiarEquipoDesdePerf('escuela')"
                 :class="[
-                  'p-6 rounded-lg font-bold transition-colors',
+                  'p-6 rounded-lg font-bold transition-colors cursor-pointer',
                   categoriaSeleccionada === 'escuela'
                     ? 'bg-primary text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -242,7 +242,7 @@
       <div class="mt-8 bg-white rounded-lg shadow-lg p-8 border-t-4 border-red-500">
         <button
           @click="handleLogout"
-          class="px-6 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors"
+          class="px-6 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors cursor-pointer"
         >
           Cerrar sesión
         </button>

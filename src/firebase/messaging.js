@@ -1,6 +1,7 @@
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { auth } from "./config"; // Importar auth
+import { jugadoraAuthUser } from "./jugadorasAuth"; // Importar jugadoraAuthUser
 import { guardarTokenNotificacion } from "./notificaciones"; // Importar la nueva función
 
 const messaging = getMessaging();
@@ -84,9 +85,21 @@ export const requestPermissionAndSubscribe = async (topicName) => {
       if (currentToken) {
         console.log("Token de FCM obtenido:", currentToken);
 
-        // Guardar el token en Firestore si hay un usuario autenticado
+        // Guardar el token en Firestore si hay un usuario autenticado (admin o jugadora)
+        let userUid = null;
         if (auth.currentUser) {
-          await guardarTokenNotificacion(auth.currentUser.uid, currentToken);
+          userUid = auth.currentUser.uid;
+          console.log('Usuario admin autenticado, UID:', userUid);
+        } else if (jugadoraAuthUser.value) {
+          userUid = jugadoraAuthUser.value.uid;
+          console.log('Jugadora autenticada, UID:', userUid);
+        }
+        
+        if (userUid) {
+          console.log('Guardando token en Firestore para UID:', userUid);
+          await guardarTokenNotificacion(userUid, currentToken);
+        } else {
+          console.warn('No hay usuario autenticado. Token no guardado en Firestore.');
         }
 
         // Llamar a la Cloud Function para suscribir el token

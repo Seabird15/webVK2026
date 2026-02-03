@@ -64,7 +64,7 @@
                 <!-- Botón Guardar -->
                 <button
                     @click="guardarProximoPartido"
-                    class="w-full bg-primary hover:bg-primary/90 text-black font-bold py-2 rounded transition-colors mt-6"
+                    class="w-full bg-primary hover:bg-primary/90 text-black font-bold py-2 rounded transition-colors mt-6 cursor-pointer"
                 >
                     Guardar Próximo Partido
                 </button>
@@ -151,7 +151,7 @@
                 <!-- Botón Guardar -->
                 <button
                     @click="guardarUltimoPartido"
-                    class="w-full bg-primary hover:bg-primary/90 text-black font-bold py-2 rounded transition-colors mt-6"
+                    class="w-full bg-primary hover:bg-primary/90 text-black font-bold py-2 rounded transition-colors mt-6 cursor-pointer"
                 >
                     Guardar Último Partido
                 </button>

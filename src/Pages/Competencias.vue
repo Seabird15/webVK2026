@@ -26,7 +26,7 @@
         <p class="text-sm mb-4">{{ error }}</p>
         <button 
           @click="fetchTabla"
-          class="bg-primary hover:bg-primary/80 text-black px-4 py-2 rounded font-bold transition"
+          class="bg-primary hover:bg-primary/80 text-black px-4 py-2 rounded font-bold transition cursor-pointer"
         >
           Intentar de nuevo
         </button>

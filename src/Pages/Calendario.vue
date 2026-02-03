@@ -14,7 +14,7 @@
       <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6 md:mb-8">
         <button
           @click="mesAnterior"
-          class="w-full md:w-auto px-3 md:px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-bold text-sm md:text-base transition-colors"
+          class="w-full md:w-auto px-3 md:px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-bold text-sm md:text-base transition-colors cursor-pointer"
         >
           ← Anterior
         </button>
@@ -25,7 +25,7 @@
         
         <button
           @click="mesSiguiente"
-          class="w-full md:w-auto px-3 md:px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-lg font-bold text-sm md:text-base transition-colors"
+          class="w-full md:w-auto px-3 md:px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-lg font-bold text-sm md:text-base transition-colors cursor-pointer"
         >
           Siguiente →
         </button>
@@ -99,7 +99,7 @@
             </div>
             <button
               @click="eventoSeleccionado = null"
-              class="text-gray-500 hover:text-gray-700 text-2xl md:text-3xl font-bold shrink-0 ml-2"
+              class="text-gray-500 hover:text-gray-700 text-2xl md:text-3xl font-bold shrink-0 ml-2 cursor-pointer"
             >
               ✕
             </button>
@@ -140,13 +140,13 @@
           <div v-if="isAdmin()" class="flex flex-col md:flex-row gap-2 md:gap-3 mt-6">
             <button
               @click="editarEvento(eventoSeleccionado)"
-              class="flex-1 px-3 md:px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-bold text-sm md:text-base transition-colors"
+              class="flex-1 px-3 md:px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-bold text-sm md:text-base transition-colors cursor-pointer"
             >
               Editar
             </button>
             <button
               @click="confirmarEliminar(eventoSeleccionado.id)"
-              class="flex-1 px-3 md:px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold text-sm md:text-base transition-colors"
+              class="flex-1 px-3 md:px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold text-sm md:text-base transition-colors cursor-pointer"
             >
               Eliminar
             </button>

@@ -24,7 +24,7 @@
           <button
             @click="cambiarEquipo('ascenso')"
             :class="[
-              'px-6 py-2 rounded-lg font-bold transition-colors',
+              'px-6 py-2 rounded-lg font-bold transition-colors cursor-pointer',
               equipoSeleccionado === 'ascenso'
                 ? 'bg-primary text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -35,7 +35,7 @@
           <button
             @click="cambiarEquipo('escuela')"
             :class="[
-              'px-6 py-2 rounded-lg font-bold transition-colors',
+              'px-6 py-2 rounded-lg font-bold transition-colors cursor-pointer',
               equipoSeleccionado === 'escuela'
                 ? 'bg-primary text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -46,7 +46,7 @@
           <button
             @click="cambiarEquipo('ambos')"
             :class="[
-              'px-6 py-2 rounded-lg font-bold transition-colors',
+              'px-6 py-2 rounded-lg font-bold transition-colors cursor-pointer',
               equipoSeleccionado === 'ambos'
                 ? 'bg-primary text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -118,7 +118,7 @@
           <div class="flex gap-2">
             <button
               @click="verDetalles(entrenamiento)"
-              class="flex-1 px-3 py-2 border border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors text-sm"
+              class="flex-1 px-3 py-2 border border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors text-sm cursor-pointer"
             >
               📋 Ver Detalles
             </button>
@@ -137,7 +137,7 @@
           </div>
           <button
             @click="entrenamientoSeleccionado = null"
-            class="text-gray-500 hover:text-gray-700 text-2xl"
+            class="text-gray-500 hover:text-gray-700 text-2xl cursor-pointer"
           >
             ✕
           </button>
@@ -258,7 +258,7 @@
           <div class="flex gap-2">
             <button
               @click="entrenamientoSeleccionado = null"
-              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-100 transition-colors cursor-pointer"
             >
               Cerrar
             </button>
@@ -323,7 +323,7 @@ const verDetalles = async (entrenamiento) => {
       bajas: organizadas.bajas.length,
       pendientes: organizadas.pendientes.length
     };
-  });
+  }, entrenamiento); // Pasar el entrenamiento completo
 
   unsubscribers.value.push(unsubscribe);
 };
@@ -353,7 +353,7 @@ onMounted(() => {
           bajas: organizadas.bajas.length,
           pendientes: organizadas.pendientes.length
         };
-      });
+      }, ent); // Pasar el entrenamiento completo
       
       unsubscribers.value.push(unsub);
     }

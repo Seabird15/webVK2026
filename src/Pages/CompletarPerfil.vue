@@ -146,14 +146,14 @@
             type="button"
             @click="handleCancel"
             :disabled="isLoading"
-            class="flex-1 px-6 py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-50 transition-colors disabled:opacity-50"
+            class="flex-1 px-6 py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer"
           >
             Cancelar
           </button>
           <button
             type="submit"
             :disabled="isLoading"
-            class="flex-1 px-6 py-2 bg-primary-dark text-white rounded-lg font-bold hover:bg-primary transition-colors disabled:opacity-50"
+            class="flex-1 px-6 py-2 bg-primary-dark text-white rounded-lg font-bold hover:bg-primary transition-colors disabled:opacity-50 cursor-pointer"
           >
             {{ isLoading ? 'Guardando...' : 'Completar perfil' }}
           </button>

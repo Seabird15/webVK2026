@@ -17,7 +17,7 @@
       <button
         v-if="!cargando"
         @click="previousImage"
-        class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20  hover:shadow-lg hover:scale-110 text-white font-bold text-lg md:text-2xl px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200"
+        class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20  hover:shadow-lg hover:scale-110 text-white font-bold text-lg md:text-2xl px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200 cursor-pointer"
         aria-label="Imagen anterior"
       >
         &#10094;
@@ -55,7 +55,7 @@
       <button
         v-if="!cargando"
         @click="nextImage"
-        class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20  hover:shadow-lg hover:scale-110 text-white font-bold text-lg md:text-2xl px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200"
+        class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20  hover:shadow-lg hover:scale-110 text-white font-bold text-lg md:text-2xl px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all duration-200 cursor-pointer"
         aria-label="Siguiente imagen"
       >
         &#10095;

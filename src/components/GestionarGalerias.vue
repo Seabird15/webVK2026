@@ -37,7 +37,7 @@
         <button 
           @click="crearNuevaGaleria"
           :disabled="cargando"
-          class="w-full bg-primary text-black font-bold py-2 rounded-lg hover:bg-opacity-90 disabled:opacity-50"
+          class="w-full bg-primary text-black font-bold py-2 rounded-lg hover:bg-opacity-90 disabled:opacity-50 cursor-pointer"
         >
           {{ cargando ? 'Creando...' : 'Crear Galería' }}
         </button>
@@ -73,7 +73,7 @@
             </div>
             <button 
               @click="eliminarGaleriaConfirm(galeria.id)"
-              class="text-red-500 hover:text-red-700 font-bold"
+              class="text-red-500 hover:text-red-700 font-bold cursor-pointer"
             >
               ✕
             </button>
@@ -93,7 +93,7 @@
               <button 
                 @click="subirFotosGaleria(galeria.id)"
                 :disabled="!fotosSeleccionadas[galeria.id] || cargando"
-                class="bg-primary text-black font-bold px-6 py-2 rounded-lg hover:bg-opacity-90 disabled:opacity-50"
+                class="bg-primary text-black font-bold px-6 py-2 rounded-lg hover:bg-opacity-90 disabled:opacity-50 cursor-pointer"
               >
                 Subir
               </button>
@@ -113,7 +113,7 @@
               />
               <button 
                 @click="eliminarFoto(galeria.id, foto.url)"
-                class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
               >
                 ✕
               </button>

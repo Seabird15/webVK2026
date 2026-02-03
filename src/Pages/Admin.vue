@@ -9,7 +9,7 @@
         </div>
         <button
           @click="handleLogout"
-          class="bg-primary-dark hover:bg-opacity-90 px-4 py-2 rounded-lg font-bold transition-colors"
+          class="bg-primary-dark hover:bg-opacity-90 px-4 py-2 rounded-lg font-bold transition-colors cursor-pointer"
         >
           Cerrar Sesión
         </button>
@@ -26,7 +26,7 @@
             :key="tab.id"
             @click="activeTab = tab.id"
             :class="[
-              'px-6 py-4 font-bold uppercase text-sm transition-colors whitespace-nowrap',
+              'px-6 py-4 font-bold uppercase text-sm transition-colors whitespace-nowrap cursor-pointer',
               activeTab === tab.id
                 ? 'text-primary border-b-2 border-primary'
                 : 'text-gray-600 hover:text-gray-900'
@@ -97,7 +97,7 @@
                 </div>
                 <p class="text-xs text-gray-700 mb-3 line-clamp-3">{{ ent.descripcion }}</p>
                 <div class="flex gap-2">
-                  <button @click="verDetalles(ent)" class="px-3 py-1 text-xs bg-primary text-white rounded-lg">Ver</button>
+                  <button @click="verDetalles(ent)" class="px-3 py-1 text-xs bg-primary text-white rounded-lg cursor-pointer">Ver</button>
                 </div>
               </div>
             </div>

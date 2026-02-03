@@ -865,7 +865,7 @@ const verDetallesEntrenamiento = (entrenamiento) => {
       bajas: organizadas.bajas.length,
       pendientes: organizadas.pendientes.length
     };
-  });
+  }, entrenamiento); // Pasar el entrenamiento completo
 
   unsubscribers.value.push(unsubscribe);
 };
@@ -1202,7 +1202,7 @@ onMounted(async () => {
           bajas: organizadas.bajas.length,
           pendientes: organizadas.pendientes.length
         };
-      });
+      }, ent); // Pasar el entrenamiento completo
       unsubscribers.value.push(unsub);
     });
   } catch (err) {

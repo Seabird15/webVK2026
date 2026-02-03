@@ -13,7 +13,7 @@
           :key="tab.value"
           @click="filtroEstado = tab.value"
           :class="[
-            'px-3 md:px-4 py-2 font-bold text-xs md:text-sm uppercase transition-colors whitespace-nowrap',
+            'px-3 md:px-4 py-2 font-bold text-xs md:text-sm uppercase transition-colors whitespace-nowrap cursor-pointer',
             filtroEstado === tab.value
               ? 'text-primary border-b-2 border-primary -mb-0.5'
               : 'text-gray-600 hover:text-gray-900'
@@ -68,13 +68,13 @@
           <div v-if="solicitud.estado === 'pendiente'" class="flex gap-2 mt-3">
             <button
               @click="abrirModal('aprobar', solicitud)"
-              class="flex-1 px-3 py-2 bg-green-500 text-white text-sm font-bold rounded-lg hover:bg-green-600 transition-colors"
+              class="flex-1 px-3 py-2 bg-green-500 text-white text-sm font-bold rounded-lg hover:bg-green-600 transition-colors cursor-pointer"
             >
               ✓ Aprobar
             </button>
             <button
               @click="abrirModal('rechazar', solicitud)"
-              class="flex-1 px-3 py-2 bg-red-500 text-white text-sm font-bold rounded-lg hover:bg-red-600 transition-colors"
+              class="flex-1 px-3 py-2 bg-red-500 text-white text-sm font-bold rounded-lg hover:bg-red-600 transition-colors cursor-pointer"
             >
               ✕ Rechazar
             </button>
@@ -121,14 +121,14 @@
                 <button
                   v-if="solicitud.estado === 'pendiente'"
                   @click="abrirModal('aprobar', solicitud)"
-                  class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors"
+                  class="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors cursor-pointer"
                 >
                   Aprobar
                 </button>
                 <button
                   v-if="solicitud.estado === 'pendiente'"
                   @click="abrirModal('rechazar', solicitud)"
-                  class="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
+                  class="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors cursor-pointer"
                 >
                   Rechazar
                 </button>
@@ -171,7 +171,7 @@
         <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <button
             @click="cerrarModal"
-            class="flex-1 px-4 py-2.5 md:py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-50 transition-colors order-2 sm:order-1"
+            class="flex-1 px-4 py-2.5 md:py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-50 transition-colors order-2 sm:order-1 cursor-pointer"
           >
             Cancelar
           </button>
@@ -179,7 +179,7 @@
             @click="ejecutarAccion"
             :disabled="isLoading"
             :class="[
-              'flex-1 px-4 py-2.5 md:py-2 text-white font-bold rounded-lg transition-colors disabled:opacity-50 order-1 sm:order-2',
+              'flex-1 px-4 py-2.5 md:py-2 text-white font-bold rounded-lg transition-colors disabled:opacity-50 order-1 sm:order-2 cursor-pointer',
               tipoAccion === 'aprobar'
                 ? 'bg-green-500 hover:bg-green-600'
                 : 'bg-red-500 hover:bg-red-600'

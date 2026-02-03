@@ -80,7 +80,7 @@
         <button
           type="submit"
           :disabled="isLoading"
-          class="w-full bg-primary-dark text-white py-2 rounded-lg font-bold uppercase hover:bg-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full bg-primary-dark text-white py-2 rounded-lg font-bold uppercase hover:bg-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {{ isLoading ? 'Enviando...' : 'Solicitar acceso' }}
         </button>

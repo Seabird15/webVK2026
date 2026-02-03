@@ -12,7 +12,7 @@
           </div>
           <button
             @click="handleLogout"
-            class="bg-white text-red-500 my-2 hover:bg-opacity-90 px-4 py-2 rounded-lg font-bold transition-colors"
+            class="bg-white text-red-500 my-2 hover:bg-opacity-90 px-4 py-2 rounded-lg font-bold transition-colors cursor-pointer"
           >
             Cerrar Sesión
           </button>
@@ -53,7 +53,7 @@
             <button
               @click="cambiarEquipo('ascenso')"
               :class="[
-                'px-6 py-2 rounded-lg font-bold transition-colors',
+                'px-6 py-2 rounded-lg font-bold transition-colors cursor-pointer',
                 equipoSeleccionado === 'ascenso'
                   ? 'bg-primary text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -64,7 +64,7 @@
             <button
               @click="cambiarEquipo('escuela')"
               :class="[
-                'px-6 py-2 rounded-lg font-bold transition-colors',
+                'px-6 py-2 rounded-lg font-bold transition-colors cursor-pointer',
                 equipoSeleccionado === 'escuela'
                   ? 'bg-primary text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -75,7 +75,7 @@
                    <button
               @click="cambiarEquipo('ambos')"
               :class="[
-                'px-6 py-2 rounded-lg font-bold transition-colors',
+                'px-6 py-2 rounded-lg font-bold transition-colors cursor-pointer',
                 equipoSeleccionado === 'ambos'
                   ? 'bg-primary text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -158,9 +158,14 @@
             </p>
 
             <!-- Mensaje informativo para convocatorias -->
-            <div v-if="entrenamiento.esConvocatoria && !estaInscrita(entrenamiento.id)" class="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
+            <div v-if="entrenamiento.esConvocatoria && !esConvocada(entrenamiento)" class="mb-4 p-3 bg-red-50 rounded-lg border border-red-200">
+              <p class="text-xs text-red-800 font-semibold">
+                ⛔ No estás en la lista de convocadas para este partido. No puedes inscribirte.
+              </p>
+            </div>
+            <div v-else-if="entrenamiento.esConvocatoria && esConvocada(entrenamiento) && !estaInscrita(entrenamiento.id)" class="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
               <p class="text-xs text-purple-800 font-semibold">
-                ℹ️ Este es un partido con convocatoria. Solo las jugadoras convocadas pueden confirmar asistencia.
+                ¡Has sido convocada! Por favor, confirma tu asistencia.
               </p>
             </div>
 
@@ -203,10 +208,10 @@
               <button
                 v-if="estadoInscripcion[entrenamiento.id] === 'confirmada'"
                 @click="abrirModalBaja(entrenamiento)"
-                :disabled="isLoadingAccion || fechaPasada(entrenamiento)"
+                :disabled="isLoadingAccion || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                 :class="[
-                  'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm',
-                  fechaPasada(entrenamiento)
+                  'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm cursor-pointer',
+                  fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50'
                 ]"
@@ -217,10 +222,10 @@
               <button
                 v-else-if="estadoInscripcion[entrenamiento.id] === 'baja'"
                 @click="handleInscribirse(entrenamiento)"
-                :disabled="isLoadingAccion || fechaPasada(entrenamiento)"
+                :disabled="isLoadingAccion || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                 :class="[
-                  'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm',
-                  fechaPasada(entrenamiento)
+                  'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm cursor-pointer',
+                  fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50'
                 ]"
@@ -231,10 +236,10 @@
               <template v-else>
                 <button
                   @click="handleInscribirse(entrenamiento)"
-                  :disabled="isLoadingAccion || fechaPasada(entrenamiento)"
+                  :disabled="isLoadingAccion || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                   :class="[
-                    'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm',
-                    fechaPasada(entrenamiento)
+                    'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm cursor-pointer',
+                    fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-green-500 text-white hover:bg-green-600 disabled:opacity-50'
                   ]"
@@ -243,10 +248,10 @@
                 </button>
                 <button
                   @click="abrirModalBaja(entrenamiento)"
-                  :disabled="isLoadingAccion || fechaPasada(entrenamiento)"
+                  :disabled="isLoadingAccion || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                   :class="[
-                    'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm',
-                    fechaPasada(entrenamiento)
+                    'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm cursor-pointer',
+                    fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-red-500 text-white hover:bg-red-600 disabled:opacity-50'
                   ]"
@@ -256,7 +261,7 @@
               </template>
               <button
                 @click="verDetalles(entrenamiento)"
-                class="flex-1 px-3 py-2 border border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors text-sm"
+                class="flex-1 px-3 py-2 border border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors text-sm cursor-pointer"
               >
                 📋 Detalles
               </button>
@@ -285,7 +290,7 @@
             </div>
             <p class="text-xs text-gray-700 mb-3 line-clamp-2">{{ ent.descripcion }}</p>
             <div class="flex gap-2">
-              <button @click="verDetalles(ent)" class="px-3 py-1 text-xs bg-primary text-white rounded-lg">Ver</button>
+              <button @click="verDetalles(ent)" class="px-3 py-1 text-xs bg-primary text-white rounded-lg cursor-pointer">Ver</button>
             </div>
           </div>
         </div>
@@ -308,7 +313,7 @@
           </div>
           <button
             @click="entrenamientoSeleccionado = null"
-            class="text-white hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-colors text-2xl"
+            class="text-white hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-colors text-2xl cursor-pointer"
           >
             ✕
           </button>
@@ -382,7 +387,7 @@
                 <button
                   @click="tabActivo = 'confirmadas'"
                   :class="[
-                    'flex-1 py-2 px-3 text-[10px] font-bold uppercase tracking-wide transition-all relative',
+                    'flex-1 py-2 px-3 text-[10px] font-bold uppercase tracking-wide transition-all relative cursor-pointer',
                     tabActivo === 'confirmadas'
                       ? 'text-green-700 bg-white'
                       : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -398,7 +403,7 @@
                 <button
                   @click="tabActivo = 'bajas'"
                   :class="[
-                    'flex-1 py-2 px-3 text-[10px] font-bold uppercase tracking-wide transition-all relative',
+                    'flex-1 py-2 px-3 text-[10px] font-bold uppercase tracking-wide transition-all relative cursor-pointer',
                     tabActivo === 'bajas'
                       ? 'text-red-700 bg-white'
                       : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -414,7 +419,7 @@
                 <button
                   @click="tabActivo = 'pendientes'"
                   :class="[
-                    'flex-1 py-2 px-3 text-[10px] font-bold uppercase tracking-wide transition-all relative',
+                    'flex-1 py-2 px-3 text-[10px] font-bold uppercase tracking-wide transition-all relative cursor-pointer',
                     tabActivo === 'pendientes'
                       ? 'text-yellow-700 bg-white'
                       : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -567,60 +572,60 @@
             <button
               v-if="estadoInscripcion[entrenamientoSeleccionado.id] === 'confirmada'"
               @click="abrirModalBaja(entrenamientoSeleccionado)"
-              :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado)"
+              :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
               :class="[
-                'w-full px-4 py-3 rounded-lg font-bold transition-colors',
-                fechaPasada(entrenamientoSeleccionado)
+                'w-full px-4 py-3 rounded-lg font-bold transition-colors cursor-pointer',
+                fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50'
               ]"
             >
-              {{ fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : '🔄 Cambiar mi respuesta a Baja' }}
+              {{ fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin) ? '⛔ No convocada' : '🔄 Cambiar mi respuesta a Baja' }}
             </button>
             <!-- Si ya se dio de baja - botón para cambiar a confirmada -->
             <button
               v-else-if="estadoInscripcion[entrenamientoSeleccionado.id] === 'baja'"
               @click="handleInscribirse(entrenamientoSeleccionado)"
-              :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado)"
+              :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
               :class="[
-                'w-full px-4 py-3 rounded-lg font-bold transition-colors',
-                fechaPasada(entrenamientoSeleccionado)
+                'w-full px-4 py-3 rounded-lg font-bold transition-colors cursor-pointer',
+                fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50'
               ]"
             >
-              {{ fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : '🔄 Cambiar mi respuesta a Confirmada' }}
+              {{ fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin) ? '⛔ No convocada' : '🔄 Cambiar mi respuesta a Confirmada' }}
             </button>
             <!-- Si no ha respondido - botones de acción -->
             <template v-else>
               <button
                 @click="handleInscribirse(entrenamientoSeleccionado)"
-                :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado)"
+                :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
                 :class="[
-                  'w-full px-4 py-3 rounded-lg font-bold transition-colors',
-                  fechaPasada(entrenamientoSeleccionado)
+                  'w-full px-4 py-3 rounded-lg font-bold transition-colors cursor-pointer',
+                  fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-green-500 text-white hover:bg-green-600 disabled:opacity-50'
                 ]"
               >
-                {{ fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : '✓ Confirmar mi Asistencia' }}
+                {{ fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin) ? '⛔ No convocada' : '✓ Confirmar mi Asistencia' }}
               </button>
               <button
                 @click="abrirModalBaja(entrenamientoSeleccionado)"
-                :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado)"
+                :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
                 :class="[
-                  'w-full px-4 py-3 rounded-lg font-bold transition-colors',
-                  fechaPasada(entrenamientoSeleccionado)
+                  'w-full px-4 py-3 rounded-lg font-bold transition-colors cursor-pointer',
+                  fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-red-500 text-white hover:bg-red-600 disabled:opacity-50'
                 ]"
               >
-                {{ fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : '✕ Darme de Baja' }}
+                {{ fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin) ? '⛔ No convocada' : '✕ Darme de Baja' }}
               </button>
             </template>
             <button
               @click="entrenamientoSeleccionado = null"
-              class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+              class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg font-bold hover:bg-gray-100 transition-colors cursor-pointer"
             >
               Cerrar
             </button>
@@ -652,14 +657,14 @@
         <div class="p-6 bg-gray-50 border-t border-gray-200 flex gap-3">
           <button
             @click="cerrarModalBaja"
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-100 transition-colors cursor-pointer"
             :disabled="isLoadingAccion"
           >
             Cancelar
           </button>
           <button
             @click="confirmarBaja"
-            class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors disabled:opacity-50"
+            class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors disabled:opacity-50 cursor-pointer"
             :disabled="isLoadingAccion"
           >
             {{ isLoadingAccion ? 'Procesando...' : 'Confirmar Baja' }}
@@ -765,6 +770,16 @@ const historialEntrenamientos = computed(() => {
   return entrenamientos.value.filter(e => e.equipo === equipoSeleccionado.value && eventoVencidoMas24h(e));
 });
 
+const esConvocada = (entrenamiento) => {
+  if (!entrenamiento.esConvocatoria) {
+    return true; // Si no es convocatoria, todos pueden inscribirse
+  }
+  if (!entrenamiento.convocadas || !jugadoraAuthUser.value) {
+    return false; // Si es convocatoria pero no hay lista o no hay usuario, no puede
+  }
+  return entrenamiento.convocadas.includes(jugadoraAuthUser.value.uid);
+};
+
 const isLoading = computed(() => isLoadingEntrenamientos.value);
 
 // Verificar si la fecha del entrenamiento ya pasó
@@ -813,6 +828,12 @@ const verDetalles = (entrenamiento) => {
 
 const handleInscribirse = async (entrenamiento) => {
   if (!jugadoraData.value) return;
+
+  // Bloquear si es convocatoria y no está convocada (excepto admin)
+  if (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin.value) {
+    mostrarToast('No estás en la lista de convocadas para este partido.', 'error');
+    return;
+  }
   
   // Validar que tengamos los datos necesarios
   const nombreCompleto = `${jugadoraData.value.nombre || ''} ${jugadoraData.value.apellido || ''}`.trim();
@@ -841,6 +862,11 @@ const handleInscribirse = async (entrenamiento) => {
 };
 
 const abrirModalBaja = (entrenamiento) => {
+  // Bloquear si es convocatoria y no está convocada (excepto admin)
+  if (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin.value) {
+    mostrarToast('No estás en la lista de convocadas para este partido.', 'error');
+    return;
+  }
   entrenamientoParaBaja.value = entrenamiento;
   motivoBaja.value = '';
   mostrarModalBaja.value = true;
@@ -912,7 +938,12 @@ onMounted(() => {
           bajas: organizadas.bajas.length,
           pendientes: organizadas.pendientes.length
         };
-      });
+        
+        // Si es el entrenamiento seleccionado en el modal, actualizar inscritasOrganizadas
+        if (entrenamientoSeleccionado.value?.id === ent.id) {
+          inscritasOrganizadas.value = organizadas;
+        }
+      }, ent); // Pasar el entrenamiento completo
       
       unsubscribers.value.push(unsub);
     }

@@ -59,7 +59,7 @@
         <button 
           @click="subirImagen"
           :disabled="!archivoSeleccionado || cargando"
-          class="w-full bg-primary hover:bg-primary-dark disabled:bg-gray-400 text-white font-bold py-3 rounded-lg transition-colors"
+          class="w-full bg-primary hover:bg-primary-dark disabled:bg-gray-400 text-white font-bold py-3 rounded-lg transition-colors cursor-pointer"
         >
           <span v-if="!cargando">📤 Subir Imagen</span>
           <span v-else>Cargando...</span>
@@ -107,7 +107,7 @@
             <button 
               @click="moverArriba(idx)"
               :disabled="idx === 0 || cargando"
-              class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-bold py-2 px-3 rounded-lg transition-colors text-sm"
+              class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-bold py-2 px-3 rounded-lg transition-colors text-sm cursor-pointer"
               title="Mover arriba"
             >
               ⬆️
@@ -116,7 +116,7 @@
             <button 
               @click="moverAbajo(idx)"
               :disabled="idx === imagenes.length - 1 || cargando"
-              class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-bold py-2 px-3 rounded-lg transition-colors text-sm"
+              class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-bold py-2 px-3 rounded-lg transition-colors text-sm cursor-pointer"
               title="Mover abajo"
             >
               ⬇️
@@ -125,7 +125,7 @@
             <button 
               @click="eliminarImagen(imagen.id, imagen.nombreArchivo, idx)"
               :disabled="cargando"
-              class="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white font-bold py-2 px-3 rounded-lg transition-colors text-sm"
+              class="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white font-bold py-2 px-3 rounded-lg transition-colors text-sm cursor-pointer"
             >
               🗑️ Eliminar
             </button>

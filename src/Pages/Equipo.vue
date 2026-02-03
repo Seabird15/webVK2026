@@ -8,7 +8,7 @@
             v-for="tab in tabs"
             :key="tab.id"
             @click="activeTab = tab.id"
-            class="py-3 md:py-4 px-2 md:px-4 font-bold text-xs md:text-base uppercase transition-all border-b-2 whitespace-nowrap"
+            class="py-3 md:py-4 px-2 md:px-4 font-bold text-xs md:text-base uppercase transition-all border-b-2 whitespace-nowrap cursor-pointer"
             :class="activeTab === tab.id
               ? 'border-primary text-primary'
               : 'border-transparent text-gray-600 hover:text-primary'"

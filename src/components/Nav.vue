@@ -67,7 +67,7 @@
         <!-- Botón menú mobile -->
         <button
           @click="isMenuOpen = !isMenuOpen"
-          class="lg:hidden flex flex-col gap-1.5 focus:outline-none"
+          class="lg:hidden flex flex-col gap-1.5 focus:outline-none cursor-pointer"
           aria-label="Menú"
         >
           <span class="w-6 h-0.5 bg-black transition-all" :class="isMenuOpen ? 'rotate-45 translate-y-2' : ''"></span>

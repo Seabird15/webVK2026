@@ -32,7 +32,7 @@
         <button
           @click="seleccionarCategoria('ascenso')"
           :disabled="isLoading"
-          class="group relative bg-white/95 backdrop-blur rounded-2xl md:rounded-3xl shadow-2xl p-6 md:p-10 hover:shadow-primary/50 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+          class="group relative bg-white/95 backdrop-blur rounded-2xl md:rounded-3xl shadow-2xl p-6 md:p-10 hover:shadow-primary/50 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden cursor-pointer"
         >
           <!-- Efecto de brillo al hover -->
           <div class="absolute inset-0 bg-gradient-to-br from-red-500/0 via-red-500/0 to-red-500/0 group-hover:from-red-500/10 group-hover:via-transparent group-hover:to-transparent transition-all duration-500"></div>
@@ -99,7 +99,7 @@
         <button
           @click="seleccionarCategoria('escuela')"
           :disabled="isLoading"
-          class="group relative bg-white/95 backdrop-blur rounded-2xl md:rounded-3xl shadow-2xl p-6 md:p-10 hover:shadow-primary-dark/50 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+          class="group relative bg-white/95 backdrop-blur rounded-2xl md:rounded-3xl shadow-2xl p-6 md:p-10 hover:shadow-primary-dark/50 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden cursor-pointer"
         >
           <!-- Efecto de brillo al hover -->
           <div class="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-blue-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:via-transparent group-hover:to-transparent transition-all duration-500"></div>

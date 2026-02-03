@@ -13,7 +13,7 @@
           :key="eq.id"
           @click="equipoSeleccionado = eq.id"
           :class="[
-            'px-6 py-2 rounded-lg font-bold uppercase transition-colors',
+            'px-6 py-2 rounded-lg font-bold uppercase transition-colors cursor-pointer',
             equipoSeleccionado === eq.id
               ? 'bg-primary text-white'
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -109,7 +109,7 @@
             <button
               type="button"
               @click="$refs.inputFoto.click()"
-              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors cursor-pointer"
             >
               Seleccionar foto
             </button>
@@ -135,7 +135,7 @@
         <button
           type="submit"
           :disabled="isLoading"
-          class="w-full bg-primary text-white py-2 rounded-lg font-bold uppercase hover:bg-primary-dark transition-colors disabled:opacity-50"
+          class="w-full bg-primary text-white py-2 rounded-lg font-bold uppercase hover:bg-primary-dark transition-colors disabled:opacity-50 cursor-pointer"
         >
           {{ isLoading ? 'Guardando...' : 'Agregar Jugadora' }}
         </button>
@@ -181,13 +181,13 @@
             <div class="flex gap-2 mt-4">
               <button
                 @click="editarJugadora(jugadora)"
-                class="flex-1 px-3 py-2 bg-blue-500 text-white rounded text-sm font-bold hover:bg-blue-600 transition-colors"
+                class="flex-1 px-3 py-2 bg-blue-500 text-white rounded text-sm font-bold hover:bg-blue-600 transition-colors cursor-pointer"
               >
                 Editar
               </button>
               <button
                 @click="confirmarEliminar(jugadora.id)"
-                class="flex-1 px-3 py-2 bg-red-500 text-white rounded text-sm font-bold hover:bg-red-600 transition-colors"
+                class="flex-1 px-3 py-2 bg-red-500 text-white rounded text-sm font-bold hover:bg-red-600 transition-colors cursor-pointer"
               >
                 Eliminar
               </button>

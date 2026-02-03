@@ -185,7 +185,7 @@ export const obtenerEstadoInscripcion = async (entrenamientoId, jugadoraId) => {
   }
 };
 // Escuchar cambios en tiempo real de inscripciones de un entrenamiento
-export const escucharInscripcionesEntrenamiento = (entrenamientoId, callback) => {
+export const escucharInscripcionesEntrenamiento = (entrenamientoId, callback, entrenamiento = null) => {
   const q = query(
     collection(db, 'inscripcionesEntrenamientos'),
     where('entrenamientoId', '==', entrenamientoId)
@@ -197,11 +197,33 @@ export const escucharInscripcionesEntrenamiento = (entrenamientoId, callback) =>
       ...doc.data()
     }));
     
+    // Filtrar pendientes: si es convocatoria, solo mostrar las convocadas
+    let pendientesFiltradas = inscritas.filter(i => i.estado === 'pendiente');
+    
+    console.log('🔍 DEBUG - Filtrado de pendientes:');
+    console.log('  - Entrenamiento ID:', entrenamientoId);
+    console.log('  - Es convocatoria:', entrenamiento?.esConvocatoria);
+    console.log('  - Convocadas:', entrenamiento?.convocadas);
+    console.log('  - Pendientes antes de filtrar:', pendientesFiltradas.length);
+    console.log('  - Pendientes IDs:', pendientesFiltradas.map(i => ({ nombre: i.jugadoraNombre, id: i.jugadoraId })));
+    
+    if (entrenamiento?.esConvocatoria && entrenamiento?.convocadas) {
+      console.log('  ✅ Aplicando filtro de convocadas...');
+      pendientesFiltradas = pendientesFiltradas.filter(i => {
+        const estaConvocada = entrenamiento.convocadas.includes(i.jugadoraId);
+        console.log(`    - ${i.jugadoraNombre} (${i.jugadoraId}): ${estaConvocada ? '✅ Convocada' : '❌ No convocada'}`);
+        return estaConvocada;
+      });
+      console.log('  - Pendientes después de filtrar:', pendientesFiltradas.length);
+    } else {
+      console.log('  ⚠️ NO se aplica filtro de convocadas');
+    }
+    
     // Organizar por estado
     const organizadas = {
       confirmadas: inscritas.filter(i => i.estado === 'confirmada'),
       bajas: inscritas.filter(i => i.estado === 'baja'),
-      pendientes: inscritas.filter(i => i.estado === 'pendiente')
+      pendientes: pendientesFiltradas
     };
     
     callback(organizadas);

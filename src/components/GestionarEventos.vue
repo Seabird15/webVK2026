@@ -111,7 +111,7 @@
           <button
             type="submit"
             :disabled="isLoading"
-            class="flex-1 px-4 py-2 bg-primary hover:bg-primary/80 disabled:bg-gray-400 text-white rounded-lg font-bold transition-colors"
+            class="flex-1 px-4 py-2 bg-primary hover:bg-primary/80 disabled:bg-gray-400 text-white rounded-lg font-bold transition-colors cursor-pointer"
           >
             {{ isLoading ? 'Guardando...' : editandoId ? 'Actualizar' : 'Crear' }}
           </button>
@@ -119,7 +119,7 @@
             v-if="editandoId"
             type="button"
             @click="cancelarEdicion"
-            class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-900 rounded-lg font-bold transition-colors"
+            class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-900 rounded-lg font-bold transition-colors cursor-pointer"
           >
             Cancelar
           </button>
@@ -173,13 +173,13 @@
           <div class="flex gap-2 ml-4">
             <button
               @click="cargarEvento(evento)"
-              class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded font-bold text-sm transition-colors"
+              class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded font-bold text-sm transition-colors cursor-pointer"
             >
               Editar
             </button>
             <button
               @click="confirmarEliminar(evento.id)"
-              class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded font-bold text-sm transition-colors"
+              class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded font-bold text-sm transition-colors cursor-pointer"
             >
               Eliminar
             </button>

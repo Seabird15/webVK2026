@@ -16,7 +16,7 @@
             v-for="equipo in equipos"
             :key="equipo.id"
             @click="equipoActivo = equipo.id"
-            class="py-3 md:py-4 px-3 md:px-4 font-bold text-xs md:text-base uppercase transition-all border-b-2 whitespace-nowrap"
+            class="py-3 md:py-4 px-3 md:px-4 font-bold text-xs md:text-base uppercase transition-all border-b-2 whitespace-nowrap cursor-pointer"
             :class="equipoActivo === equipo.id
               ? 'border-primary text-primary'
               : 'border-transparent text-gray-600 hover:text-primary'"

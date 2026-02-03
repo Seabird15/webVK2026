@@ -44,7 +44,7 @@
         <button
           type="submit"
           :disabled="isLoading"
-          class="w-full bg-primary-dark text-white py-2 rounded-lg font-bold uppercase hover:bg-primary-dark transition-colors disabled:opacity-50"
+          class="w-full bg-primary-dark text-white py-2 rounded-lg font-bold uppercase hover:bg-primary-dark transition-colors disabled:opacity-50 cursor-pointer"
         >
           {{ isLoading ? 'Iniciando...' : 'Iniciar Sesión' }}
         </button>

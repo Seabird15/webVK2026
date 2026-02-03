@@ -73,7 +73,7 @@ exports.sendPushNotification = functions.https.onCall(async (data, context) => {
         body: body,
       },
       fcmOptions: {
-        link: `https://www.clubdeportivovikingas/entrenamientos`,
+        link: `https://www.clubdeportivovikingas.cl/entrenamientos`,
       },
     },
   };

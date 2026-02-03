@@ -51,13 +51,13 @@
               <!-- Botones navegación -->
               <button 
                 @click="fotoAnterior(galeria.id, galeria.fotos.length)"
-                class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 md:-translate-x-8 bg-black hover:bg-primary text-white rounded-full p-4 md:p-5 transition-all duration-200 z-20 text-xl"
+                class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 md:-translate-x-8 bg-black hover:bg-primary text-white rounded-full p-4 md:p-5 transition-all duration-200 z-20 text-xl cursor-pointer"
               >
                 &#10094;
               </button>
               <button 
                 @click="fotoSiguiente(galeria.id, galeria.fotos.length)"
-                class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 md:translate-x-8 bg-black hover:bg-primary text-white rounded-full p-4 md:p-5 transition-all duration-200 z-20 text-xl"
+                class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 md:translate-x-8 bg-black hover:bg-primary text-white rounded-full p-4 md:p-5 transition-all duration-200 z-20 text-xl cursor-pointer"
               >
                 &#10095;
               </button>
@@ -69,7 +69,7 @@
                   :key="idx"
                   @click="indiceActual[galeria.id] = idx"
                   :class="[
-                    'h-2 rounded-full transition-all duration-200',
+                    'h-2 rounded-full transition-all duration-200 cursor-pointer',
                     idx === (indiceActual[galeria.id] || 0) ? 'bg-primary w-6' : 'bg-gray-300 w-2 hover:bg-gray-400'
                   ]"
                 ></button>
@@ -98,14 +98,14 @@
                   <button 
                     v-if="galeria.fotos.length > 1"
                     @click="fotoAnterior(galeria.id, galeria.fotos.length)"
-                    class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-primary text-white rounded-full p-3 transition-all duration-200 z-10"
+                    class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-primary text-white rounded-full p-3 transition-all duration-200 z-10 cursor-pointer"
                   >
                     &#10094;
                   </button>
                   <button 
                     v-if="galeria.fotos.length > 1"
                     @click="fotoSiguiente(galeria.id, galeria.fotos.length)"
-                    class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-primary text-white rounded-full p-3 transition-all duration-200 z-10"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-primary text-white rounded-full p-3 transition-all duration-200 z-10 cursor-pointer"
                   >
                     &#10095;
                   </button>
@@ -227,13 +227,13 @@
                   <!-- Botones navegación premium -->
                   <button 
                     @click="fotoAnterior(galeria.id, galeria.fotos.length)"
-                    class="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-primary text-black hover:text-white rounded-full p-3 md:p-4 transition-all duration-200 z-20 shadow-xl hover:shadow-2xl opacity-0 group-hover:opacity-100 transform hover:scale-125"
+                    class="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-primary text-black hover:text-white rounded-full p-3 md:p-4 transition-all duration-200 z-20 shadow-xl hover:shadow-2xl opacity-0 group-hover:opacity-100 transform hover:scale-125 cursor-pointer"
                   >
                     <span class="text-2xl md:text-3xl font-bold">‹</span>
                   </button>
                   <button 
                     @click="fotoSiguiente(galeria.id, galeria.fotos.length)"
-                    class="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-primary text-black hover:text-white rounded-full p-3 md:p-4 transition-all duration-200 z-20 shadow-xl hover:shadow-2xl opacity-0 group-hover:opacity-100 transform hover:scale-125"
+                    class="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-primary text-black hover:text-white rounded-full p-3 md:p-4 transition-all duration-200 z-20 shadow-xl hover:shadow-2xl opacity-0 group-hover:opacity-100 transform hover:scale-125 cursor-pointer"
                   >
                     <span class="text-2xl md:text-3xl font-bold">›</span>
                   </button>
@@ -251,7 +251,7 @@
                     :key="idx"
                     @click="indiceActual[galeria.id] = idx"
                     :class="[
-                      'transition-all duration-300 rounded-full',
+                      'transition-all duration-300 rounded-full cursor-pointer',
                       idx === (indiceActual[galeria.id] || 0) 
                         ? 'bg-primary w-10 h-3 shadow-lg' 
                         : 'bg-gray-400 w-2 h-2 hover:bg-gray-500'
