@@ -595,7 +595,39 @@ const formulario = ref({
 const busquedaConvocatoria = ref('');
 const jugadorasParaConvocar = ref([]);
 
+const parseFechaBase = (fecha) => {
+  if (!fecha) return null;
+  if (fecha?.seconds) return new Date(fecha.seconds * 1000);
+  if (fecha instanceof Date) return fecha;
+
+  if (typeof fecha === 'string') {
+    const soloFecha = fecha.split('T')[0];
+    const partes = soloFecha.split('-').map(Number);
+    if (partes.length === 3 && partes.every(n => Number.isFinite(n))) {
+      const [y, m, d] = partes;
+      return new Date(y, m - 1, d);
+    }
+  }
+
+  const d = new Date(fecha);
+  return Number.isNaN(d.getTime()) ? null : d;
+};
+
+const getFechaHoraMs = (ent) => {
+  const base = parseFechaBase(ent?.fecha);
+  if (!base) return null;
+  const dt = new Date(base);
+  if (typeof ent?.hora === 'string' && ent.hora.includes(':')) {
+    const [hh, mm] = ent.hora.split(':').map(Number);
+    dt.setHours(Number.isFinite(hh) ? hh : 0, Number.isFinite(mm) ? mm : 0, 0, 0);
+  } else {
+    dt.setHours(0, 0, 0, 0);
+  }
+  return dt.getTime();
+};
+
 const entrenamientosFiltrados = computed(() => {
+  const now = Date.now();
   return entrenamientos.value
     .filter(e => {
       if (!filtroEquipo.value) return true; // Sin filtro, mostrar todos
@@ -605,11 +637,16 @@ const entrenamientosFiltrados = computed(() => {
     .filter(e => {
       const termino = busqueda.value.toLowerCase();
       return (
-        e.nombre.toLowerCase().includes(termino) ||
-        e.lugar.toLowerCase().includes(termino)
+        (e.nombre || '').toLowerCase().includes(termino) ||
+        (e.lugar || '').toLowerCase().includes(termino)
       );
     })
-    .sort((a, b) => new Date(a.fecha + ' ' + a.hora) - new Date(b.fecha + ' ' + b.hora));
+    // Mostrar solo los futuros; los finalizados van al Historial del Admin
+    .filter(e => {
+      const ms = getFechaHoraMs(e);
+      return ms == null ? true : ms >= now;
+    })
+    .sort((a, b) => (getFechaHoraMs(a) ?? 0) - (getFechaHoraMs(b) ?? 0));
 });
 
 const mostrarFormularioNuevo = () => {
@@ -948,11 +985,8 @@ const formatearFecha = (fecha) => {
 
 // Verificar si la fecha del entrenamiento ya pasó
 const fechaPasada = (entrenamiento) => {
-  if (!entrenamiento.fecha) return false;
-  const fechaEntrenamiento = new Date(entrenamiento.fecha);
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  return fechaEntrenamiento < hoy;
+  const ms = getFechaHoraMs(entrenamiento);
+  return ms != null && ms < Date.now();
 };
 
 // Cargar entrenamientos al montar

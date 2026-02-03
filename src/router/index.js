@@ -93,6 +93,12 @@ const routes = [
     meta: { requiresJugadora: true }
   },
   {
+    path: '/entrenamientos/:id',
+    name: 'DetalleEntrenamiento',
+    component: () => import('../Pages/DetalleEntrenamiento.vue'),
+    meta: { requiresJugadora: true }
+  },
+  {
     path: '/perfil',
     name: 'Perfil',
     component: () => import('../Pages/Perfil.vue'),
@@ -142,6 +148,21 @@ router.beforeEach(async (to, from, next) => {
       next('/login');
     }
   } else if (requiresJugadora) {
+    // Permitir a Admin/Coach ver el detalle si viene desde el panel admin
+    if (to.name === 'DetalleEntrenamiento' && to.query?.from === 'admin') {
+      // Esperar a que Admin Auth esté listo (best-effort)
+      let intentos = 0;
+      while (!authReady.value && intentos < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        intentos++;
+      }
+
+      if (authUser.value && (userRole.value === 'admin' || userRole.value === 'coach')) {
+        next();
+        return;
+      }
+    }
+
     // Esperar a que Firebase Auth esté listo
     let intentos = 0;
     while (!jugadoraAuthReady.value && intentos < 50) {
