@@ -2,15 +2,10 @@
 importScripts("https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging-compat.js");
 
-// Tu configuración de Firebase (esto está bien como lo tienes)
+// Inicializa Firebase en el Service Worker con la mínima
+// información necesaria para FCM (no expone apiKey ni otros campos).
 const firebaseConfig = {
-  apiKey: "AIzaSyDsbiUocTAjYAMuzsYqH6uj06pvUnOelYY",
-  authDomain: "loginvk-955b2.firebaseapp.com",
-  projectId: "loginvk-955b2",
-  storageBucket: "loginvk-955b2.firebasestorage.app",
-  messagingSenderId: "400299482128",
-  appId: "1:400299482128:web:1835fcb5d6941e11127e95",
-  measurementId: "G-5C1E0KDXCS"
+  messagingSenderId: "400299482128"
 };
 
 // Ahora usa la sintaxis de la versión "compat"
