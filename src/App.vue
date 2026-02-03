@@ -3,10 +3,22 @@
     import Loader from './components/Loader.vue';
     import Footer from './components/Footer.vue';
 
-    import { watch } from 'vue';
+    import { watch, onMounted } from 'vue';
 import { jugadoraData } from './firebase/jugadorasAuth'; // Asegúrate que la ruta sea correcta
 import { requestPermissionAndSubscribe } from './firebase/messaging'; // La función que creamos
 
+// Ejecutar al montar el componente si ya hay datos de jugadora
+onMounted(() => {
+  if (jugadoraData.value && jugadoraData.value.equipo) {
+    console.log(`App montada con datos de jugadora. Equipo: ${jugadoraData.value.equipo}. Suscribiendo...`);
+    requestPermissionAndSubscribe(jugadoraData.value.equipo);
+    
+    if (jugadoraData.value.equipo === 'ambos') {
+      requestPermissionAndSubscribe('ascenso');
+      requestPermissionAndSubscribe('escuela');
+    }
+  }
+});
 
 watch(jugadoraData, (newData, oldData) => {
   // Solo proceder si tenemos nuevos datos y esos datos tienen un 'equipo'
