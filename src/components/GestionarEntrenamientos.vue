@@ -414,19 +414,9 @@
 
         <!-- Contenido -->
         <div class="p-2 sm:p-6 bg-gray-50">
-          <!-- Resumen -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-            <div class="bg-white rounded-lg border border-primary-dark p-4">
-              <div class="text-xs text-gray-500 font-bold uppercase">📍 Lugar</div>
-              <div class="text-sm font-semibold text-gray-900 mt-1">{{ entrenamientoDetallado.lugar || '-' }}</div>
-            </div>
-            <div class="bg-white rounded-lg border border-primary-dark p-4">
-              <div class="text-xs text-gray-500 font-bold uppercase">👥 Total inscritas</div>
-              <div class="text-sm font-semibold text-gray-900 mt-1">
-                {{ inscritasOrganizadasAdmin.confirmadas.length + inscritasOrganizadasAdmin.bajas.length + inscritasOrganizadasAdmin.pendientes.length }}
-                <span v-if="entrenamientoDetallado.capacidadMaxima" class="text-gray-400">/ {{ entrenamientoDetallado.capacidadMaxima }}</span>
-              </div>
-            </div>
+          <!-- Acciones y Notificaciones -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Acciones rápidas -->
             <div class="bg-white rounded-lg border border-primary-dark p-4">
               <div class="text-xs text-gray-500 font-bold uppercase">⚡ Acciones rápidas</div>
               <button
@@ -436,6 +426,21 @@
               >
                 🔄 Regenerar pendientes
               </button>
+            </div>
+            <!-- Enviar Notificación -->
+            <div class="bg-white rounded-lg border border-primary-dark p-4">
+              <div class="text-xs text-gray-500 font-bold uppercase">🔔 Enviar Notificación</div>
+              <div class="space-y-2 mt-2">
+                <input type="text" v-model="notificationData.title" placeholder="Título" class="w-full px-2 py-1 border border-gray-300 rounded-md text-sm">
+                <textarea v-model="notificationData.body" placeholder="Mensaje" rows="2" class="w-full px-2 py-1 border border-gray-300 rounded-md text-sm"></textarea>
+                <button
+                  @click="enviarNotificacionEntrenamiento"
+                  :disabled="isSendingNotification"
+                  class="w-full px-3 py-2 rounded-lg font-bold transition-colors text-sm bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400"
+                >
+                  {{ isSendingNotification ? 'Enviando...' : 'Enviar' }}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -686,6 +691,7 @@ import {
 } from '../firebase/entrenamientos';
 import { escucharInscripcionesEntrenamiento, cambiarEstadoInscripcion, inscribirJugadoraManual, crearInscripcionesPendientes } from '../firebase/inscripciones';
 import { fetchJugadorasRegistradasPorEquipo } from '../firebase/jugadorasAuth';
+import { sendPushNotification } from '../firebase/notificaciones';
 
 const mostrarFormulario = ref(false);
 const isLoading = ref(false);
@@ -703,6 +709,8 @@ const inscritasOrganizadasAdmin = ref({
 const unsubscribers = ref([]);
 const busquedaJugadora = ref('');
 const jugadorasDisponibles = ref([]);
+const isSendingNotification = ref(false);
+const notificationData = ref({ title: '', body: '' });
 
 // Mapeo para contar inscritas por estado
 const conteoInscritas = ref({});
@@ -838,6 +846,10 @@ const verDetallesEntrenamiento = (entrenamiento) => {
   tabDetalleAdmin.value = 'confirmadas';
   busquedaJugadora.value = '';
   jugadorasDisponibles.value = [];
+  notificationData.value = {
+    title: entrenamiento.nombre,
+    body: `Recordatorio: ${entrenamiento.tipo} el ${formatearFecha(entrenamiento.fecha)} a las ${entrenamiento.hora}`
+  };
 
   // Desuscribir de listeners anteriores
   unsubscribers.value.forEach(unsub => unsub());
@@ -1017,6 +1029,32 @@ const agregarJugadoraConvocatoria = (jugadora) => {
 // Quitar jugadora de la convocatoria
 const quitarJugadoraConvocatoria = (index) => {
   formulario.value.jugadorasConvocadas.splice(index, 1);
+};
+
+const enviarNotificacionEntrenamiento = async () => {
+  if (!entrenamientoDetallado.value) return;
+  if (!notificationData.value.title || !notificationData.value.body) {
+    alert('Por favor, ingresa un título y un cuerpo para la notificación.');
+    return;
+  }
+
+  isSendingNotification.value = true;
+  try {
+    const equipo = entrenamientoDetallado.value.equipo;
+    const { title, body } = notificationData.value;
+    if (equipo === 'ambos') {
+      await sendPushNotification('ascenso', title, body);
+      await sendPushNotification('escuela', title, body);
+    } else {
+      await sendPushNotification(equipo, title, body);
+    }
+    alert('Notificación enviada con éxito.');
+  } catch (error) {
+    alert('Error al enviar la notificación.');
+    console.error(error);
+  } finally {
+    isSendingNotification.value = false;
+  }
 };
 
 const guardarEntrenamiento = async () => {

@@ -2,7 +2,36 @@
     import Nav from './components/Nav.vue';
     import Loader from './components/Loader.vue';
     import Footer from './components/Footer.vue';
-  
+
+    import { watch } from 'vue';
+import { jugadoraData } from './firebase/jugadorasAuth'; // Asegúrate que la ruta sea correcta
+import { requestPermissionAndSubscribe } from './firebase/messaging'; // La función que creamos
+
+
+watch(jugadoraData, (newData, oldData) => {
+  // Solo proceder si tenemos nuevos datos y esos datos tienen un 'equipo'
+  // y además, nos aseguramos de que no sea una ejecución inicial con datos vacíos.
+  if (newData && newData.equipo) {
+    
+    // Para evitar ejecuciones múltiples, solo suscribimos si el equipo ha cambiado
+    // o si antes no había datos y ahora sí.
+    if (!oldData || newData.equipo !== oldData.equipo) {
+      
+      console.log(`Datos de jugadora actualizados. Equipo: ${newData.equipo}. Intentando suscribir...`);
+      
+      // Llama a la función para suscribirla al tema de su equipo
+      requestPermissionAndSubscribe(newData.equipo);
+
+      // Si una jugadora puede pertenecer a "ambos" equipos
+      if (newData.equipo === 'ambos') {
+          requestPermissionAndSubscribe('ascenso');
+          requestPermissionAndSubscribe('escuela');
+      }
+    }
+  }
+}, { 
+  deep: true // 'deep' es mejor para observar cambios dentro de un objeto
+});
 </script>
 
 <template>

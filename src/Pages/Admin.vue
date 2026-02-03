@@ -38,7 +38,7 @@
       </div>
 
       <!-- Contenido de Tabs -->
-      <div class="bg-white rounded-lg shadow p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="bg-white rounded-lg shadow p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Main -->
         <div class="lg:col-span-2">
         <!-- Solicitudes de Registro -->
