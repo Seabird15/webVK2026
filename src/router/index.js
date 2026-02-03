@@ -181,7 +181,7 @@ router.beforeEach(async (to, from, next) => {
   else if (to.path === '/login' && authUser.value && (userRole.value === 'admin' || userRole.value === 'coach')) {
     next('/admin');
   } else if (to.path === '/login-jugadora' && jugadoraAuthUser.value) {
-    next('/perfil'); // O a la ruta que consideres principal para jugadoras
+    next('/entrenamientos'); // O a la ruta que consideres principal para jugadoras
   }
   // Permitir acceso a rutas públicas
   else {
