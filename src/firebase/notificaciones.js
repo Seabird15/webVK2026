@@ -1,5 +1,7 @@
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import { doc, setDoc } from 'firebase/firestore';
 import app from './config';
+import { db } from './config';
 
 const functions = getFunctions(app);
 
@@ -21,5 +23,25 @@ export const sendPushNotification = async (topic, title, body) => {
   } catch (error) {
     console.error('Error al enviar la notificación:', error);
     throw new Error('Hubo un problema al enviar la notificación.');
+  }
+};
+
+/**
+ * Guarda o actualiza el token de notificación de una jugadora en Firestore.
+ * @param {string} uid - El UID de la jugadora.
+ * @param {string} token - El token de FCM.
+ */
+export const guardarTokenNotificacion = async (uid, token) => {
+  if (!uid || !token) {
+    console.error("UID o token de notificación no proporcionado.");
+    return;
+  }
+
+  try {
+    const notificacionRef = doc(db, 'notificaciones', uid);
+    await setDoc(notificacionRef, { token: token }, { merge: true });
+    console.log('Token de notificación guardado en Firestore para el UID:', uid);
+  } catch (error) {
+    console.error("Error al guardar el token de notificación:", error);
   }
 };

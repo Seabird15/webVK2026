@@ -1,9 +1,10 @@
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import app from "./config";
+import { auth } from "./config"; // Importar auth
+import { guardarTokenNotificacion } from "./notificaciones"; // Importar la nueva función
 
-const messaging = getMessaging(app);
-const functions = getFunctions(app);
+const messaging = getMessaging();
+const functions = getFunctions();
 
 // Prepara la llamada a nuestra Cloud Function
 const subscribeToTopicFunction = httpsCallable(functions, 'subscribeToTopic');
@@ -82,6 +83,11 @@ export const requestPermissionAndSubscribe = async (topicName) => {
 
       if (currentToken) {
         console.log("Token de FCM obtenido:", currentToken);
+
+        // Guardar el token en Firestore si hay un usuario autenticado
+        if (auth.currentUser) {
+          await guardarTokenNotificacion(auth.currentUser.uid, currentToken);
+        }
 
         // Llamar a la Cloud Function para suscribir el token
         console.log(`Llamando a la Cloud Function para suscribir al tema: ${topicName}`);
