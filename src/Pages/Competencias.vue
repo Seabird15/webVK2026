@@ -15,6 +15,19 @@
           <div class="h-1 w-12 bg-primary rounded-full"></div>
         </div>
         <p class="text-white/70 text-sm">LigaDobleve Summer Cup 2026 - Vikingas Ascenso - Enero 2026</p>
+        
+        <!-- Botón a Estadísticas -->
+        <div class="mt-6">
+          <router-link
+            to="/estadisticas"
+            class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-black px-6 py-3 rounded-lg font-bold text-sm transition-all transform hover:scale-105 shadow-xl"
+          >
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+            </svg>
+            Ver Estadísticas del Equipo
+          </router-link>
+        </div>
       </div>
 
       <!-- Loading State -->
