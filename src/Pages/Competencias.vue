@@ -14,7 +14,7 @@
           </p>
           <div class="h-1 w-12 bg-primary rounded-full"></div>
         </div>
-        <p class="text-white/70 text-sm">LigaDoble Summer Cup 2026 - Vikingas Ascenso - Enero 2026</p>
+        <p class="text-white/70 text-sm">LigaDobleve Summer Cup 2026 - Vikingas Ascenso - Enero 2026</p>
       </div>
 
       <!-- Loading State -->
@@ -213,9 +213,9 @@
         </h2>
         <div class="grid md:grid-cols-2 gap-8">
           <div>
-            <h3 class="text-black font-bold text-lg mb-3">LIGADOUBLE SUMMER CUP 2026</h3>
+            <h3 class="text-black font-bold text-lg mb-3">LIGADOBLEVE SUMMER CUP 2026</h3>
             <p class="text-black/80 text-sm mb-4 leading-relaxed">
-              ¡CD Vikingas - categoría Vikingas Ascenso - es campeona de la Serie AB+ Liga de Verano! El equipo demostró una gran recuperación tras una fase de grupos complicada, logrando victorias contundentes en los playoffs para coronarse campeonas.
+              ¡CD Vikingas - categoría Vikingas Ascenso - es campeona de la Serie Oro AB+ Liga de Verano! El equipo demostró una gran recuperación tras una fase de grupos complicada, logrando victorias contundentes en los playoffs para coronarse campeonas.
             </p>
             <a 
               href="https://trotamundos.cl/index.php/ligadobleve-summer-cup/" 
@@ -237,7 +237,7 @@
                 <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
                 </svg>
-                Campeonas Serie AB+ Liga de Verano
+                Campeonas Serie Oro AB+ Liga de Verano
               </li>
               <li class="font-bold text-black flex items-center gap-2">
                 <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
