@@ -110,8 +110,20 @@
             </p>
           </div>
           
-          <!-- CTA Button -->
-          <div class="shrink-0">
+          <!-- Botón de Like y CTA -->
+          <div class="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+            <!-- Botón de Like -->
+            <button
+              @click="toggleLike"
+              :disabled="isLikeLoading"
+              class="flex items-center gap-2 bg-white/20 backdrop-blur-md hover:bg-white/30 text-black border-2 border-black/30 px-4 py-3 rounded-lg font-bold text-sm transition-all transform hover:scale-105 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <HeartIconSolid v-if="hasLiked" class="w-6 h-6 text-red-500 transition-all" />
+              <HeartIcon v-else class="w-6 h-6 text-black transition-all" />
+              <span>{{ likesCount }}</span>
+            </button>
+            
+            <!-- CTA Ver Resultados -->
             <router-link
               to="/competencias"
               class="inline-block bg-black hover:bg-gray-900 text-primary px-6 py-3 rounded-lg font-bold text-sm transition-all transform hover:scale-105 shadow-xl"
@@ -146,8 +158,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import { HeartIcon } from '@heroicons/vue/24/outline';
+import { HeartIcon as HeartIconSolid } from '@heroicons/vue/24/solid';
 import Eventos from '../components/Eventos.vue';
 
 const heroData = ref({
@@ -163,6 +177,67 @@ const heroData = ref({
   stat3Texto: 'Categorías'
 });
 
+const likesCount = ref(0);
+const hasLiked = ref(false);
+const isLikeLoading = ref(false);
+
+// Verificar si el usuario ya dio like (usando localStorage)
+const checkIfLiked = () => {
+  const liked = localStorage.getItem('campeonato_liked');
+  hasLiked.value = liked === 'true';
+};
+
+// Cargar contador de likes desde Firebase
+const cargarLikes = async () => {
+  try {
+    const docRef = doc(db, 'configuracion', 'campeonatoLikes');
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      likesCount.value = docSnap.data().count || 0;
+    } else {
+      // Crear documento si no existe
+      await setDoc(docRef, { count: 0 });
+      likesCount.value = 0;
+    }
+  } catch (error) {
+    console.error('Error cargando likes:', error);
+  }
+};
+
+// Toggle like
+const toggleLike = async () => {
+  if (isLikeLoading.value) return;
+  
+  isLikeLoading.value = true;
+  
+  try {
+    const docRef = doc(db, 'configuracion', 'campeonatoLikes');
+    
+    if (hasLiked.value) {
+      // Quitar like
+      await updateDoc(docRef, {
+        count: increment(-1)
+      });
+      likesCount.value--;
+      hasLiked.value = false;
+      localStorage.removeItem('campeonato_liked');
+    } else {
+      // Dar like
+      await updateDoc(docRef, {
+        count: increment(1)
+      });
+      likesCount.value++;
+      hasLiked.value = true;
+      localStorage.setItem('campeonato_liked', 'true');
+    }
+  } catch (error) {
+    console.error('Error actualizando like:', error);
+  } finally {
+    isLikeLoading.value = false;
+  }
+};
+
 onMounted(async () => {
   try {
     const docRef = doc(db, 'configuracion', 'heroSection');
@@ -174,6 +249,10 @@ onMounted(async () => {
   } catch (error) {
     console.error('Error cargando datos del hero:', error);
   }
+  
+  // Cargar likes y verificar si el usuario ya dio like
+  checkIfLiked();
+  await cargarLikes();
 });
 
 </script>
