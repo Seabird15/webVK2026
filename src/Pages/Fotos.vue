@@ -14,7 +14,7 @@
           <div v-if="galeria.orden === 2 && galeria.fotos && galeria.fotos.length > 0" class="mb-16 p-7">
             <!-- Encabezado con barra de color -->
             <div class="flex items-center gap-4 mb-8">
-              <h2 class="text-3xl md:text-4xl font-bold text-black ">{{ galeria.titulo }}</h2>
+              <h2 class="text-3xl md:text-4xl font-bold text-black">{{ galeria.titulo }}</h2>
               <div class="flex-1 h-3 bg-primary rounded-full"></div>
             </div>
 
@@ -24,54 +24,65 @@
                 <img 
                   :src="foto.url"
                   :alt="galeria.titulo"
-                  class="w-full h-80 md:h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  class="w-full h-80 md:h-96 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
             </div>
 
-            <!-- CARRUSEL (si hay más de 3 fotos) -->
-            <div v-else class="relative">
-              <div class="overflow-hidden">
+            <!-- CARRUSEL MEJORADO (si hay más de 3 fotos) -->
+            <div v-else class="relative group">
+              <div class="relative overflow-hidden rounded-xl shadow-2xl bg-black">
                 <div 
-                  class="flex transition-transform duration-300 ease-out"
+                  class="flex transition-transform duration-500 ease-out"
                   :style="{ transform: `translateX(-${(indiceActual[galeria.id] || 0) * (100 / 3)}%)` }"
                 >
                   <div v-for="foto in galeria.fotos" :key="foto.url" class="w-1/3 flex-shrink-0 px-2">
-                    <div class="relative overflow-hidden rounded-lg shadow-lg bg-black">
-                      <img 
-                        :src="foto.url"
-                        :alt="galeria.titulo"
-                        class="w-full h-64 md:h-80 object-cover"
-                      />
-                    </div>
+                    <img 
+                      :src="foto.url"
+                      :alt="galeria.titulo"
+                      class="w-full h-80 md:h-[500px] lg:h-[600px] object-cover rounded-lg"
+                    />
                   </div>
+                </div>
+
+                <!-- Overlay gradiente -->
+                <div class="absolute inset-0 pointer-events-none bg-gradient-to-r from-black/20 via-transparent to-black/20"></div>
+
+                <!-- Botones navegación -->
+                <button 
+                  v-if="(indiceActual[galeria.id] || 0) > 0"
+                  @click="fotoAnteriorOrden2(galeria.id, galeria.fotos.length)"
+                  class="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-primary text-black hover:text-white rounded-full p-3 md:p-4 transition-all duration-200 z-20 shadow-xl opacity-0 group-hover:opacity-100 hover:scale-110 cursor-pointer"
+                >
+                  <span class="text-2xl md:text-3xl font-bold">‹</span>
+                </button>
+                <button 
+                  v-if="(indiceActual[galeria.id] || 0) < galeria.fotos.length - 3"
+                  @click="fotoSiguienteOrden2(galeria.id, galeria.fotos.length)"
+                  class="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-primary text-black hover:text-white rounded-full p-3 md:p-4 transition-all duration-200 z-20 shadow-xl opacity-0 group-hover:opacity-100 hover:scale-110 cursor-pointer"
+                >
+                  <span class="text-2xl md:text-3xl font-bold">›</span>
+                </button>
+
+                <!-- Contador de fotos -->
+                <div class="absolute bottom-4 right-4 bg-gradient-to-r from-primary to-primary/80 text-white px-5 py-2 rounded-full text-sm font-bold shadow-lg">
+                  {{ (indiceActual[galeria.id] || 0) + 1 }} / {{ galeria.fotos.length }}
                 </div>
               </div>
 
-              <!-- Botones navegación -->
-              <button 
-                @click="fotoAnterior(galeria.id, galeria.fotos.length)"
-                class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 md:-translate-x-8 bg-black hover:bg-primary text-white rounded-full p-4 md:p-5 transition-all duration-200 z-20 text-xl cursor-pointer"
-              >
-                &#10094;
-              </button>
-              <button 
-                @click="fotoSiguiente(galeria.id, galeria.fotos.length)"
-                class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 md:translate-x-8 bg-black hover:bg-primary text-white rounded-full p-4 md:p-5 transition-all duration-200 z-20 text-xl cursor-pointer"
-              >
-                &#10095;
-              </button>
-
-              <!-- Indicadores (dots) -->
+              <!-- Indicadores (dots) mejorados -->
               <div class="flex justify-center gap-2 mt-6">
                 <button
                   v-for="(_, idx) in galeria.fotos"
                   :key="idx"
                   @click="indiceActual[galeria.id] = idx"
                   :class="[
-                    'h-2 rounded-full transition-all duration-200 cursor-pointer',
-                    idx === (indiceActual[galeria.id] || 0) ? 'bg-primary w-6' : 'bg-gray-300 w-2 hover:bg-gray-400'
+                    'transition-all duration-300 rounded-full cursor-pointer',
+                    idx === (indiceActual[galeria.id] || 0) 
+                      ? 'bg-primary w-8 h-3 shadow-lg' 
+                      : 'bg-gray-300 w-2 h-2 hover:bg-gray-400'
                   ]"
+                  :title="`Foto ${idx + 1}`"
                 ></button>
               </div>
             </div>
@@ -122,13 +133,13 @@
               </div>
 
               <!-- Miniaturas verticales (1/3 en desktop) -->
-              <div v-if="galeria.fotos.length > 1" class="flex flex-col gap-3 md:gap-4">
+              <div v-if="galeria.fotos.length > 1" class="grid grid-cols-2 gap-3 md:gap-4">
                 <button 
-                  v-for="(foto, idx) in galeria.fotos.slice(0, 3)"
+                  v-for="(foto, idx) in galeria.fotos.slice(0, 4)"
                   :key="idx"
                   @click="indiceActual[galeria.id] = idx"
                   :class="[
-                    'relative overflow-hidden rounded-lg border-4 transition-all duration-200 h-24 md:h-32 cursor-pointer',
+                    'relative overflow-hidden rounded-lg border-4 transition-all duration-200 h-32 md:h-40 lg:h-48 cursor-pointer',
                     idx === (indiceActual[galeria.id] || 0) ? 'border-primary shadow-lg scale-105' : 'border-gray-300 hover:border-primary/50'
                   ]"
                 >
@@ -303,6 +314,18 @@ const fotoSiguiente = (galeriaId, total) => {
 const fotoAnterior = (galeriaId, total) => {
   const actual = indiceActual.value[galeriaId] || 0;
   indiceActual.value[galeriaId] = (actual - 1 + total) % total;
+};
+
+// Navegación para carrusel orden 2 (muestra 3 fotos a la vez)
+const fotoSiguienteOrden2 = (galeriaId, total) => {
+  const actual = indiceActual.value[galeriaId] || 0;
+  const maxIndice = Math.max(0, total - 3);
+  indiceActual.value[galeriaId] = Math.min(actual + 1, maxIndice);
+};
+
+const fotoAnteriorOrden2 = (galeriaId, total) => {
+  const actual = indiceActual.value[galeriaId] || 0;
+  indiceActual.value[galeriaId] = Math.max(actual - 1, 0);
 };
 
 // Determinar cuántas columnas mostrar en el carrusel según pantalla y total de fotos
