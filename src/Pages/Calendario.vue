@@ -67,7 +67,7 @@
                 :key="evento.id"
                 :class="[
                   'text-xs px-1 md:px-2 py-0.5 md:py-1 rounded font-semibold truncate cursor-pointer hover:opacity-80 border flex items-center gap-0.5 md:gap-1',
-                  obtenerColorEvento(evento.equipo)
+                  obtenerColorEvento(evento.equipo, evento.esCumplea\u00f1os)
                 ]"
                 @click="seleccionarEvento(evento)"
                 :title="evento.titulo"
@@ -112,7 +112,7 @@
                 {{ formatearFecha(eventoSeleccionado.fecha) }}
               </p>
             </div>
-            <div>
+            <div v-if="!eventoSeleccionado.esCumplea\u00f1os">
               <p class="text-xs md:text-sm font-medium text-gray-600">Hora</p>
               <p class="text-base md:text-lg text-gray-900">{{ eventoSeleccionado.hora }}</p>
             </div>
@@ -120,7 +120,7 @@
               <p class="text-xs md:text-sm font-medium text-gray-600">Tipo</p>
               <p class="text-base md:text-lg text-gray-900 capitalize">{{ eventoSeleccionado.tipo }}</p>
             </div>
-            <div v-if="eventoSeleccionado.equipo">
+            <div v-if="eventoSeleccionado.equipo && !eventoSeleccionado.esCumplea\u00f1os">
               <p class="text-xs md:text-sm font-medium text-gray-600">Equipo</p>
               <p class="text-base md:text-lg text-gray-900 capitalize">{{ eventoSeleccionado.equipo }}</p>
             </div>
@@ -136,8 +136,8 @@
             <p class="text-gray-900 text-sm md:text-base">{{ eventoSeleccionado.descripcion }}</p>
           </div>
 
-          <!-- Botones de acción (solo para admins) -->
-          <div v-if="isAdmin()" class="flex flex-col md:flex-row gap-2 md:gap-3 mt-6">
+          <!-- Botones de acción (solo para admins y no cumpleaños) -->
+          <div v-if="isAdmin() && !eventoSeleccionado.esCumplea\u00f1os" class="flex flex-col md:flex-row gap-2 md:gap-3 mt-6">
             <button
               @click="editarEvento(eventoSeleccionado)"
               class="flex-1 px-3 md:px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-bold text-sm md:text-base transition-colors cursor-pointer"
@@ -165,17 +165,24 @@
             @click="seleccionarEvento(evento)"
           >
             <div class="flex items-start justify-between gap-2 mb-2">
-              <h4 class="text-base md:text-lg font-bold text-gray-900 flex-1 wrap-break-word flex items-center gap-1.5">
+              <h4 class="text-base md:text-lg font-bold text-gray-900 flex-1 min-w-0 wrap-break-word flex items-center gap-1.5">
                 <component :is="obtenerIconoTipo(evento.tipo)" class="w-5 h-5 shrink-0" />
                 <span class="truncate">{{ evento.titulo }}</span>
               </h4>
               <span
+                v-if="!evento.esCumpleaños"
                 :class="[
-                  'text-xs px-2 py-1 rounded font-semibold border whitespace-nowrap',
-                  obtenerColorEvento(evento.equipo)
+                  'text-xs px-2 py-1 rounded font-semibold border whitespace-nowrap shrink-0',
+                  obtenerColorEvento(evento.equipo, evento.esCumpleaños)
                 ]"
               >
                 {{ evento.equipo || 'general' }}
+              </span>
+              <span
+                v-else
+                class="text-xs px-2 py-1 rounded font-semibold border whitespace-nowrap shrink-0 bg-pink-100 text-pink-800 border-pink-300"
+              >
+                Cumpleaños
               </span>
             </div>
             <!-- Indicador de convocatoria -->
@@ -183,9 +190,13 @@
               <ClipboardDocumentListIcon class="w-4 h-4" />
               Convocatoria ({{ evento.jugadorasConvocadas?.length || 0 }} jugadoras)
             </p>
-            <p class="text-xs md:text-sm text-gray-600 mb-2">
+            <p v-if="!evento.esCumplea\u00f1os" class="text-xs md:text-sm text-gray-600 mb-2">
               <CalendarIcon class="w-4 h-4 inline mr-1" />
               {{ formatearFecha(evento.fecha) }} <br class="md:hidden" /> a las {{ evento.hora }}
+            </p>
+            <p v-else class="text-xs md:text-sm text-gray-600 mb-2">
+              <CakeIcon class="w-4 h-4 inline mr-1" />
+              {{ formatearFecha(evento.fecha) }}
             </p>
             <p v-if="evento.lugar" class="text-xs md:text-sm text-gray-700">
               <MapPinIcon class="w-4 h-4 inline mr-1" />
@@ -203,6 +214,8 @@ import { ref, computed, onMounted } from 'vue';
 import { isAdmin } from '../firebase/auth';
 import { fetchEntrenamientosPorEquipo } from '../firebase/entrenamientos';
 import { useLoader } from '../composables/useLoader.js';
+import { db } from '../firebase/config';
+import { collection, getDocs } from 'firebase/firestore';
 import { 
   CalendarIcon, 
   MapPinIcon, 
@@ -210,7 +223,8 @@ import {
   UserGroupIcon,
   SparklesIcon,
   BoltIcon,
-  ClipboardDocumentListIcon
+  ClipboardDocumentListIcon,
+  CakeIcon
 } from '@heroicons/vue/24/outline';
 
 const { show, hide } = useLoader();
@@ -218,6 +232,7 @@ const mesActual = ref(new Date().getMonth());
 const anioActual = ref(new Date().getFullYear());
 const diaActual = ref(new Date().getDate());
 const eventosDelMes = ref([]);
+const cumpleaniosDelMes = ref([]);
 const eventoSeleccionado = ref(null);
 
 const meses = [
@@ -247,22 +262,28 @@ const diasCalendario = computed(() => {
   return calendario;
 });
 
-// Obtener eventos de un día específico
+// Obtener eventos de un día específico (incluyendo cumpleaños)
 const obtenerEventosDia = (dia) => {
-  return eventosDelMes.value.filter(evento => {
+  const eventos = eventosDelMes.value.filter(evento => {
     const fecha = new Date(evento.fecha);
     return fecha.getDate() === dia && 
            fecha.getMonth() === mesActual.value && 
            fecha.getFullYear() === anioActual.value;
   });
+
+  const cumples = cumpleaniosDelMes.value.filter(cumple => cumple.diaMes === dia);
+
+  return [...cumples, ...eventos];
 };
 
-// Próximos eventos
+// Próximos eventos (incluyendo cumpleaños)
 const proximosEventos = computed(() => {
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
   
-  return eventosDelMes.value
+  const todosEventos = [...eventosDelMes.value, ...cumpleaniosDelMes.value];
+  
+  return todosEventos
     .filter(evento => {
       const fecha = new Date(evento.fecha);
       return fecha >= hoy;
@@ -283,7 +304,11 @@ const formatearFecha = (fecha) => {
 };
 
 // Obtener color del evento según el equipo o tipo
-const obtenerColorEvento = (equipo) => {
+const obtenerColorEvento = (equipo, esCumpleaños = false) => {
+  if (esCumpleaños) {
+    return 'bg-pink-100 text-pink-800 border-pink-300';
+  }
+  
   switch (equipo) {
     case 'ascenso':
       return 'bg-red-100 text-red-800 border-red-300';
@@ -299,6 +324,8 @@ const obtenerColorEvento = (equipo) => {
 // Obtener componente de icono según el tipo de evento
 const obtenerIconoTipo = (tipo) => {
   switch (tipo) {
+    case 'cumpleaños':
+      return CakeIcon;
     case 'partido':
       return TrophyIcon;
     case 'amistoso':
@@ -331,6 +358,40 @@ const mesSiguiente = () => {
   cargarEventos();
 };
 
+// Cargar cumpleaños de jugadoras
+const cargarCumpleanios = async () => {
+  try {
+    const snapshot = await getDocs(collection(db, 'jugadoraRegistro'));
+    const todasJugadoras = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    // Filtrar jugadoras que tengan fecha de nacimiento y procesarlas
+    cumpleaniosDelMes.value = todasJugadoras
+      .filter(jugadora => jugadora.fechaNacimiento)
+      .map(jugadora => {
+        const [anio, mes, dia] = jugadora.fechaNacimiento.split('-').map(Number);
+        return {
+          id: `cumple-${jugadora.id}`,
+          titulo: `${jugadora.nombre} ${jugadora.apellido}`,
+          tipo: 'cumpleaños',
+          equipo: jugadora.equipo,
+          diaMes: dia,
+          mesNacimiento: mes - 1, // JavaScript usa meses 0-11
+          fecha: new Date(anioActual.value, mes - 1, dia).toISOString(),
+          hora: '00:00',
+          descripcion: `Cumpleaños de ${jugadora.nombre} ${jugadora.apellido}`,
+          esCumpleaños: true,
+          nombreJugadora: `${jugadora.nombre} ${jugadora.apellido}`
+        };
+      })
+      .filter(cumple => cumple.mesNacimiento === mesActual.value);
+  } catch (err) {
+    console.error('Error cargando cumpleaños:', err);
+  }
+};
+
 // Cargar eventos (entrenamientos)
 const cargarEventos = async () => {
   try {
@@ -339,11 +400,14 @@ const cargarEventos = async () => {
     const entrenamientosAscenso = await fetchEntrenamientosPorEquipo('ascenso');
     const entrenamientosEscuela = await fetchEntrenamientosPorEquipo('escuela');
     
-    // Combinar y transformar los datos para el calendario
+    // Combinar y eliminar duplicados (los entrenamientos 'ambos' aparecen en ambos)
     const todosEntrenamientos = [...entrenamientosAscenso, ...entrenamientosEscuela];
+    const entrenamientosUnicos = Array.from(
+      new Map(todosEntrenamientos.map(ent => [ent.id, ent])).values()
+    );
     
     // Filtrar por mes y año actual
-    eventosDelMes.value = todosEntrenamientos
+    eventosDelMes.value = entrenamientosUnicos
       .filter(ent => {
         const fecha = new Date(ent.fecha);
         return fecha.getMonth() === mesActual.value && 
@@ -354,6 +418,9 @@ const cargarEventos = async () => {
         titulo: ent.nombre,  // Mapear 'nombre' a 'titulo' para compatibilidad
         tipo: ent.tipo || 'entrenamiento'
       }));
+
+    // Cargar cumpleaños del mes
+    await cargarCumpleanios();
   } catch (err) {
     console.error('Error cargando eventos:', err);
   } finally {

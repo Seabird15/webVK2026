@@ -189,8 +189,8 @@
             <!-- Directora Técnica -->
             <div v-if="equipoActual.directoraTecnica" class="mb-12 md:mb-16">
               <h3 class="text-xl md:text-2xl font-bold uppercase mb-6 md:mb-8 text-black">Directora Técnica</h3>
-              <div class="flex bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow max-w-2xl">
-                <div class="w-40 md:w-48 h-40 md:h-48 shrink-0 bg-gray-100 flex items-center justify-center">
+              <div class="flex bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow max-w-2xl h-48">
+                <div class="w-48 h-48 shrink-0 bg-gray-100 flex items-center justify-center overflow-hidden">
                   <img :src="obtenerFoto(equipoActual.directoraTecnica.foto)" :alt="equipoActual.directoraTecnica.nombre" class="w-full h-full object-cover"/>
                 </div>
                 <div class="flex-1 p-4 md:p-6 flex flex-col justify-center">
@@ -204,8 +204,8 @@
             <!-- Preparador Porteras -->
             <div v-if="equipoActual.preparadorPorteras" class="mb-12 md:mb-16">
               <h3 class="text-xl md:text-2xl font-bold uppercase mb-6 md:mb-8 text-black">Preparador Porteras</h3>
-              <div class="flex bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow max-w-2xl">
-                <div class="w-40 md:w-48 h-40 md:h-48 shrink-0 bg-gray-100 flex items-center justify-center">
+              <div class="flex bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow max-w-2xl h-48">
+                <div class="w-48 h-48 shrink-0 bg-gray-100 flex items-center justify-center overflow-hidden">
                   <img :src="obtenerFoto(equipoActual.preparadorPorteras.foto)" :alt="equipoActual.preparadorPorteras.nombre" class="w-full h-full object-cover"/>
                 </div>
                 <div class="flex-1 p-4 md:p-6 flex flex-col justify-center">
@@ -220,8 +220,8 @@
             <div v-if="equipoActual.porteras.length > 0" class="mb-12 md:mb-16">
               <h3 class="text-xl md:text-2xl font-bold uppercase mb-6 md:mb-8 text-black">Porteras</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                <div v-for="jugadora in equipoActual.porteras" :key="jugadora.id" class="flex flex-row bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                  <div class="w-38 h-auto bg-gray-100 flex items-center justify-center shrink-0">
+                <div v-for="jugadora in equipoActual.porteras" :key="jugadora.id" class="flex flex-row bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow h-40 md:h-44">
+                  <div class="w-32 h-40 md:w-36 md:h-44 bg-gray-100 flex items-center justify-center shrink-0 overflow-hidden">
                     <img :src="obtenerFoto(jugadora.foto)" :alt="jugadora.nombre" class="w-full h-full object-cover"/>
                   </div>
                   <div class="p-4 md:p-6 flex flex-col justify-center flex-1">
@@ -237,8 +237,8 @@
             <div v-if="equipoActual.defensas.length > 0" class="mb-12 md:mb-16">
               <h3 class="text-xl md:text-2xl font-bold uppercase mb-6 md:mb-8 text-black">Defensas</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                <div v-for="jugadora in equipoActual.defensas" :key="jugadora.id" class="flex flex-row bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                  <div class="w-38 h-auto bg-gray-100 flex items-center justify-center shrink-0">
+                <div v-for="jugadora in equipoActual.defensas" :key="jugadora.id" class="flex flex-row bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow h-40 md:h-44">
+                  <div class="w-32 h-40 md:w-36 md:h-44 bg-gray-100 flex items-center justify-center shrink-0 overflow-hidden">
                     <img :src="obtenerFoto(jugadora.foto)" :alt="jugadora.nombre" class="w-full h-full object-cover"/>
                   </div>
                   <div class="p-4 md:p-6 flex flex-col justify-center flex-1">
@@ -254,8 +254,8 @@
             <div v-if="equipoActual.alas.length > 0" class="mb-12 md:mb-16">
               <h3 class="text-xl md:text-2xl font-bold uppercase mb-6 md:mb-8 text-black">Alas</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                <div v-for="jugadora in equipoActual.alas" :key="jugadora.id" class="flex flex-row bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                  <div class="w-38 h-auto bg-gray-100 flex items-center justify-center shrink-0">
+                <div v-for="jugadora in equipoActual.alas" :key="jugadora.id" class="flex flex-row bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow h-40 md:h-44">
+                  <div class="w-32 h-40 md:w-36 md:h-44 bg-gray-100 flex items-center justify-center shrink-0 overflow-hidden">
                     <img :src="obtenerFoto(jugadora.foto)" :alt="jugadora.nombre" class="w-full h-full object-cover"/>
                   </div>
                   <div class="p-4 md:p-6 flex flex-col justify-center flex-1">
@@ -271,8 +271,8 @@
             <div v-if="equipoActual.medio.length > 0" class="mb-12 md:mb-16">
               <h3 class="text-xl md:text-2xl font-bold uppercase mb-6 md:mb-8 text-black">Medio</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                <div v-for="jugadora in equipoActual.medio" :key="jugadora.id" class="flex flex-row bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                  <div class="w-38 h-auto bg-gray-100 flex items-center justify-center shrink-0">
+                <div v-for="jugadora in equipoActual.medio" :key="jugadora.id" class="flex flex-row bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow h-40 md:h-44">
+                  <div class="w-32 h-40 md:w-36 md:h-44 bg-gray-100 flex items-center justify-center shrink-0 overflow-hidden">
                     <img :src="obtenerFoto(jugadora.foto)" :alt="jugadora.nombre" class="w-full h-full object-cover"/>
                   </div>
                   <div class="p-4 md:p-6 flex flex-col justify-center flex-1">
@@ -288,8 +288,8 @@
             <div v-if="equipoActual.delanteras.length > 0" class="mb-12 md:mb-16">
               <h3 class="text-xl md:text-2xl font-bold uppercase mb-6 md:mb-8 text-black">Delanteras</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                <div v-for="jugadora in equipoActual.delanteras" :key="jugadora.id" class="flex flex-row bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                  <div class="w-38 h-auto bg-gray-100 flex items-center justify-center shrink-0">
+                <div v-for="jugadora in equipoActual.delanteras" :key="jugadora.id" class="flex flex-row bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow h-40 md:h-44">
+                  <div class="w-32 h-40 md:w-36 md:h-44 bg-gray-100 flex items-center justify-center shrink-0 overflow-hidden">
                     <img :src="obtenerFoto(jugadora.foto)" :alt="jugadora.nombre" class="w-full h-full object-cover"/>
                   </div>
                   <div class="p-4 md:p-6 flex flex-col justify-center flex-1">
