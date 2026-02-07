@@ -21,7 +21,7 @@ const estadisticasIniciales = {
 };
 
 export async function inicializarEstadisticasAscenso() {
-  console.log('🔄 Iniciando actualización de estadísticas...');
+  // // console.log('🔄 Iniciando actualización de estadísticas...');
   
   try {
     // Obtener todas las jugadoras de ascenso
@@ -38,7 +38,7 @@ export async function inicializarEstadisticasAscenso() {
       nombreCompleto: `${doc.data().nombre} ${doc.data().apellido}`.toLowerCase()
     }));
 
-    console.log(`📋 Encontradas ${jugadoras.length} jugadoras en ascenso`);
+    // // console.log(`📋 Encontradas ${jugadoras.length} jugadoras en ascenso`);
 
     let actualizadas = 0;
     let noEncontradas = [];
@@ -60,23 +60,23 @@ export async function inicializarEstadisticasAscenso() {
           updatedAt: new Date()
         });
         
-        console.log(`✅ Actualizada: ${jugadora.nombre} ${jugadora.apellido} - ${estadistica.goles} goles, ${estadistica.asistencias} asistencias`);
+        // // console.log(`✅ Actualizada: ${jugadora.nombre} ${jugadora.apellido} - ${estadistica.goles} goles, ${estadistica.asistencias} asistencias`);
         actualizadas++;
       } else {
         noEncontradas.push(estadistica.nombre);
-        console.warn(`⚠️  No encontrada: ${estadistica.nombre}`);
+        // // console.warn(`⚠️  No encontrada: ${estadistica.nombre}`);
       }
     }
 
-    console.log(`\n🎉 Proceso completado:`);
-    console.log(`   ✅ ${actualizadas} jugadoras actualizadas`);
+    // // console.log(`\n🎉 Proceso completado:`);
+    // // console.log(`   ✅ ${actualizadas} jugadoras actualizadas`);
     if (noEncontradas.length > 0) {
-      console.log(`   ⚠️  ${noEncontradas.length} no encontradas: ${noEncontradas.join(', ')}`);
+      // // console.log(`   ⚠️  ${noEncontradas.length} no encontradas: ${noEncontradas.join(', ')}`);
     }
 
     return { actualizadas, noEncontradas };
   } catch (error) {
-    console.error('❌ Error:', error);
+    // // console.error('❌ Error:', error);
     throw error;
   }
 }

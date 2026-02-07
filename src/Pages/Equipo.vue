@@ -372,7 +372,7 @@ const cargarEquipo = async (equipoId) => {
       delanteras: datosEquipo.delanteras
     };
   } catch (err) {
-    console.error(`Error cargando equipo ${equipoId}:`, err);
+    // // console.error(`Error cargando equipo ${equipoId}:`, err);
   } finally {
     hide();
   }

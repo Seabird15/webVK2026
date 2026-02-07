@@ -217,7 +217,7 @@ onMounted(async () => {
         hide();
     } catch (error) {
         hide();
-        console.error('Error cargando eventos especiales:', error);
+        // console.error('Error cargando eventos especiales:', error);
         alert('Error al cargar los datos');
     }
 });
@@ -236,7 +236,7 @@ const guardarProximoPartido = async () => {
         alert('✓ Próximo partido guardado correctamente');
     } catch (error) {
         hide();
-        console.error('Error guardando próximo partido:', error);
+        // console.error('Error guardando próximo partido:', error);
         alert('Error al guardar');
     }
 };
@@ -251,7 +251,7 @@ const guardarUltimoPartido = async () => {
         alert('✓ Último partido guardado correctamente');
     } catch (error) {
         hide();
-        console.error('Error guardando último partido:', error);
+        // console.error('Error guardando último partido:', error);
         alert('Error al guardar');
     }
 };

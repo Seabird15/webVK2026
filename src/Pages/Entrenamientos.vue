@@ -289,8 +289,10 @@
               <span class="text-xs bg-gray-200 text-gray-700 rounded-full px-3 py-1">Finalizado</span>
             </div>
             <p class="text-xs text-gray-700 mb-3 line-clamp-2">{{ ent.descripcion }}</p>
-            <div class="flex gap-2">
-              <button @click="verDetalles(ent)" class="px-3 py-1 text-xs bg-primary text-white rounded-lg cursor-pointer">Ver</button>
+            <div class="flex gap-2 flex-wrap">
+              <button @click="verDetalles(ent)" class="flex-1 min-w-[80px] px-3 py-2 text-xs bg-primary text-white rounded-lg cursor-pointer hover:bg-primary/90 font-bold transition-colors">
+                ✏️ Editar Asistencia
+              </button>
             </div>
           </div>
         </div>
@@ -299,7 +301,7 @@
     <div v-if="entrenamientoSeleccionado" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" @click.self="entrenamientoSeleccionado = null">
       <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
         <!-- Header con gradiente -->
-        <div class="sticky top-0 bg-gradient-to-r from-primary-dark to-primary p-6 text-white flex justify-between items-start">
+        <div class="sticky top-0 bg-linear-to-r from-primary-dark to-primary p-6 text-white flex justify-between items-start">
           <div class="flex-1">
             <h2 class="text-2xl font-bold mb-2">{{ entrenamientoSeleccionado.nombre }}</h2>
             <div class="flex items-center gap-3 text-sm opacity-90">
@@ -762,23 +764,30 @@ if (!jugadoraAuthUser.value) {
 
 const entrenamientosFiltered = computed(() => {
   const now = Date.now();
-  return entrenamientos.value.filter(e => {
-    // Filtrar por equipo (fetchEntrenamientosPorEquipo ya devuelve los correctos, pero lo dejamos explícito)
-    if (e.equipo !== equipoSeleccionado.value) return false;
+  return entrenamientos.value
+    .filter(e => {
+      // Filtrar por equipo
+      if (e.equipo !== equipoSeleccionado.value) return false;
 
-    // Si no hay fecha, mostrar por seguridad
-    if (!e.fecha) return true;
+      // Si no hay fecha, mostrar por seguridad
+      if (!e.fecha) return true;
 
-    const fechaEvento = new Date(e.fecha.seconds ? e.fecha.seconds * 1000 : e.fecha);
+      const fechaEvento = new Date(e.fecha.seconds ? e.fecha.seconds * 1000 : e.fecha);
 
-    // Mostrar si el evento es en el futuro
-    if (fechaEvento.getTime() > now) return true;
+      // Mostrar si el evento es en el futuro
+      if (fechaEvento.getTime() > now) return true;
 
-    // Mostrar si el evento terminó hace menos de 24 horas
-    const diff = now - fechaEvento.getTime();
-    const veinticuatroHoras = 24 * 60 * 60 * 1000;
-    return diff <= veinticuatroHoras;
-  });
+      // Mostrar si el evento terminó hace menos de 24 horas
+      const diff = now - fechaEvento.getTime();
+      const veinticuatroHoras = 24 * 60 * 60 * 1000;
+      return diff <= veinticuatroHoras;
+    })
+    .sort((a, b) => {
+      // Ordenar por fecha: más próximo primero
+      const fechaA = new Date(a.fecha?.seconds ? a.fecha.seconds * 1000 : a.fecha || 0);
+      const fechaB = new Date(b.fecha?.seconds ? b.fecha.seconds * 1000 : b.fecha || 0);
+      return fechaA.getTime() - fechaB.getTime();
+    });
 });
 
 // Retorna true si el evento terminó hace más de 24 horas
@@ -792,7 +801,14 @@ const eventoVencidoMas24h = (entrenamiento) => {
 const esAdmin = computed(() => userRole.value === 'admin');
 
 const historialEntrenamientos = computed(() => {
-  return entrenamientos.value.filter(e => e.equipo === equipoSeleccionado.value && eventoVencidoMas24h(e));
+  return entrenamientos.value
+    .filter(e => e.equipo === equipoSeleccionado.value && eventoVencidoMas24h(e))
+    .sort((a, b) => {
+      // Ordenar por fecha: más reciente primero en el historial
+      const fechaA = new Date(a.fecha?.seconds ? a.fecha.seconds * 1000 : a.fecha || 0);
+      const fechaB = new Date(b.fecha?.seconds ? b.fecha.seconds * 1000 : b.fecha || 0);
+      return fechaB.getTime() - fechaA.getTime();
+    });
 });
 
 const esConvocada = (entrenamiento) => {
@@ -864,12 +880,12 @@ const handleInscribirse = async (entrenamiento) => {
   // Validar que tengamos los datos necesarios
   const nombreCompleto = `${jugadoraData.value.nombre || ''} ${jugadoraData.value.apellido || ''}`.trim();
   if (!nombreCompleto) {
-    console.error('Datos de jugadora incompletos:', jugadoraData.value);
+    // // console.error('Datos de jugadora incompletos:', jugadoraData.value);
     mostrarToast('Error: datos de perfil incompletos', 'error');
     return;
   }
   
-  console.log('Inscribiendo con nombre:', nombreCompleto);
+  // // console.log('Inscribiendo con nombre:', nombreCompleto);
   
   isLoadingAccion.value = true;
   const success = await inscribirseEntrenamiento(

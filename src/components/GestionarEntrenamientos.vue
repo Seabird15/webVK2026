@@ -44,14 +44,15 @@
       </div>
 
     <!-- Modal Nuevo/Editar Entrenamiento -->
-    <div v-if="mostrarFormulario" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
-      <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
-        <!-- Encabezado Modal -->
-        <div class="sticky top-0 bg-primary text-white p-4 sm:p-6 border-b border-gray-200 z-10">
-          <h3 class="text-lg sm:text-xl font-bold">
-            {{ entrenamientoEditando ? 'Editar Entrenamiento' : 'Nuevo Entrenamiento' }}
-          </h3>
-        </div>
+    <Teleport to="body">
+      <div v-if="mostrarFormulario" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-2 sm:p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+          <!-- Encabezado Modal -->
+          <div class="sticky top-0 bg-primary text-white p-4 sm:p-6 border-b border-gray-200 z-10">
+            <h3 class="text-lg sm:text-xl font-bold">
+              {{ entrenamientoEditando ? 'Editar Entrenamiento' : 'Nuevo Entrenamiento' }}
+            </h3>
+          </div>
 
         <!-- Formulario -->
         <form @submit.prevent="guardarEntrenamiento" class="p-4 sm:p-6 space-y-4">
@@ -263,6 +264,7 @@
         </form>
       </div>
     </div>
+    </Teleport>
 
       <!-- Lista de Entrenamientos -->
       <div v-if="isLoadingEntrenamientos" class="text-center py-12">
@@ -810,7 +812,12 @@ const editarEntrenamiento = (entrenamiento) => {
   
   // Convertir fecha a formato YYYY-MM-DD para el input date
   let fechaFormato = entrenamiento.fecha;
-  if (typeof fechaFormato === 'string' && fechaFormato.includes('T')) {
+  
+  // Manejar timestamp de Firestore (objeto con .seconds)
+  if (fechaFormato && typeof fechaFormato === 'object' && fechaFormato.seconds) {
+    const date = new Date(fechaFormato.seconds * 1000);
+    fechaFormato = date.toISOString().split('T')[0];
+  } else if (typeof fechaFormato === 'string' && fechaFormato.includes('T')) {
     // Si ya tiene hora, extraer solo la fecha
     fechaFormato = fechaFormato.split('T')[0];
   } else if (fechaFormato instanceof Date) {
@@ -909,7 +916,7 @@ const cambiarEstado = async (inscripcionId, nuevoEstado) => {
   try {
     const success = await cambiarEstadoInscripcion(inscripcionId, nuevoEstado);
     if (success) {
-      console.log('Estado actualizado correctamente');
+      // // console.log('Estado actualizado correctamente');
     } else {
       alert('Error al cambiar el estado');
     }
@@ -945,7 +952,7 @@ const buscarJugadoras = async () => {
              !idsInscritas.includes(j.id);
     });
   } catch (err) {
-    console.error('Error buscando jugadoras:', err);
+    // // console.error('Error buscando jugadoras:', err);
   }
 };
 
@@ -962,7 +969,7 @@ const agregarJugadoraManual = async (jugadora, estado) => {
     );
     
     if (success) {
-      console.log('Jugadora agregada correctamente');
+      // // console.log('Jugadora agregada correctamente');
       busquedaJugadora.value = '';
       jugadorasDisponibles.value = [];
     } else {
@@ -1010,7 +1017,7 @@ const buscarJugadorasParaConvocar = async () => {
              !idsConvocadas.includes(j.id);
     });
   } catch (err) {
-    console.error('Error buscando jugadoras:', err);
+    // // console.error('Error buscando jugadoras:', err);
   }
 };
 
@@ -1051,7 +1058,7 @@ const enviarNotificacionEntrenamiento = async () => {
     alert('Notificación enviada con éxito.');
   } catch (error) {
     alert('Error al enviar la notificación.');
-    console.error(error);
+    // // console.error(error);
   } finally {
     isSendingNotification.value = false;
   }
@@ -1093,7 +1100,7 @@ const guardarEntrenamiento = async () => {
         esConvocatoria: formulario.value.esConvocatoria,
         jugadorasConvocadas: formulario.value.jugadorasConvocadas
       });
-      console.log('Entrenamiento actualizado');
+      // // console.log('Entrenamiento actualizado');
     } else {
       // Crear
       await crearEntrenamiento({
@@ -1108,7 +1115,7 @@ const guardarEntrenamiento = async () => {
         esConvocatoria: formulario.value.esConvocatoria,
         jugadorasConvocadas: formulario.value.jugadorasConvocadas
       });
-      console.log('Entrenamiento creado');
+      // // console.log('Entrenamiento creado');
     }
 
     // Recargar entrenamientos
@@ -1131,7 +1138,7 @@ const confirmarEliminar = async (entrenamientoId) => {
   if (confirm('¿Estás seguro que deseas eliminar este entrenamiento? También se eliminarán todas las inscripciones.')) {
     try {
       await eliminarEntrenamiento(entrenamientoId);
-      console.log('Entrenamiento eliminado');
+      // // console.log('Entrenamiento eliminado');
 
       // Recargar
       if (filtroEquipo.value) {
@@ -1206,7 +1213,7 @@ onMounted(async () => {
       unsubscribers.value.push(unsub);
     });
   } catch (err) {
-    console.error('Error cargando entrenamientos:', err);
+    // // console.error('Error cargando entrenamientos:', err);
   }
 });
 

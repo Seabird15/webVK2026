@@ -68,7 +68,7 @@ app.get('/api/competencias/tabla-ab', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error en scraping:', error);
+    // console.error('Error en scraping:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener los datos',
@@ -83,6 +83,6 @@ app.get('/api/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-  console.log(`📊 Endpoint tabla AB: http://localhost:${PORT}/api/competencias/tabla-ab`);
+  // console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  // console.log(`📊 Endpoint tabla AB: http://localhost:${PORT}/api/competencias/tabla-ab`);
 });

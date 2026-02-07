@@ -35,7 +35,7 @@ export const fetchJugadorasByEquipo = async (equipo) => {
     return jugadoras.value;
   } catch (err) {
     error.value = err.message;
-    console.error('Error obteniendo jugadoras:', err);
+    // // console.error('Error obteniendo jugadoras:', err);
     return [];
   } finally {
     isLoading.value = false;
@@ -54,7 +54,7 @@ export const uploadFoto = async (file, jugadoraId) => {
     return url;
   } catch (err) {
     error.value = `Error subiendo foto: ${err.message}`;
-    console.error('Error en uploadFoto:', err);
+    // // console.error('Error en uploadFoto:', err);
     throw err;
   }
 };
@@ -86,7 +86,7 @@ export const crearJugadora = async (jugadoraData, fotoFile) => {
     };
   } catch (err) {
     error.value = err.message;
-    console.error('Error creando jugadora:', err);
+    // // console.error('Error creando jugadora:', err);
     throw err;
   } finally {
     isLoading.value = false;
@@ -114,7 +114,7 @@ export const actualizarJugadora = async (jugadoraId, jugadoraData, nuevoFotoFile
     return { id: jugadoraId, ...jugadoraData, foto: fotoUrl };
   } catch (err) {
     error.value = err.message;
-    console.error('Error actualizando jugadora:', err);
+    // // console.error('Error actualizando jugadora:', err);
     throw err;
   } finally {
     isLoading.value = false;
@@ -135,14 +135,14 @@ export const eliminarJugadora = async (jugadoraId, fotoUrl) => {
         const fileRef = storageRef(storage, fotoUrl);
         await deleteObject(fileRef);
       } catch (err) {
-        console.warn('No se pudo eliminar la foto:', err);
+        // // console.warn('No se pudo eliminar la foto:', err);
       }
     }
     
     return true;
   } catch (err) {
     error.value = err.message;
-    console.error('Error eliminando jugadora:', err);
+    // // console.error('Error eliminando jugadora:', err);
     throw err;
   } finally {
     isLoading.value = false;
@@ -164,7 +164,7 @@ export const obtenerJugadorasPorPosicion = async (equipo, posicion) => {
       ...doc.data()
     }));
   } catch (err) {
-    console.error(`Error obteniendo ${posicion}:`, err);
+    // // console.error(`Error obteniendo ${posicion}:`, err);
     return [];
   }
 };
@@ -192,7 +192,7 @@ export const obtenerEquipoCompleto = async (equipo) => {
       delanteras: delanteras
     };
   } catch (err) {
-    console.error('Error obteniendo equipo completo:', err);
+    // // console.error('Error obteniendo equipo completo:', err);
     return {
       directoraTecnica: null,
       preparadorPorteras: null,

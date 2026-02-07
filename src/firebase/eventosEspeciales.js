@@ -30,7 +30,7 @@ export const obtenerEventosEspeciales = async () => {
             ultimoPartido: null
         };
     } catch (error) {
-        console.error('Error obteniendo eventos especiales:', error);
+        // // console.error('Error obteniendo eventos especiales:', error);
         throw error;
     }
 };
@@ -47,7 +47,7 @@ export const actualizarProximoPartido = async (datos) => {
         });
         return true;
     } catch (error) {
-        console.error('Error actualizando próximo partido:', error);
+        // // console.error('Error actualizando próximo partido:', error);
         throw error;
     }
 };
@@ -64,7 +64,7 @@ export const actualizarUltimoPartido = async (datos) => {
         });
         return true;
     } catch (error) {
-        console.error('Error actualizando último partido:', error);
+        // // console.error('Error actualizando último partido:', error);
         throw error;
     }
 };
@@ -83,7 +83,7 @@ export const subirLogoEquipo = async (file, equipoNombre) => {
         
         return url;
     } catch (error) {
-        console.error('Error subiendo logo:', error);
+        // // console.error('Error subiendo logo:', error);
         throw error;
     }
 };
@@ -105,7 +105,7 @@ export const inicializarEventosEspeciales = async () => {
             });
         }
     } catch (error) {
-        console.error('Error inicializando eventos especiales:', error);
+        // // console.error('Error inicializando eventos especiales:', error);
         throw error;
     }
 };

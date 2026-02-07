@@ -18,8 +18,8 @@ const requiredVars = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'mes
 const missingVars = requiredVars.filter(key => !firebaseConfig[key]);
 
 if (missingVars.length > 0) {
-  console.warn('⚠️ Faltan variables de entorno de Firebase configuradas:', missingVars);
-  console.warn('Por favor, actualiza el archivo .env con tus credenciales de Firebase');
+  // // console.warn('⚠️ Faltan variables de entorno de Firebase configuradas:', missingVars);
+  // // console.warn('Por favor, actualiza el archivo .env con tus credenciales de Firebase');
 }
 
 // Inicializar Firebase
@@ -31,7 +31,7 @@ export const auth = getAuth(app);
 // Persistencia local: mantiene la sesión aunque se cierre/recargue el navegador.
 // Si el navegador bloquea storage (p.ej. incógnito/ITP), Firebase puede caer a otro modo.
 setPersistence(auth, browserLocalPersistence).catch((err) => {
-  console.warn('No se pudo establecer persistencia local de Auth:', err?.code || err?.message || err);
+  // // console.warn('No se pudo establecer persistencia local de Auth:', err?.code || err?.message || err);
 });
 
 export const db = getFirestore(app);

@@ -90,23 +90,23 @@
       
       <div class="max-w-6xl mx-auto relative z-10">
         <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
-          <!-- Icono de trofeo -->
+          <!-- Icono de balón de fútbol -->
           <div class="shrink-0">
-            <svg class="w-14 h-14 md:w-20 md:h-20 text-black animate-bounce" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            <svg class="w-14 h-14 md:w-20 md:h-20 text-black animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15.5v-2.09c1.86-.31 3.29-1.77 3.63-3.63h2.08c-.39 3.47-3.24 6.24-6.71 6.72zm-4.71-6.72H6.2c.39-3.47 3.24-6.24 6.71-6.72v2.09c-1.86.31-3.29 1.77-3.63 3.63zm6.71-5.78v.58c0 1.22-.78 2.27-1.88 2.63l-2.36.77.77 2.36c.36 1.1 1.41 1.88 2.63 1.88h.58c1.22 0 2.27-.78 2.63-1.88l.77-2.36-2.36-.77c-1.1-.36-1.88-1.41-1.88-2.63v-.58zm-2 10.78v2.09c-3.47-.48-6.32-3.25-6.71-6.72h2.08c.34 1.86 1.77 3.32 3.63 3.63z"/>
             </svg>
           </div>
           
           <!-- Contenido principal -->
           <div class="text-center md:text-left">
             <h2 class="text-2xl md:text-4xl font-black text-black mb-1 uppercase" style="font-family: 'Gobold High', sans-serif;">
-              ¡Campeonas Serie AB+ COPA ORO!
+              ¡HOY Comienza el Campeonato Interno VKS!
             </h2>
             <p class="text-black/90 font-bold text-sm md:text-base mb-2">
-              Vikingas Ascenso - Liga de Verano 2026
+              1er Campeonato Interno Vikingas - Sábado 7 de Febrero 2026
             </p>
             <p class="text-black/70 text-xs md:text-sm font-semibold">
-              Victoria en final 4-2 vs Firegol | Semifinal 7-2 vs Clever
+              19:00 hrs | Tricolor La Florida | 3 equipos mixtos | Escuela + Ascenso
             </p>
           </div>
           
@@ -123,12 +123,12 @@
               <span>{{ likesCount }}</span>
             </button>
             
-            <!-- CTA Ver Resultados -->
+            <!-- CTA Ver Fixture -->
             <router-link
               to="/competencias"
               class="inline-block bg-black hover:bg-gray-900 text-primary px-6 py-3 rounded-lg font-bold text-sm transition-all transform hover:scale-105 shadow-xl"
             >
-              Ver Resultados →
+              Ver Fixture →
             </router-link>
           </div>
         </div>
@@ -201,7 +201,7 @@ const cargarLikes = async () => {
       likesCount.value = 0;
     }
   } catch (error) {
-    console.error('Error cargando likes:', error);
+    // // console.error('Error cargando likes:', error);
   }
 };
 
@@ -232,7 +232,7 @@ const toggleLike = async () => {
       localStorage.setItem('campeonato_liked', 'true');
     }
   } catch (error) {
-    console.error('Error actualizando like:', error);
+    // // console.error('Error actualizando like:', error);
   } finally {
     isLikeLoading.value = false;
   }
@@ -247,7 +247,7 @@ onMounted(async () => {
       heroData.value = { ...heroData.value, ...docSnap.data() };
     }
   } catch (error) {
-    console.error('Error cargando datos del hero:', error);
+    // // console.error('Error cargando datos del hero:', error);
   }
   
   // Cargar likes y verificar si el usuario ya dio like

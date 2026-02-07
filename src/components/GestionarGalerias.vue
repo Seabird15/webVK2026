@@ -151,7 +151,7 @@ const cargarGalerias = async () => {
   try {
     galerias.value = await obtenerGalerias();
   } catch (error) {
-    console.error('Error al cargar galerías:', error);
+    // console.error('Error al cargar galerías:', error);
   }
 };
 
@@ -168,7 +168,7 @@ const crearNuevaGaleria = async () => {
     await cargarGalerias();
     alert('Galería creada exitosamente');
   } catch (error) {
-    console.error('Error:', error);
+    // console.error('Error:', error);
     alert('Error al crear galería');
   } finally {
     cargando.value = false;
@@ -193,7 +193,7 @@ const subirFotosGaleria = async (galeriaId) => {
     await cargarGalerias();
     alert('Fotos subidas exitosamente');
   } catch (error) {
-    console.error('Error:', error);
+    // console.error('Error:', error);
     alert('Error al subir fotos');
   } finally {
     cargando.value = false;
@@ -205,7 +205,7 @@ const actualizarOrden = async (id, nuevoOrden) => {
     await actualizarGaleria(id, { orden: nuevoOrden });
     await cargarGalerias();
   } catch (error) {
-    console.error('Error:', error);
+    // console.error('Error:', error);
     alert('Error al actualizar el orden');
   }
 };
@@ -219,7 +219,7 @@ const eliminarGaleriaConfirm = async (id) => {
     await cargarGalerias();
     alert('Galería eliminada');
   } catch (error) {
-    console.error('Error:', error);
+    // console.error('Error:', error);
     alert('Error al eliminar galería');
   } finally {
     cargando.value = false;
@@ -234,7 +234,7 @@ const eliminarFoto = async (galeriaId, fotoUrl) => {
     await eliminarFotoDeGaleria(galeriaId, fotoUrl);
     await cargarGalerias();
   } catch (error) {
-    console.error('Error:', error);
+    // console.error('Error:', error);
     alert('Error al eliminar foto');
   } finally {
     cargando.value = false;

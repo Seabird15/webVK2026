@@ -300,7 +300,7 @@ const cargarGalerias = async () => {
       indiceActual.value[g.id] = 0;
     });
   } catch (error) {
-    console.error('Error al cargar galerías:', error);
+    // // console.error('Error al cargar galerías:', error);
   } finally {
     hide();
   }

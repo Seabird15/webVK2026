@@ -39,7 +39,7 @@ export const obtenerEventosMes = async (year, month) => {
     }));
     return eventos.value;
   } catch (err) {
-    console.error('Error obteniendo eventos:', err);
+    // // console.error('Error obteniendo eventos:', err);
     error.value = err.message;
     return [];
   } finally {
@@ -64,7 +64,7 @@ export const obtenerTodosEventos = async () => {
     }));
     return eventos.value;
   } catch (err) {
-    console.error('Error obteniendo eventos:', err);
+    // // console.error('Error obteniendo eventos:', err);
     error.value = err.message;
     return [];
   } finally {
@@ -91,10 +91,10 @@ export const crearEvento = async (datos) => {
     };
     
     const docRef = await addDoc(collection(db, 'entrenamientos'), evento);
-    console.log('Evento creado:', docRef.id);
+    // // console.log('Evento creado:', docRef.id);
     return docRef.id;
   } catch (err) {
-    console.error('Error creando evento:', err);
+    // // console.error('Error creando evento:', err);
     error.value = err.message;
     throw err;
   }
@@ -112,10 +112,10 @@ export const actualizarEvento = async (id, datos) => {
     };
     
     await updateDoc(doc(db, 'eventos', id), evento);
-    console.log('Evento actualizado:', id);
+    // // console.log('Evento actualizado:', id);
     return true;
   } catch (err) {
-    console.error('Error actualizando evento:', err);
+    // // console.error('Error actualizando evento:', err);
     error.value = err.message;
     throw err;
   }
@@ -125,10 +125,10 @@ export const actualizarEvento = async (id, datos) => {
 export const eliminarEvento = async (id) => {
   try {
     await deleteDoc(doc(db, 'eventos', id));
-    console.log('Evento eliminado:', id);
+    // // console.log('Evento eliminado:', id);
     return true;
   } catch (err) {
-    console.error('Error eliminando evento:', err);
+    // // console.error('Error eliminando evento:', err);
     error.value = err.message;
     throw err;
   }

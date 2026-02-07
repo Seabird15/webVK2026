@@ -12,7 +12,7 @@ onMounted(() => {
   // Esperar a que la autenticación esté lista
   const checkAndSubscribe = () => {
     if (authReady.value && jugadoraData.value && jugadoraData.value.equipo) {
-      console.log(`App montada con datos de jugadora. Equipo: ${jugadoraData.value.equipo}. Suscribiendo...`);
+      // console.log(`App montada con datos de jugadora. Equipo: ${jugadoraData.value.equipo}. Suscribiendo...`);
       requestPermissionAndSubscribe(jugadoraData.value.equipo);
       
       if (jugadoraData.value.equipo === 'ambos') {
@@ -20,7 +20,7 @@ onMounted(() => {
         requestPermissionAndSubscribe('escuela');
       }
     } else {
-      console.log('Esperando auth o datos de jugadora...', { authReady: authReady.value, hasData: !!jugadoraData.value });
+      // // console.log('Esperando auth o datos de jugadora...', { authReady: authReady.value, hasData: !!jugadoraData.value });
     }
   };
   
@@ -30,7 +30,7 @@ onMounted(() => {
   // Y también observar cambios en authReady por si aún no está listo
   watch(authReady, (ready) => {
     if (ready) {
-      console.log('Auth ready - verificando suscripción');
+      // console.log('Auth ready - verificando suscripción');
       checkAndSubscribe();
     }
   }, { immediate: true });
@@ -45,7 +45,7 @@ watch(jugadoraData, (newData, oldData) => {
     // o si antes no había datos y ahora sí.
     if (!oldData || newData.equipo !== oldData.equipo) {
       
-      console.log(`Datos de jugadora actualizados. Equipo: ${newData.equipo}. Intentando suscribir...`);
+      // console.log(`Datos de jugadora actualizados. Equipo: ${newData.equipo}. Intentando suscribir...`);
       
       // Llama a la función para suscribirla al tema de su equipo
       requestPermissionAndSubscribe(newData.equipo);

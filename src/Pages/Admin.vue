@@ -96,8 +96,10 @@
                   <span class="text-xs bg-gray-200 text-gray-700 rounded-full px-3 py-1">Finalizado</span>
                 </div>
                 <p class="text-xs text-gray-700 mb-3 line-clamp-3">{{ ent.descripcion }}</p>
-                <div class="flex gap-2">
-                  <button @click="verDetalles(ent)" class="px-3 py-1 text-xs bg-primary text-white rounded-lg cursor-pointer">Ver</button>
+                <div class="flex gap-2 flex-wrap">
+                  <button @click="verDetalles(ent)" class="flex-1 min-w-[80px] px-3 py-2 text-xs bg-primary text-white rounded-lg cursor-pointer hover:bg-primary/90 font-bold transition-colors">
+                    ✏️ Editar Asistencia
+                  </button>
                 </div>
               </div>
             </div>

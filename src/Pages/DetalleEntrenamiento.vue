@@ -119,7 +119,8 @@
 
               <!-- Botones de acción -->
               <div class="space-y-2">
-                <template v-if="canInteract">
+                <!-- Solo mostrar botones de inscripción si NO es admin -->
+                <template v-if="canInteract && !vieneDeAdmin">
                   <!-- Si ya confirmó y el evento no pasó -->
                   <button
                     v-if="estadoInscripcion === 'confirmada' && !fechaPasada(entrenamiento)"
@@ -161,17 +162,17 @@
                   </template>
                 </template>
 
-                <div v-else class="p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+                <!-- Mensaje informativo para admin -->
+                <div v-if="vieneDeAdmin && adminPuedeVer" class="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
                   <p class="text-sm text-gray-700 font-semibold">
-                    <span v-if="entrenamiento.esConvocatoria && !isConvocada">No estás convocada para este entrenamiento. Solo puedes visualizar los detalles.</span>
-                    <span v-else-if="fechaPasada(entrenamiento)">El evento ya finalizó. No se pueden hacer cambios.</span>
+                    👨‍💼 Modo Administrador: Gestiona las asistencias de las jugadoras en la lista de convocatoria.
                   </p>
                 </div>
 
-                <!-- Mensaje cuando el evento ya pasó (se deja para compatibilidad) -->
-                <div v-if="fechaPasada(entrenamiento) && canInteract" class="text-center py-2">
-                  <p class="text-xs text-gray-500 font-semibold">
-                    El evento ya finalizó. No se pueden hacer cambios.
+                <div v-else-if="!canInteract && !vieneDeAdmin" class="p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+                  <p class="text-sm text-gray-700 font-semibold">
+                    <span v-if="entrenamiento.esConvocatoria && !isConvocada">No estás convocada para este entrenamiento. Solo puedes visualizar los detalles.</span>
+                    <span v-else-if="fechaPasada(entrenamiento)">El evento ya finalizó. No se pueden hacer cambios.</span>
                   </p>
                 </div>
               </div>
@@ -257,7 +258,23 @@
                     <div class="text-sm font-bold text-gray-900">{{ inscrita.jugadoraNombre }}</div>
                     <div v-if="inscrita.updatedAt || inscrita.createdAt" class="text-xs text-gray-400 mt-1">Anotada: {{ formatFechaHora(inscrita.updatedAt || inscrita.createdAt) }}</div>
                   </div>
-                  <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <div v-if="vieneDeAdmin && adminPuedeVer" class="flex gap-2">
+                    <button
+                      @click="cambiarEstadoInscripcion(inscrita.id, 'baja')"
+                      class="px-3 py-1.5 bg-red-500 text-white rounded-md text-xs font-bold hover:bg-red-600 transition-colors cursor-pointer"
+                      title="Marcar como ausente"
+                    >
+                      Ausente
+                    </button>
+                    <button
+                      @click="cambiarEstadoInscripcion(inscrita.id, 'pendiente')"
+                      class="px-3 py-1.5 bg-yellow-500 text-white rounded-md text-xs font-bold hover:bg-yellow-600 transition-colors cursor-pointer"
+                      title="Marcar como pendiente"
+                    >
+                      Pendiente
+                    </button>
+                  </div>
+                  <div v-else class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                     <CheckIcon class="w-5 h-5 text-green-600" />
                   </div>
                 </div>
@@ -287,7 +304,23 @@
                         <ChatBubbleLeftIcon class="w-3 h-3 text-blue-700" />
                         <span class="text-blue-700 text-xs font-bold">Motivo</span>
                       </div>
-                      <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                      <div v-if="vieneDeAdmin && adminPuedeVer" class="flex gap-2">
+                        <button
+                          @click="cambiarEstadoInscripcion(inscrita.id, 'confirmada')"
+                          class="px-3 py-1.5 bg-green-500 text-white rounded-md text-xs font-bold hover:bg-green-600 transition-colors cursor-pointer"
+                          title="Marcar como confirmada"
+                        >
+                          Confirmar
+                        </button>
+                        <button
+                          @click="cambiarEstadoInscripcion(inscrita.id, 'pendiente')"
+                          class="px-3 py-1.5 bg-yellow-500 text-white rounded-md text-xs font-bold hover:bg-yellow-600 transition-colors cursor-pointer"
+                          title="Marcar como pendiente"
+                        >
+                          Pendiente
+                        </button>
+                      </div>
+                      <div v-else class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
                         <XMarkIcon class="w-5 h-5 text-red-600" />
                       </div>
                     </div>
@@ -320,7 +353,23 @@
                     <div class="text-sm font-bold text-gray-900">{{ inscrita.jugadoraNombre }}</div>
                     <div class="text-xs text-gray-500">Esperando respuesta...</div>
                   </div>
-                  <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                  <div v-if="vieneDeAdmin && adminPuedeVer" class="flex gap-2">
+                    <button
+                      @click="cambiarEstadoInscripcion(inscrita.id, 'confirmada')"
+                      class="px-3 py-1.5 bg-green-500 text-white rounded-md text-xs font-bold hover:bg-green-600 transition-colors cursor-pointer"
+                      title="Marcar como confirmada"
+                    >
+                      Confirmar
+                    </button>
+                    <button
+                      @click="cambiarEstadoInscripcion(inscrita.id, 'baja')"
+                      class="px-3 py-1.5 bg-red-500 text-white rounded-md text-xs font-bold hover:bg-red-600 transition-colors cursor-pointer"
+                      title="Marcar como ausente"
+                    >
+                      Ausente
+                    </button>
+                  </div>
+                  <div v-else class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
                     <ClockIcon class="w-5 h-5 text-yellow-600" />
                   </div>
                 </div>
@@ -415,7 +464,8 @@ import {
   desuscribirseEntrenamiento,
   obtenerEstadoInscripcion,
   escucharInscripcionesEntrenamiento,
-  errorInscripciones
+  errorInscripciones,
+  cambiarEstadoInscripcion as cambiarEstadoInscripcionFirebase
 } from '../firebase/inscripciones';
 import { entrenamientos } from '../firebase/entrenamientos';
 import { authUser, userRole } from '../firebase/auth';
@@ -517,7 +567,7 @@ const cargarDatos = async () => {
     estadoInscripcion.value = await obtenerEstadoInscripcion(id, jugadoraAuthUser.value.uid);
   }
 
-  console.log('📋 DEBUG - Entrenamiento cargado:', {
+  // // console.log('📋 DEBUG - Entrenamiento cargado:', {
     id: entrenamiento.value.id,
     nombre: entrenamiento.value.nombre,
     esConvocatoria: entrenamiento.value.esConvocatoria,
@@ -568,6 +618,10 @@ const actualizarConvocatoriaUsuario = (organizadas) => {
 
 const canInteract = computed(() => {
   if (!entrenamiento.value) return false;
+  
+  // Si es admin, siempre puede interactuar (incluso con eventos pasados)
+  if (vieneDeAdmin.value && adminPuedeVer.value) return true;
+  
   // Si no es convocatoria, todas las jugadoras pueden interactuar (si el evento no pasó)
   if (!entrenamiento.value.esConvocatoria) return !fechaPasada(entrenamiento.value);
   // Si es convocatoria, solo las convocadas y si el evento no pasó
@@ -639,6 +693,22 @@ const confirmarBaja = async () => {
     mostrarToast(errorInscripciones.value || 'Error al darse de baja', 'error');
   }
   isLoadingAccion.value = false;
+};
+
+const cambiarEstadoInscripcion = async (inscripcionId, nuevoEstado) => {
+  if (!adminPuedeVer.value) {
+    mostrarToast('No tienes permisos para realizar esta acción', 'error');
+    return;
+  }
+
+  const success = await cambiarEstadoInscripcionFirebase(inscripcionId, nuevoEstado);
+  
+  if (success) {
+    const estadoTexto = nuevoEstado === 'confirmada' ? 'confirmada' : nuevoEstado === 'baja' ? 'ausente' : 'pendiente';
+    mostrarToast(`Estado cambiado a ${estadoTexto}`, 'success');
+  } else {
+    mostrarToast(errorInscripciones.value || 'Error al cambiar estado', 'error');
+  }
 };
 
 const mostrarToast = (mensaje, tipo) => {

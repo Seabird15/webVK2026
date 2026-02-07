@@ -31,7 +31,7 @@ export const crearGaleria = async (datos) => {
     });
     return docRef.id;
   } catch (error) {
-    console.error('Error al crear galería:', error);
+    // // console.error('Error al crear galería:', error);
     throw error;
   }
 };
@@ -50,7 +50,7 @@ export const obtenerGalerias = async () => {
     });
     return galerias;
   } catch (error) {
-    console.error('Error al obtener galerías:', error);
+    // // console.error('Error al obtener galerías:', error);
     throw error;
   }
 };
@@ -64,7 +64,7 @@ export const actualizarGaleria = async (id, datos) => {
       updatedAt: serverTimestamp()
     });
   } catch (error) {
-    console.error('Error al actualizar galería:', error);
+    // // console.error('Error al actualizar galería:', error);
     throw error;
   }
 };
@@ -84,7 +84,7 @@ export const eliminarGaleria = async (id) => {
             const photoRef = storageRef(storage, foto.url);
             await deleteObject(photoRef);
           } catch (e) {
-            console.log('Foto ya eliminada:', e);
+            // // console.log('Foto ya eliminada:', e);
           }
         }
       }
@@ -92,7 +92,7 @@ export const eliminarGaleria = async (id) => {
     
     await deleteDoc(galeriaRef);
   } catch (error) {
-    console.error('Error al eliminar galería:', error);
+    // // console.error('Error al eliminar galería:', error);
     throw error;
   }
 };
@@ -112,7 +112,7 @@ export const subirFotoGaleria = async (galeriaId, file) => {
       uploadedAt: new Date().toISOString()
     };
   } catch (error) {
-    console.error('Error al subir foto:', error);
+    // // console.error('Error al subir foto:', error);
     throw error;
   }
 };
@@ -138,7 +138,7 @@ export const agregarFotoAGaleria = async (galeriaId, fotoData) => {
       updatedAt: serverTimestamp()
     });
   } catch (error) {
-    console.error('Error al agregar foto:', error);
+    // // console.error('Error al agregar foto:', error);
     throw error;
   }
 };
@@ -167,7 +167,7 @@ export const eliminarFotoDeGaleria = async (galeriaId, fotoUrl) => {
       }
     }
   } catch (error) {
-    console.error('Error al eliminar foto:', error);
+    // // console.error('Error al eliminar foto:', error);
     throw error;
   }
 };

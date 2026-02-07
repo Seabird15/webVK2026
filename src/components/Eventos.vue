@@ -104,7 +104,7 @@ onMounted(async () => {
         proximoPartido.value = datos.proximoPartido;
         ultimoPartido.value = datos.ultimoPartido;
     } catch (error) {
-        console.error('Error cargando eventos especiales:', error);
+        // console.error('Error cargando eventos especiales:', error);
     } finally {
         cargando.value = false;
     }

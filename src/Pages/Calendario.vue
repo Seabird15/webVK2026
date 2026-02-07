@@ -388,7 +388,7 @@ const cargarCumpleanios = async () => {
       })
       .filter(cumple => cumple.mesNacimiento === mesActual.value);
   } catch (err) {
-    console.error('Error cargando cumpleaños:', err);
+    // // console.error('Error cargando cumpleaños:', err);
   }
 };
 
@@ -422,7 +422,7 @@ const cargarEventos = async () => {
     // Cargar cumpleaños del mes
     await cargarCumpleanios();
   } catch (err) {
-    console.error('Error cargando eventos:', err);
+    // // console.error('Error cargando eventos:', err);
   } finally {
     hide();
   }
@@ -435,7 +435,7 @@ const seleccionarEvento = (evento) => {
 
 // Editar evento (redirigir al admin)
 const editarEvento = (evento) => {
-  console.log('Editar evento:', evento);
+  // // console.log('Editar evento:', evento);
   // TODO: Implementar formulario de edición o redirigir a la sección de admin
   alert('Para editar este evento, ve a la sección de Administración');
 };
@@ -450,7 +450,7 @@ const confirmarEliminar = async (id) => {
   //     eventoSeleccionado.value = null;
   //     cargarEventos();
   //   } catch (err) {
-  //     console.error('Error eliminando evento:', err);
+  //     // // console.error('Error eliminando evento:', err);
   //   }
   // }
 };

@@ -16,7 +16,7 @@ export const cargarDatosEquipos = async () => {
     return equiposData.value;
   } catch (err) {
     error.value = err.message;
-    console.error('Error cargando datos:', err);
+    // // console.error('Error cargando datos:', err);
   } finally {
     isLoading.value = false;
   }
@@ -33,7 +33,7 @@ export const obtenerJugadorasDelEquipo = async (equipo) => {
       ...doc.data()
     }));
   } catch (err) {
-    console.error('Error obteniendo jugadoras:', err);
+    // // console.error('Error obteniendo jugadoras:', err);
     return [];
   }
 };

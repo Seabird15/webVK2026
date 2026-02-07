@@ -26,7 +26,7 @@ export const fetchSolicitudesPendientes = async () => {
     }));
     return solicitudes.value;
   } catch (err) {
-    console.error('Error obteniendo solicitudes:', err);
+    // // console.error('Error obteniendo solicitudes:', err);
     errorSolicitudes.value = err.message;
     return [];
   } finally {
@@ -46,7 +46,7 @@ export const fetchTodasSolicitudes = async () => {
     }));
     return solicitudes.value;
   } catch (err) {
-    console.error('Error obteniendo solicitudes:', err);
+    // // console.error('Error obteniendo solicitudes:', err);
     errorSolicitudes.value = err.message;
     return [];
   } finally {
@@ -59,27 +59,27 @@ export const aprobarSolicitud = async (uid, email) => {
   isLoadingSolicitudes.value = true;
   errorSolicitudes.value = null;
   try {
-    console.log('Aprobando solicitud para uid:', uid);
+    // // console.log('Aprobando solicitud para uid:', uid);
     
     // Actualizar estado en jugadoras primero (es el documento principal)
     await updateDoc(doc(db, 'jugadoras', uid), {
       estado: 'aprobada',
       updatedAt: new Date()
     });
-    console.log('Documento en jugadoras actualizado a aprobada');
+    // // console.log('Documento en jugadoras actualizado a aprobada');
 
     // Actualizar estado en jugadorasLogin
     await updateDoc(doc(db, 'jugadorasLogin', uid), {
       estado: 'aprobada',
       updatedAt: new Date()
     });
-    console.log('Documento en jugadorasLogin actualizado a aprobada');
+    // // console.log('Documento en jugadorasLogin actualizado a aprobada');
 
     // Actualizar lista local
     await fetchTodasSolicitudes();
     return true;
   } catch (err) {
-    console.error('Error aprobando solicitud:', err);
+    // // console.error('Error aprobando solicitud:', err);
     errorSolicitudes.value = err.message;
     return false;
   } finally {
@@ -110,7 +110,7 @@ export const rechazarSolicitud = async (uid, razon = '') => {
     await fetchTodasSolicitudes();
     return true;
   } catch (err) {
-    console.error('Error rechazando solicitud:', err);
+    // // console.error('Error rechazando solicitud:', err);
     errorSolicitudes.value = err.message;
     return false;
   } finally {

@@ -287,7 +287,7 @@ const handleAgregarJugadora = async () => {
     // Recargar jugadoras
     await cargarJugadoras();
   } catch (err) {
-    console.error('Error:', err);
+    // console.error('Error:', err);
   }
 };
 

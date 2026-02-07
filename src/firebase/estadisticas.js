@@ -34,7 +34,7 @@ export const obtenerEstadisticasPorEquipo = async (equipo) => {
     return estadisticas.value;
   } catch (err) {
     error.value = err.message;
-    console.error('Error obteniendo estadísticas:', err);
+    // // console.error('Error obteniendo estadísticas:', err);
     return [];
   } finally {
     isLoading.value = false;
@@ -52,7 +52,7 @@ export const agregarEstadistica = async (data) => {
     return docRef.id;
   } catch (err) {
     error.value = err.message;
-    console.error('Error agregando estadística:', err);
+    // // console.error('Error agregando estadística:', err);
     throw err;
   }
 };
@@ -68,7 +68,7 @@ export const actualizarEstadistica = async (id, data) => {
     return true;
   } catch (err) {
     error.value = err.message;
-    console.error('Error actualizando estadística:', err);
+    // // console.error('Error actualizando estadística:', err);
     throw err;
   }
 };
@@ -80,7 +80,7 @@ export const eliminarEstadistica = async (id) => {
     return true;
   } catch (err) {
     error.value = err.message;
-    console.error('Error eliminando estadística:', err);
+    // // console.error('Error eliminando estadística:', err);
     throw err;
   }
 };

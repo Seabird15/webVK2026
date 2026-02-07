@@ -320,7 +320,7 @@ const cargarEventos = async () => {
   try {
     eventos.value = await obtenerTodosEventos();
   } catch (err) {
-    console.error('Error cargando eventos:', err);
+    // console.error('Error cargando eventos:', err);
   }
 };
 

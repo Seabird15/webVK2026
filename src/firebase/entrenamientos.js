@@ -35,7 +35,7 @@ export const crearEntrenamiento = async (entrenamientoData) => {
         const { crearInscripcionesConvocadas } = await import('./inscripciones');
         await crearInscripcionesConvocadas(entrenamientoId, entrenamientoData.jugadorasConvocadas);
       } catch (err) {
-        console.error('Error creando inscripciones de convocatoria:', err);
+        // // console.error('Error creando inscripciones de convocatoria:', err);
       }
     } else {
       // Crear inscripciones pendientes para todas las jugadoras del equipo
@@ -43,7 +43,7 @@ export const crearEntrenamiento = async (entrenamientoData) => {
         const { crearInscripcionesPendientes } = await import('./inscripciones');
         await crearInscripcionesPendientes(entrenamientoId, entrenamientoData.equipo);
       } catch (err) {
-        console.error('Error creando inscripciones pendientes:', err);
+        // // console.error('Error creando inscripciones pendientes:', err);
         // No lanzar error, el entrenamiento ya fue creado exitosamente
       }
     }
@@ -53,7 +53,7 @@ export const crearEntrenamiento = async (entrenamientoData) => {
       ...entrenamientoData
     };
   } catch (err) {
-    console.error('Error creando entrenamiento:', err);
+    // // console.error('Error creando entrenamiento:', err);
     errorEntrenamientos.value = err.message;
     throw err;
   } finally {
@@ -73,7 +73,7 @@ export const fetchTodosEntrenamientos = async () => {
     }));
     return entrenamientos.value;
   } catch (err) {
-    console.error('Error obteniendo entrenamientos:', err);
+    // // console.error('Error obteniendo entrenamientos:', err);
     errorEntrenamientos.value = err.message;
     return [];
   } finally {
@@ -129,7 +129,7 @@ export const fetchEntrenamientosPorEquipo = async (equipo) => {
     entrenamientos.value = [...entrenamientosEquipo, ...entrenamientosAmbos];
     return entrenamientos.value;
   } catch (err) {
-    console.error('Error obteniendo entrenamientos:', err);
+    // // console.error('Error obteniendo entrenamientos:', err);
     errorEntrenamientos.value = err.message;
     return [];
   } finally {
@@ -149,7 +149,7 @@ export const actualizarEntrenamiento = async (entrenamientoId, data) => {
 
     return true;
   } catch (err) {
-    console.error('Error actualizando entrenamiento:', err);
+    // // console.error('Error actualizando entrenamiento:', err);
     errorEntrenamientos.value = err.message;
     return false;
   } finally {
@@ -176,7 +176,7 @@ export const eliminarEntrenamiento = async (entrenamientoId) => {
     await deleteDoc(doc(db, 'entrenamientos', entrenamientoId));
     return true;
   } catch (err) {
-    console.error('Error eliminando entrenamiento:', err);
+    // // console.error('Error eliminando entrenamiento:', err);
     errorEntrenamientos.value = err.message;
     return false;
   } finally {

@@ -209,7 +209,7 @@ const cargarHeroData = async () => {
       heroData.value = { ...heroData.value, ...docSnap.data() };
     }
   } catch (error) {
-    console.error('Error cargando datos del hero:', error);
+    // console.error('Error cargando datos del hero:', error);
   }
 };
 
@@ -240,7 +240,7 @@ const guardarHero = async () => {
     
     alert('✅ Hero actualizado exitosamente');
   } catch (error) {
-    console.error('Error guardando hero:', error);
+    // console.error('Error guardando hero:', error);
     alert('❌ Error al guardar: ' + error.message);
   } finally {
     cargando.value = false;

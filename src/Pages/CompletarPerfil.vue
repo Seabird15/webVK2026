@@ -188,7 +188,7 @@ const formData = reactive({
 // Verificar autenticación cuando monta el componente
 onMounted(() => {
   if (!jugadoraAuthUser.value) {
-    console.log('No hay usuario autenticado, redirigiendo a login');
+    // // console.log('No hay usuario autenticado, redirigiendo a login');
     router.push('/login-jugadora');
   }
 });
@@ -217,14 +217,14 @@ const handleSubmit = async () => {
   // Validaciones
   if (!formData.nombre || !formData.apellido || !formData.equipo || !formData.dorsal || !formData.posicion || !formData.fechaNacimiento) {
     error.value = 'Por favor completa todos los campos requeridos';
-    console.warn('Validación fallida - campos incompletos');
+    // // console.warn('Validación fallida - campos incompletos');
     return;
   }
 
-  console.log('Iniciando guardado de perfil...');
-  console.log('UID del usuario:', jugadoraAuthUser.value.uid);
-  console.log('Datos del formulario:', formData);
-  console.log('Foto seleccionada:', fotoFile.value ? 'Sí' : 'No');
+  // // console.log('Iniciando guardado de perfil...');
+  // // console.log('UID del usuario:', jugadoraAuthUser.value.uid);
+  // // console.log('Datos del formulario:', formData);
+  // // console.log('Foto seleccionada:', fotoFile.value ? 'Sí' : 'No');
 
   isLoading.value = true;
 
@@ -243,10 +243,10 @@ const handleSubmit = async () => {
 
   isLoading.value = false;
 
-  console.log('Resultado de guardado:', success);
+  // // console.log('Resultado de guardado:', success);
 
   if (success) {
-    console.log('Perfil guardado exitosamente, redirigiendo...');
+    // // console.log('Perfil guardado exitosamente, redirigiendo...');
     // Redirigir según equipo
     if (formData.equipo === 'ambos') {
       router.push('/seleccionar-categoria');
@@ -255,7 +255,7 @@ const handleSubmit = async () => {
     }
   } else {
     error.value = errorJugadora.value || 'Error al guardar el perfil';
-    console.error('Error al guardar perfil:', error.value);
+    // // console.error('Error al guardar perfil:', error.value);
   }
 };
 

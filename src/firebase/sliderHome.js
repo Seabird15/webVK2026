@@ -31,7 +31,7 @@ export const obtenerSliderHome = async () => {
     });
     return imagenes;
   } catch (error) {
-    console.error('Error al obtener slider:', error);
+    // // console.error('Error al obtener slider:', error);
     throw error;
   }
 };
@@ -66,7 +66,7 @@ export const subirImagenSlider = async (archivo, orden) => {
       nombreArchivo: nombreArchivo
     };
   } catch (error) {
-    console.error('Error al subir imagen:', error);
+    // // console.error('Error al subir imagen:', error);
     throw error;
   }
 };
@@ -82,7 +82,7 @@ export const actualizarOrdenSlider = async (imagenes) => {
       });
     }
   } catch (error) {
-    console.error('Error al actualizar orden:', error);
+    // // console.error('Error al actualizar orden:', error);
     throw error;
   }
 };
@@ -97,7 +97,7 @@ export const eliminarImagenSlider = async (imagenId, nombreArchivo) => {
     // Eliminar de Firestore
     await deleteDoc(doc(db, 'sliderHome', imagenId));
   } catch (error) {
-    console.error('Error al eliminar imagen:', error);
+    // // console.error('Error al eliminar imagen:', error);
     throw error;
   }
 };

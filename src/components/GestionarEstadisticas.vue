@@ -247,7 +247,7 @@ const cargarEstadisticas = async () => {
       return nombreA.localeCompare(nombreB);
     });
   } catch (err) {
-    console.error('Error cargando estadísticas:', err);
+    // console.error('Error cargando estadísticas:', err);
     mostrarMensaje('Error al cargar las estadísticas', 'error');
   } finally {
     isLoading.value = false;
@@ -289,7 +289,7 @@ const guardarEdicion = async () => {
     editando.value = null;
     mostrarMensaje('Estadísticas actualizadas correctamente', 'success');
   } catch (err) {
-    console.error('Error guardando estadísticas:', err);
+    // console.error('Error guardando estadísticas:', err);
     mostrarMensaje('Error al guardar las estadísticas', 'error');
   } finally {
     guardando.value = false;
@@ -322,7 +322,7 @@ const agregarJugadora = async () => {
     cancelarAgregar();
     await cargarEstadisticas();
   } catch (err) {
-    console.error('Error agregando jugadora:', err);
+    // console.error('Error agregando jugadora:', err);
     mostrarMensaje('Error al agregar la jugadora', 'error');
   } finally {
     guardando.value = false;
@@ -351,7 +351,7 @@ const confirmarEliminar = async (jugadora) => {
     jugadoras.value = jugadoras.value.filter(j => j.id !== jugadora.id);
     mostrarMensaje('Jugadora eliminada correctamente', 'success');
   } catch (err) {
-    console.error('Error eliminando jugadora:', err);
+    // console.error('Error eliminando jugadora:', err);
     mostrarMensaje('Error al eliminar la jugadora', 'error');
   }
 };
@@ -382,7 +382,7 @@ const inicializarDatosAscenso = async () => {
     mostrarMensaje(`✅ ${agregadas} jugadoras agregadas correctamente`, 'success');
     await cargarEstadisticas();
   } catch (err) {
-    console.error('Error inicializando datos:', err);
+    // console.error('Error inicializando datos:', err);
     mostrarMensaje('Error al cargar los datos iniciales', 'error');
   } finally {
     inicializando.value = false;
