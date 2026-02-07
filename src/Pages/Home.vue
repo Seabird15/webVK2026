@@ -4,7 +4,7 @@
       <!-- Imagen de fondo -->
       <div class="absolute inset-0 z-0">
         <img 
-          :src="heroData.imagenFondo"
+          :src="heroData.imagenFondo || 'https://firebasestorage.googleapis.com/v0/b/loginvk-955b2.firebasestorage.app/o/slide2.webp?alt=media&token=88083cd1-4f14-4e7f-9aef-0bb1421f92e0'"
           alt="CD Vikingas"
           class="w-full h-full object-cover"
         />

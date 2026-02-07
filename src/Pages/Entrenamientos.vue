@@ -361,6 +361,31 @@
               </div>
             </div>
 
+            <!-- Lista de Jugadoras Convocadas (si es convocatoria) -->
+            <div v-if="entrenamientoSeleccionado.esConvocatoria && entrenamientoSeleccionado.jugadorasConvocadas && entrenamientoSeleccionado.jugadorasConvocadas.length > 0" class="bg-purple-50 rounded-lg p-4 border border-purple-200">
+              <h3 class="font-bold text-purple-900 text-sm mb-3 flex items-center gap-2">
+                <span class="text-lg">📋</span> Jugadoras Convocadas ({{ entrenamientoSeleccionado.jugadorasConvocadas.length }})
+              </h3>
+              <div class="space-y-2">
+                <div
+                  v-for="jugadora in entrenamientoSeleccionado.jugadorasConvocadas"
+                  :key="jugadora.id"
+                  class="flex items-center gap-2 bg-white p-2 rounded border border-purple-100"
+                >
+                  <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-black text-xs shadow-md">
+                    {{ obtenerIniciales(jugadora.nombre) }}
+                  </div>
+                  <div class="flex-1">
+                    <div class="text-xs font-bold text-gray-900">{{ jugadora.nombre }}</div>
+                    <div class="text-[9px] text-gray-500 font-medium">Convocada</div>
+                  </div>
+                  <div v-if="jugadora.id === jugadoraAuthUser?.uid" class="px-2 py-0.5 bg-green-100 rounded-full">
+                    <span class="text-green-600 text-[9px] font-bold">Tú</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- CONVOCATORIA - Estilo App Deportiva -->
             <div class="bg-gradient-to-b from-gray-50 to-white rounded-xl border border-gray-200 overflow-hidden">
               <!-- Stats Bar -->
@@ -774,10 +799,11 @@ const esConvocada = (entrenamiento) => {
   if (!entrenamiento.esConvocatoria) {
     return true; // Si no es convocatoria, todos pueden inscribirse
   }
-  if (!entrenamiento.convocadas || !jugadoraAuthUser.value) {
+  if (!entrenamiento.jugadorasConvocadas || !jugadoraAuthUser.value) {
     return false; // Si es convocatoria pero no hay lista o no hay usuario, no puede
   }
-  return entrenamiento.convocadas.includes(jugadoraAuthUser.value.uid);
+  // Verificar si el UID del usuario está en la lista de jugadoras convocadas
+  return entrenamiento.jugadorasConvocadas.some(j => j.id === jugadoraAuthUser.value.uid);
 };
 
 const isLoading = computed(() => isLoadingEntrenamientos.value);
