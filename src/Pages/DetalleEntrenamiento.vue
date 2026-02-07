@@ -567,7 +567,7 @@ const cargarDatos = async () => {
     estadoInscripcion.value = await obtenerEstadoInscripcion(id, jugadoraAuthUser.value.uid);
   }
 
-  // // console.log('📋 DEBUG - Entrenamiento cargado:', {
+console.log('📋 DEBUG - Entrenamiento cargado:', {
     id: entrenamiento.value.id,
     nombre: entrenamiento.value.nombre,
     esConvocatoria: entrenamiento.value.esConvocatoria,

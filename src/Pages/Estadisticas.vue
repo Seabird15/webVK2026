@@ -175,7 +175,7 @@
                   </tr>
                   <tr v-if="estadisticasCompletas.length === 0">
                     <td colspan="5" class="px-4 py-6 text-center text-white/70">
-                      No hay jugadoras registradas en este equipo
+                      No hay jugadoras registradas en este equipo.
                     </td>
                   </tr>
                 </tbody>
