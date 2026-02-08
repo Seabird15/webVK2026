@@ -58,11 +58,20 @@
           v-show="competenciaExpandida === 'interno'"
           class="p-8"
         >
+          <!-- Loading State -->
+          <div v-if="loadingCampeonato" class="text-center py-12">
+            <div class="inline-block">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            </div>
+            <p class="text-white/70 mt-4 font-medium">Cargando datos del campeonato...</p>
+          </div>
+
+          <div v-else>
           <!-- Info del torneo -->
           <div class="bg-primary/10 border border-primary rounded-lg p-6 mb-8">
             <div class="grid md:grid-cols-3 gap-6 text-center">
               <div>
-                <p class="text-primary text-sm font-bold mb-1">FECHA</p>
+                <p class="text-primary text-sm font-bold mb-1">INICIO</p>
                 <p class="text-white font-bold">7 de Febrero 2026</p>
                 <p class="text-white/70 text-sm">19:00 hrs</p>
               </div>
@@ -79,6 +88,7 @@
           </div>
 
           <!-- Equipos participantes -->
+          <div v-if="equipos.verserkers && equipos.internadas && equipos.siemprealpalo">
           <h3 class="text-primary font-bold text-xl mb-6 text-center flex items-center justify-center gap-2">
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 7a2 2 0 1 1 0 4 2 2 0 0 1 0-4m0-2a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 11c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"/>
@@ -103,15 +113,41 @@
                   <span class="text-sm font-bold">Capitana: Barby</span>
                 </div>
                 <div class="w-full bg-cyan-900/30 rounded-lg p-4 text-left">
-                  <p class="text-cyan-200 text-xs font-bold mb-2 uppercase">Plantel ({{ equipos.verserkers.jugadoras.length }} jugadoras)</p>
-                  <div class="grid grid-cols-2 gap-2 text-white/90 text-xs">
-                    <div v-for="(jugadora, index) in equipos.verserkers.jugadoras" :key="index" class="flex items-center gap-1">
-                      <svg class="w-3 h-3 text-cyan-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" v-if="jugadora.capitana"/>
-                        <circle cx="12" cy="12" r="3" v-else/>
-                      </svg>
-                      <span :class="jugadora.capitana ? 'font-bold' : ''">{{ jugadora.nombre }}</span>
-                      <span v-if="jugadora.goles > 0" class="text-primary font-bold ml-1">({{ jugadora.goles }})</span>
+                  <p class="text-cyan-200 text-xs font-bold mb-2 uppercase">Plantel ({{ equipos.verserkers?.jugadoras?.length || 0 }} jugadoras)</p>
+                  <div class="space-y-2">
+                    <!-- Jugadoras con goles -->
+                    <div v-if="equipos.verserkers?.jugadoras?.filter(j => j.goles > 0).length > 0" class="mb-3">
+                      <p class="text-cyan-300 text-xs font-bold mb-2 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                        </svg>
+                        GOLEADORAS
+                      </p>
+                      <div class="grid grid-cols-2 gap-2">
+                        <div v-for="(jugadora, index) in equipos.verserkers?.jugadoras?.filter(j => j.goles > 0) || []" :key="index" 
+                             class="flex items-center justify-between bg-cyan-400/10 px-2 py-1.5 rounded border border-cyan-400/30">
+                          <div class="flex items-center gap-1">
+                            <svg class="w-3 h-3 text-cyan-400" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" v-if="jugadora.capitana"/>
+                              <circle cx="12" cy="12" r="3" v-else/>
+                            </svg>
+                            <span class="text-cyan-100 text-xs" :class="jugadora.capitana ? 'font-bold' : ''">{{ jugadora.nombre }}</span>
+                          </div>
+                          <span class="text-cyan-400 font-black text-sm">{{ jugadora.goles }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Resto del plantel -->
+                    <div>
+                      <p class="text-cyan-200/60 text-xs font-bold mb-2">PLANTEL COMPLETO</p>
+                      <div class="grid grid-cols-2 gap-1.5 text-white/70 text-xs">
+                        <div v-for="(jugadora, index) in equipos.verserkers?.jugadoras || []" :key="index" class="flex items-center gap-1">
+                          <svg class="w-2.5 h-2.5 text-cyan-400/50" fill="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3"/>
+                          </svg>
+                          <span>{{ jugadora.nombre }}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -137,15 +173,41 @@
                   <span class="text-sm font-bold">Capitana: Pau Motta</span>
                 </div>
                 <div class="w-full bg-gray-900/30 rounded-lg p-4 text-left">
-                  <p class="text-gray-200 text-xs font-bold mb-2 uppercase">Plantel ({{ equipos.internadas.jugadoras.length }} jugadoras)</p>
-                  <div class="grid grid-cols-2 gap-2 text-white/90 text-xs">
-                    <div v-for="(jugadora, index) in equipos.internadas.jugadoras" :key="index" class="flex items-center gap-1">
-                      <svg class="w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" v-if="jugadora.capitana"/>
-                        <circle cx="12" cy="12" r="3" v-else/>
-                      </svg>
-                      <span :class="jugadora.capitana ? 'font-bold' : ''">{{ jugadora.nombre }}</span>
-                      <span v-if="jugadora.goles > 0" class="text-primary font-bold ml-1">({{ jugadora.goles }})</span>
+                  <p class="text-gray-200 text-xs font-bold mb-2 uppercase">Plantel ({{ equipos.internadas?.jugadoras?.length || 0 }} jugadoras)</p>
+                  <div class="space-y-2">
+                    <!-- Jugadoras con goles -->
+                    <div v-if="equipos.internadas?.jugadoras?.filter(j => j.goles > 0).length > 0" class="mb-3">
+                      <p class="text-gray-300 text-xs font-bold mb-2 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                        </svg>
+                        GOLEADORAS
+                      </p>
+                      <div class="grid grid-cols-2 gap-2">
+                        <div v-for="(jugadora, index) in equipos.internadas?.jugadoras?.filter(j => j.goles > 0) || []" :key="index" 
+                             class="flex items-center justify-between bg-gray-400/10 px-2 py-1.5 rounded border border-gray-400/30">
+                          <div class="flex items-center gap-1">
+                            <svg class="w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" v-if="jugadora.capitana"/>
+                              <circle cx="12" cy="12" r="3" v-else/>
+                            </svg>
+                            <span class="text-gray-100 text-xs" :class="jugadora.capitana ? 'font-bold' : ''">{{ jugadora.nombre }}</span>
+                          </div>
+                          <span class="text-gray-400 font-black text-sm">{{ jugadora.goles }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Resto del plantel -->
+                    <div>
+                      <p class="text-gray-200/60 text-xs font-bold mb-2">PLANTEL COMPLETO</p>
+                      <div class="grid grid-cols-2 gap-1.5 text-white/70 text-xs">
+                        <div v-for="(jugadora, index) in equipos.internadas?.jugadoras || []" :key="index" class="flex items-center gap-1">
+                          <svg class="w-2.5 h-2.5 text-gray-400/50" fill="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3"/>
+                          </svg>
+                          <span>{{ jugadora.nombre }}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -171,15 +233,41 @@
                   <span class="text-sm font-bold">Capitana: Dany Farias</span>
                 </div>
                 <div class="w-full bg-red-900/30 rounded-lg p-4 text-left">
-                  <p class="text-red-200 text-xs font-bold mb-2 uppercase">Plantel ({{ equipos.siemprealpalo.jugadoras.length }} jugadoras)</p>
-                  <div class="grid grid-cols-2 gap-2 text-white/90 text-xs">
-                    <div v-for="(jugadora, index) in equipos.siemprealpalo.jugadoras" :key="index" class="flex items-center gap-1">
-                      <svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" v-if="jugadora.capitana"/>
-                        <circle cx="12" cy="12" r="3" v-else/>
-                      </svg>
-                      <span :class="jugadora.capitana ? 'font-bold' : ''">{{ jugadora.nombre }}</span>
-                      <span v-if="jugadora.goles > 0" class="text-primary font-bold ml-1">({{ jugadora.goles }})</span>
+                  <p class="text-red-200 text-xs font-bold mb-2 uppercase">Plantel ({{ equipos.siemprealpalo?.jugadoras?.length || 0 }} jugadoras)</p>
+                  <div class="space-y-2">
+                    <!-- Jugadoras con goles -->
+                    <div v-if="equipos.siemprealpalo?.jugadoras?.filter(j => j.goles > 0).length > 0" class="mb-3">
+                      <p class="text-red-300 text-xs font-bold mb-2 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                        </svg>
+                        GOLEADORAS
+                      </p>
+                      <div class="grid grid-cols-2 gap-2">
+                        <div v-for="(jugadora, index) in equipos.siemprealpalo?.jugadoras?.filter(j => j.goles > 0) || []" :key="index" 
+                             class="flex items-center justify-between bg-red-400/10 px-2 py-1.5 rounded border border-red-400/30">
+                          <div class="flex items-center gap-1">
+                            <svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" v-if="jugadora.capitana"/>
+                              <circle cx="12" cy="12" r="3" v-else/>
+                            </svg>
+                            <span class="text-red-100 text-xs" :class="jugadora.capitana ? 'font-bold' : ''">{{ jugadora.nombre }}</span>
+                          </div>
+                          <span class="text-red-400 font-black text-sm">{{ jugadora.goles }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Resto del plantel -->
+                    <div>
+                      <p class="text-red-200/60 text-xs font-bold mb-2">PLANTEL COMPLETO</p>
+                      <div class="grid grid-cols-2 gap-1.5 text-white/70 text-xs">
+                        <div v-for="(jugadora, index) in equipos.siemprealpalo?.jugadoras || []" :key="index" class="flex items-center gap-1">
+                          <svg class="w-2.5 h-2.5 text-red-400/50" fill="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3"/>
+                          </svg>
+                          <span>{{ jugadora.nombre }}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -189,15 +277,182 @@
               </div>
             </div>
           </div>
+          </div>
+
+          <!-- Tabla General de Goleadoras -->
+          <div class="mt-8">
+            <div class="bg-black border-2 border-primary rounded-lg overflow-hidden">
+              <button
+                @click="mostrarTablaGoleadoras = !mostrarTablaGoleadoras"
+                class="w-full px-6 py-3 bg-primary-dark flex items-center justify-between hover:bg-primary transition-colors cursor-pointer"
+              >
+                <div class="flex items-center gap-3">
+                  <svg class="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                  </svg>
+                  <div class="text-left">
+                    <h2 class="text-xl font-400 tracking-wider text-white" style="font-family: 'Collegiate Black', sans-serif;">
+                      TABLA DE GOLEADORAS
+                    </h2>
+                    <p class="text-black/70 text-xs">Rankings individuales por goles anotados</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="text-black font-bold text-xs bg-black/20 px-3 py-1 rounded-full">
+                    {{ tablaGoleadoras.length }} {{ tablaGoleadoras.length === 1 ? 'goleadora' : 'goleadoras' }}
+                  </span>
+                  <svg 
+                    class="w-5 h-5 text-black transition-transform duration-300"
+                    :class="mostrarTablaGoleadoras ? 'rotate-180' : ''"
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                  </svg>
+                </div>
+              </button>
+
+              <div v-show="mostrarTablaGoleadoras" class="p-6 bg-linear-to-br from-black via-gray-900 to-black">
+                <!-- Última actualización -->
+                <div class="mb-4 text-center">
+                  <p class="text-white/60 text-xs">
+                    Última actualización: <span class="text-primary font-bold">{{ formatLastUpdate() }}</span>
+                  </p>
+                </div>
+
+                <!-- Mensaje si no hay goleadoras -->
+                <div v-if="tablaGoleadoras.length === 0" class="text-center py-12">
+                  <svg class="w-16 h-16 text-white/20 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                  </svg>
+                  <p class="text-white/60 text-lg font-medium">Aún no hay goles registrados</p>
+                  <p class="text-white/40 text-sm mt-2">Los goles se mostrarán aquí una vez que comience el torneo</p>
+                </div>
+
+                <!-- Tabla completa de goleadoras -->
+                <div v-if="tablaGoleadoras.length > 0" class="bg-black/50 rounded-lg border border-primary/30 overflow-hidden shadow-2xl">
+                  <div class="overflow-x-auto">
+                    <table class="w-full">
+                      <thead>
+                        <tr class="bg-primary/10 border-b border-primary/30">
+                          <th class="px-3 py-2 text-center text-primary font-bold text-xs uppercase tracking-wider">#</th>
+                          <th class="px-3 py-2 text-left text-primary font-bold text-xs uppercase tracking-wider">Jugadora</th>
+                          <th class="px-3 py-2 text-left text-primary font-bold text-xs uppercase tracking-wider">Equipo</th>
+                          <th class="px-3 py-2 text-center text-primary font-bold text-xs uppercase tracking-wider">Goles</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr 
+                          v-for="(jugadora, index) in tablaGoleadoras" 
+                          :key="index"
+                          class="border-b border-white/5 transition-all duration-200"
+                          :class="{
+                            'bg-linear-to-r from-yellow-400/15 via-yellow-500/5 to-transparent hover:from-yellow-400/20 border-l-4 border-l-yellow-400': index === 0,
+                            'bg-linear-to-r from-gray-300/15 via-gray-400/5 to-transparent hover:from-gray-300/20 border-l-4 border-l-gray-300': index === 1,
+                            'bg-linear-to-r from-orange-400/15 via-orange-500/5 to-transparent hover:from-orange-400/20 border-l-4 border-l-orange-400': index === 2,
+                            'hover:bg-primary/5': index > 2
+                          }"
+                        >
+                          <td class="px-3 py-3 text-center">
+                            <!-- 1er Lugar -->
+                            <div v-if="index === 0" class="flex items-center justify-center">
+                              <svg class="w-7 h-7 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                              </svg>
+                            </div>
+                            <!-- 2do Lugar -->
+                            <div v-else-if="index === 1" class="flex items-center justify-center">
+                              <svg class="w-7 h-7 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                              </svg>
+                            </div>
+                            <!-- 3er Lugar -->
+                            <div v-else-if="index === 2" class="flex items-center justify-center">
+                              <svg class="w-7 h-7 text-orange-400" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                              </svg>
+                            </div>
+                            <!-- Resto -->
+                            <span v-else class="text-white/60 text-sm font-semibold">{{ index + 1 }}</span>
+                          </td>
+                          <td class="px-3 py-3">
+                            <div class="flex items-center gap-2">
+                              <span 
+                                class="font-bold text-sm"
+                                :class="{
+                                  'text-yellow-400': index === 0,
+                                  'text-gray-300': index === 1,
+                                  'text-orange-300': index === 2,
+                                  'text-white': index > 2
+                                }"
+                              >
+                                {{ jugadora.nombre }}
+                              </span>
+                              <span v-if="jugadora.capitana" class="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">C</span>
+                            </div>
+                          </td>
+                          <td class="px-3 py-3">
+                            <span 
+                              class="text-xs font-semibold px-2 py-1 rounded-full"
+                              :class="{
+                                'text-cyan-300 bg-cyan-400/15 border border-cyan-400/30': jugadora.color === 'cyan',
+                                'text-gray-300 bg-gray-400/15 border border-gray-400/30': jugadora.color === 'gray',
+                                'text-red-300 bg-red-400/15 border border-red-400/30': jugadora.color === 'red'
+                              }"
+                            >
+                              {{ jugadora.equipo }}
+                            </span>
+                          </td>
+                          <td class="px-3 py-3 text-center">
+                            <div class="inline-flex items-center gap-1">
+                              <svg class="w-4 h-4" 
+                                :class="{
+                                  'text-yellow-400': index === 0,
+                                  'text-gray-300': index === 1,
+                                  'text-orange-300': index === 2,
+                                  'text-primary': index > 2
+                                }"
+                                fill="currentColor" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"/>
+                              </svg>
+                              <span 
+                                class="font-black text-lg"
+                                :class="{
+                                  'text-yellow-400': index === 0,
+                                  'text-gray-300': index === 1,
+                                  'text-orange-300': index === 2,
+                                  'text-primary': index > 2
+                                }"
+                              >
+                                {{ jugadora.goles }}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <!-- Panel de Administración de Goles (Solo Admin) -->
-          <div v-if="isAdmin" class="mt-8 bg-primary-dark rounded-lg p-6 border-2 border-primary">
+          <div v-if="isAdmin && equipos.verserkers && equipos.internadas && equipos.siemprealpalo" class="mt-8 bg-primary-dark rounded-lg p-6 border-2 border-primary">
             <div class="flex items-center justify-between mb-6">
               <h3 class="text-black font-bold text-xl flex items-center gap-2">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
                 PANEL DE GOLES - ADMINISTRADOR
+                <span v-if="guardandoGol" class="ml-2 inline-flex items-center gap-1 text-xs bg-black/30 text-black px-2 py-1 rounded">
+                  <svg class="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Guardando...
+                </span>
               </h3>
               <button
                 @click="mostrarPanelGoles = !mostrarPanelGoles"
@@ -212,19 +467,20 @@
               <div class="bg-black/50 rounded-lg p-4 border-2 border-cyan-400">
                 <h4 class="text-cyan-400 font-bold mb-4 text-center">LAS VERSERKERS</h4>
                 <div class="space-y-2">
-                  <div v-for="(jugadora, index) in equipos.verserkers.jugadoras" :key="index" 
+                  <div v-for="(jugadora, index) in equipos.verserkers?.jugadoras || []" :key="index" 
                        class="flex items-center justify-between bg-white/5 p-2 rounded">
                     <span class="text-white text-sm">{{ jugadora.nombre }}</span>
                     <div class="flex items-center gap-2">
                       <button
                         @click="restarGol('verserkers', index)"
-                        class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded font-bold"
-                        :disabled="jugadora.goles === 0"
+                        class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        :disabled="jugadora.goles === 0 || guardandoGol"
                       >-</button>
                       <span class="text-primary font-bold w-8 text-center">{{ jugadora.goles }}</span>
                       <button
                         @click="agregarGol('verserkers', index)"
-                        class="bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded font-bold"
+                        class="bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        :disabled="guardandoGol"
                       >+</button>
                     </div>
                   </div>
@@ -238,19 +494,20 @@
               <div class="bg-black/50 rounded-lg p-4 border-2 border-gray-400">
                 <h4 class="text-gray-400 font-bold mb-4 text-center">INTER NADAS</h4>
                 <div class="space-y-2">
-                  <div v-for="(jugadora, index) in equipos.internadas.jugadoras" :key="index" 
+                  <div v-for="(jugadora, index) in equipos.internadas?.jugadoras || []" :key="index" 
                        class="flex items-center justify-between bg-white/5 p-2 rounded">
                     <span class="text-white text-sm">{{ jugadora.nombre }}</span>
                     <div class="flex items-center gap-2">
                       <button
                         @click="restarGol('internadas', index)"
-                        class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded font-bold"
-                        :disabled="jugadora.goles === 0"
+                        class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        :disabled="jugadora.goles === 0 || guardandoGol"
                       >-</button>
                       <span class="text-primary font-bold w-8 text-center">{{ jugadora.goles }}</span>
                       <button
                         @click="agregarGol('internadas', index)"
-                        class="bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded font-bold"
+                        class="bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        :disabled="guardandoGol"
                       >+</button>
                     </div>
                   </div>
@@ -264,19 +521,20 @@
               <div class="bg-black/50 rounded-lg p-4 border-2 border-red-400">
                 <h4 class="text-red-400 font-bold mb-4 text-center">SIEMPRE AL PALO FC</h4>
                 <div class="space-y-2">
-                  <div v-for="(jugadora, index) in equipos.siemprealpalo.jugadoras" :key="index" 
+                  <div v-for="(jugadora, index) in equipos.siemprealpalo?.jugadoras || []" :key="index" 
                        class="flex items-center justify-between bg-white/5 p-2 rounded">
                     <span class="text-white text-sm">{{ jugadora.nombre }}</span>
                     <div class="flex items-center gap-2">
                       <button
                         @click="restarGol('siemprealpalo', index)"
-                        class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded font-bold"
-                        :disabled="jugadora.goles === 0"
+                        class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        :disabled="jugadora.goles === 0 || guardandoGol"
                       >-</button>
                       <span class="text-primary font-bold w-8 text-center">{{ jugadora.goles }}</span>
                       <button
                         @click="agregarGol('siemprealpalo', index)"
-                        class="bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded font-bold"
+                        class="bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        :disabled="guardandoGol"
                       >+</button>
                     </div>
                   </div>
@@ -288,15 +546,23 @@
             </div>
           </div>
 
-          <!-- Fixture del Torneo -->
+          <!-- Resultados Primera Fecha -->
           <div class="bg-black border-2 border-primary rounded-lg p-4 sm:p-8 mt-8">
             <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4 sm:mb-6 text-center flex items-center justify-center gap-2 sm:gap-3" style="font-family: 'Collegiate Black', sans-serif;">
               <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M9 11H7v2h2v-2m4 0h-2v2h2v-2m4 0h-2v2h2v-2m2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m0 16H5V9h14v11z"/>
               </svg>
-              <span class="hidden sm:inline">FIXTURE - SÁBADO 7 DE FEBRERO</span>
-              <span class="sm:hidden">FIXTURE - 7 FEB</span>
+              <span class="hidden sm:inline">RESULTADOS - SÁBADO 7 DE FEBRERO</span>
+              <span class="sm:hidden">RESULTADOS - 7 FEB</span>
             </h2>
+            <div class="text-center mb-4">
+              <span class="inline-flex items-center gap-2 bg-green-500/20 text-green-400 border border-green-400 px-4 py-2 rounded-full text-sm font-bold">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                </svg>
+                PRIMERA FECHA COMPLETADA
+              </span>
+            </div>
             
             <div class="space-y-3 sm:space-y-4">
               <!-- Partido 1 -->
@@ -308,18 +574,22 @@
                     </svg>
                     <span class="font-bold text-xs sm:text-sm">19:00 - 19:35</span>
                   </div>
-                  <span class="text-primary text-xs font-bold bg-primary/20 px-2 sm:px-3 py-1 rounded-full">PARTIDO 1</span>
+                  <span class="text-xs font-bold bg-green-500/20 text-green-400 border border-green-400 px-2 sm:px-3 py-1 rounded-full">✓ FINALIZADO</span>
                 </div>
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
-                  <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+                  <div class="flex items-center gap-2 sm:gap-3 flex-1">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
                       <img src="../assets/internadasLogo.jpeg" alt="Inter Nadas" class="w-full h-full object-contain" />
                     </div>
-                    <span class="text-white font-bold text-sm sm:text-lg">Inter Nadas</span>
+                    <span class="text-white/70 font-bold text-sm sm:text-lg">Inter Nadas</span>
                   </div>
-                  <span class="text-primary font-black text-xl sm:text-2xl mx-2 sm:mx-4">VS</span>
-                  <div class="flex items-center gap-2 sm:gap-3">
-                    <span class="text-white font-bold text-sm sm:text-lg text-right sm:text-left">Siempre al Palo FC</span>
+                  <div class="flex items-center gap-3 sm:gap-4">
+                    <span class="text-white/70 font-black text-2xl sm:text-3xl">0</span>
+                    <span class="text-primary/50 font-bold text-lg">-</span>
+                    <span class="text-primary font-black text-2xl sm:text-3xl">2</span>
+                  </div>
+                  <div class="flex items-center gap-2 sm:gap-3 flex-1 justify-end">
+                    <span class="text-primary font-bold text-sm sm:text-lg text-right">Siempre al Palo FC</span>
                     <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
                       <img src="../assets/siemprealpaloLogo.jpeg" alt="Siempre al Palo" class="w-full h-full object-contain" />
                     </div>
@@ -336,18 +606,22 @@
                     </svg>
                     <span class="font-bold text-xs sm:text-sm">19:40 - 20:15</span>
                   </div>
-                  <span class="text-primary text-xs font-bold bg-primary/20 px-2 sm:px-3 py-1 rounded-full">PARTIDO 2</span>
+                  <span class="text-xs font-bold bg-green-500/20 text-green-400 border border-green-400 px-2 sm:px-3 py-1 rounded-full">✓ FINALIZADO</span>
                 </div>
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
-                  <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+                  <div class="flex items-center gap-2 sm:gap-3 flex-1">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
                       <img src="../assets/siemprealpaloLogo.jpeg" alt="Siempre al Palo" class="w-full h-full object-contain" />
                     </div>
-                    <span class="text-white font-bold text-sm sm:text-lg">Siempre al Palo FC</span>
+                    <span class="text-white/70 font-bold text-sm sm:text-lg">Siempre al Palo FC</span>
                   </div>
-                  <span class="text-primary font-black text-xl sm:text-2xl mx-2 sm:mx-4">VS</span>
-                  <div class="flex items-center gap-2 sm:gap-3">
-                    <span class="text-white font-bold text-sm sm:text-lg text-right sm:text-left">Las Verserkers</span>
+                  <div class="flex items-center gap-3 sm:gap-4">
+                    <span class="text-white/70 font-black text-2xl sm:text-3xl">1</span>
+                    <span class="text-primary/50 font-bold text-lg">-</span>
+                    <span class="text-primary font-black text-2xl sm:text-3xl">7</span>
+                  </div>
+                  <div class="flex items-center gap-2 sm:gap-3 flex-1 justify-end">
+                    <span class="text-primary font-bold text-sm sm:text-lg text-right">Las Verserkers</span>
                     <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
                       <img src="../assets/versekersLogo.jpeg" alt="Las Versekers" class="w-full h-full object-contain" />
                     </div>
@@ -364,23 +638,138 @@
                     </svg>
                     <span class="font-bold text-xs sm:text-sm">20:20 - 20:55</span>
                   </div>
-                  <span class="text-primary text-xs font-bold bg-primary/20 px-2 sm:px-3 py-1 rounded-full">PARTIDO 3</span>
+                  <span class="text-xs font-bold bg-green-500/20 text-green-400 border border-green-400 px-2 sm:px-3 py-1 rounded-full">✓ FINALIZADO</span>
                 </div>
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0">
-                  <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+                  <div class="flex items-center gap-2 sm:gap-3 flex-1">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
                       <img src="../assets/internadasLogo.jpeg" alt="Inter Nadas" class="w-full h-full object-contain" />
                     </div>
-                    <span class="text-white font-bold text-sm sm:text-lg">Inter Nadas</span>
+                    <span class="text-primary font-bold text-sm sm:text-lg">Inter Nadas</span>
                   </div>
-                  <span class="text-primary font-black text-xl sm:text-2xl mx-2 sm:mx-4">VS</span>
-                  <div class="flex items-center gap-2 sm:gap-3">
-                    <span class="text-white font-bold text-sm sm:text-lg text-right sm:text-left">Las Verserkers</span>
+                  <div class="flex items-center gap-3 sm:gap-4">
+                    <span class="text-primary font-black text-2xl sm:text-3xl">5</span>
+                    <span class="text-primary/50 font-bold text-lg">-</span>
+                    <span class="text-white/70 font-black text-2xl sm:text-3xl">1</span>
+                  </div>
+                  <div class="flex items-center gap-2 sm:gap-3 flex-1 justify-end">
+                    <span class="text-white/70 font-bold text-sm sm:text-lg text-right">Las Verserkers</span>
                     <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
                       <img src="../assets/versekersLogo.jpeg" alt="Las Versekers" class="w-full h-full object-contain" />
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <!-- Tabla de Posiciones -->
+            <div class="mt-6 bg-black/50 border-2 border-primary/50 rounded-lg overflow-hidden shadow-lg">
+              <div class="bg-primary/20 px-4 py-2 border-b border-primary/50">
+                <h3 class="text-primary font-bold text-sm text-center flex items-center justify-center gap-2 uppercase tracking-wider">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                  </svg>
+                  Tabla de Posiciones
+                </h3>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="bg-primary/10 border-b border-primary/30">
+                      <th class="px-2 py-2 text-center text-primary font-bold text-xs uppercase">#</th>
+                      <th class="px-2 py-2 text-left text-primary font-bold text-xs uppercase">Equipo</th>
+                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">PJ</th>
+                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">G</th>
+                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">P</th>
+                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">GF</th>
+                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">GC</th>
+                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">DG</th>
+                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">PTS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- 1. Inter Nadas -->
+                    <tr class="border-b border-white/5 hover:bg-primary/5 bg-linear-to-r from-yellow-400/10 to-transparent border-l-4 border-l-yellow-400 transition-all">
+                      <td class="px-2 py-2 text-center">
+                        <svg class="w-6 h-6 text-yellow-400 mx-auto" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                        </svg>
+                      </td>
+                      <td class="px-2 py-2">
+                        <div class="flex items-center gap-2">
+                          <div class="w-5 h-5 bg-white rounded-full p-0.5 shrink-0">
+                            <img src="../assets/internadasLogo.jpeg" alt="Inter Nadas" class="w-full h-full object-contain" />
+                          </div>
+                          <span class="text-white font-bold text-xs">Inter Nadas</span>
+                        </div>
+                      </td>
+                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">2</td>
+                      <td class="px-2 py-2 text-center text-primary font-bold text-xs">1</td>
+                      <td class="px-2 py-2 text-center text-red-400 font-bold text-xs">1</td>
+                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">5</td>
+                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">3</td>
+                      <td class="px-2 py-2 text-center text-primary font-bold text-xs">+2</td>
+                      <td class="px-2 py-2 text-center text-primary font-bold text-base">3</td>
+                    </tr>
+                    <!-- 2. Las Verserkers -->
+                    <tr class="border-b border-white/5 hover:bg-primary/5 bg-linear-to-r from-gray-300/10 to-transparent border-l-4 border-l-gray-300 transition-all">
+                      <td class="px-2 py-2 text-center">
+                        <svg class="w-6 h-6 text-gray-300 mx-auto" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                        </svg>
+                      </td>
+                      <td class="px-2 py-2">
+                        <div class="flex items-center gap-2">
+                          <div class="w-5 h-5 bg-white rounded-full p-0.5 shrink-0">
+                            <img src="../assets/versekersLogo.jpeg" alt="Las Verserkers" class="w-full h-full object-contain" />
+                          </div>
+                          <span class="text-white font-bold text-xs">Las Verserkers</span>
+                        </div>
+                      </td>
+                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">2</td>
+                      <td class="px-2 py-2 text-center text-primary font-bold text-xs">1</td>
+                      <td class="px-2 py-2 text-center text-red-400 font-bold text-xs">1</td>
+                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">8</td>
+                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">8</td>
+                      <td class="px-2 py-2 text-center text-white/70 font-bold text-xs">0</td>
+                      <td class="px-2 py-2 text-center text-primary font-bold text-base">3</td>
+                    </tr>
+                    <!-- 3. Siempre al Palo -->
+                    <tr class="border-b border-white/5 hover:bg-primary/5 bg-linear-to-r from-orange-400/10 to-transparent border-l-4 border-l-orange-400 transition-all">
+                      <td class="px-2 py-2 text-center">
+                        <svg class="w-6 h-6 text-orange-400 mx-auto" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                        </svg>
+                      </td>
+                      <td class="px-2 py-2">
+                        <div class="flex items-center gap-2">
+                          <div class="w-5 h-5 bg-white rounded-full p-0.5 shrink-0">
+                            <img src="../assets/siemprealpaloLogo.jpeg" alt="Siempre al Palo" class="w-full h-full object-contain" />
+                          </div>
+                          <span class="text-white font-bold text-xs">Siempre al Palo FC</span>
+                        </div>
+                      </td>
+                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">2</td>
+                      <td class="px-2 py-2 text-center text-primary font-bold text-xs">1</td>
+                      <td class="px-2 py-2 text-center text-red-400 font-bold text-xs">1</td>
+                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">3</td>
+                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">7</td>
+                      <td class="px-2 py-2 text-center text-red-400 font-bold text-xs">-4</td>
+                      <td class="px-2 py-2 text-center text-primary font-bold text-base">3</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="bg-primary/10 px-3 py-1.5 border-t border-primary/30">
+                <p class="text-white/60 text-xs text-center leading-relaxed">
+                  <span class="font-semibold text-white">PJ:</span> Partidos Jugados • 
+                  <span class="font-semibold text-white">G:</span> Ganados • 
+                  <span class="font-semibold text-white">P:</span> Perdidos • 
+                  <span class="font-semibold text-white">GF:</span> Goles a Favor • 
+                  <span class="font-semibold text-white">GC:</span> Goles en Contra • 
+                  <span class="font-semibold text-white">DG:</span> Diferencia de Goles • 
+                  <span class="font-semibold text-white">PTS:</span> Puntos
+                </p>
               </div>
             </div>
 
@@ -398,10 +787,9 @@
           <!-- Información adicional -->
           <div class="mt-8 bg-white/5 rounded-lg p-6">
             <p class="text-white/80 text-center leading-relaxed">
-              Primer torneo interno que reúne a jugadoras de <span class="text-primary font-bold">Vikingas Escuela</span> y 
-              <span class="text-primary font-bold"> Vikingas Ascenso</span> en equipos mixtos. 
-              Una oportunidad para fortalecer lazos, desarrollar habilidades y disfrutar del fútbol en familia vikinga.
+             Próxima fecha: Sábado 14 de febrero • Desde las 20hrs
             </p>
+          </div>
           </div>
         </div>
       </div>
@@ -690,8 +1078,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, onUnmounted } from 'vue';
 import { authUser, userRole } from '../firebase/auth';
+import { 
+  obtenerDatosCampeonato,
+  escucharCampeonato,
+  agregarGol as agregarGolFirebase,
+  restarGol as restarGolFirebase,
+  calcularTotalGoles,
+  obtenerTablaGoleadoras,
+  equiposCampeonato,
+  isLoading as loadingCampeonato
+} from '../firebase/campeonatoInterno';
 
 const tabla = ref([]);
 const loading = ref(true);
@@ -699,85 +1097,64 @@ const error = ref(null);
 const lastUpdate = ref(null);
 const competenciaExpandida = ref('interno'); // 'verano' o 'interno'
 
-// Equipos del torneo interno
-const equipos = ref({
-  verserkers: {
-    nombre: 'Las Verserkers',
-    color: 'cyan',
-    capitana: 'Barby',
-    jugadoras: [
-      { nombre: 'May', goles: 0 },
-      { nombre: 'Barby', goles: 0, capitana: true },
-      { nombre: 'Eve', goles: 0 },
-      { nombre: 'Luna', goles: 0 },
-      { nombre: 'Vale G', goles: 0 },
-      { nombre: 'Pao', goles: 0 },
-      { nombre: 'Ju', goles: 0 },
-      { nombre: 'Mayo', goles: 0 },
-      { nombre: 'Tania', goles: 0 },
-      { nombre: 'Roxi', goles: 0 },
-      { nombre: 'Tiare', goles: 0 },
-      { nombre: 'Lore', goles: 0 },
-      { nombre: 'Milla', goles: 0 }
-    ]
-  },
-  internadas: {
-    nombre: 'Inter Nadas',
-    color: 'gray',
-    capitana: 'Pau Motta',
-    jugadoras: [
-      { nombre: 'Eli López', goles: 0 },
-      { nombre: 'Jessi C', goles: 0 },
-      { nombre: 'Chama', goles: 0 },
-      { nombre: 'Vane', goles: 0 },
-      { nombre: 'Franshe', goles: 0 },
-      { nombre: 'Javi C', goles: 0 },
-      { nombre: 'Natiluminati', goles: 0 },
-      { nombre: 'Motta', goles: 0, capitana: true },
-      { nombre: 'Mila', goles: 0 },
-      { nombre: 'Jessi P', goles: 0 },
-      { nombre: 'Francy', goles: 0 },
-      { nombre: 'Valeria', goles: 0 },
-      { nombre: 'Chica', goles: 0 }
-    ]
-  },
-  siemprealpalo: {
-    nombre: 'Siempre al Palo FC',
-    color: 'red',
-    capitana: 'Dany Farias',
-    jugadoras: [
-      { nombre: 'Jose', goles: 0 },
-      { nombre: 'Majo', goles: 0 },
-      { nombre: 'Deisy', goles: 0 },
-      { nombre: 'Cami', goles: 0 },
-      { nombre: 'Mi', goles: 0 },
-      { nombre: 'Liss', goles: 0 },
-      { nombre: 'Ro', goles: 0 },
-      { nombre: 'Ge', goles: 0 },
-      { nombre: 'Eli O', goles: 0 },
-      { nombre: 'Caro', goles: 0 },
-      { nombre: 'Dani F', goles: 0, capitana: true },
-      { nombre: 'Dani O', goles: 0 }
-    ]
-  }
-});
+// Equipos del torneo interno (ahora vinculados a Firebase)
+const equipos = computed(() => equiposCampeonato.value);
+
+// Tabla de goleadoras general
+const tablaGoleadoras = ref([]);
+const mostrarTablaGoleadoras = ref(false);
 
 const isAdmin = computed(() => userRole.value === 'admin');
 const mostrarPanelGoles = ref(false);
-const equipoSeleccionado = ref(null);
+const guardandoGol = ref(false);
 
-const agregarGol = (equipoKey, jugadoraIndex) => {
-  equipos.value[equipoKey].jugadoras[jugadoraIndex].goles++;
+let unsubscribe = null;
+
+const agregarGol = async (equipoKey, jugadoraIndex) => {
+  if (guardandoGol.value) return;
+  
+  guardandoGol.value = true;
+  try {
+    await agregarGolFirebase(equipoKey, jugadoraIndex);
+    // Actualizar tabla de goleadoras
+    await cargarTablaGoleadoras();
+  } catch (err) {
+    console.error('Error agregando gol:', err);
+    alert('Error al agregar gol. Por favor intenta nuevamente.');
+  } finally {
+    guardandoGol.value = false;
+  }
 };
 
-const restarGol = (equipoKey, jugadoraIndex) => {
-  if (equipos.value[equipoKey].jugadoras[jugadoraIndex].goles > 0) {
-    equipos.value[equipoKey].jugadoras[jugadoraIndex].goles--;
+const restarGol = async (equipoKey, jugadoraIndex) => {
+  if (guardandoGol.value) return;
+  if (!equipos.value[equipoKey]?.jugadoras?.[jugadoraIndex] || equipos.value[equipoKey]?.jugadoras?.[jugadoraIndex]?.goles === 0) {
+    return;
+  }
+  
+  guardandoGol.value = true;
+  try {
+    await restarGolFirebase(equipoKey, jugadoraIndex);
+    // Actualizar tabla de goleadoras
+    await cargarTablaGoleadoras();
+  } catch (err) {
+    console.error('Error restando gol:', err);
+    alert('Error al restar gol. Por favor intenta nuevamente.');
+  } finally {
+    guardandoGol.value = false;
   }
 };
 
 const totalGoles = (equipoKey) => {
-  return equipos.value[equipoKey].jugadoras.reduce((sum, j) => sum + j.goles, 0);
+  return calcularTotalGoles(equipoKey);
+};
+
+const cargarTablaGoleadoras = async () => {
+  try {
+    tablaGoleadoras.value = await obtenerTablaGoleadoras();
+  } catch (err) {
+    console.error('Error cargando tabla de goleadoras:', err);
+  }
 };
 
 const fetchTabla = async () => {
@@ -820,8 +1197,39 @@ const formatDate = (dateString) => {
   });
 };
 
-onMounted(() => {
+const formatLastUpdate = () => {
+  if (!equipos.value || !equipos.value.lastUpdated) return 'No disponible';
+  const date = new Date(equipos.value.lastUpdated);
+  return date.toLocaleString('es-CL', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+onMounted(async () => {
   fetchTabla();
+  
+  // Cargar datos del campeonato desde Firebase
+  try {
+    await obtenerDatosCampeonato();
+    await cargarTablaGoleadoras();
+    
+    // Escuchar cambios en tiempo real
+    unsubscribe = escucharCampeonato(async () => {
+      await cargarTablaGoleadoras();
+    });
+  } catch (err) {
+    console.error('Error cargando datos del campeonato:', err);
+  }
+});
+
+onUnmounted(() => {
+  if (unsubscribe) {
+    unsubscribe();
+  }
 });
 </script>
 
