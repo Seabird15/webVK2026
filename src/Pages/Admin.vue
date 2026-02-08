@@ -126,6 +126,11 @@
           <GestionarEstadisticas />
         </div>
 
+        <!-- Partidos Campeonato Interno -->
+        <div v-if="activeTab === 'partidos'">
+          <GestionarPartidos />
+        </div>
+
         <!-- Configuración -->
         <!-- <div v-if="activeTab === 'configuracion'" class="space-y-6">
           <h2 class="text-2xl font-bold text-gray-900 mb-6">Configuración</h2>
@@ -150,6 +155,7 @@ import GestionarEstadisticas from '../components/GestionarEstadisticas.vue';
 import GestionarSliderHome from '../components/GestionarSliderHome.vue';
 import GestionarSolicitudesRegistro from '../components/GestionarSolicitudesRegistro.vue';
 import GestionarEntrenamientos from '../components/GestionarEntrenamientos.vue';
+import GestionarPartidos from '../components/GestionarPartidos.vue';
 import { entrenamientos, fetchTodosEntrenamientos } from '../firebase/entrenamientos';
 import VistaJugadorasAdmin from '../components/VistaJugadorasAdmin.vue';
 import ListadoJugadorasAdmin from '../components/ListadoJugadorasAdmin.vue';
@@ -176,6 +182,7 @@ const tabs = [
   { id: 'eventos-especiales', label: 'Próximo/Último Partido' },
   { id: 'galeria', label: 'Galería' },
   { id: 'estadisticas', label: 'Estadísticas' },
+  { id: 'partidos', label: 'Partidos Campeonato' },
 ];
 
 const handleLogout = async () => {

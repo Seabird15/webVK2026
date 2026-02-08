@@ -564,99 +564,149 @@
               </span>
             </div>
             
+            <!-- Panel de Administración de Resultados (Solo Admin) -->
+            <div v-if="isAdmin" class="mb-6 bg-primary/20 border-2 border-primary rounded-lg p-4">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-primary font-bold text-sm flex items-center gap-2">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                  </svg>
+                  MODO EDICIÓN (ADMIN)
+                </h3>
+                <span v-if="editandoResultado" class="text-xs bg-black/30 text-primary px-2 py-1 rounded flex items-center gap-1">
+                  <svg class="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Guardando...
+                </span>
+              </div>
+              <p class="text-primary/80 text-xs">Haz clic en "Editar" para modificar los resultados de cada partido</p>
+            </div>
+
             <div class="space-y-3 sm:space-y-4">
-              <!-- Partido 1 -->
-              <div class="bg-linear-to-r from-blue-900/30 via-purple-900/30 to-pink-900/30 border-2 border-primary rounded-lg p-3 sm:p-6">
+              <!-- Partidos dinámicos desde Firebase -->
+              <div v-for="(partido, index) in partidos" :key="partido.id" class="bg-linear-to-r from-blue-900/30 via-purple-900/30 to-pink-900/30 border-2 border-primary rounded-lg p-3 sm:p-6">
                 <div class="flex items-center justify-between mb-3 sm:mb-4">
                   <div class="flex items-center gap-1 sm:gap-2 text-primary">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/>
                     </svg>
-                    <span class="font-bold text-xs sm:text-sm">19:00 - 19:35</span>
+                    <span class="font-bold text-xs sm:text-sm">{{ partido.horario }}</span>
                   </div>
-                  <span class="text-xs font-bold bg-green-500/20 text-green-400 border border-green-400 px-2 sm:px-3 py-1 rounded-full">✓ FINALIZADO</span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold bg-green-500/20 text-green-400 border border-green-400 px-2 sm:px-3 py-1 rounded-full">✓ FINALIZADO</span>
+                    
+                    <!-- Botón de editar (solo admin) -->
+                    <button
+                      v-if="isAdmin && !partidoEditando"
+                      @click="editarResultado(partido)"
+                      class="bg-primary hover:bg-primary/80 text-black px-2 py-1 rounded text-xs font-bold transition"
+                    >
+                      Editar
+                    </button>
+                  </div>
                 </div>
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+                
+                <!-- Vista normal del partido -->
+                <div v-if="!partidoEditando || partidoEditando.id !== partido.id" class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
                   <div class="flex items-center gap-2 sm:gap-3 flex-1">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                      <img src="../assets/internadasLogo.jpeg" alt="Inter Nadas" class="w-full h-full object-contain" />
+                      <img :src="`/src/assets/${obtenerDatosEquipo(partido.equipoLocal).logo}`" :alt="obtenerDatosEquipo(partido.equipoLocal).nombre" class="w-full h-full object-contain" />
                     </div>
-                    <span class="text-white/70 font-bold text-sm sm:text-lg">Inter Nadas</span>
+                    <span 
+                      class="font-bold text-sm sm:text-lg"
+                      :class="partido.golesLocal > partido.golesVisita ? 'text-primary' : 'text-white/70'"
+                    >
+                      {{ obtenerDatosEquipo(partido.equipoLocal).nombre }}
+                    </span>
                   </div>
                   <div class="flex items-center gap-3 sm:gap-4">
-                    <span class="text-white/70 font-black text-2xl sm:text-3xl">0</span>
+                    <span 
+                      class="font-black text-2xl sm:text-3xl"
+                      :class="partido.golesLocal > partido.golesVisita ? 'text-primary' : 'text-white/70'"
+                    >
+                      {{ partido.golesLocal }}
+                    </span>
                     <span class="text-primary/50 font-bold text-lg">-</span>
-                    <span class="text-primary font-black text-2xl sm:text-3xl">2</span>
+                    <span 
+                      class="font-black text-2xl sm:text-3xl"
+                      :class="partido.golesVisita > partido.golesLocal ? 'text-primary' : 'text-white/70'"
+                    >
+                      {{ partido.golesVisita }}
+                    </span>
                   </div>
                   <div class="flex items-center gap-2 sm:gap-3 flex-1 justify-end">
-                    <span class="text-primary font-bold text-sm sm:text-lg text-right">Siempre al Palo FC</span>
+                    <span 
+                      class="font-bold text-sm sm:text-lg text-right"
+                      :class="partido.golesVisita > partido.golesLocal ? 'text-primary' : 'text-white/70'"
+                    >
+                      {{ obtenerDatosEquipo(partido.equipoVisita).nombre }}
+                    </span>
                     <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                      <img src="../assets/siemprealpaloLogo.jpeg" alt="Siempre al Palo" class="w-full h-full object-contain" />
+                      <img :src="`/src/assets/${obtenerDatosEquipo(partido.equipoVisita).logo}`" :alt="obtenerDatosEquipo(partido.equipoVisita).nombre" class="w-full h-full object-contain" />
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <!-- Partido 2 -->
-              <div class="bg-linear-to-r from-pink-900/30 via-purple-900/30 to-purple-900/30 border-2 border-primary rounded-lg p-3 sm:p-6">
-                <div class="flex items-center justify-between mb-3 sm:mb-4">
-                  <div class="flex items-center gap-1 sm:gap-2 text-primary">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/>
-                    </svg>
-                    <span class="font-bold text-xs sm:text-sm">19:40 - 20:15</span>
-                  </div>
-                  <span class="text-xs font-bold bg-green-500/20 text-green-400 border border-green-400 px-2 sm:px-3 py-1 rounded-full">✓ FINALIZADO</span>
-                </div>
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
-                  <div class="flex items-center gap-2 sm:gap-3 flex-1">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                      <img src="../assets/siemprealpaloLogo.jpeg" alt="Siempre al Palo" class="w-full h-full object-contain" />
+                
+                <!-- Modo de edición (solo admin) -->
+                <div v-else class="space-y-4">
+                  <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="flex items-center gap-2 sm:gap-3 flex-1">
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
+                        <img :src="`/src/assets/${obtenerDatosEquipo(partido.equipoLocal).logo}`" :alt="obtenerDatosEquipo(partido.equipoLocal).nombre" class="w-full h-full object-contain" />
+                      </div>
+                      <span class="text-white font-bold text-sm sm:text-lg">{{ obtenerDatosEquipo(partido.equipoLocal).nombre }}</span>
                     </div>
-                    <span class="text-white/70 font-bold text-sm sm:text-lg">Siempre al Palo FC</span>
-                  </div>
-                  <div class="flex items-center gap-3 sm:gap-4">
-                    <span class="text-white/70 font-black text-2xl sm:text-3xl">1</span>
-                    <span class="text-primary/50 font-bold text-lg">-</span>
-                    <span class="text-primary font-black text-2xl sm:text-3xl">7</span>
-                  </div>
-                  <div class="flex items-center gap-2 sm:gap-3 flex-1 justify-end">
-                    <span class="text-primary font-bold text-sm sm:text-lg text-right">Las Verserkers</span>
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                      <img src="../assets/versekersLogo.jpeg" alt="Las Versekers" class="w-full h-full object-contain" />
+                    <div class="flex items-center gap-3">
+                      <button
+                        @click="decrementarGol('local')"
+                        :disabled="partidoEditando.golesLocalEdit === 0"
+                        class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      >-</button>
+                      <span class="text-primary font-black text-3xl w-12 text-center">{{ partidoEditando.golesLocalEdit }}</span>
+                      <button
+                        @click="incrementarGol('local')"
+                        class="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded font-bold transition"
+                      >+</button>
                     </div>
                   </div>
-                </div>
-              </div>
-
-              <!-- Partido 3 -->
-              <div class="bg-linear-to-r from-blue-900/30 via-purple-900/30 to-purple-900/30 border-2 border-primary rounded-lg p-3 sm:p-6">
-                <div class="flex items-center justify-between mb-3 sm:mb-4">
-                  <div class="flex items-center gap-1 sm:gap-2 text-primary">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/>
-                    </svg>
-                    <span class="font-bold text-xs sm:text-sm">20:20 - 20:55</span>
-                  </div>
-                  <span class="text-xs font-bold bg-green-500/20 text-green-400 border border-green-400 px-2 sm:px-3 py-1 rounded-full">✓ FINALIZADO</span>
-                </div>
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
-                  <div class="flex items-center gap-2 sm:gap-3 flex-1">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                      <img src="../assets/internadasLogo.jpeg" alt="Inter Nadas" class="w-full h-full object-contain" />
+                  
+                  <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="flex items-center gap-2 sm:gap-3 flex-1">
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
+                        <img :src="`/src/assets/${obtenerDatosEquipo(partido.equipoVisita).logo}`" :alt="obtenerDatosEquipo(partido.equipoVisita).nombre" class="w-full h-full object-contain" />
+                      </div>
+                      <span class="text-white font-bold text-sm sm:text-lg">{{ obtenerDatosEquipo(partido.equipoVisita).nombre }}</span>
                     </div>
-                    <span class="text-primary font-bold text-sm sm:text-lg">Inter Nadas</span>
-                  </div>
-                  <div class="flex items-center gap-3 sm:gap-4">
-                    <span class="text-primary font-black text-2xl sm:text-3xl">5</span>
-                    <span class="text-primary/50 font-bold text-lg">-</span>
-                    <span class="text-white/70 font-black text-2xl sm:text-3xl">1</span>
-                  </div>
-                  <div class="flex items-center gap-2 sm:gap-3 flex-1 justify-end">
-                    <span class="text-white/70 font-bold text-sm sm:text-lg text-right">Las Verserkers</span>
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                      <img src="../assets/versekersLogo.jpeg" alt="Las Versekers" class="w-full h-full object-contain" />
+                    <div class="flex items-center gap-3">
+                      <button
+                        @click="decrementarGol('visita')"
+                        :disabled="partidoEditando.golesVisitaEdit === 0"
+                        class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      >-</button>
+                      <span class="text-primary font-black text-3xl w-12 text-center">{{ partidoEditando.golesVisitaEdit }}</span>
+                      <button
+                        @click="incrementarGol('visita')"
+                        class="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded font-bold transition"
+                      >+</button>
                     </div>
+                  </div>
+                  
+                  <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
+                    <button
+                      @click="cancelarEdicion"
+                      class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded font-bold transition text-sm"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      @click="guardarResultado(partido.id)"
+                      :disabled="editandoResultado"
+                      class="bg-primary hover:bg-primary/80 text-black px-4 py-2 rounded font-bold transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Guardar
+                    </button>
                   </div>
                 </div>
               </div>
@@ -688,74 +738,49 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <!-- 1. Inter Nadas -->
-                    <tr class="border-b border-white/5 hover:bg-primary/5 bg-linear-to-r from-yellow-400/10 to-transparent border-l-4 border-l-yellow-400 transition-all">
+                    <tr 
+                      v-for="(equipo, index) in tablaPosiciones" 
+                      :key="equipo.key"
+                      class="border-b border-white/5 hover:bg-primary/5 transition-all border-l-4"
+                      :class="[
+                        index === 0 ? 'bg-linear-to-r from-yellow-400/10 to-transparent' : '',
+                        index === 1 ? 'bg-linear-to-r from-gray-300/10 to-transparent' : '',
+                        index === 2 ? 'bg-linear-to-r from-orange-400/10 to-transparent' : '',
+                        obtenerColorBorde(equipo)
+                      ]"
+                    >
                       <td class="px-2 py-2 text-center">
-                        <svg class="w-6 h-6 text-yellow-400 mx-auto" fill="currentColor" viewBox="0 0 24 24">
+                        <svg 
+                          v-if="index < 3" 
+                          class="w-6 h-6 mx-auto" 
+                          :class="[
+                            index === 0 ? 'text-yellow-400' : '',
+                            index === 1 ? 'text-gray-300' : '',
+                            index === 2 ? 'text-orange-400' : ''
+                          ]"
+                          fill="currentColor" viewBox="0 0 24 24"
+                        >
                           <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
                         </svg>
+                        <span v-else class="text-white/70">{{ index + 1 }}</span>
                       </td>
                       <td class="px-2 py-2">
                         <div class="flex items-center gap-2">
                           <div class="w-5 h-5 bg-white rounded-full p-0.5 shrink-0">
-                            <img src="../assets/internadasLogo.jpeg" alt="Inter Nadas" class="w-full h-full object-contain" />
+                            <img :src="`/src/assets/${equipo.logo}`" :alt="equipo.nombre" class="w-full h-full object-contain" />
                           </div>
-                          <span class="text-white font-bold text-xs">Inter Nadas</span>
+                          <span class="text-white font-bold text-xs">{{ equipo.nombre }}</span>
                         </div>
                       </td>
-                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">2</td>
-                      <td class="px-2 py-2 text-center text-primary font-bold text-xs">1</td>
-                      <td class="px-2 py-2 text-center text-red-400 font-bold text-xs">1</td>
-                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">5</td>
-                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">3</td>
-                      <td class="px-2 py-2 text-center text-primary font-bold text-xs">+2</td>
-                      <td class="px-2 py-2 text-center text-primary font-bold text-base">3</td>
-                    </tr>
-                    <!-- 2. Las Verserkers -->
-                    <tr class="border-b border-white/5 hover:bg-primary/5 bg-linear-to-r from-gray-300/10 to-transparent border-l-4 border-l-gray-300 transition-all">
-                      <td class="px-2 py-2 text-center">
-                        <svg class="w-6 h-6 text-gray-300 mx-auto" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                        </svg>
+                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">{{ equipo.pj }}</td>
+                      <td class="px-2 py-2 text-center text-primary font-bold text-xs">{{ equipo.pg }}</td>
+                      <td class="px-2 py-2 text-center text-red-400 font-bold text-xs">{{ equipo.pp }}</td>
+                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">{{ equipo.gf }}</td>
+                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">{{ equipo.gc }}</td>
+                      <td class="px-2 py-2 text-center font-bold text-xs" :class="equipo.dg >= 0 ? 'text-primary' : 'text-red-400'">
+                        {{ equipo.dg >= 0 ? '+' : '' }}{{ equipo.dg }}
                       </td>
-                      <td class="px-2 py-2">
-                        <div class="flex items-center gap-2">
-                          <div class="w-5 h-5 bg-white rounded-full p-0.5 shrink-0">
-                            <img src="../assets/versekersLogo.jpeg" alt="Las Verserkers" class="w-full h-full object-contain" />
-                          </div>
-                          <span class="text-white font-bold text-xs">Las Verserkers</span>
-                        </div>
-                      </td>
-                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">2</td>
-                      <td class="px-2 py-2 text-center text-primary font-bold text-xs">1</td>
-                      <td class="px-2 py-2 text-center text-red-400 font-bold text-xs">1</td>
-                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">8</td>
-                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">8</td>
-                      <td class="px-2 py-2 text-center text-white/70 font-bold text-xs">0</td>
-                      <td class="px-2 py-2 text-center text-primary font-bold text-base">3</td>
-                    </tr>
-                    <!-- 3. Siempre al Palo -->
-                    <tr class="border-b border-white/5 hover:bg-primary/5 bg-linear-to-r from-orange-400/10 to-transparent border-l-4 border-l-orange-400 transition-all">
-                      <td class="px-2 py-2 text-center">
-                        <svg class="w-6 h-6 text-orange-400 mx-auto" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                        </svg>
-                      </td>
-                      <td class="px-2 py-2">
-                        <div class="flex items-center gap-2">
-                          <div class="w-5 h-5 bg-white rounded-full p-0.5 shrink-0">
-                            <img src="../assets/siemprealpaloLogo.jpeg" alt="Siempre al Palo" class="w-full h-full object-contain" />
-                          </div>
-                          <span class="text-white font-bold text-xs">Siempre al Palo FC</span>
-                        </div>
-                      </td>
-                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">2</td>
-                      <td class="px-2 py-2 text-center text-primary font-bold text-xs">1</td>
-                      <td class="px-2 py-2 text-center text-red-400 font-bold text-xs">1</td>
-                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">3</td>
-                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">7</td>
-                      <td class="px-2 py-2 text-center text-red-400 font-bold text-xs">-4</td>
-                      <td class="px-2 py-2 text-center text-primary font-bold text-base">3</td>
+                      <td class="px-2 py-2 text-center text-primary font-bold text-base">{{ equipo.pts }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -1088,7 +1113,13 @@ import {
   calcularTotalGoles,
   obtenerTablaGoleadoras,
   equiposCampeonato,
-  isLoading as loadingCampeonato
+  isLoading as loadingCampeonato,
+  obtenerPartidos,
+  actualizarResultadoPartido,
+  obtenerTabla,
+  escucharPartidos,
+  escucharTabla,
+  calcularTabla
 } from '../firebase/campeonatoInterno';
 
 const tabla = ref([]);
@@ -1096,6 +1127,13 @@ const loading = ref(true);
 const error = ref(null);
 const lastUpdate = ref(null);
 const competenciaExpandida = ref('interno'); // 'verano' o 'interno'
+
+// Estados para partidos y tabla del campeonato interno
+const partidos = ref([]);
+const tablaPosiciones = ref([]);
+const loadingPartidos = ref(false);
+const editandoResultado = ref(false);
+const partidoEditando = ref(null);
 
 // Equipos del torneo interno (ahora vinculados a Firebase)
 const equipos = computed(() => equiposCampeonato.value);
@@ -1209,6 +1247,124 @@ const formatLastUpdate = () => {
   });
 };
 
+/**
+ * ===================================
+ * FUNCIONES PARA GESTIÓN DE PARTIDOS
+ * ===================================
+ */
+
+const cargarPartidos = async () => {
+  loadingPartidos.value = true;
+  try {
+    partidos.value = await obtenerPartidos();
+  } catch (err) {
+    console.error('Error cargando partidos:', err);
+  } finally {
+    loadingPartidos.value = false;
+  }
+};
+
+const cargarTablaPosiciones = async () => {
+  try {
+    tablaPosiciones.value = await obtenerTabla();
+  } catch (err) {
+    console.error('Error cargando tabla:', err);
+  }
+};
+
+const obtenerDatosEquipo = (equipoKey) => {
+  const equiposData = {
+    verserkers: {
+      nombre: 'Las Verserkers',
+      logo: 'versekersLogo.jpeg',
+      color: 'cyan'
+    },
+    internadas: {
+      nombre: 'Inter Nadas',
+      logo: 'internadasLogo.jpeg',
+      color: 'gray'
+    },
+    siemprealpalo: {
+      nombre: 'Siempre al Palo FC',
+      logo: 'siemprealpaloLogo.jpeg',
+      color: 'red'
+    }
+  };
+  return equiposData[equipoKey] || {};
+};
+
+const editarResultado = (partido) => {
+  partidoEditando.value = {
+    ...partido,
+    golesLocalEdit: partido.golesLocal,
+    golesVisitaEdit: partido.golesVisita
+  };
+};
+
+const cancelarEdicion = () => {
+  partidoEditando.value = null;
+};
+
+const guardarResultado = async (partidoId) => {
+  if (!partidoEditando.value || editandoResultado.value) return;
+  
+  editandoResultado.value = true;
+  try {
+    await actualizarResultadoPartido(
+      partidoId,
+      partidoEditando.value.golesLocalEdit,
+      partidoEditando.value.golesVisitaEdit
+    );
+    partidoEditando.value = null;
+    await cargarPartidos();
+    await cargarTablaPosiciones();
+  } catch (err) {
+    console.error('Error guardando resultado:', err);
+    alert('Error al guardar el resultado. Por favor intenta nuevamente.');
+  } finally {
+    editandoResultado.value = false;
+  }
+};
+
+const incrementarGol = (tipo) => {
+  if (!partidoEditando.value) return;
+  if (tipo === 'local') {
+    partidoEditando.value.golesLocalEdit++;
+  } else {
+    partidoEditando.value.golesVisitaEdit++;
+  }
+};
+
+const decrementarGol = (tipo) => {
+  if (!partidoEditando.value) return;
+  if (tipo === 'local' && partidoEditando.value.golesLocalEdit > 0) {
+    partidoEditando.value.golesLocalEdit--;
+  } else if (tipo === 'visita' && partidoEditando.value.golesVisitaEdit > 0) {
+    partidoEditando.value.golesVisitaEdit--;
+  }
+};
+
+const obtenerIconoMedalla = (posicion) => {
+  if (posicion === 0) return '🥇';
+  if (posicion === 1) return '🥈';
+  if (posicion === 2) return '🥉';
+  return posicion + 1;
+};
+
+const obtenerColorBorde = (equipoData) => {
+  if (equipoData.color === 'cyan') return 'border-l-cyan-400';
+  if (equipoData.color === 'gray') return 'border-l-gray-300';
+  if (equipoData.color === 'red') return 'border-l-red-400';
+  return 'border-l-yellow-400';
+};
+
+const obtenerColorTexto = (equipoData) => {
+  if (equipoData.color === 'cyan') return 'text-cyan-400';
+  if (equipoData.color === 'gray') return 'text-gray-300';
+  if (equipoData.color === 'red') return 'text-red-400';
+  return 'text-yellow-400';
+};
+
 onMounted(async () => {
   fetchTabla();
   
@@ -1216,11 +1372,38 @@ onMounted(async () => {
   try {
     await obtenerDatosCampeonato();
     await cargarTablaGoleadoras();
+    await cargarPartidos();
+    await cargarTablaPosiciones();
     
     // Escuchar cambios en tiempo real
     unsubscribe = escucharCampeonato(async () => {
       await cargarTablaGoleadoras();
     });
+    
+    // Escuchar cambios en partidos en tiempo real
+    const unsubscribePartidos = escucharPartidos(async (nuevosPartidos) => {
+      partidos.value = nuevosPartidos;
+    });
+    
+    // Escuchar cambios en tabla en tiempo real
+    const unsubscribeTabla = escucharTabla(async (nuevaTabla) => {
+      tablaPosiciones.value = nuevaTabla;
+    });
+    
+    // Guardar funciones de desuscripción para limpiar después
+    if (!unsubscribe) {
+      unsubscribe = () => {
+        unsubscribePartidos();
+        unsubscribeTabla();
+      };
+    } else {
+      const oldUnsubscribe = unsubscribe;
+      unsubscribe = () => {
+        oldUnsubscribe();
+        unsubscribePartidos();
+        unsubscribeTabla();
+      };
+    }
   } catch (err) {
     console.error('Error cargando datos del campeonato:', err);
   }
