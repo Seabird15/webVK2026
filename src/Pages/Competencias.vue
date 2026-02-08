@@ -394,7 +394,7 @@
                           </td>
                           <td class="px-3 py-3">
                             <span 
-                              class="text-xs font-semibold px-2 py-1 rounded-full"
+                              class="text-xs font-semibold whitespace-nowrap px-2 py-1 rounded-full"
                               :class="{
                                 'text-cyan-300 bg-cyan-400/15 border border-cyan-400/30': jugadora.color === 'cyan',
                                 'text-gray-300 bg-gray-400/15 border border-gray-400/30': jugadora.color === 'gray',
