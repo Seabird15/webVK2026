@@ -3,37 +3,61 @@
     <h2 class="text-2xl font-bold text-gray-900 mb-6">Gestionar Estadísticas 2026</h2>
 
     <!-- Selector de equipo y botones de acción -->
-    <div class="bg-gray-50 p-4 rounded-lg flex flex-wrap items-center justify-between gap-4">
-      <div class="flex-1 min-w-[200px]">
-        <label class="block text-sm font-bold text-gray-700 mb-2">Seleccionar Equipo</label>
-        <select
-          v-model="equipoSeleccionado"
-          @change="cargarEstadisticas"
-          class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-        >
-          <option value="ascenso">Ascenso</option>
-          <option value="escuela">Escuela</option>
-        </select>
-      </div>
-      
-      <div class="flex gap-2">
-        <!-- Botón para agregar nueva jugadora -->
-        <button
-          @click="mostrarFormularioAgregar = true"
-          class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold text-sm transition-colors flex items-center gap-2"
-        >
-          <PlusIcon class="w-5 h-5" />
-          Agregar Jugadora
-        </button>
+    <div class="bg-gray-50 p-4 rounded-lg space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex-1 min-w-[200px]">
+          <label class="block text-sm font-bold text-gray-700 mb-2">Seleccionar Equipo</label>
+          <select
+            v-model="equipoSeleccionado"
+            @change="onEquipoChange"
+            class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          >
+            <option value="ascenso">Ascenso</option>
+            <option value="escuela">Escuela</option>
+          </select>
+        </div>
+        
+        <div class="flex gap-2">
+          <!-- Botón para agregar nueva jugadora -->
+          <button
+            @click="mostrarFormularioAgregar = true"
+            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold text-sm transition-colors flex items-center gap-2"
+          >
+            <PlusIcon class="w-5 h-5" />
+            Agregar Jugadora
+          </button>
 
-        <!-- Botón para inicializar datos (solo para Ascenso) -->
+          <!-- Botón para inicializar datos (solo para Ascenso Competición) -->
+          <button
+            v-if="equipoSeleccionado === 'ascenso' && tipoEstadistica === 'competicion'"
+            @click="inicializarDatosAscenso"
+            :disabled="inicializando"
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ inicializando ? 'Inicializando...' : '⚡ Cargar Datos Iniciales' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Sub-pestañas para Ascenso (Competición/Amistosos) -->
+      <div v-if="equipoSeleccionado === 'ascenso'" class="flex gap-3">
         <button
-          v-if="equipoSeleccionado === 'ascenso'"
-          @click="inicializarDatosAscenso"
-          :disabled="inicializando"
-          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="tipoEstadistica = 'competicion'"
+          class="px-5 py-2 font-bold text-xs uppercase transition-all rounded-lg cursor-pointer"
+          :class="tipoEstadistica === 'competicion'
+            ? 'bg-primary text-black shadow-lg'
+            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
         >
-          {{ inicializando ? 'Inicializando...' : '⚡ Cargar Datos Iniciales' }}
+          📊 Estadísticas Competición
+        </button>
+        <button
+          @click="tipoEstadistica = 'amistosos'"
+          class="px-5 py-2 font-bold text-xs uppercase transition-all rounded-lg cursor-pointer"
+          :class="tipoEstadistica === 'amistosos'
+            ? 'bg-primary text-black shadow-lg'
+            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+        >
+          🤝 Estadísticas Amistosos
         </button>
       </div>
     </div>
@@ -198,12 +222,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { getDocs, collection, query, where, updateDoc, doc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { PencilIcon, CheckIcon, XMarkIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/solid';
 
 const equipoSeleccionado = ref('ascenso');
+const tipoEstadistica = ref('competicion'); // Para filtrar en ascenso
 const jugadoras = ref([]);
 const isLoading = ref(false);
 const editando = ref(null);
@@ -229,14 +254,36 @@ const estadisticasIniciales = [
   { nombre: 'Genesis', apellido: 'Rodriguez', goles: 0, asistencias: 1 }
 ];
 
+// Obtener el nombre de la colección según el equipo y tipo
+const obtenerNombreColeccion = () => {
+  if (equipoSeleccionado.value === 'escuela') {
+    return 'estadisticas';
+  }
+  // Para ascenso
+  if (tipoEstadistica.value === 'competicion') {
+    return 'estadisticas';
+  } else {
+    return 'estadisticasAscAmistosos';
+  }
+};
+
 // Cargar estadísticas del equipo seleccionado
 const cargarEstadisticas = async () => {
   isLoading.value = true;
   try {
-    const q = query(
-      collection(db, 'estadisticas'),
-      where('equipo', '==', equipoSeleccionado.value)
-    );
+    const nombreColeccion = obtenerNombreColeccion();
+    let q;
+    
+    // Para estadisticasAscAmistosos, no necesita filtro de equipo
+    if (nombreColeccion === 'estadisticasAscAmistosos') {
+      q = collection(db, nombreColeccion);
+    } else {
+      q = query(
+        collection(db, nombreColeccion),
+        where('equipo', '==', equipoSeleccionado.value)
+      );
+    }
+    
     const snapshot = await getDocs(q);
     jugadoras.value = snapshot.docs.map(doc => ({
       id: doc.id,
@@ -247,7 +294,7 @@ const cargarEstadisticas = async () => {
       return nombreA.localeCompare(nombreB);
     });
   } catch (err) {
-    // console.error('Error cargando estadísticas:', err);
+    console.error('Error cargando estadísticas:', err);
     mostrarMensaje('Error al cargar las estadísticas', 'error');
   } finally {
     isLoading.value = false;
@@ -272,7 +319,8 @@ const cancelarEdicion = () => {
 const guardarEdicion = async () => {
   guardando.value = true;
   try {
-    const docRef = doc(db, 'estadisticas', editando.value.id);
+    const nombreColeccion = obtenerNombreColeccion();
+    const docRef = doc(db, nombreColeccion, editando.value.id);
     await updateDoc(docRef, {
       goles: editando.value.goles || 0,
       asistencias: editando.value.asistencias || 0,
@@ -289,7 +337,7 @@ const guardarEdicion = async () => {
     editando.value = null;
     mostrarMensaje('Estadísticas actualizadas correctamente', 'success');
   } catch (err) {
-    // console.error('Error guardando estadísticas:', err);
+    console.error('Error guardando estadísticas:', err);
     mostrarMensaje('Error al guardar las estadísticas', 'error');
   } finally {
     guardando.value = false;
@@ -308,21 +356,28 @@ const mostrarMensaje = (texto, tipo) => {
 const agregarJugadora = async () => {
   guardando.value = true;
   try {
-    await addDoc(collection(db, 'estadisticas'), {
+    const nombreColeccion = obtenerNombreColeccion();
+    const datosJugadora = {
       nombre: nuevaJugadora.value.nombre,
       apellido: nuevaJugadora.value.apellido,
-      equipo: equipoSeleccionado.value,
       goles: nuevaJugadora.value.goles || 0,
       asistencias: nuevaJugadora.value.asistencias || 0,
       createdAt: new Date(),
       updatedAt: new Date()
-    });
+    };
+    
+    // Solo agregar equipo si no es estadisticasAscAmistosos
+    if (nombreColeccion !== 'estadisticasAscAmistosos') {
+      datosJugadora.equipo = equipoSeleccionado.value;
+    }
+    
+    await addDoc(collection(db, nombreColeccion), datosJugadora);
 
     mostrarMensaje('Jugadora agregada correctamente', 'success');
     cancelarAgregar();
     await cargarEstadisticas();
   } catch (err) {
-    // console.error('Error agregando jugadora:', err);
+    console.error('Error agregando jugadora:', err);
     mostrarMensaje('Error al agregar la jugadora', 'error');
   } finally {
     guardando.value = false;
@@ -347,11 +402,12 @@ const confirmarEliminar = async (jugadora) => {
   }
 
   try {
-    await deleteDoc(doc(db, 'estadisticas', jugadora.id));
+    const nombreColeccion = obtenerNombreColeccion();
+    await deleteDoc(doc(db, nombreColeccion, jugadora.id));
     jugadoras.value = jugadoras.value.filter(j => j.id !== jugadora.id);
     mostrarMensaje('Jugadora eliminada correctamente', 'success');
   } catch (err) {
-    // console.error('Error eliminando jugadora:', err);
+    console.error('Error eliminando jugadora:', err);
     mostrarMensaje('Error al eliminar la jugadora', 'error');
   }
 };
@@ -382,15 +438,26 @@ const inicializarDatosAscenso = async () => {
     mostrarMensaje(`✅ ${agregadas} jugadoras agregadas correctamente`, 'success');
     await cargarEstadisticas();
   } catch (err) {
-    // console.error('Error inicializando datos:', err);
+    console.error('Error inicializando datos:', err);
     mostrarMensaje('Error al cargar los datos iniciales', 'error');
   } finally {
     inicializando.value = false;
   }
 };
 
+// Manejar cambio de equipo
+const onEquipoChange = () => {
+  tipoEstadistica.value = 'competicion';
+  cargarEstadisticas();
+};
+
 // Cargar estadísticas al montar
 onMounted(() => {
+  cargarEstadisticas();
+});
+
+// Watcher para cambio de tipo de estadística
+watch(() => tipoEstadistica.value, () => {
   cargarEstadisticas();
 });
 </script>

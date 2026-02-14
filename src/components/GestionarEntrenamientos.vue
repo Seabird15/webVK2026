@@ -534,13 +534,22 @@
                       Anotada: {{ formatFechaHora(inscrita.updatedAt || inscrita.createdAt) }}
                     </div>
                   </div>
-                  <button
-                    @click="cambiarEstado(inscrita.id, 'baja')"
-                    class="px-3 py-2 text-xs bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors whitespace-nowrap"
-                    title="Marcar como ausente"
-                  >
-                    Ausente
-                  </button>
+                  <div class="flex gap-2">
+                    <button
+                      @click="cambiarEstado(inscrita.id, 'pendiente')"
+                      class="px-3 py-2 text-xs bg-yellow-600 text-white rounded-lg font-bold hover:bg-yellow-700 transition-colors whitespace-nowrap"
+                      title="Marcar como pendiente"
+                    >
+                      Pendiente
+                    </button>
+                    <button
+                      @click="cambiarEstado(inscrita.id, 'baja')"
+                      class="px-3 py-2 text-xs bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors whitespace-nowrap"
+                      title="Marcar como ausente"
+                    >
+                      Ausente
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -564,13 +573,22 @@
                       Anotada: {{ formatFechaHora(inscrita.updatedAt || inscrita.createdAt) }}
                     </div>
                   </div>
-                  <button
-                    @click="cambiarEstado(inscrita.id, 'confirmada')"
-                    class="px-3 py-2 text-xs bg-green-700 text-white rounded-lg font-bold hover:bg-green-800 transition-colors whitespace-nowrap"
-                    title="Marcar como presente"
-                  >
-                    Presente
-                  </button>
+                  <div class="flex gap-2">
+                    <button
+                      @click="cambiarEstado(inscrita.id, 'confirmada')"
+                      class="px-3 py-2 text-xs bg-green-700 text-white rounded-lg font-bold hover:bg-green-800 transition-colors whitespace-nowrap"
+                      title="Marcar como presente"
+                    >
+                      Presente
+                    </button>
+                    <button
+                      @click="cambiarEstado(inscrita.id, 'pendiente')"
+                      class="px-3 py-2 text-xs bg-yellow-600 text-white rounded-lg font-bold hover:bg-yellow-700 transition-colors whitespace-nowrap"
+                      title="Marcar como pendiente"
+                    >
+                      Pendiente
+                    </button>
+                  </div>
                 </div>
               </div>
 

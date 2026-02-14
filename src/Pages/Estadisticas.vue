@@ -12,6 +12,13 @@
           <div class="h-1 w-12 bg-primary rounded-full"></div>
         </div>
         
+        <!-- Indicador de tipo de estadística -->
+        <div v-if="equipoActivo === 'ascenso'" class="mt-2">
+          <span class="inline-block bg-white/10 text-white px-4 py-2 rounded-lg text-sm font-semibold">
+            {{ tipoEstadistica === 'competicion' ? '📊 Competición' : '🤝 Amistosos' }}
+          </span>
+        </div>
+        
         <!-- Botón a Competencias -->
         <div class="mt-6">
           <router-link
@@ -36,6 +43,28 @@
             : 'bg-white/10 text-white hover:bg-white/20'"
         >
           {{ equipo.label }}
+        </button>
+      </div>
+
+      <!-- Sub-pestañas para Ascenso (Competición/Amistosos) -->
+      <div v-if="equipoActivo === 'ascenso'" class="flex justify-center gap-3 mb-8">
+        <button
+          @click="tipoEstadistica = 'competicion'"
+          class="px-5 py-2 font-bold text-xs uppercase transition-all rounded-lg cursor-pointer"
+          :class="tipoEstadistica === 'competicion'
+            ? 'bg-primary text-black shadow-lg'
+            : 'bg-white/20 text-white hover:bg-white/30'"
+        >
+          📊 Estadísticas Competición
+        </button>
+        <button
+          @click="tipoEstadistica = 'amistosos'"
+          class="px-5 py-2 font-bold text-xs uppercase transition-all rounded-lg cursor-pointer"
+          :class="tipoEstadistica === 'amistosos'
+            ? 'bg-primary text-black shadow-lg'
+            : 'bg-white/20 text-white hover:bg-white/30'"
+        >
+          🤝 Estadísticas Amistosos
         </button>
       </div>
 
@@ -196,6 +225,7 @@ import { TrophyIcon, FireIcon, SparklesIcon, ChartBarIcon } from '@heroicons/vue
 
 const isLoading = ref(false);
 const equipoActivo = ref('ascenso');
+const tipoEstadistica = ref('competicion'); // Para filtrar en ascenso
 const jugadoras = ref([]);
 
 const equipos = [
@@ -231,17 +261,34 @@ const estadisticasCompletas = computed(() => {
 const cargarJugadoras = async () => {
   isLoading.value = true;
   try {
-    const q = query(
-      collection(db, 'estadisticas'),
-      where('equipo', '==', equipoActivo.value)
-    );
+    let q;
+    
+    // Para escuela: cargar todas las estadísticas del equipo
+    if (equipoActivo.value === 'escuela') {
+      q = query(
+        collection(db, 'estadisticas'),
+        where('equipo', '==', equipoActivo.value)
+      );
+    } 
+    // Para ascenso competición: usar colección estadisticas
+    else if (tipoEstadistica.value === 'competicion') {
+      q = query(
+        collection(db, 'estadisticas'),
+        where('equipo', '==', equipoActivo.value)
+      );
+    }
+    // Para ascenso amistosos: usar colección estadisticasAscAmistosos
+    else {
+      q = collection(db, 'estadisticasAscAmistosos');
+    }
+    
     const snapshot = await getDocs(q);
     jugadoras.value = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
   } catch (err) {
-    // // console.error('Error cargando estadísticas:', err);
+    console.error('Error cargando estadísticas:', err);
     jugadoras.value = [];
   } finally {
     isLoading.value = false;
@@ -254,6 +301,13 @@ onMounted(() => {
 
 // Watcher para cambios de equipo
 watch(() => equipoActivo.value, () => {
+  // Reiniciar tipo de estadística al cambiar de equipo
+  tipoEstadistica.value = 'competicion';
+  cargarJugadoras();
+});
+
+// Watcher para cambios de tipo de estadística
+watch(() => tipoEstadistica.value, () => {
   cargarJugadoras();
 });
 </script>

@@ -232,25 +232,6 @@ export const escucharInscripcionesEntrenamiento = (entrenamientoId, callback, en
   });
 };
 
-// Cambiar estado de una inscripción (para admin)
-export const cambiarEstadoInscripcion = async (inscripcionId, nuevoEstado) => {
-  isLoadingInscripciones.value = true;
-  errorInscripciones.value = null;
-  try {
-    await updateDoc(doc(db, 'inscripcionesEntrenamientos', inscripcionId), {
-      estado: nuevoEstado,
-      updatedAt: new Date()
-    });
-    return true;
-  } catch (err) {
-    // // console.error('Error cambiando estado:', err);
-    errorInscripciones.value = err.message;
-    return false;
-  } finally {
-    isLoadingInscripciones.value = false;
-  }
-};
-
 // Crear inscripciones pendientes para todas las jugadoras del equipo
 export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
   try {
@@ -376,6 +357,36 @@ export const inscribirJugadoraManual = async (entrenamientoId, jugadoraId, jugad
     return true;
   } catch (err) {
     // // console.error('Error inscribiendo jugadora:', err);
+    errorInscripciones.value = err.message;
+    return false;
+  } finally {
+    isLoadingInscripciones.value = false;
+  }
+};
+
+// Cambiar estado de inscripción (para admin)
+export const cambiarEstadoInscripcion = async (inscripcionId, nuevoEstado) => {
+  isLoadingInscripciones.value = true;
+  errorInscripciones.value = null;
+  try {
+    const docRef = doc(db, 'inscripcionesEntrenamientos', inscripcionId);
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) {
+      errorInscripciones.value = 'Inscripción no encontrada';
+      return false;
+    }
+
+    // Actualizar estado
+    await updateDoc(docRef, {
+      estado: nuevoEstado,
+      ...(nuevoEstado === 'pendiente' && { motivoBaja: '', fechaBaja: null }),
+      updatedAt: new Date()
+    });
+
+    return true;
+  } catch (err) {
+    console.error('Error cambiando estado:', err);
     errorInscripciones.value = err.message;
     return false;
   } finally {

@@ -25,15 +25,29 @@
       <!-- Información de jugadora -->
       <div v-if="jugadoraData" class="bg-white rounded-lg shadow mb-6 p-6">
         <div class="flex justify-between items-start">
-          <div class="flex flex-col lg:flex-row gap-4">
+          <div class="flex flex-col lg:flex-row gap-4 flex-1">
             <div v-if="jugadoraData.fotoPerfil" class="w-20 h-20 rounded-lg overflow-hidden bg-gray-100">
               <img :src="jugadoraData.fotoPerfil" alt="Perfil" class="w-full h-full object-cover" />
             </div>
-            <div>
+            <div class="flex-1">
               <h2 class="text-2xl font-bold text-gray-900">
                 {{ jugadoraData.nombre }} {{ jugadoraData.apellido }}
               </h2>
               <p class="text-gray-600">{{ jugadoraData.posicion }} - Dorsal #{{ jugadoraData.dorsal }}</p>
+              
+              <!-- Próximo Cumpleaños -->
+              <div v-if="proximoCumpleanios" class="mt-3 inline-flex items-center gap-2 bg-linear-to-r from-pink-50 to-purple-50 border border-pink-200 px-3 py-2 rounded-lg">
+                <span class="text-xl">🎂</span>
+                <div class="text-xs">
+                  <p class="font-bold text-pink-700">Próximo Cumpleaños</p>
+                  <p class="text-gray-700">
+                    <span class="font-semibold">{{ proximoCumpleanios.nombre }}</span> - {{ proximoCumpleanios.fechaFormateada }}
+                    <span v-if="proximoCumpleanios.diasRestantes === 0" class="text-pink-600 font-bold ml-1">(¡Hoy!)</span>
+                    <span v-else-if="proximoCumpleanios.diasRestantes === 1" class="text-pink-600 font-bold ml-1">(¡Mañana!)</span>
+                    <span v-else class="text-gray-500 ml-1">({{ proximoCumpleanios.diasRestantes }} días)</span>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
           <router-link
@@ -290,7 +304,7 @@
             </div>
             <p class="text-xs text-gray-700 mb-3 line-clamp-2">{{ ent.descripcion }}</p>
             <div class="flex gap-2 flex-wrap">
-              <button @click="verDetalles(ent)" class="flex-1 min-w-[80px] px-3 py-2 text-xs bg-primary text-white rounded-lg cursor-pointer hover:bg-primary/90 font-bold transition-colors">
+              <button @click="verDetalles(ent)" class="flex-1 min-w-20 px-3 py-2 text-xs bg-primary text-white rounded-lg cursor-pointer hover:bg-primary/90 font-bold transition-colors">
                 ✏️ Editar Asistencia
               </button>
             </div>
@@ -374,7 +388,7 @@
                   :key="jugadora.id"
                   class="flex items-center gap-2 bg-white p-2 rounded border border-purple-100"
                 >
-                  <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-black text-xs shadow-md">
+                  <div class="w-8 h-8 bg-linear-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-black text-xs shadow-md">
                     {{ obtenerIniciales(jugadora.nombre) }}
                   </div>
                   <div class="flex-1">
@@ -389,9 +403,9 @@
             </div>
 
             <!-- CONVOCATORIA - Estilo App Deportiva -->
-            <div class="bg-gradient-to-b from-gray-50 to-white rounded-xl border border-gray-200 overflow-hidden">
+            <div class="bg-linear-to-b from-gray-50 to-white rounded-xl border border-gray-200 overflow-hidden">
               <!-- Stats Bar -->
-              <div class="bg-gradient-to-r from-gray-900 to-gray-800 px-4 py-3">
+              <div class="bg-linear-to-r from-gray-900 to-gray-800 px-4 py-3">
                 <h3 class="text-white font-black text-xs uppercase tracking-wider mb-2">Lista de Convocatoria</h3>
                 <div class="grid grid-cols-3 gap-2">
                   <div class="bg-white/10 backdrop-blur rounded-lg px-2 py-1.5 text-center">
@@ -475,7 +489,7 @@
                     class="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-green-100 hover:border-green-300 hover:shadow-md transition-all group"
                   >
                     <div class="flex items-center gap-2 flex-1">
-                      <div class="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-black text-xs shadow-md">
+                      <div class="w-8 h-8 bg-linear-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-black text-xs shadow-md">
                         {{ obtenerIniciales(inscrita.jugadoraNombre) }}
                       </div>
                       <div class="flex-1">
@@ -483,7 +497,23 @@
                         <div class="text-[9px] text-gray-500 font-medium">Jugadora #{{ index + 1 }}</div>
                       </div>
                     </div>
-                    <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div v-if="esAdmin" class="flex items-center gap-1">
+                      <button
+                        @click="cambiarEstadoJugadora(inscrita.id, 'baja')"
+                        class="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-[9px] font-bold transition-colors cursor-pointer"
+                        title="Marcar como baja"
+                      >
+                        Baja
+                      </button>
+                      <button
+                        @click="cambiarEstadoJugadora(inscrita.id, 'pendiente')"
+                        class="px-2 py-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded text-[9px] font-bold transition-colors cursor-pointer"
+                        title="Marcar como pendiente"
+                      >
+                        Pendiente
+                      </button>
+                    </div>
+                    <div v-else class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                       <span class="text-green-600 font-bold text-sm">✓</span>
                     </div>
                   </div>
@@ -502,7 +532,7 @@
                   >
                     <div class="flex items-center gap-3 p-2.5">
                       <div class="flex items-center gap-2 flex-1">
-                        <div class="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-white font-black text-xs shadow-md">
+                        <div class="w-8 h-8 bg-linear-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-white font-black text-xs shadow-md">
                           {{ obtenerIniciales(inscrita.jugadoraNombre) }}
                         </div>
                         <div class="flex-1">
@@ -514,7 +544,23 @@
                         <div v-if="inscrita.motivoBaja" class="px-2 py-0.5 bg-blue-100 rounded-full">
                           <span class="text-blue-600 text-[9px] font-bold">💬 Motivo</span>
                         </div>
-                        <div class="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                        <div v-if="esAdmin" class="flex items-center gap-1 ml-1">
+                          <button
+                            @click="cambiarEstadoJugadora(inscrita.id, 'confirmada')"
+                            class="px-2 py-1 bg-green-100 hover:bg-green-200 text-green-700 rounded text-[9px] font-bold transition-colors cursor-pointer"
+                            title="Marcar como confirmada"
+                          >
+                            Confirmar
+                          </button>
+                          <button
+                            @click="cambiarEstadoJugadora(inscrita.id, 'pendiente')"
+                            class="px-2 py-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded text-[9px] font-bold transition-colors cursor-pointer"
+                            title="Marcar como pendiente"
+                          >
+                            Pendiente
+                          </button>
+                        </div>
+                        <div v-else class="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
                           <span class="text-red-600 font-bold text-sm">✕</span>
                         </div>
                       </div>
@@ -539,7 +585,7 @@
                     class="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-yellow-100 hover:border-yellow-300 hover:shadow-md transition-all group"
                   >
                     <div class="flex items-center gap-2 flex-1">
-                      <div class="w-8 h-8 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center text-white font-black text-xs shadow-md">
+                      <div class="w-8 h-8 bg-linear-to-br from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center text-white font-black text-xs shadow-md">
                         {{ obtenerIniciales(inscrita.jugadoraNombre) }}
                       </div>
                       <div class="flex-1">
@@ -547,7 +593,23 @@
                         <div class="text-[9px] text-gray-500 font-medium">Esperando respuesta...</div>
                       </div>
                     </div>
-                    <div class="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div v-if="esAdmin" class="flex items-center gap-1">
+                      <button
+                        @click="cambiarEstadoJugadora(inscrita.id, 'confirmada')"
+                        class="px-2 py-1 bg-green-100 hover:bg-green-200 text-green-700 rounded text-[9px] font-bold transition-colors cursor-pointer"
+                        title="Marcar como confirmada"
+                      >
+                        Confirmar
+                      </button>
+                      <button
+                        @click="cambiarEstadoJugadora(inscrita.id, 'baja')"
+                        class="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-[9px] font-bold transition-colors cursor-pointer"
+                        title="Marcar como baja"
+                      >
+                        Baja
+                      </button>
+                    </div>
+                    <div v-else class="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                       <span class="text-yellow-600 font-bold text-sm">⏳</span>
                     </div>
                   </div>
@@ -723,9 +785,12 @@ import {
   estaInscrita as checkInscrita,
   obtenerEstadoInscripcion,
   escucharInscripcionesEntrenamiento,
+  cambiarEstadoInscripcion,
   isLoadingInscripciones,
   errorInscripciones
 } from '../firebase/inscripciones';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase/config';
 
 const router = useRouter();
 const equipoSeleccionado = ref(localStorage.getItem('categoriaSeleccionada') || jugadoraData.value?.equipo || 'ascenso');
@@ -746,6 +811,7 @@ const mostrarModalBaja = ref(false);
 const motivoBaja = ref('');
 const entrenamientoParaBaja = ref(null);
 const tabActivo = ref('confirmadas'); // Para el modal de detalles
+const proximoCumpleanios = ref(null); // Para mostrar el próximo cumpleaños
 
 // Función auxiliar para obtener iniciales
 const obtenerIniciales = (nombre) => {
@@ -941,6 +1007,26 @@ const confirmarBaja = async () => {
   isLoadingAccion.value = false;
 };
 
+// Función para que admin cambie el estado de inscripción
+const cambiarEstadoJugadora = async (inscripcionId, nuevoEstado) => {
+  if (!esAdmin.value) return;
+  
+  isLoadingAccion.value = true;
+  const success = await cambiarEstadoInscripcion(inscripcionId, nuevoEstado);
+
+  if (success) {
+    const mensajes = {
+      confirmada: 'Jugadora marcada como confirmada',
+      baja: 'Jugadora marcada como baja',
+      pendiente: 'Jugadora marcada como pendiente'
+    };
+    mostrarToast(mensajes[nuevoEstado] || 'Estado actualizado', 'success');
+  } else {
+    mostrarToast('Error al cambiar estado', 'error');
+  }
+  isLoadingAccion.value = false;
+};
+
 const mostrarToast = (mensaje, tipo) => {
   toastMensaje.value = mensaje;
   toastTipo.value = tipo;
@@ -960,6 +1046,63 @@ const formatearFecha = (date) => {
   });
 };
 
+// Función para calcular el próximo cumpleaños
+const cargarProximoCumpleanios = async () => {
+  try {
+    const snapshot = await getDocs(collection(db, 'jugadoraRegistro'));
+    const todasJugadoras = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    // Filtrar jugadoras que tengan fecha de nacimiento
+    const jugadorasConCumple = todasJugadoras
+      .filter(jugadora => jugadora.fechaNacimiento)
+      .map(jugadora => {
+        const [anio, mes, dia] = jugadora.fechaNacimiento.split('-').map(Number);
+        const hoy = new Date();
+        const anioActual = hoy.getFullYear();
+        
+        // Crear fecha del cumpleaños en el año actual
+        let fechaCumple = new Date(anioActual, mes - 1, dia);
+        
+        // Si ya pasó este año, usar el próximo año
+        if (fechaCumple < hoy) {
+          fechaCumple = new Date(anioActual + 1, mes - 1, dia);
+        }
+        
+        return {
+          nombre: `${jugadora.nombre} ${jugadora.apellido}`,
+          fechaCumple: fechaCumple,
+          dia: dia,
+          mes: mes
+        };
+      });
+
+    // Ordenar por fecha más próxima
+    jugadorasConCumple.sort((a, b) => a.fechaCumple - b.fechaCumple);
+
+    // Obtener el próximo cumpleaños
+    if (jugadorasConCumple.length > 0) {
+      const proximo = jugadorasConCumple[0];
+      const hoy = new Date();
+      const diasRestantes = Math.ceil((proximo.fechaCumple - hoy) / (1000 * 60 * 60 * 24));
+      
+      proximoCumpleanios.value = {
+        nombre: proximo.nombre,
+        fecha: proximo.fechaCumple,
+        diasRestantes: diasRestantes,
+        fechaFormateada: proximo.fechaCumple.toLocaleDateString('es-ES', {
+          day: 'numeric',
+          month: 'long'
+        })
+      };
+    }
+  } catch (err) {
+    console.error('Error cargando cumpleaños:', err);
+  }
+};
+
 const handleLogout = async () => {
   await logoutJugadora();
   router.push('/');
@@ -967,6 +1110,7 @@ const handleLogout = async () => {
 
 onMounted(() => {
   cargarEntrenamientos();
+  cargarProximoCumpleanios(); // Cargar el próximo cumpleaños
   
   // NUEVO: Iniciar listeners para todos los entrenamientos para actualizar conteos
   const iniciarListenersTodos = async () => {
