@@ -303,7 +303,9 @@ export const inicializarPartidos = async () => {
           golesVisita: 2,
           horario: '19:00 - 19:35',
           fecha: '2026-02-07',
-          estado: 'FINALIZADO'
+          numeroFecha: 1,
+          estado: 'FINALIZADO',
+          goleadoras: []
         },
         {
           id: 2,
@@ -313,7 +315,9 @@ export const inicializarPartidos = async () => {
           golesVisita: 7,
           horario: '19:40 - 20:15',
           fecha: '2026-02-07',
-          estado: 'FINALIZADO'
+          numeroFecha: 1,
+          estado: 'FINALIZADO',
+          goleadoras: []
         },
         {
           id: 3,
@@ -323,7 +327,9 @@ export const inicializarPartidos = async () => {
           golesVisita: 1,
           horario: '20:20 - 20:55',
           fecha: '2026-02-07',
-          estado: 'FINALIZADO'
+          numeroFecha: 1,
+          estado: 'FINALIZADO',
+          goleadoras: []
         }
       ],
       lastUpdated: new Date().toISOString()
@@ -334,6 +340,77 @@ export const inicializarPartidos = async () => {
   }
 
   return docSnap.data();
+};
+
+/**
+ * Inicializar partidos de la Fecha 2
+ */
+export const inicializarFecha2 = async () => {
+  try {
+    const docRef = doc(db, CAMPEONATO_INTERNO_2026, 'partidos');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const datos = docSnap.data();
+      
+      // Verificar si ya existen partidos de fecha 2
+      const tieneFecha2 = datos.partidos.some(p => p.numeroFecha === 2);
+      if (tieneFecha2) {
+        return { success: false, message: 'La Fecha 2 ya está inicializada' };
+      }
+
+      // Agregar partidos de Fecha 2
+      const nuevoId = Math.max(...datos.partidos.map(p => p.id)) + 1;
+      const partidosFecha2 = [
+        {
+          id: nuevoId,
+          equipoLocal: 'siemprealpalo',
+          equipoVisita: 'verserkers',
+          golesLocal: 0,
+          golesVisita: 0,
+          horario: '20:00 - 20:35',
+          fecha: '2026-02-14',
+          numeroFecha: 2,
+          estado: 'PROGRAMADO',
+          goleadoras: []
+        },
+        {
+          id: nuevoId + 1,
+          equipoLocal: 'internadas',
+          equipoVisita: 'verserkers',
+          golesLocal: 0,
+          golesVisita: 0,
+          horario: '20:40 - 21:15',
+          fecha: '2026-02-14',
+          numeroFecha: 2,
+          estado: 'PROGRAMADO',
+          goleadoras: []
+        },
+        {
+          id: nuevoId + 2,
+          equipoLocal: 'internadas',
+          equipoVisita: 'siemprealpalo',
+          golesLocal: 0,
+          golesVisita: 0,
+          horario: '21:20 - 21:55',
+          fecha: '2026-02-14',
+          numeroFecha: 2,
+          estado: 'PROGRAMADO',
+          goleadoras: []
+        }
+      ];
+
+      datos.partidos = [...datos.partidos, ...partidosFecha2];
+      datos.lastUpdated = new Date().toISOString();
+
+      await updateDoc(docRef, datos);
+      return { success: true, message: 'Fecha 2 inicializada correctamente', partidos: partidosFecha2 };
+    }
+    return { success: false, message: 'No se encontró el documento de partidos' };
+  } catch (err) {
+    console.error('Error inicializando Fecha 2:', err);
+    throw err;
+  }
 };
 
 /**
@@ -526,4 +603,61 @@ export const escucharTabla = (callback) => {
   }, (err) => {
     console.error('Error escuchando tabla:', err);
   });
+};
+
+/**
+ * Obtener partidos agrupados por numeroFecha
+ */
+export const obtenerPartidosPorFecha = async () => {
+  try {
+    const partidos = await obtenerPartidos();
+    const partidosPorFecha = {};
+    
+    partidos.forEach(partido => {
+      // Usar numeroFecha si existe, sino asignar 1 por defecto
+      const numeroFecha = partido.numeroFecha || 1;
+      if (!partidosPorFecha[numeroFecha]) {
+        partidosPorFecha[numeroFecha] = [];
+      }
+      partidosPorFecha[numeroFecha].push(partido);
+    });
+    
+    return partidosPorFecha;
+  } catch (err) {
+    console.error('Error obteniendo partidos por fecha:', err);
+    return {};
+  }
+};
+
+/**
+ * Actualizar estado de un partido
+ */
+export const actualizarEstadoPartido = async (partidoId, nuevoEstado) => {
+  try {
+    const docRef = doc(db, CAMPEONATO_INTERNO_2026, 'partidos');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const datos = docSnap.data();
+      const partidoIndex = datos.partidos.findIndex(p => p.id === partidoId);
+      
+      if (partidoIndex !== -1) {
+        datos.partidos[partidoIndex].estado = nuevoEstado;
+        datos.lastUpdated = new Date().toISOString();
+
+        await updateDoc(docRef, datos);
+        
+        // Si se finaliza un partido, recalcular tabla
+        if (nuevoEstado === 'FINALIZADO') {
+          await calcularTabla();
+        }
+        
+        return true;
+      }
+    }
+    return false;
+  } catch (err) {
+    console.error('Error actualizando estado:', err);
+    throw err;
+  }
 };

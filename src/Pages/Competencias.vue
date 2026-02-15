@@ -546,21 +546,37 @@
             </div>
           </div>
 
-          <!-- Resultados Primera Fecha -->
-          <div class="bg-black border-2 border-primary rounded-lg p-4 sm:p-8 mt-8">
+          <!-- Botón Admin: Inicializar Fecha 2 -->
+          <div v-if="isAdmin && !fechasOrdenadas.includes(2)" class="mt-8 text-center">
+            <button
+              @click="iniciarFecha2"
+              :disabled="inicializandoFecha2"
+              class="bg-primary hover:bg-primary/90 text-black px-6 py-3 rounded-lg font-bold transition-all transform hover:scale-105 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span v-if="inicializandoFecha2">Inicializando...</span>
+              <span v-else>➕ Inicializar Fecha 2</span>
+            </button>
+          </div>
+
+          <!-- Resultados por Fecha (Dinámico) -->
+          <div v-for="numeroFecha in fechasOrdenadas" :key="`fecha-${numeroFecha}`" class="bg-black border-2 border-primary rounded-lg p-4 sm:p-8 mt-8">
             <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4 sm:mb-6 text-center flex items-center justify-center gap-2 sm:gap-3" style="font-family: 'Collegiate Black', sans-serif;">
               <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M9 11H7v2h2v-2m4 0h-2v2h2v-2m4 0h-2v2h2v-2m2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m0 16H5V9h14v11z"/>
               </svg>
-              <span class="hidden sm:inline">RESULTADOS - SÁBADO 7 DE FEBRERO</span>
-              <span class="sm:hidden">RESULTADOS - 7 FEB</span>
+              <span class="hidden sm:inline">{{ obtenerTituloFecha(numeroFecha) }}</span>
+              <span class="sm:hidden">FECHA {{ numeroFecha }}</span>
             </h2>
+            
+            <!-- Estado de la fecha -->
             <div class="text-center mb-4">
-              <span class="inline-flex items-center gap-2 bg-green-500/20 text-green-400 border border-green-400 px-4 py-2 rounded-full text-sm font-bold">
+              <span 
+                :class="['inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold', obtenerEstadoFecha(partidosPorFecha[numeroFecha]).class]"
+              >
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
                 </svg>
-                PRIMERA FECHA COMPLETADA
+                {{ obtenerEstadoFecha(partidosPorFecha[numeroFecha]).text }}
               </span>
             </div>
             
@@ -581,12 +597,12 @@
                   Guardando...
                 </span>
               </div>
-              <p class="text-primary/80 text-xs">Haz clic en "Editar" para modificar los resultados de cada partido</p>
+              <p class="text-primary/80 text-xs">Haz clic en "Editar" o en los botones de estado para modificar los partidos</p>
             </div>
 
             <div class="space-y-3 sm:space-y-4">
               <!-- Partidos dinámicos desde Firebase -->
-              <div v-for="(partido, index) in partidos" :key="partido.id" class="bg-linear-to-r from-blue-900/30 via-purple-900/30 to-pink-900/30 border-2 border-primary rounded-lg p-3 sm:p-6">
+              <div v-for="partido in partidosPorFecha[numeroFecha]" :key="partido.id" class="bg-linear-to-r from-blue-900/30 via-purple-900/30 to-pink-900/30 border-2 border-primary rounded-lg p-3 sm:p-6">
                 <div class="flex items-center justify-between mb-3 sm:mb-4">
                   <div class="flex items-center gap-1 sm:gap-2 text-primary">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -595,16 +611,37 @@
                     <span class="font-bold text-xs sm:text-sm">{{ partido.horario }}</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold bg-green-500/20 text-green-400 border border-green-400 px-2 sm:px-3 py-1 rounded-full">✓ FINALIZADO</span>
-                    
-                    <!-- Botón de editar (solo admin) -->
-                    <button
-                      v-if="isAdmin && !partidoEditando"
-                      @click="editarResultado(partido)"
-                      class="bg-primary hover:bg-primary/80 text-black px-2 py-1 rounded text-xs font-bold transition"
+                    <span 
+                      :class="['text-xs font-bold px-2 sm:px-3 py-1 rounded-full', obtenerEstadoBadge(partido.estado).class]"
                     >
-                      Editar
-                    </button>
+                      {{ obtenerEstadoBadge(partido.estado).text }}
+                    </span>
+                    
+                    <!-- Botones de admin -->
+                    <div v-if="isAdmin && !partidoEditando" class="flex gap-1">
+                      <button
+                        v-if="partido.estado !== 'EN_CURSO'"
+                        @click="cambiarEstadoPartido(partido.id, 'EN_CURSO')"
+                        class="bg-yellow-500 hover:bg-yellow-600 text-black px-2 py-1 rounded text-xs font-bold transition"
+                        title="Iniciar partido"
+                      >
+                        ▶
+                      </button>
+                      <button
+                        v-if="partido.estado === 'EN_CURSO'"
+                        @click="cambiarEstadoPartido(partido.id, 'FINALIZADO')"
+                        class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs font-bold transition"
+                        title="Finalizar partido"
+                      >
+                        ✓
+                      </button>
+                      <button
+                        @click="editarResultado(partido)"
+                        class="bg-primary hover:bg-primary/80 text-black px-2 py-1 rounded text-xs font-bold transition"
+                      >
+                        Editar
+                      </button>
+                    </div>
                   </div>
                 </div>
                 
@@ -712,8 +749,8 @@
               </div>
             </div>
 
-            <!-- Tabla de Posiciones -->
-            <div class="mt-6 bg-black/50 border-2 border-primary/50 rounded-lg overflow-hidden shadow-lg">
+            <!-- Tabla de Posiciones (solo se muestra una vez al final) -->
+            <div v-if="numeroFecha === fechasOrdenadas[fechasOrdenadas.length - 1]" class="mt-6 bg-black/50 border-2 border-primary/50 rounded-lg overflow-hidden shadow-lg">
               <div class="bg-primary/20 px-4 py-2 border-b border-primary/50">
                 <h3 class="text-primary font-bold text-sm text-center flex items-center justify-center gap-2 uppercase tracking-wider">
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -807,13 +844,6 @@
                 <span class="font-bold text-sm sm:text-lg">Cancha Tricolor La Florida</span>
               </div>
             </div>
-          </div>
-
-          <!-- Información adicional -->
-          <div class="mt-8 bg-white/5 rounded-lg p-6">
-            <p class="text-white/80 text-center leading-relaxed">
-             Próxima fecha: Sábado 14 de febrero • Desde las 20hrs
-            </p>
           </div>
           </div>
         </div>
@@ -1115,11 +1145,14 @@ import {
   equiposCampeonato,
   isLoading as loadingCampeonato,
   obtenerPartidos,
+  obtenerPartidosPorFecha,
   actualizarResultadoPartido,
+  actualizarEstadoPartido,
   obtenerTabla,
   escucharPartidos,
   escucharTabla,
-  calcularTabla
+  calcularTabla,
+  inicializarFecha2
 } from '../firebase/campeonatoInterno';
 
 const tabla = ref([]);
@@ -1130,10 +1163,12 @@ const competenciaExpandida = ref('interno'); // 'verano' o 'interno'
 
 // Estados para partidos y tabla del campeonato interno
 const partidos = ref([]);
+const partidosPorFecha = ref({});
 const tablaPosiciones = ref([]);
 const loadingPartidos = ref(false);
 const editandoResultado = ref(false);
 const partidoEditando = ref(null);
+const inicializandoFecha2 = ref(false);
 
 // Equipos del torneo interno (ahora vinculados a Firebase)
 const equipos = computed(() => equiposCampeonato.value);
@@ -1257,6 +1292,7 @@ const cargarPartidos = async () => {
   loadingPartidos.value = true;
   try {
     partidos.value = await obtenerPartidos();
+    partidosPorFecha.value = await obtenerPartidosPorFecha();
   } catch (err) {
     console.error('Error cargando partidos:', err);
   } finally {
@@ -1271,6 +1307,73 @@ const cargarTablaPosiciones = async () => {
     console.error('Error cargando tabla:', err);
   }
 };
+
+const iniciarFecha2 = async () => {
+  if (inicializandoFecha2.value) return;
+  
+  const confirmar = confirm('¿Estás seguro de que quieres inicializar la Fecha 2? Esto agregará los 3 partidos de la segunda fecha.');
+  if (!confirmar) return;
+  
+  inicializandoFecha2.value = true;
+  try {
+    const resultado = await inicializarFecha2();
+    if (resultado.success) {
+      alert('Fecha 2 inicializada correctamente');
+      await cargarPartidos();
+    } else {
+      alert(resultado.message);
+    }
+  } catch (err) {
+    console.error('Error inicializando Fecha 2:', err);
+    alert('Error al inicializar Fecha 2. Por favor intenta nuevamente.');
+  } finally {
+    inicializandoFecha2.value = false;
+  }
+};
+
+const cambiarEstadoPartido = async (partidoId, nuevoEstado) => {
+  try {
+    await actualizarEstadoPartido(partidoId, nuevoEstado);
+    await cargarPartidos();
+    await cargarTablaPosiciones();
+  } catch (err) {
+    console.error('Error cambiando estado:', err);
+    alert('Error al cambiar estado del partido.');
+  }
+};
+
+const obtenerEstadoBadge = (estado) => {
+  if (estado === 'FINALIZADO') {
+    return { text: '✓ FINALIZADO', class: 'bg-green-500/20 text-green-400 border border-green-400' };
+  } else if (estado === 'EN_CURSO') {
+    return { text: '⚽ EN CURSO', class: 'bg-yellow-500/20 text-yellow-400 border border-yellow-400 animate-pulse' };
+  } else {
+    return { text: '⏱ PRÓXIMAMENTE', class: 'bg-blue-500/20 text-blue-400 border border-blue-400' };
+  }
+};
+
+const obtenerTituloFecha = (numeroFecha) => {
+  if (numeroFecha == 1) {
+    return 'FECHA 1 - SÁBADO 7 DE FEBRERO';
+  } else if (numeroFecha == 2) {
+    return 'FECHA 2 - SÁBADO 14 DE FEBRERO';
+  }
+  return `FECHA ${numeroFecha}`;
+};
+
+const obtenerEstadoFecha = (partidos) => {
+  if (partidos.every(p => p.estado === 'FINALIZADO')) {
+    return { text: 'FECHA COMPLETADA', class: 'bg-green-500/20 text-green-400 border border-green-400' };
+  } else if (partidos.some(p => p.estado === 'EN_CURSO')) {
+    return { text: 'EN CURSO', class: 'bg-yellow-500/20 text-yellow-400 border border-yellow-400 animate-pulse' };
+  } else {
+    return { text: 'PRÓXIMAMENTE', class: 'bg-blue-500/20 text-blue-400 border border-blue-400' };
+  }
+};
+
+const fechasOrdenadas = computed(() => {
+  return Object.keys(partidosPorFecha.value).map(Number).sort((a, b) => a - b);
+});
 
 const obtenerDatosEquipo = (equipoKey) => {
   const equiposData = {
@@ -1383,6 +1486,14 @@ onMounted(async () => {
     // Escuchar cambios en partidos en tiempo real
     const unsubscribePartidos = escucharPartidos(async (nuevosPartidos) => {
       partidos.value = nuevosPartidos;
+      // Reagrupar por numeroFecha
+      const porFecha = {};
+      nuevosPartidos.forEach(p => {
+        const numeroFecha = p.numeroFecha || 1;
+        if (!porFecha[numeroFecha]) porFecha[numeroFecha] = [];
+        porFecha[numeroFecha].push(p);
+      });
+      partidosPorFecha.value = porFecha;
     });
     
     // Escuchar cambios en tabla en tiempo real
