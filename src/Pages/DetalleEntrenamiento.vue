@@ -581,7 +581,7 @@ console.log('📋 DEBUG - Entrenamiento cargado:', {
     inscritasOrganizadas.value = organizadas;
     // Actualizar si la jugadora actual forma parte de la convocatoria (si aplica)
     actualizarConvocatoriaUsuario(organizadas);
-  }, entrenamiento.value); // Pasar el entrenamiento completo
+  }, () => entrenamiento.value); // Pasar función que retorna el entrenamiento actualizado
 
   unsubscribers.value.push(unsubscribe);
 };

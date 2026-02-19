@@ -323,7 +323,7 @@ const verDetalles = async (entrenamiento) => {
       bajas: organizadas.bajas.length,
       pendientes: organizadas.pendientes.length
     };
-  }, entrenamiento); // Pasar el entrenamiento completo
+  }, () => entrenamientoSeleccionado.value); // Pasar función que retorna el entrenamiento actualizado
 
   unsubscribers.value.push(unsubscribe);
 };
@@ -353,7 +353,7 @@ onMounted(() => {
           bajas: organizadas.bajas.length,
           pendientes: organizadas.pendientes.length
         };
-      }, ent); // Pasar el entrenamiento completo
+      }, () => entrenamientos.value.find(e => e.id === ent.id)); // Pasar función que retorna el entrenamiento actualizado
       
       unsubscribers.value.push(unsub);
     }

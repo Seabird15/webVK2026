@@ -7,6 +7,7 @@ import { authUser, userRole, authReady } from '../firebase/auth';
 import { jugadoraAuthUser, authReady as jugadoraAuthReady } from '../firebase/jugadorasAuth';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase/config';
+import { trackPageView } from '../composables/useAnalytics';
 
 const routes = [
   {
@@ -187,6 +188,15 @@ router.beforeEach(async (to, from, next) => {
   else {
     next();
   }
+});
+
+// Tracking de Google Analytics después de cada navegación
+router.afterEach((to, from) => {
+  // Usar nextTick para asegurar que el título de la página se haya actualizado
+  setTimeout(() => {
+    const pageTitle = document.title || to.name || 'CD VIKINGAS';
+    trackPageView(to.path, pageTitle);
+  }, 100);
 });
 
 export default router;

@@ -185,7 +185,7 @@ export const obtenerEstadoInscripcion = async (entrenamientoId, jugadoraId) => {
   }
 };
 // Escuchar cambios en tiempo real de inscripciones de un entrenamiento
-export const escucharInscripcionesEntrenamiento = (entrenamientoId, callback, entrenamiento = null) => {
+export const escucharInscripcionesEntrenamiento = (entrenamientoId, callback, getEntrenamiento = null) => {
   const q = query(
     collection(db, 'inscripcionesEntrenamientos'),
     where('entrenamientoId', '==', entrenamientoId)
@@ -197,26 +197,16 @@ export const escucharInscripcionesEntrenamiento = (entrenamientoId, callback, en
       ...doc.data()
     }));
     
+    // Obtener el entrenamiento actualizado si se pasó la función
+    const entrenamiento = typeof getEntrenamiento === 'function' ? getEntrenamiento() : getEntrenamiento;
+    
     // Filtrar pendientes: si es convocatoria, solo mostrar las convocadas
     let pendientesFiltradas = inscritas.filter(i => i.estado === 'pendiente');
     
-    // // console.log('🔍 DEBUG - Filtrado de pendientes:');
-    // // console.log('  - Entrenamiento ID:', entrenamientoId);
-    // // console.log('  - Es convocatoria:', entrenamiento?.esConvocatoria);
-    // // console.log('  - Convocadas:', entrenamiento?.convocadas);
-    // // console.log('  - Pendientes antes de filtrar:', pendientesFiltradas.length);
-    // // console.log('  - Pendientes IDs:', pendientesFiltradas.map(i => ({ nombre: i.jugadoraNombre, id: i.jugadoraId })));
-    
-    if (entrenamiento?.esConvocatoria && entrenamiento?.convocadas) {
-      // // console.log('  ✅ Aplicando filtro de convocadas...');
+    if (entrenamiento?.esConvocatoria && entrenamiento?.convocadas && Array.isArray(entrenamiento.convocadas)) {
       pendientesFiltradas = pendientesFiltradas.filter(i => {
-        const estaConvocada = entrenamiento.convocadas.includes(i.jugadoraId);
-        // // console.log(`    - ${i.jugadoraNombre} (${i.jugadoraId}): ${estaConvocada ? '✅ Convocada' : '❌ No convocada'}`);
-        return estaConvocada;
+        return entrenamiento.convocadas.includes(i.jugadoraId);
       });
-      // // console.log('  - Pendientes después de filtrar:', pendientesFiltradas.length);
-    } else {
-      // // console.log('  ⚠️ NO se aplica filtro de convocadas');
     }
     
     // Organizar por estado
@@ -228,7 +218,7 @@ export const escucharInscripcionesEntrenamiento = (entrenamientoId, callback, en
     
     callback(organizadas);
   }, (error) => {
-    // // console.error('Error escuchando inscripciones:', error);
+    console.error('Error escuchando inscripciones:', error);
   });
 };
 

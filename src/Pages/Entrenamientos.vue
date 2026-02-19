@@ -194,8 +194,13 @@
       </div>
 
       <!-- Loading -->
-      <div v-if="isLoading" class="text-center py-12">
-        <p class="text-gray-500">Cargando entrenamientos...</p>
+      <div v-if="isLoading || primeraCarga" class="flex flex-col items-center justify-center py-20">
+        <div class="relative">
+          <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-primary"></div>
+          <div class="animate-ping absolute inset-0 rounded-full h-16 w-16 border-b-4 border-primary opacity-20"></div>
+        </div>
+        <p class="text-white mt-6 text-lg font-semibold">Cargando entrenamientos...</p>
+        <p class="text-gray-300 mt-2 text-sm">Esto puede tomar unos segundos</p>
       </div>
 
       <!-- Sin entrenamientos -->
@@ -204,7 +209,7 @@
       </div>
 
       <!-- Lista de entrenamientos -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-if="!primeraCarga && entrenamientosFiltered.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
           v-for="entrenamiento in entrenamientosFiltered"
           :key="entrenamiento.id"
@@ -418,9 +423,9 @@
       </div>
     </div>
     <div v-if="entrenamientoSeleccionado" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" @click.self="entrenamientoSeleccionadoId = null">
-      <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+      <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
         <!-- Header con gradiente -->
-        <div class="sticky top-0 bg-linear-to-r from-primary-dark to-primary p-6 text-white flex justify-between items-start">
+        <div class="shrink-0 bg-linear-to-r from-primary-dark to-primary p-6 text-white flex justify-between items-start z-20">
           <div class="flex-1">
             <h2 class="text-2xl font-bold mb-2">{{ entrenamientoSeleccionado.nombre }}</h2>
             <div class="flex items-center gap-3 text-sm opacity-90">
@@ -442,8 +447,8 @@
           </button>
         </div>
 
-        <div class="overflow-y-auto max-h-[calc(90vh-180px)]">
-          <div class="p-4 space-y-4">
+        <div class="overflow-y-auto flex-1">
+          <div class="p-4 space-y-4 pb-6">
             <!-- Indicador de convocatoria -->
             <div v-if="entrenamientoSeleccionado.esConvocatoria" class="p-3 bg-purple-50 rounded-lg border-l-4 border-purple-500">
               <h3 class="font-bold text-purple-900 text-xs mb-1 flex items-center gap-1">
@@ -487,36 +492,13 @@
             </div>
 
             <!-- Lista de Jugadoras Convocadas (si es convocatoria) -->
-            <div v-if="entrenamientoSeleccionado.esConvocatoria && entrenamientoSeleccionado.jugadorasConvocadas && entrenamientoSeleccionado.jugadorasConvocadas.length > 0" class="bg-purple-50 rounded-lg p-4 border border-purple-200">
-              <h3 class="font-bold text-purple-900 text-sm mb-3 flex items-center gap-2">
-                <ClipboardDocumentListIcon class="w-5 h-5" />
-                Jugadoras Convocadas ({{ entrenamientoSeleccionado.jugadorasConvocadas.length }})
-              </h3>
-              <div class="space-y-2">
-                <div
-                  v-for="jugadora in entrenamientoSeleccionado.jugadorasConvocadas"
-                  :key="jugadora.id"
-                  class="flex items-center gap-2 bg-white p-2 rounded border border-purple-100"
-                >
-                  <div class="w-8 h-8 bg-linear-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-black text-xs shadow-md">
-                    {{ obtenerIniciales(jugadora.nombre) }}
-                  </div>
-                  <div class="flex-1">
-                    <div class="text-xs font-bold text-gray-900">{{ jugadora.nombre }}</div>
-                    <div class="text-[9px] text-gray-500 font-medium">Convocada</div>
-                  </div>
-                  <div v-if="jugadora.id === jugadoraAuthUser?.uid" class="px-2 py-0.5 bg-green-100 rounded-full">
-                    <span class="text-green-600 text-[9px] font-bold">Tú</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+     
 
             <!-- CONVOCATORIA - Estilo App Deportiva -->
             <div class="bg-linear-to-b from-gray-50 to-white rounded-xl border border-gray-200 overflow-hidden">
               <!-- Stats Bar -->
-              <div class="bg-linear-to-r from-gray-900 to-gray-800 px-4 py-3">
-                <h3 class="text-white font-black text-xs uppercase tracking-wider mb-2">Lista de Convocatoria</h3>
+              <div class=" px-4 py-3">
+                <h3 class="text-black font-black text-xs uppercase tracking-wider mb-2">Lista de Convocatoria</h3>
                 <div class="grid grid-cols-3 gap-2">
                   <div class="bg-white/10 backdrop-blur rounded-lg px-2 py-1.5 text-center">
                     <div class="text-green-400 font-black text-lg">{{ inscritasOrganizadas.confirmadas.length }}</div>
@@ -526,7 +508,7 @@
                     <div class="text-red-400 font-black text-lg">{{ inscritasOrganizadas.bajas.length }}</div>
                     <div class="text-white/70 text-[9px] font-bold uppercase">Ausentes</div>
                   </div>
-                  <div class="bg-white/10 backdrop-blur rounded-lg px-2 py-1.5 text-center">
+                  <div class="bg-white/10 backdrop-blur shadow rounded-lg px-2 py-1.5 text-center">
                     <div class="text-yellow-400 font-black text-lg">{{ inscritasOrganizadas.pendientes.length }}</div>
                     <div class="text-white/70 text-[9px] font-bold uppercase">Sin Respuesta</div>
                   </div>
@@ -587,6 +569,17 @@
 
               <!-- Player List -->
               <div class="p-3">
+                <!-- Loader mientras cargan inscripciones -->
+                <div v-if="cargandoInscripciones[entrenamientoSeleccionado.id] !== false" class="flex flex-col items-center justify-center py-12">
+                  <div class="relative">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                    <div class="animate-ping absolute inset-0 rounded-full h-12 w-12 border-b-2 border-primary opacity-20"></div>
+                  </div>
+                  <p class="text-gray-500 mt-4 text-sm font-medium">Cargando lista de jugadoras...</p>
+                </div>
+
+                <!-- Listas de jugadoras -->
+                <div v-else>
                 <!-- Confirmadas -->
                 <div v-show="tabActivo === 'confirmadas'" class="space-y-1.5">
                   <div v-if="inscritasOrganizadas.confirmadas.length === 0" class="text-center py-8 text-gray-400">
@@ -604,7 +597,7 @@
                       </div>
                       <div class="flex-1">
                         <div class="text-xs font-bold text-gray-900">{{ inscrita.jugadoraNombre }}</div>
-                        <div class="text-[9px] text-gray-500 font-medium">Jugadora #{{ index + 1 }}</div>
+                        <div class="text-[9px] text-gray-500 font-medium">Confirmó: {{ formatearFechaInscripcion(inscrita.updatedAt || inscrita.createdAt) }}</div>
                       </div>
                     </div>
                     <div v-if="esAdmin" class="flex items-center gap-1">
@@ -724,12 +717,13 @@
                     </div>
                   </div>
                 </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="sticky bottom-0 bg-gray-50 p-2 border-t border-gray-200">
+        <div class="shrink-0 bg-gray-50 p-4 border-t border-gray-200 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
           <!-- Mensaje si la fecha pasó -->
           <div v-if="fechaPasada(entrenamientoSeleccionado)" class="mb-4 p-3 bg-gray-100 border border-gray-300 rounded-lg">
             <p class="text-sm text-gray-700 font-semibold">
@@ -927,11 +921,8 @@ const router = useRouter();
 const equipoSeleccionado = ref(localStorage.getItem('categoriaSeleccionada') || jugadoraData.value?.equipo || 'ascenso');
 const entrenamientoSeleccionadoId = ref(null);
 const inscritasEntrenamiento = ref([]);
-const inscritasOrganizadas = ref({
-  confirmadas: [],
-  bajas: [],
-  pendientes: []
-});
+// Guardar inscripciones organizadas de todos los entrenamientos
+const todasInscritasOrganizadas = ref({});
 const estadoInscripcion = ref({});
 const conteoInscritas = ref({}); // NUEVO: Mapeo de conteos por entrenamiento
 const toastMensaje = ref(null);
@@ -945,11 +936,21 @@ const entrenamientoParaBaja = ref(null);
 const tabActivo = ref('confirmadas'); // Para el modal de detalles
 const cumpleaniosHoy = ref([]); // Cumpleaños de hoy
 const proximoCumpleanios = ref([]); // Próximos cumpleaños (mismo día)
+const cargandoInscripciones = ref({}); // Estado de carga por entrenamiento
+const primeraCarga = ref(true); // Para mostrar loader en primera carga
 
 // Computed para obtener el entrenamiento seleccionado actualizado en tiempo real
 const entrenamientoSeleccionado = computed(() => {
   if (!entrenamientoSeleccionadoId.value) return null;
   return entrenamientos.value.find(e => e.id === entrenamientoSeleccionadoId.value) || null;
+});
+
+// Computed para obtener inscripciones organizadas del entrenamiento seleccionado
+const inscritasOrganizadas = computed(() => {
+  if (!entrenamientoSeleccionadoId.value) {
+    return { confirmadas: [], bajas: [], pendientes: [] };
+  }
+  return todasInscritasOrganizadas.value[entrenamientoSeleccionadoId.value] || { confirmadas: [], bajas: [], pendientes: [] };
 });
 
 // Función auxiliar para obtener iniciales
@@ -1039,6 +1040,7 @@ const fechaPasada = (entrenamiento) => {
 };
 
 const cambiarEquipo = (equipo) => {
+  primeraCarga.value = true; // Mostrar loader al cambiar equipo
   equipoSeleccionado.value = equipo;
   localStorage.setItem('categoriaSeleccionada', equipo);
   cargarEntrenamientos();
@@ -1056,6 +1058,10 @@ const cargarEntrenamientos = () => {
   unsubscribers.value.forEach(unsub => unsub());
   unsubscribers.value = [];
   
+  // Limpiar inscripciones organizadas
+  todasInscritasOrganizadas.value = {};
+  cargandoInscripciones.value = {};
+  
   // Iniciar listener en tiempo real de entrenamientos
   unsubEntrenamientos.value = escucharEntrenamientosPorEquipo(equipoSeleccionado.value, async () => {
     await actualizarEstados();
@@ -1064,7 +1070,16 @@ const cargarEntrenamientos = () => {
     unsubscribers.value.forEach(unsub => unsub());
     unsubscribers.value = [];
     
+    // Si no hay entrenamientos, ocultar loader inmediatamente
+    if (entrenamientos.value.length === 0) {
+      primeraCarga.value = false;
+      return;
+    }
+    
     for (const ent of entrenamientos.value) {
+      // Marcar como cargando antes de iniciar listener
+      cargandoInscripciones.value[ent.id] = true;
+      
       const unsub = escucharInscripcionesEntrenamiento(ent.id, (organizadas) => {
         conteoInscritas.value[ent.id] = {
           confirmadas: organizadas.confirmadas.length,
@@ -1072,10 +1087,24 @@ const cargarEntrenamientos = () => {
           pendientes: organizadas.pendientes.length
         };
         
-        if (entrenamientoSeleccionadoId.value === ent.id) {
-          inscritasOrganizadas.value = organizadas;
+        // Guardar inscripciones organizadas para este entrenamiento
+        todasInscritasOrganizadas.value[ent.id] = organizadas;
+        
+        // Marcar como cargado
+        cargandoInscripciones.value[ent.id] = false;
+        
+        // Verificar si todas las inscripciones terminaron de cargar
+        const todasCargadas = Object.values(cargandoInscripciones.value).every(val => val === false);
+        if (todasCargadas && primeraCarga.value) {
+          // Pequeño delay para suavizar la transición
+          setTimeout(() => {
+            primeraCarga.value = false;
+          }, 300);
         }
-      }, ent);
+      }, () => {
+        // Pasar función que retorna el entrenamiento actualizado
+        return entrenamientos.value.find(e => e.id === ent.id);
+      });
       
       unsubscribers.value.push(unsub);
     }
@@ -1214,6 +1243,17 @@ const formatearFecha = (date) => {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
+  });
+};
+
+const formatearFechaInscripcion = (date) => {
+  if (!date) return '-';
+  const d = new Date(date.seconds ? date.seconds * 1000 : date);
+  return d.toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
   });
 };
 

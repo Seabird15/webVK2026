@@ -1056,7 +1056,7 @@ const verDetallesEntrenamiento = (entrenamiento) => {
       bajas: organizadas.bajas.length,
       pendientes: organizadas.pendientes.length
     };
-  }, entrenamiento); // Pasar el entrenamiento completo
+  }, () => entrenamientoSeleccionado.value); // Pasar función que retorna el entrenamiento actualizado
 
   unsubscribers.value.push(unsubscribe);
 };
