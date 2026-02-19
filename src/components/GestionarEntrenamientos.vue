@@ -462,13 +462,32 @@
         </button>
       </div>
 
-    <!-- Modal de detalles de inscripciones -->
-    <div v-if="entrenamientoDetallado" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4 animate-fade-in">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
-        <!-- Header del modal mejorado -->
-        <div class="sticky top-0 bg-gradient-to-r from-primary-dark via-primary to-primary-light text-white p-6 z-10 shadow-lg">
-          <div class="flex justify-between items-start gap-4">
-            <div class="flex-1 min-w-0 flex items-start gap-4">
+    <!-- Vista de detalles de inscripciones -->
+    <Transition
+      enter-active-class="transition-all duration-300 ease-out"
+      enter-from-class="opacity-0 translate-x-full"
+      enter-to-class="opacity-100 translate-x-0"
+      leave-active-class="transition-all duration-300 ease-in"
+      leave-from-class="opacity-100 translate-x-0"
+      leave-to-class="opacity-0 translate-x-full"
+    >
+      <div v-if="entrenamientoDetallado" class="fixed inset-0 bg-gradient-to-br from-gray-50 to-gray-100 z-50 overflow-y-auto">
+        <div class="min-h-screen pb-20">
+          <!-- Header mejorado -->
+          <div class="sticky top-0 bg-gradient-to-r from-primary-dark via-primary to-primary-light text-white p-6 z-10 shadow-lg">
+            <div class="max-w-7xl mx-auto">
+              <button
+                @click="entrenamientoDetallado = null"
+                class="mb-4 flex items-center gap-2 text-white/90 hover:text-white transition-colors group"
+              >
+                <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                <span class="font-bold text-sm uppercase tracking-wide">Volver</span>
+              </button>
+              
+              <div class="flex justify-between items-start gap-4">
+                <div class="flex-1 min-w-0 flex items-start gap-4">
               <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm shrink-0">
                 <CalendarIcon class="w-8 h-8" />
               </div>
@@ -493,20 +512,43 @@
                     Convocatoria
                   </span>
                 </div>
+                </div>
               </div>
             </div>
-            <button
-              @click="entrenamientoDetallado = null"
-              class="w-12 h-12 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-all shrink-0 backdrop-blur-sm"
-              aria-label="Cerrar"
-            >
-              <XCircleIcon class="w-6 h-6" />
-            </button>
           </div>
-        </div>
+          </div>
 
-        <!-- Contenido mejorado -->
-        <div class="p-6 bg-gradient-to-br from-gray-50 to-gray-100">
+          <!-- Contenido mejorado -->
+          <div class="max-w-7xl mx-auto p-6">
+          <!-- Lista de Convocadas (solo si es convocatoria) -->
+          <div v-if="entrenamientoDetallado.esConvocatoria && entrenamientoDetallado.jugadorasConvocadas && entrenamientoDetallado.jugadorasConvocadas.length > 0" class="bg-white rounded-xl border-2 border-purple-200 p-5 shadow-sm mb-6">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <ClipboardDocumentListIcon class="w-5 h-5 text-white" />
+              </div>
+              <div class="text-xs text-gray-600 font-black uppercase tracking-wide">Jugadoras Convocadas ({{ entrenamientoDetallado.jugadorasConvocadas.length }})</div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-60 overflow-y-auto">
+              <div
+                v-for="jugadora in entrenamientoDetallado.jugadorasConvocadas"
+                :key="jugadora.id"
+                class="flex items-center justify-between gap-2 p-3 bg-purple-50 rounded-lg border border-purple-200 hover:border-purple-400 transition-colors"
+              >
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-bold text-purple-900 truncate">{{ jugadora.nombre }}</p>
+                  <p class="text-xs text-purple-700">{{ jugadora.posicion }} - #{{ jugadora.dorsal }}</p>
+                </div>
+                <button
+                  @click="desconvocarJugadora(jugadora.id)"
+                  class="px-2 py-1 text-xs bg-red-600 text-white rounded font-bold hover:bg-red-700 transition-colors whitespace-nowrap"
+                  title="Desconvocar"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Acciones y Notificaciones -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <!-- Acciones rápidas -->
@@ -624,7 +666,7 @@
             </div>
 
             <!-- Contenido tabs -->
-            <div class=" min-h-60">
+            <div class="p-4 min-h-60">
               <!-- Empty global -->
               <div
                 v-if="
@@ -687,32 +729,51 @@
                 <div
                   v-for="inscrita in inscritasOrganizadasAdmin.bajas"
                   :key="inscrita.id"
-                  class="flex items-center gap-3 bg-white p-3 rounded-lg border-2 border-red-200 hover:border-red-400 hover:shadow-lg transition-all"
+                  class="bg-white rounded-lg border-2 border-red-200 hover:border-red-400 hover:shadow-lg transition-all overflow-hidden"
                 >
-                  <div class="w-12 h-12 bg-linear-to-br from-primary-dark to-primary-light rounded-full flex items-center justify-center text-white font-black shadow-md">
-                    {{ obtenerIniciales(inscrita.jugadoraNombre) }}
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="text-sm font-bold text-gray-900 wrap-break-word">{{ inscrita.jugadoraNombre }}</div>
-                    <div v-if="inscrita.updatedAt || inscrita.createdAt" class="text-xs text-gray-400 mt-1">
-                      Anotada: {{ formatFechaHora(inscrita.updatedAt || inscrita.createdAt) }}
+                  <div class="flex items-center gap-3 p-3">
+                    <div class="w-12 h-12 bg-linear-to-br from-primary-dark to-primary-light rounded-full flex items-center justify-center text-white font-black shadow-md shrink-0">
+                      {{ obtenerIniciales(inscrita.jugadoraNombre) }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="text-sm font-bold text-gray-900 wrap-break-word">{{ inscrita.jugadoraNombre }}</div>
+                      <div class="flex items-center gap-2 mt-1">
+                        <div v-if="inscrita.fechaBaja" class="text-xs text-gray-400">
+                          Baja: {{ formatFechaHora(inscrita.fechaBaja) }}
+                        </div>
+                        <div v-if="inscrita.motivoBaja" class="px-2 py-0.5 bg-blue-100 rounded-full">
+                          <span class="text-blue-600 text-[10px] font-bold">💬 Motivo</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex flex-col gap-1 shrink-0">
+                      <button
+                        @click="cambiarEstado(inscrita.id, 'confirmada')"
+                        class="px-3 py-1.5 text-xs bg-green-700 text-white rounded-lg font-bold hover:bg-green-800 transition-colors whitespace-nowrap"
+                        title="Marcar como presente"
+                      >
+                        Presente
+                      </button>
+                      <button
+                        @click="cambiarEstado(inscrita.id, 'pendiente')"
+                        class="px-3 py-1.5 text-xs bg-yellow-600 text-white rounded-lg font-bold hover:bg-yellow-700 transition-colors whitespace-nowrap"
+                        title="Marcar como pendiente"
+                      >
+                        Pendiente
+                      </button>
                     </div>
                   </div>
-                  <div class="flex gap-2">
-                    <button
-                      @click="cambiarEstado(inscrita.id, 'confirmada')"
-                      class="px-3 py-2 text-xs bg-green-700 text-white rounded-lg font-bold hover:bg-green-800 transition-colors whitespace-nowrap"
-                      title="Marcar como presente"
-                    >
-                      Presente
-                    </button>
-                    <button
-                      @click="cambiarEstado(inscrita.id, 'pendiente')"
-                      class="px-3 py-2 text-xs bg-yellow-600 text-white rounded-lg font-bold hover:bg-yellow-700 transition-colors whitespace-nowrap"
-                      title="Marcar como pendiente"
-                    >
-                      Pendiente
-                    </button>
+                  <!-- Motivo de baja -->
+                  <div v-if="inscrita.motivoBaja" class="px-3 pb-3">
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
+                      <div class="flex items-start gap-2">
+                        <span class="text-blue-600 text-base shrink-0">💬</span>
+                        <div class="flex-1">
+                          <p class="text-xs font-bold text-blue-900 mb-1">Motivo de la ausencia:</p>
+                          <p class="text-xs text-gray-700 italic leading-relaxed">"{{ inscrita.motivoBaja }}"</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -805,19 +866,24 @@
             
             </div>
            
+            </div>
+          </div>
+
+          <!-- Botón flotante de cerrar -->
+          <div class="fixed bottom-6 right-6 z-20">
+            <button
+              @click="entrenamientoDetallado = null"
+              class="bg-primary-dark text-white px-8 py-4 rounded-full font-bold hover:bg-primary transition-all shadow-2xl hover:scale-105 flex items-center gap-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              Volver
+            </button>
           </div>
         </div>
-
-        <div class="sticky bottom-0 bg-white p-4 sm:p-6 border-t border-gray-200">
-          <button
-            @click="entrenamientoDetallado = null"
-            class="w-full px-4 py-3 bg-primary-dark text-white rounded-lg font-bold hover:bg-primary transition-colors"
-          >
-            Cerrar
-          </button>
-        </div>
       </div>
-    </div>
+    </Transition>
     </div>
     
     <!-- Modal de confirmaci\u00f3n -->
@@ -1056,7 +1122,7 @@ const verDetallesEntrenamiento = (entrenamiento) => {
       bajas: organizadas.bajas.length,
       pendientes: organizadas.pendientes.length
     };
-  }, () => entrenamientoSeleccionado.value); // Pasar función que retorna el entrenamiento actualizado
+  }, () => entrenamientoDetallado.value); // Pasar función que retorna el entrenamiento actualizado
 
   unsubscribers.value.push(unsubscribe);
 };
@@ -1161,6 +1227,45 @@ const agregarJugadoraManual = async (jugadora, estado) => {
     }
   } catch (err) {
     alert('Error: ' + err.message);
+  }
+};
+
+// Desconvocar jugadora (remover de la convocatoria)
+const desconvocarJugadora = async (jugadoraId) => {
+  if (!entrenamientoDetallado.value) return;
+  
+  try {
+    // Confirmar acción
+    if (!confirm('¿Estás seguro de que deseas desconvocar a esta jugadora?')) {
+      return;
+    }
+    
+    // Actualizar la lista de convocadas, removiendo esta jugadora
+    const jugadorasActualizadas = entrenamientoDetallado.value.jugadorasConvocadas.filter(
+      j => j.id !== jugadoraId
+    );
+    
+    // Actualizar el entrenamiento en Firestore
+    await actualizarEntrenamiento(entrenamientoDetallado.value.id, {
+      jugadorasConvocadas: jugadorasActualizadas
+    });
+    
+    // Sincronizar inscripciones (esto eliminará la inscripción pendiente o marcará como no convocada)
+    await sincronizarInscripcionesConvocatoria(
+      entrenamientoDetallado.value.id,
+      jugadorasActualizadas
+    );
+    
+    // Actualizar el objeto local
+    entrenamientoDetallado.value.jugadorasConvocadas = jugadorasActualizadas;
+    
+    // Recargar todos los entrenamientos para actualizar la lista
+    await fetchTodosEntrenamientos();
+    
+    alert('Jugadora desconvocada correctamente');
+  } catch (err) {
+    console.error('Error desconvocando jugadora:', err);
+    alert('Error al desconvocar la jugadora: ' + err.message);
   }
 };
 

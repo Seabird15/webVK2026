@@ -271,3 +271,17 @@ export const escucharEntrenamientosPorEquipo = (equipo, callback) => {
   };
 };
 
+// Escuchar TODOS los entrenamientos en tiempo real (sin filtro de equipo)
+export const escucharTodosEntrenamientos = (callback) => {
+  const q = query(collection(db, 'entrenamientos'));
+  
+  return onSnapshot(q, (snapshot) => {
+    entrenamientos.value = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    if (callback) callback(entrenamientos.value);
+  }, (error) => {
+    errorEntrenamientos.value = error.message;
+  });
+};

@@ -200,20 +200,19 @@ export const escucharInscripcionesEntrenamiento = (entrenamientoId, callback, ge
     // Obtener el entrenamiento actualizado si se pasó la función
     const entrenamiento = typeof getEntrenamiento === 'function' ? getEntrenamiento() : getEntrenamiento;
     
-    // Filtrar pendientes: si es convocatoria, solo mostrar las convocadas
-    let pendientesFiltradas = inscritas.filter(i => i.estado === 'pendiente');
+    // Si es convocatoria, solo mostrar jugadoras convocadas en TODOS los estados
+    let inscritasFiltradas = inscritas;
     
-    if (entrenamiento?.esConvocatoria && entrenamiento?.convocadas && Array.isArray(entrenamiento.convocadas)) {
-      pendientesFiltradas = pendientesFiltradas.filter(i => {
-        return entrenamiento.convocadas.includes(i.jugadoraId);
-      });
+    if (entrenamiento?.esConvocatoria && entrenamiento?.jugadorasConvocadas && Array.isArray(entrenamiento.jugadorasConvocadas)) {
+      const idsConvocadas = entrenamiento.jugadorasConvocadas.map(j => j.id);
+      inscritasFiltradas = inscritas.filter(i => idsConvocadas.includes(i.jugadoraId));
     }
     
-    // Organizar por estado
+    // Organizar por estado (usando las inscritas filtradas)
     const organizadas = {
-      confirmadas: inscritas.filter(i => i.estado === 'confirmada'),
-      bajas: inscritas.filter(i => i.estado === 'baja'),
-      pendientes: pendientesFiltradas
+      confirmadas: inscritasFiltradas.filter(i => i.estado === 'confirmada'),
+      bajas: inscritasFiltradas.filter(i => i.estado === 'baja'),
+      pendientes: inscritasFiltradas.filter(i => i.estado === 'pendiente')
     };
     
     callback(organizadas);

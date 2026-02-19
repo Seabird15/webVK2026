@@ -422,33 +422,50 @@
         </div>
       </div>
     </div>
-    <div v-if="entrenamientoSeleccionado" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" @click.self="entrenamientoSeleccionadoId = null">
-      <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
-        <!-- Header con gradiente -->
-        <div class="shrink-0 bg-linear-to-r from-primary-dark to-primary p-6 text-white flex justify-between items-start z-20">
-          <div class="flex-1">
-            <h2 class="text-2xl font-bold mb-2">{{ entrenamientoSeleccionado.nombre }}</h2>
-            <div class="flex items-center gap-3 text-sm opacity-90">
-              <span class="flex items-center gap-1">
-                <CalendarIcon class="w-4 h-4" />
-                {{ formatearFecha(entrenamientoSeleccionado.fecha) }}
-              </span>
-              <span class="flex items-center gap-1">
-                <ClockIcon class="w-4 h-4" />
-                {{ entrenamientoSeleccionado.hora }}
-              </span>
+    <!-- Vista de detalles -->
+    <Transition
+      enter-active-class="transition-all duration-300 ease-out"
+      enter-from-class="opacity-0 translate-x-full"
+      enter-to-class="opacity-100 translate-x-0"
+      leave-active-class="transition-all duration-300 ease-in"
+      leave-from-class="opacity-100 translate-x-0"
+      leave-to-class="opacity-0 translate-x-full"
+    >
+      <div v-if="entrenamientoSeleccionado" class="fixed inset-0 bg-black z-50 overflow-y-auto">
+        <div class="min-h-screen pb-24">
+          <!-- Header con gradiente -->
+          <div class="sticky top-0 bg-linear-to-r from-primary-dark to-primary text-white p-6 z-20 shadow-lg">
+            <div class="max-w-4xl mx-auto">
+              <button
+                @click="entrenamientoSeleccionadoId = null"
+                class="mb-4 flex items-center gap-2 text-white/90 hover:text-white transition-colors group"
+              >
+                <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                <span class="font-bold text-sm uppercase tracking-wide">Volver a la lista</span>
+              </button>
+              
+              <div class="flex justify-between items-start gap-4">
+                <div class="flex-1">
+                  <h2 class="text-2xl font-bold mb-2">{{ entrenamientoSeleccionado.nombre }}</h2>
+                  <div class="flex items-center gap-3 text-sm opacity-90">
+                    <span class="flex items-center gap-1">
+                      <CalendarIcon class="w-4 h-4" />
+                      {{ formatearFecha(entrenamientoSeleccionado.fecha) }}
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <ClockIcon class="w-4 h-4" />
+                      {{ entrenamientoSeleccionado.hora }}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <button
-            @click="entrenamientoSeleccionadoId = null"
-            class="text-white hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-colors cursor-pointer"
-          >
-            <XMarkIcon class="w-6 h-6" />
-          </button>
-        </div>
 
-        <div class="overflow-y-auto flex-1">
-          <div class="p-4 space-y-4 pb-6">
+          <!-- Contenido -->
+          <div class="max-w-4xl mx-auto p-4 space-y-4 pb-6">
             <!-- Indicador de convocatoria -->
             <div v-if="entrenamientoSeleccionado.esConvocatoria" class="p-3 bg-purple-50 rounded-lg border-l-4 border-purple-500">
               <h3 class="font-bold text-purple-900 text-xs mb-1 flex items-center gap-1">
@@ -721,9 +738,10 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="shrink-0 bg-gray-50 p-4 border-t border-gray-200 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+          <!-- Footer fijo con acciones -->
+          <div class="fixed bottom-0 left-0 right-0 bg-gray-900 p-4 border-t border-gray-700 z-20 shadow-2xl">
+            <div class="max-w-4xl mx-auto">
           <!-- Mensaje si la fecha pasó -->
           <div v-if="fechaPasada(entrenamientoSeleccionado)" class="mb-4 p-3 bg-gray-100 border border-gray-300 rounded-lg">
             <p class="text-sm text-gray-700 font-semibold">
@@ -816,16 +834,12 @@
                 {{ fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin) ? '⛔ No convocada' : '✕ Darme de Baja' }}
               </button>
             </template>
-            <button
-              @click="entrenamientoSeleccionadoId = null"
-              class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg font-bold hover:bg-gray-100 transition-colors cursor-pointer"
-            >
-              Cerrar
-            </button>
+          </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Transition>
 
     <!-- Modal de motivo de baja -->
     <div v-if="mostrarModalBaja" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
