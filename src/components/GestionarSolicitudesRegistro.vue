@@ -139,18 +139,18 @@
       </div>
     </div>
 
-    <!-- Modal de confirmación -->
+    <!-- Modal de rechazo (con campo de razón) -->
     <div v-if="modalAbierto" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-lg p-4 md:p-6 max-w-md w-full">
         <h3 class="text-lg md:text-xl font-bold mb-3 md:mb-4">
-          {{ tipoAccion === 'aprobar' ? '¿Aprobar solicitud?' : '¿Rechazar solicitud?' }}
+          ¿Rechazar solicitud?
         </h3>
         <p class="text-sm md:text-base text-gray-600 mb-4 break-all">
           Email: <strong>{{ solicitudSeleccionada?.email }}</strong>
         </p>
 
-        <!-- Campo de razón (solo para rechazo) -->
-        <div v-if="tipoAccion === 'rechazar'" class="mb-4">
+        <!-- Campo de razón -->
+        <div class="mb-4">
           <label class="block text-sm font-bold text-gray-700 mb-2">
             Motivo del rechazo (opcional)
           </label>
@@ -178,32 +178,51 @@
           <button
             @click="ejecutarAccion"
             :disabled="isLoading"
-            :class="[
-              'flex-1 px-4 py-2.5 md:py-2 text-white font-bold rounded-lg transition-colors disabled:opacity-50 order-1 sm:order-2 cursor-pointer',
-              tipoAccion === 'aprobar'
-                ? 'bg-green-500 hover:bg-green-600'
-                : 'bg-red-500 hover:bg-red-600'
-            ]"
+            class="flex-1 px-4 py-2.5 md:py-2 text-white font-bold rounded-lg bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-50 order-1 sm:order-2 cursor-pointer"
           >
-            {{ isLoading ? 'Procesando...' : (tipoAccion === 'aprobar' ? 'Aprobar' : 'Rechazar') }}
+            {{ isLoading ? 'Procesando...' : 'Rechazar' }}
           </button>
         </div>
       </div>
     </div>
+
+    <!-- Modal de confirmación para aprobar -->
+    <ModalConfirmacion
+      v-model="mostrarModal"
+      :titulo="modalConfig.titulo"
+      :mensaje="modalConfig.mensaje"
+      :detalles="modalConfig.detalles"
+      :tipo="modalConfig.tipo"
+      :textoConfirmar="modalConfig.textoConfirmar"
+      :cargando="modalCargando"
+      @confirmar="modalConfig.accion"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { fetchTodasSolicitudes, aprobarSolicitud, rechazarSolicitud, solicitudes, isLoadingSolicitudes, errorSolicitudes } from '../firebase/solicitudesRegistro';
+import ModalConfirmacion from './ModalConfirmacion.vue';
 
 const filtroEstado = ref('pendiente');
 const modalAbierto = ref(false);
-const tipoAccion = ref(null);
 const solicitudSeleccionada = ref(null);
 const razonRechazo = ref('');
 const errorAccion = ref(null);
 const isLoading = ref(false);
+
+// Modal de confirmación (para aprobar)
+const mostrarModal = ref(false);
+const modalCargando = ref(false);
+const modalConfig = ref({
+  titulo: '',
+  mensaje: '',
+  detalles: '',
+  tipo: 'info',
+  textoConfirmar: 'Confirmar',
+  accion: null
+});
 
 const tabs = [
   { label: 'Pendientes', value: 'pendiente' },
@@ -232,11 +251,39 @@ const formatearFecha = (date) => {
 };
 
 const abrirModal = (tipo, solicitud) => {
-  tipoAccion.value = tipo;
-  solicitudSeleccionada.value = solicitud;
-  razonRechazo.value = '';
-  errorAccion.value = null;
-  modalAbierto.value = true;
+  if (tipo === 'aprobar') {
+    // Usar ModalConfirmacion para aprobar
+    modalConfig.value = {
+      titulo: 'Aprobar Solicitud',
+      mensaje: '¿Estás seguro de que deseas aprobar esta solicitud?',
+      detalles: `Email: ${solicitud.email}`,
+      tipo: 'info',
+      textoConfirmar: 'Aprobar',
+      accion: async () => {
+        modalCargando.value = true;
+        try {
+          const success = await aprobarSolicitud(solicitud.id, solicitud.email);
+          if (success) {
+            mostrarModal.value = false;
+            await fetchTodasSolicitudes();
+          } else {
+            alert(errorSolicitudes.value || 'Error al aprobar solicitud');
+          }
+        } catch (err) {
+          alert(err.message);
+        } finally {
+          modalCargando.value = false;
+        }
+      }
+    };
+    mostrarModal.value = true;
+  } else {
+    // Para rechazar, usar modal personalizado (con textarea)
+    solicitudSeleccionada.value = solicitud;
+    razonRechazo.value = '';
+    errorAccion.value = null;
+    modalAbierto.value = true;
+  }
 };
 
 const cerrarModal = () => {
@@ -245,30 +292,18 @@ const cerrarModal = () => {
 };
 
 const ejecutarAccion = async () => {
+  // Solo se usa para rechazar ahora (aprobar usa ModalConfirmacion)
   isLoading.value = true;
   errorAccion.value = null;
 
   try {
     const uid = solicitudSeleccionada.value.id;
-
-    if (tipoAccion.value === 'aprobar') {
-      const success = await aprobarSolicitud(uid, solicitudSeleccionada.value.email);
-      if (success) {
-        cerrarModal();
-        // Recargar solicitudes
-        await fetchTodasSolicitudes();
-      } else {
-        errorAccion.value = errorSolicitudes.value || 'Error al aprobar solicitud';
-      }
+    const success = await rechazarSolicitud(uid, razonRechazo.value);
+    if (success) {
+      cerrarModal();
+      await fetchTodasSolicitudes();
     } else {
-      const success = await rechazarSolicitud(uid, razonRechazo.value);
-      if (success) {
-        cerrarModal();
-        // Recargar solicitudes
-        await fetchTodasSolicitudes();
-      } else {
-        errorAccion.value = errorSolicitudes.value || 'Error al rechazar solicitud';
-      }
+      errorAccion.value = errorSolicitudes.value || 'Error al rechazar solicitud';
     }
   } catch (err) {
     errorAccion.value = err.message;

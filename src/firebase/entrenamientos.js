@@ -8,7 +8,8 @@ import {
   updateDoc,
   query,
   where,
-  getDoc
+  getDoc,
+  onSnapshot
 } from 'firebase/firestore';
 import { db } from './config';
 
@@ -183,3 +184,90 @@ export const eliminarEntrenamiento = async (entrenamientoId) => {
     isLoadingEntrenamientos.value = false;
   }
 };
+
+// Escuchar entrenamientos por equipo en tiempo real
+export const escucharEntrenamientosPorEquipo = (equipo, callback) => {
+  let unsubscribers = [];
+  
+  // Si el equipo es 'ambos', solo escuchar los entrenamientos marcados como 'ambos'
+  if (equipo === 'ambos') {
+    const q = query(
+      collection(db, 'entrenamientos'),
+      where('equipo', '==', 'ambos')
+    );
+    
+    const unsub = onSnapshot(q, (snapshot) => {
+      entrenamientos.value = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      if (callback) callback(entrenamientos.value);
+    }, (error) => {
+      errorEntrenamientos.value = error.message;
+    });
+    
+    return unsub;
+  }
+  
+  // Para equipos específicos, escuchar tanto el equipo como 'ambos'
+  const entrenamientosMap = new Map();
+  
+  const actualizarEntrenamientos = () => {
+    entrenamientos.value = Array.from(entrenamientosMap.values());
+    if (callback) callback(entrenamientos.value);
+  };
+  
+  // Listener para entrenamientos del equipo específico
+  const q1 = query(
+    collection(db, 'entrenamientos'),
+    where('equipo', '==', equipo)
+  );
+  
+  const unsub1 = onSnapshot(q1, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+      if (change.type === 'added' || change.type === 'modified') {
+        entrenamientosMap.set(change.doc.id, {
+          id: change.doc.id,
+          ...change.doc.data()
+        });
+      } else if (change.type === 'removed') {
+        entrenamientosMap.delete(change.doc.id);
+      }
+    });
+    actualizarEntrenamientos();
+  }, (error) => {
+    errorEntrenamientos.value = error.message;
+  });
+  
+  unsubscribers.push(unsub1);
+  
+  // Listener para entrenamientos de 'ambos'
+  const q2 = query(
+    collection(db, 'entrenamientos'),
+    where('equipo', '==', 'ambos')
+  );
+  
+  const unsub2 = onSnapshot(q2, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+      if (change.type === 'added' || change.type === 'modified') {
+        entrenamientosMap.set(change.doc.id, {
+          id: change.doc.id,
+          ...change.doc.data()
+        });
+      } else if (change.type === 'removed') {
+        entrenamientosMap.delete(change.doc.id);
+      }
+    });
+    actualizarEntrenamientos();
+  }, (error) => {
+    errorEntrenamientos.value = error.message;
+  });
+  
+  unsubscribers.push(unsub2);
+  
+  // Retornar función para desuscribirse de ambos listeners
+  return () => {
+    unsubscribers.forEach(unsub => unsub());
+  };
+};
+

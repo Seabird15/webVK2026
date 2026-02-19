@@ -1129,11 +1129,24 @@
         </div>
       </div>
     </div>
+    
+    <!-- Modal de confirmación -->
+    <ModalConfirmacion
+      v-model="mostrarModal"
+      :titulo="modalConfig.titulo"
+      :mensaje="modalConfig.mensaje"
+      :detalles="modalConfig.detalles"
+      :tipo="modalConfig.tipo"
+      :texto-confirmar="modalConfig.textoConfirmar"
+      :cargando="modalCargando"
+      @confirmar="modalConfig.accion"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, onUnmounted } from 'vue';
+import ModalConfirmacion from '../components/ModalConfirmacion.vue';
 import { authUser, userRole } from '../firebase/auth';
 import { 
   obtenerDatosCampeonato,
@@ -1168,6 +1181,18 @@ const tablaPosiciones = ref([]);
 const loadingPartidos = ref(false);
 const editandoResultado = ref(false);
 const partidoEditando = ref(null);
+
+// Control del modal de confirmación
+const mostrarModal = ref(false);
+const modalCargando = ref(false);
+const modalConfig = ref({
+  titulo: '',
+  mensaje: '',
+  detalles: null,
+  tipo: 'warning',
+  textoConfirmar: 'Confirmar',
+  accion: null
+});
 const inicializandoFecha2 = ref(false);
 
 // Equipos del torneo interno (ahora vinculados a Firebase)
@@ -1308,27 +1333,37 @@ const cargarTablaPosiciones = async () => {
   }
 };
 
-const iniciarFecha2 = async () => {
+const iniciarFecha2 = () => {
   if (inicializandoFecha2.value) return;
   
-  const confirmar = confirm('¿Estás seguro de que quieres inicializar la Fecha 2? Esto agregará los 3 partidos de la segunda fecha.');
-  if (!confirmar) return;
-  
-  inicializandoFecha2.value = true;
-  try {
-    const resultado = await inicializarFecha2();
-    if (resultado.success) {
-      alert('Fecha 2 inicializada correctamente');
-      await cargarPartidos();
-    } else {
-      alert(resultado.message);
+  modalConfig.value = {
+    titulo: '¿Inicializar Fecha 2?',
+    mensaje: 'Se agregarán los 3 partidos de la segunda fecha del campeonato.',
+    detalles: 'Esta acción creará nuevos partidos en el sistema.',
+    tipo: 'warning',
+    textoConfirmar: 'Inicializar',
+    accion: async () => {
+      try {
+        modalCargando.value = true;
+        inicializandoFecha2.value = true;
+        const resultado = await inicializarFecha2();
+        if (resultado.success) {
+          alert('Fecha 2 inicializada correctamente');
+          await cargarPartidos();
+          mostrarModal.value = false;
+        } else {
+          alert(resultado.message);
+        }
+      } catch (err) {
+        console.error('Error inicializando Fecha 2:', err);
+        alert('Error al inicializar Fecha 2. Por favor intenta nuevamente.');
+      } finally {
+        inicializandoFecha2.value = false;
+        modalCargando.value = false;
+      }
     }
-  } catch (err) {
-    console.error('Error inicializando Fecha 2:', err);
-    alert('Error al inicializar Fecha 2. Por favor intenta nuevamente.');
-  } finally {
-    inicializandoFecha2.value = false;
-  }
+  };
+  mostrarModal.value = true;
 };
 
 const cambiarEstadoPartido = async (partidoId, nuevoEstado) => {

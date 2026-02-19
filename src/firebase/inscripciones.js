@@ -364,6 +364,86 @@ export const inscribirJugadoraManual = async (entrenamientoId, jugadoraId, jugad
   }
 };
 
+// Sincronizar inscripciones de convocatoria al editar entrenamiento
+export const sincronizarInscripcionesConvocatoria = async (entrenamientoId, jugadorasConvocadas) => {
+  try {
+    // Obtener todas las inscripciones actuales del entrenamiento
+    const q = query(
+      collection(db, 'inscripcionesEntrenamientos'),
+      where('entrenamientoId', '==', entrenamientoId)
+    );
+    const snapshot = await getDocs(q);
+    
+    const inscripcionesActuales = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    // Crear un Set de IDs de jugadoras convocadas para búsqueda rápida
+    const idsConvocadas = new Set(jugadorasConvocadas.map(j => j.id));
+    
+    // Crear un Set de IDs de inscripciones actuales
+    const idsInscritas = new Set(inscripcionesActuales.map(i => i.jugadoraId));
+
+    // 1. Agregar inscripciones para jugadoras nuevas en la convocatoria
+    const promesasAgregar = [];
+    for (const jugadora of jugadorasConvocadas) {
+      if (!idsInscritas.has(jugadora.id)) {
+        // Crear nueva inscripción pendiente
+        promesasAgregar.push(
+          addDoc(collection(db, 'inscripcionesEntrenamientos'), {
+            entrenamientoId: entrenamientoId,
+            jugadoraId: jugadora.id,
+            jugadoraNombre: jugadora.nombre,
+            estado: 'pendiente',
+            esConvocada: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          })
+        );
+      }
+    }
+
+    // 2. Marcar inscripciones de jugadoras que ya no están convocadas
+    const promesasActualizar = [];
+    for (const inscripcion of inscripcionesActuales) {
+      if (!idsConvocadas.has(inscripcion.jugadoraId)) {
+        // Jugadora removida de la convocatoria
+        // Solo eliminar si el estado es 'pendiente', de lo contrario solo quitar marca de convocada
+        if (inscripcion.estado === 'pendiente') {
+          promesasActualizar.push(
+            deleteDoc(doc(db, 'inscripcionesEntrenamientos', inscripcion.id))
+          );
+        } else {
+          // Si ya confirmó o se dio de baja, mantener el registro pero quitar marca de convocada
+          promesasActualizar.push(
+            updateDoc(doc(db, 'inscripcionesEntrenamientos', inscripcion.id), {
+              esConvocada: false,
+              updatedAt: new Date()
+            })
+          );
+        }
+      } else {
+        // Jugadora sigue en la convocatoria, asegurar que tenga la marca
+        promesasActualizar.push(
+          updateDoc(doc(db, 'inscripcionesEntrenamientos', inscripcion.id), {
+            esConvocada: true,
+            updatedAt: new Date()
+          })
+        );
+      }
+    }
+
+    // Ejecutar todas las promesas
+    await Promise.all([...promesasAgregar, ...promesasActualizar]);
+    
+    return true;
+  } catch (err) {
+    console.error('Error sincronizando inscripciones de convocatoria:', err);
+    return false;
+  }
+};
+
 // Cambiar estado de inscripción (para admin)
 export const cambiarEstadoInscripcion = async (inscripcionId, nuevoEstado) => {
   isLoadingInscripciones.value = true;

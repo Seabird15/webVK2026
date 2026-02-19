@@ -35,17 +35,109 @@
               </h2>
               <p class="text-gray-600">{{ jugadoraData.posicion }} - Dorsal #{{ jugadoraData.dorsal }}</p>
               
-              <!-- Próximo Cumpleaños -->
-              <div v-if="proximoCumpleanios" class="mt-3 inline-flex items-center gap-2 bg-linear-to-r from-pink-50 to-purple-50 border border-pink-200 px-3 py-2 rounded-lg">
-                <span class="text-xl">🎂</span>
-                <div class="text-xs">
-                  <p class="font-bold text-pink-700">Próximo Cumpleaños</p>
-                  <p class="text-gray-700">
-                    <span class="font-semibold">{{ proximoCumpleanios.nombre }}</span> - {{ proximoCumpleanios.fechaFormateada }}
-                    <span v-if="proximoCumpleanios.diasRestantes === 0" class="text-pink-600 font-bold ml-1">(¡Hoy!)</span>
-                    <span v-else-if="proximoCumpleanios.diasRestantes === 1" class="text-pink-600 font-bold ml-1">(¡Mañana!)</span>
-                    <span v-else class="text-gray-500 ml-1">({{ proximoCumpleanios.diasRestantes }} días)</span>
-                  </p>
+              <!-- Tarjeta de Cumpleaños Mejorada -->
+              <div v-if="cumpleaniosHoy.length > 0 || proximoCumpleanios.length > 0" class="mt-3 space-y-2">
+                <!-- Cumpleaños HOY -->
+                <div v-if="cumpleaniosHoy.length > 0" class="bg-linear-to-r from-pink-500 via-purple-500 to-indigo-500 p-3 rounded-xl shadow-lg border border-white/20 animate-pulse">
+                  <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center animate-bounce">
+                      <CakeIcon class="w-5 h-5 text-white" />
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-1.5">
+                        <h3 class="text-white font-bold text-sm uppercase tracking-wide">¡Cumpleaños HOY!</h3>
+                        <SparklesIcon class="w-4 h-4 text-yellow-300" />
+                      </div>
+                      <p class="text-white/90 text-[10px] font-medium">{{ cumpleaniosHoy.length === 1 ? 'Felicitemos a:' : 'Felicitemos a todas:' }}</p>
+                    </div>
+                  </div>
+                  <div class="space-y-1.5">
+                    <div
+                      v-for="(cumple, index) in cumpleaniosHoy"
+                      :key="index"
+                      class="bg-white/95 backdrop-blur-sm p-2 rounded-lg border border-pink-300 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                          <div class="w-7 h-7 bg-linear-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-[10px] shadow-sm">
+                            {{ obtenerIniciales(cumple.nombre) }}
+                          </div>
+                          <div>
+                            <p class="font-bold text-gray-900 text-xs">{{ cumple.nombre }}</p>
+                            <p class="text-pink-600 text-[10px] font-medium">{{ cumple.edad }} años</p>
+                          </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-0.5">
+                          <span class="bg-linear-to-r from-pink-500 to-purple-500 text-white px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm">HOY</span>
+                          <span class="text-gray-600 text-[9px] font-medium">{{ cumple.fechaFormateada }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Próximos Cumpleaños (si no hay hoy) -->
+                <div v-else-if="proximoCumpleanios.length > 0" class="bg-linear-to-r from-pink-50 via-purple-50 to-indigo-50 p-3 rounded-xl border border-pink-200 shadow-sm">
+                  <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 bg-linear-to-br from-pink-400 to-purple-400 rounded-lg flex items-center justify-center">
+                      <CakeIcon class="w-5 h-5 text-white" />
+                    </div>
+                    <div class="flex-1">
+                      <h3 class="font-bold text-pink-700 text-xs uppercase tracking-wide">Próximo{{ proximoCumpleanios.length > 1 ? 's' : '' }} Cumpleaños</h3>
+                      <p class="text-gray-600 text-[10px] font-medium">{{ proximoCumpleanios[0].diasRestantes === 1 ? '¡Mañana!' : `En ${proximoCumpleanios[0].diasRestantes} días` }}</p>
+                    </div>
+                  </div>
+                  <div class="space-y-1.5">
+                    <div
+                      v-for="(cumple, index) in proximoCumpleanios"
+                      :key="index"
+                      class="bg-white p-2 rounded-lg border border-pink-200 hover:border-pink-300 hover:shadow-sm transition-all"
+                    >
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                          <div class="w-7 h-7 bg-linear-to-br from-pink-300 to-purple-300 rounded-full flex items-center justify-center text-white font-bold text-[10px] shadow-sm">
+                            {{ obtenerIniciales(cumple.nombre) }}
+                          </div>
+                          <div>
+                            <p class="font-bold text-gray-900 text-xs">{{ cumple.nombre }}</p>
+                          </div>
+                        </div>
+                        <div class="text-right">
+                          <p class="text-gray-900 font-bold text-[10px]">{{ cumple.fechaFormateada }}</p>
+                          <p class="text-pink-600 text-[9px] font-medium">
+                            {{ cumple.diasRestantes === 1 ? '¡Mañana!' : `${cumple.diasRestantes} días` }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recordatorio Camiseta 2026 -->
+              <div class="mt-2">
+                <div class="bg-linear-to-r from-blue-500 via-blue-600 to-indigo-600 p-3 rounded-xl shadow-lg border border-blue-400/30">
+                  <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                      <ShoppingBagIcon class="w-5 h-5 text-white" />
+                    </div>
+                    <div class="flex-1">
+                      <h3 class="text-white font-bold text-sm uppercase tracking-wide">Pedido camiseta 2026</h3>
+                    </div>
+                  </div>
+                  <div class="bg-white/95 backdrop-blur-sm p-2.5 rounded-lg border border-blue-300 shadow-sm">
+                    <p class="text-gray-700 text-[11px] font-medium mb-2">Anota tu talla y número para el próximo pedido de camisetas</p>
+                    <a
+                      href="https://docs.google.com/spreadsheets/d/1u-22axEvNqGepC_yLpddVSYeWt2ZAUaQUZihyZlBRns/edit?usp=drivesdk"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="flex items-center justify-center gap-1.5 w-full px-3 py-2 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-xs font-bold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
+                    >
+                      <ShoppingBagIcon class="w-4 h-4" />
+                      Pedir Camiseta
+                      <ArrowTopRightOnSquareIcon class="w-3.5 h-3.5" />
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -124,8 +216,9 @@
               <div>
                 <h3 class="text-xl font-bold text-gray-900 mb-1">{{ entrenamiento.nombre }}</h3>
                 <!-- Indicador de convocatoria -->
-                <span v-if="entrenamiento.esConvocatoria" class="inline-block mt-1 text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded font-semibold">
-                  📋 Convocatoria
+                <span v-if="entrenamiento.esConvocatoria" class="inline-flex items-center gap-1 mt-1 text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded font-semibold">
+                  <ClipboardDocumentListIcon class="w-3 h-3" />
+                  Convocatoria
                 </span>
               </div>
               <span
@@ -152,18 +245,20 @@
             <!-- Detalles -->
             <div class="space-y-2 mb-6 text-sm text-gray-600">
               <div class="flex items-center gap-2">
-                <span class="font-bold w-24">📅 Fecha:</span>
+                <CalendarIcon class="w-4 h-4 text-primary-dark" />
+                <span class="font-bold">Fecha:</span>
                 <span>{{ formatearFecha(entrenamiento.fecha) }}</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="font-bold w-24">🕐 Hora:</span>
+                <ClockIcon class="w-4 h-4 text-primary-dark" />
+                <span class="font-bold">Hora:</span>
                 <span>{{ entrenamiento.hora }}</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="font-bold w-24">📍 Lugar:</span>
+                <MapPinIcon class="w-4 h-4 text-primary-dark" />
+                <span class="font-bold">Lugar:</span>
                 <span>{{ entrenamiento.lugar }}</span>
               </div>
-    
             </div>
 
             <!-- Descripción -->
@@ -173,20 +268,23 @@
 
             <!-- Mensaje informativo para convocatorias -->
             <div v-if="entrenamiento.esConvocatoria && !esConvocada(entrenamiento)" class="mb-4 p-3 bg-red-50 rounded-lg border border-red-200">
-              <p class="text-xs text-red-800 font-semibold">
-                ⛔ No estás en la lista de convocadas para este partido. No puedes inscribirte.
+              <p class="text-xs text-red-800 font-semibold flex items-center gap-2">
+                <NoSymbolIcon class="w-4 h-4" />
+                No estás en la lista de convocadas para este partido. No puedes inscribirte.
               </p>
             </div>
             <div v-else-if="entrenamiento.esConvocatoria && esConvocada(entrenamiento) && !estaInscrita(entrenamiento.id)" class="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
-              <p class="text-xs text-purple-800 font-semibold">
+              <p class="text-xs text-purple-800 font-semibold flex items-center gap-2">
+                <CheckCircleIcon class="w-4 h-4" />
                 ¡Has sido convocada! Por favor, confirma tu asistencia.
               </p>
             </div>
 
             <!-- Mensaje informativo cuando la fecha pasó -->
             <div v-if="fechaPasada(entrenamiento)" class="mb-4 p-3 bg-gray-100 rounded-lg border border-gray-300">
-              <p class="text-xs text-gray-700 font-semibold">
-                ⚠️ Este evento ya finalizó. No se pueden realizar cambios en la inscripción.
+              <p class="text-xs text-gray-700 font-semibold flex items-center gap-2">
+                <ExclamationTriangleIcon class="w-4 h-4" />
+                Este evento ya finalizó. No se pueden realizar cambios en la inscripción.
               </p>
             </div>
 
@@ -204,7 +302,8 @@
                     'text-2xl',
                     estadoInscripcion[entrenamiento.id] === 'confirmada' ? 'text-green-600' : 'text-red-600'
                   ]">
-                    {{ estadoInscripcion[entrenamiento.id] === 'confirmada' ? '✓' : '✕' }}
+                    <CheckIcon v-if="estadoInscripcion[entrenamiento.id] === 'confirmada'" class="w-6 h-6" />
+                    <XMarkIcon v-else class="w-6 h-6" />
                   </span>
                   <span :class="[
                     'font-bold text-sm',
@@ -224,13 +323,14 @@
                 @click="abrirModalBaja(entrenamiento)"
                 :disabled="isLoadingAccion || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                 :class="[
-                  'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm cursor-pointer',
+                  'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm cursor-pointer flex items-center justify-center gap-1',
                   fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50'
                 ]"
               >
-                🔄 Cambiar a Baja
+                <ArrowPathIcon class="w-4 h-4" />
+                Cambiar a Baja
               </button>
               <!-- Cuando está de baja - botón para cambiar a confirmada -->
               <button
@@ -238,13 +338,14 @@
                 @click="handleInscribirse(entrenamiento)"
                 :disabled="isLoadingAccion || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                 :class="[
-                  'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm cursor-pointer',
+                  'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm cursor-pointer flex items-center justify-center gap-1',
                   fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50'
                 ]"
               >
-                🔄 Cambiar a Confirmada
+                <ArrowPathIcon class="w-4 h-4" />
+                Cambiar a Confirmada
               </button>
               <!-- Botones cuando no ha respondido -->
               <template v-else>
@@ -252,32 +353,35 @@
                   @click="handleInscribirse(entrenamiento)"
                   :disabled="isLoadingAccion || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                   :class="[
-                    'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm cursor-pointer',
+                    'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm cursor-pointer flex items-center justify-center gap-1',
                     fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-green-500 text-white hover:bg-green-600 disabled:opacity-50'
                   ]"
                 >
-                  ✓ Confirmar
+                  <CheckIcon class="w-4 h-4" />
+                  Confirmar
                 </button>
                 <button
                   @click="abrirModalBaja(entrenamiento)"
                   :disabled="isLoadingAccion || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                   :class="[
-                    'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm cursor-pointer',
+                    'flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm cursor-pointer flex items-center justify-center gap-1',
                     fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-red-500 text-white hover:bg-red-600 disabled:opacity-50'
                   ]"
                 >
-                  ✕ Baja
+                  <XMarkIcon class="w-4 h-4" />
+                  Baja
                 </button>
               </template>
               <button
                 @click="verDetalles(entrenamiento)"
-                class="flex-1 px-3 py-2 border border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors text-sm cursor-pointer"
+                class="flex-1 px-3 py-2 border border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors text-sm cursor-pointer flex items-center justify-center gap-1"
               >
-                📋 Detalles
+                <ClipboardDocumentListIcon class="w-4 h-4" />
+                Detalles
               </button>
             </div>
           </div>
@@ -304,15 +408,16 @@
             </div>
             <p class="text-xs text-gray-700 mb-3 line-clamp-2">{{ ent.descripcion }}</p>
             <div class="flex gap-2 flex-wrap">
-              <button @click="verDetalles(ent)" class="flex-1 min-w-20 px-3 py-2 text-xs bg-primary text-white rounded-lg cursor-pointer hover:bg-primary/90 font-bold transition-colors">
-                ✏️ Editar Asistencia
+              <button @click="verDetalles(ent)" class="flex-1 min-w-20 px-3 py-2 text-xs bg-primary text-white rounded-lg cursor-pointer hover:bg-primary/90 font-bold transition-colors flex items-center justify-center gap-1">
+                <PencilIcon class="w-3 h-3" />
+                Editar Asistencia
               </button>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div v-if="entrenamientoSeleccionado" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" @click.self="entrenamientoSeleccionado = null">
+    <div v-if="entrenamientoSeleccionado" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" @click.self="entrenamientoSeleccionadoId = null">
       <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
         <!-- Header con gradiente -->
         <div class="sticky top-0 bg-linear-to-r from-primary-dark to-primary p-6 text-white flex justify-between items-start">
@@ -320,18 +425,20 @@
             <h2 class="text-2xl font-bold mb-2">{{ entrenamientoSeleccionado.nombre }}</h2>
             <div class="flex items-center gap-3 text-sm opacity-90">
               <span class="flex items-center gap-1">
-                📅 {{ formatearFecha(entrenamientoSeleccionado.fecha) }}
+                <CalendarIcon class="w-4 h-4" />
+                {{ formatearFecha(entrenamientoSeleccionado.fecha) }}
               </span>
               <span class="flex items-center gap-1">
-                🕐 {{ entrenamientoSeleccionado.hora }}
+                <ClockIcon class="w-4 h-4" />
+                {{ entrenamientoSeleccionado.hora }}
               </span>
             </div>
           </div>
           <button
-            @click="entrenamientoSeleccionado = null"
-            class="text-white hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-colors text-2xl cursor-pointer"
+            @click="entrenamientoSeleccionadoId = null"
+            class="text-white hover:bg-white/20 rounded-full w-10 h-10 flex items-center justify-center transition-colors cursor-pointer"
           >
-            ✕
+            <XMarkIcon class="w-6 h-6" />
           </button>
         </div>
 
@@ -340,7 +447,8 @@
             <!-- Indicador de convocatoria -->
             <div v-if="entrenamientoSeleccionado.esConvocatoria" class="p-3 bg-purple-50 rounded-lg border-l-4 border-purple-500">
               <h3 class="font-bold text-purple-900 text-xs mb-1 flex items-center gap-1">
-                📋 Partido con Convocatoria
+                <ClipboardDocumentListIcon class="w-4 h-4" />
+                Partido con Convocatoria
               </h3>
               <p class="text-xs text-purple-700">
                 Solo las jugadoras convocadas pueden confirmar su asistencia a este partido.
@@ -350,7 +458,8 @@
             <!-- Descripción -->
             <div class="bg-gray-50 rounded-lg p-3">
               <h3 class="font-bold text-gray-800 text-xs mb-1 flex items-center gap-1">
-                <span class="text-sm">📝</span> Descripción
+                <DocumentTextIcon class="w-4 h-4" />
+                Descripción
               </h3>
               <p class="text-gray-700 text-xs leading-relaxed">{{ entrenamientoSeleccionado.descripcion }}</p>
             </div>
@@ -359,7 +468,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div class="bg-blue-50 rounded-lg p-3 border border-blue-200">
                 <div class="flex items-start gap-2">
-                  <span class="text-lg">📍</span>
+                  <MapPinIcon class="w-5 h-5 text-blue-600" />
                   <div>
                     <h3 class="font-bold text-blue-900 text-xs mb-0.5">Lugar</h3>
                     <p class="text-blue-800 text-xs">{{ entrenamientoSeleccionado.lugar }}</p>
@@ -368,7 +477,7 @@
               </div>
               <div class="bg-green-50 rounded-lg p-3 border border-green-200">
                 <div class="flex items-start gap-2">
-                  <span class="text-lg">👥</span>
+                  <UserGroupIcon class="w-5 h-5 text-green-600" />
                   <div>
                     <h3 class="font-bold text-green-900 text-xs mb-0.5">Equipo</h3>
                     <p class="text-green-800 text-xs capitalize">{{ entrenamientoSeleccionado.equipo }}</p>
@@ -380,7 +489,8 @@
             <!-- Lista de Jugadoras Convocadas (si es convocatoria) -->
             <div v-if="entrenamientoSeleccionado.esConvocatoria && entrenamientoSeleccionado.jugadorasConvocadas && entrenamientoSeleccionado.jugadorasConvocadas.length > 0" class="bg-purple-50 rounded-lg p-4 border border-purple-200">
               <h3 class="font-bold text-purple-900 text-sm mb-3 flex items-center gap-2">
-                <span class="text-lg">📋</span> Jugadoras Convocadas ({{ entrenamientoSeleccionado.jugadorasConvocadas.length }})
+                <ClipboardDocumentListIcon class="w-5 h-5" />
+                Jugadoras Convocadas ({{ entrenamientoSeleccionado.jugadorasConvocadas.length }})
               </h3>
               <div class="space-y-2">
                 <div
@@ -713,7 +823,7 @@
               </button>
             </template>
             <button
-              @click="entrenamientoSeleccionado = null"
+              @click="entrenamientoSeleccionadoId = null"
               class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg font-bold hover:bg-gray-100 transition-colors cursor-pointer"
             >
               Cerrar
@@ -775,9 +885,30 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { 
+  CakeIcon,
+  SparklesIcon,
+  CalendarIcon,
+  ClockIcon,
+  MapPinIcon,
+  ClipboardDocumentListIcon,
+  DocumentTextIcon,
+  UserGroupIcon,
+  CheckIcon,
+  XMarkIcon,
+  TrophyIcon,
+  ChatBubbleLeftIcon,
+  CheckCircleIcon,
+  PencilIcon,
+  ArrowPathIcon,
+  ExclamationTriangleIcon,
+  NoSymbolIcon,
+  ShoppingBagIcon,
+  ArrowTopRightOnSquareIcon
+} from '@heroicons/vue/24/outline';
 import { logoutJugadora, jugadoraAuthUser, jugadoraData } from '../firebase/jugadorasAuth';
 import { userRole } from '../firebase/auth';
-import { fetchEntrenamientosPorEquipo, entrenamientos, isLoadingEntrenamientos } from '../firebase/entrenamientos';
+import { fetchEntrenamientosPorEquipo, entrenamientos, isLoadingEntrenamientos, escucharEntrenamientosPorEquipo } from '../firebase/entrenamientos';
 import { 
   inscribirseEntrenamiento, 
   desuscribirseEntrenamiento, 
@@ -794,7 +925,7 @@ import { db } from '../firebase/config';
 
 const router = useRouter();
 const equipoSeleccionado = ref(localStorage.getItem('categoriaSeleccionada') || jugadoraData.value?.equipo || 'ascenso');
-const entrenamientoSeleccionado = ref(null);
+const entrenamientoSeleccionadoId = ref(null);
 const inscritasEntrenamiento = ref([]);
 const inscritasOrganizadas = ref({
   confirmadas: [],
@@ -807,11 +938,19 @@ const toastMensaje = ref(null);
 const toastTipo = ref('success');
 const isLoadingAccion = ref(false);
 const unsubscribers = ref([]);
+const unsubEntrenamientos = ref(null);
 const mostrarModalBaja = ref(false);
 const motivoBaja = ref('');
 const entrenamientoParaBaja = ref(null);
 const tabActivo = ref('confirmadas'); // Para el modal de detalles
-const proximoCumpleanios = ref(null); // Para mostrar el próximo cumpleaños
+const cumpleaniosHoy = ref([]); // Cumpleaños de hoy
+const proximoCumpleanios = ref([]); // Próximos cumpleaños (mismo día)
+
+// Computed para obtener el entrenamiento seleccionado actualizado en tiempo real
+const entrenamientoSeleccionado = computed(() => {
+  if (!entrenamientoSeleccionadoId.value) return null;
+  return entrenamientos.value.find(e => e.id === entrenamientoSeleccionadoId.value) || null;
+});
 
 // Función auxiliar para obtener iniciales
 const obtenerIniciales = (nombre) => {
@@ -906,9 +1045,41 @@ const cambiarEquipo = (equipo) => {
   actualizarEstados();
 };
 
-const cargarEntrenamientos = async () => {
-  await fetchEntrenamientosPorEquipo(equipoSeleccionado.value);
-  await actualizarEstados();
+const cargarEntrenamientos = () => {
+  // Limpiar listener anterior si existe
+  if (unsubEntrenamientos.value) {
+    unsubEntrenamientos.value();
+    unsubEntrenamientos.value = null;
+  }
+  
+  // Limpiar listeners de inscripciones
+  unsubscribers.value.forEach(unsub => unsub());
+  unsubscribers.value = [];
+  
+  // Iniciar listener en tiempo real de entrenamientos
+  unsubEntrenamientos.value = escucharEntrenamientosPorEquipo(equipoSeleccionado.value, async () => {
+    await actualizarEstados();
+    
+    // Reiniciar listeners de inscripciones con los entrenamientos actualizados
+    unsubscribers.value.forEach(unsub => unsub());
+    unsubscribers.value = [];
+    
+    for (const ent of entrenamientos.value) {
+      const unsub = escucharInscripcionesEntrenamiento(ent.id, (organizadas) => {
+        conteoInscritas.value[ent.id] = {
+          confirmadas: organizadas.confirmadas.length,
+          bajas: organizadas.bajas.length,
+          pendientes: organizadas.pendientes.length
+        };
+        
+        if (entrenamientoSeleccionadoId.value === ent.id) {
+          inscritasOrganizadas.value = organizadas;
+        }
+      }, ent);
+      
+      unsubscribers.value.push(unsub);
+    }
+  });
 };
 
 const actualizarEstados = async () => {
@@ -931,7 +1102,7 @@ const estaInscrita = (entrenamientoId) => {
 };
 
 const verDetalles = (entrenamiento) => {
-  router.push(`/entrenamientos/${entrenamiento.id}`);
+  entrenamientoSeleccionadoId.value = entrenamiento.id;
 };
 
 const handleInscribirse = async (entrenamiento) => {
@@ -1000,7 +1171,7 @@ const confirmarBaja = async () => {
     mostrarToast('Te diste de baja correctamente', 'success');
     await actualizarEstados();
     cerrarModalBaja();
-    entrenamientoSeleccionado.value = null;
+    entrenamientoSeleccionadoId.value = null;
   } else {
     mostrarToast(errorInscripciones.value || 'Error al darse de baja', 'error');
   }
@@ -1046,7 +1217,7 @@ const formatearFecha = (date) => {
   });
 };
 
-// Función para calcular el próximo cumpleaños
+// Función para calcular cumpleaños de hoy y próximos
 const cargarProximoCumpleanios = async () => {
   try {
     const snapshot = await getDocs(collection(db, 'jugadoraRegistro'));
@@ -1055,48 +1226,82 @@ const cargarProximoCumpleanios = async () => {
       ...doc.data()
     }));
 
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const diaHoy = hoy.getDate();
+    const mesHoy = hoy.getMonth() + 1;
+    const anioActual = hoy.getFullYear();
+
     // Filtrar jugadoras que tengan fecha de nacimiento
     const jugadorasConCumple = todasJugadoras
       .filter(jugadora => jugadora.fechaNacimiento)
       .map(jugadora => {
-        const [anio, mes, dia] = jugadora.fechaNacimiento.split('-').map(Number);
-        const hoy = new Date();
-        const anioActual = hoy.getFullYear();
+        const [anioNacimiento, mes, dia] = jugadora.fechaNacimiento.split('-').map(Number);
         
         // Crear fecha del cumpleaños en el año actual
         let fechaCumple = new Date(anioActual, mes - 1, dia);
+        fechaCumple.setHours(0, 0, 0, 0);
         
         // Si ya pasó este año, usar el próximo año
         if (fechaCumple < hoy) {
           fechaCumple = new Date(anioActual + 1, mes - 1, dia);
         }
         
+        // Calcular edad
+        const edad = fechaCumple.getFullYear() - anioNacimiento;
+        
         return {
           nombre: `${jugadora.nombre} ${jugadora.apellido}`,
           fechaCumple: fechaCumple,
           dia: dia,
-          mes: mes
+          mes: mes,
+          edad: edad,
+          anioNacimiento: anioNacimiento
         };
       });
 
-    // Ordenar por fecha más próxima
-    jugadorasConCumple.sort((a, b) => a.fechaCumple - b.fechaCumple);
-
-    // Obtener el próximo cumpleaños
-    if (jugadorasConCumple.length > 0) {
-      const proximo = jugadorasConCumple[0];
-      const hoy = new Date();
-      const diasRestantes = Math.ceil((proximo.fechaCumple - hoy) / (1000 * 60 * 60 * 24));
-      
-      proximoCumpleanios.value = {
-        nombre: proximo.nombre,
-        fecha: proximo.fechaCumple,
-        diasRestantes: diasRestantes,
-        fechaFormateada: proximo.fechaCumple.toLocaleDateString('es-ES', {
+    // Separar cumpleaños de hoy
+    const hoyList = jugadorasConCumple.filter(j => j.dia === diaHoy && j.mes === mesHoy);
+    
+    if (hoyList.length > 0) {
+      // Si hay cumpleaños hoy, mostrar solo esos
+      cumpleaniosHoy.value = hoyList.map(j => ({
+        nombre: j.nombre,
+        edad: j.edad,
+        fechaFormateada: j.fechaCumple.toLocaleDateString('es-ES', {
           day: 'numeric',
           month: 'long'
-        })
-      };
+        }),
+        diasRestantes: 0
+      }));
+      proximoCumpleanios.value = [];
+    } else {
+      // Si no hay cumpleaños hoy, buscar los próximos
+      cumpleaniosHoy.value = [];
+      
+      // Ordenar por fecha más próxima
+      jugadorasConCumple.sort((a, b) => a.fechaCumple - b.fechaCumple);
+
+      if (jugadorasConCumple.length > 0) {
+        const primeraCumple = jugadorasConCumple[0].fechaCumple;
+        const diasRestantes = Math.ceil((primeraCumple - hoy) / (1000 * 60 * 60 * 24));
+        
+        // Obtener todos los cumpleaños del mismo día
+        const cumplesMismoDia = jugadorasConCumple.filter(j => 
+          j.fechaCumple.getTime() === primeraCumple.getTime()
+        );
+        
+        proximoCumpleanios.value = cumplesMismoDia.map(j => ({
+          nombre: j.nombre,
+          edad: j.edad,
+          fecha: j.fechaCumple,
+          diasRestantes: diasRestantes,
+          fechaFormateada: j.fechaCumple.toLocaleDateString('es-ES', {
+            day: 'numeric',
+            month: 'long'
+          })
+        }));
+      }
     }
   } catch (err) {
     console.error('Error cargando cumpleaños:', err);
@@ -1111,35 +1316,16 @@ const handleLogout = async () => {
 onMounted(() => {
   cargarEntrenamientos();
   cargarProximoCumpleanios(); // Cargar el próximo cumpleaños
-  
-  // NUEVO: Iniciar listeners para todos los entrenamientos para actualizar conteos
-  const iniciarListenersTodos = async () => {
-    await new Promise(r => setTimeout(r, 500)); // Esperar a que carguen entrenamientos
-    
-    for (const ent of entrenamientos.value) {
-      const unsub = escucharInscripcionesEntrenamiento(ent.id, (organizadas) => {
-        // Actualizar conteo para tarjetas
-        conteoInscritas.value[ent.id] = {
-          confirmadas: organizadas.confirmadas.length,
-          bajas: organizadas.bajas.length,
-          pendientes: organizadas.pendientes.length
-        };
-        
-        // Si es el entrenamiento seleccionado en el modal, actualizar inscritasOrganizadas
-        if (entrenamientoSeleccionado.value?.id === ent.id) {
-          inscritasOrganizadas.value = organizadas;
-        }
-      }, ent); // Pasar el entrenamiento completo
-      
-      unsubscribers.value.push(unsub);
-    }
-  };
-  
-  iniciarListenersTodos();
 });
 
 // Limpiar listeners cuando se desmonta el componente
 onUnmounted(() => {
+  // Limpiar listener de entrenamientos
+  if (unsubEntrenamientos.value) {
+    unsubEntrenamientos.value();
+  }
+  
+  // Limpiar listeners de inscripciones
   unsubscribers.value.forEach(unsub => unsub());
   unsubscribers.value = [];
 });

@@ -199,11 +199,24 @@
 
     <!-- Modal de edición (opcional para después) -->
     <!-- Aquí podríamos agregar un modal para editar jugadoras -->
+    
+    <!-- Modal de confirmación -->
+    <ModalConfirmacion
+      v-model="mostrarModal"
+      :titulo="modalConfig.titulo"
+      :mensaje="modalConfig.mensaje"
+      :detalles="modalConfig.detalles"
+      :tipo="modalConfig.tipo"
+      :texto-confirmar="modalConfig.textoConfirmar"
+      :cargando="modalCargando"
+      @confirmar="modalConfig.accion"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
+import ModalConfirmacion from './ModalConfirmacion.vue';
 import { 
   fetchJugadorasByEquipo, 
   crearJugadora, 
@@ -235,6 +248,18 @@ const formulario = ref({
 const equipoActual = computed(() => 
   equipos.find(e => e.id === equipoSeleccionado.value)
 );
+
+// Control del modal de confirmación
+const mostrarModal = ref(false);
+const modalCargando = ref(false);
+const modalConfig = ref({
+  titulo: '',
+  mensaje: '',
+  detalles: null,
+  tipo: 'warning',
+  textoConfirmar: 'Confirmar',
+  accion: null
+});
 
 // Cargar jugadoras cuando cambia el equipo
 watch(equipoSeleccionado, () => {
@@ -291,12 +316,29 @@ const handleAgregarJugadora = async () => {
   }
 };
 
-const confirmarEliminar = async (jugadoraId) => {
-  if (confirm('¿Estás seguro de que quieres eliminar esta jugadora?')) {
-    const jugadora = jugadoras.value.find(j => j.id === jugadoraId);
-    await eliminarJugadora(jugadoraId, jugadora.foto);
-    await cargarJugadoras();
-  }
+const confirmarEliminar = (jugadoraId) => {
+  const jugadora = jugadoras.value.find(j => j.id === jugadoraId);
+  
+  modalConfig.value = {
+    titulo: '¿Eliminar jugadora?',
+    mensaje: `Estás a punto de eliminar a ${jugadora.nombre} ${jugadora.apellido}.`,
+    detalles: 'Esta acción eliminará la jugadora y su foto. No se puede deshacer.',
+    tipo: 'danger',
+    textoConfirmar: 'Eliminar',
+    accion: async () => {
+      try {
+        modalCargando.value = true;
+        await eliminarJugadora(jugadoraId, jugadora.foto);
+        await cargarJugadoras();
+        mostrarModal.value = false;
+      } catch (err) {
+        alert('Error al eliminar: ' + err.message);
+      } finally {
+        modalCargando.value = false;
+      }
+    }
+  };
+  mostrarModal.value = true;
 };
 
 const editarJugadora = (jugadora) => {

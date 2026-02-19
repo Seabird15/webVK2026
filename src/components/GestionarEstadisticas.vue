@@ -218,11 +218,24 @@
     ]">
       {{ mensaje.texto }}
     </div>
+    
+    <!-- Modal de confirmación -->
+    <ModalConfirmacion
+      v-model="mostrarModal"
+      :titulo="modalConfig.titulo"
+      :mensaje="modalConfig.mensaje"
+      :detalles="modalConfig.detalles"
+      :tipo="modalConfig.tipo"
+      :texto-confirmar="modalConfig.textoConfirmar"
+      :cargando="modalCargando"
+      @confirmar="modalConfig.accion"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import ModalConfirmacion from './ModalConfirmacion.vue';
 import { getDocs, collection, query, where, updateDoc, doc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { PencilIcon, CheckIcon, XMarkIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/solid';
@@ -241,6 +254,18 @@ const nuevaJugadora = ref({
   apellido: '',
   goles: 0,
   asistencias: 0
+});
+
+// Control del modal de confirmación
+const mostrarModal = ref(false);
+const modalCargando = ref(false);
+const modalConfig = ref({
+  titulo: '',
+  mensaje: '',
+  detalles: null,
+  tipo: 'warning',
+  textoConfirmar: 'Confirmar',
+  accion: null
 });
 
 // Datos iniciales de estadísticas para Ascenso
@@ -396,53 +421,72 @@ const cancelarAgregar = () => {
 };
 
 // Confirmar eliminar
-const confirmarEliminar = async (jugadora) => {
-  if (!confirm(`¿Estás seguro de eliminar a ${jugadora.nombre} ${jugadora.apellido}?`)) {
-    return;
-  }
-
-  try {
-    const nombreColeccion = obtenerNombreColeccion();
-    await deleteDoc(doc(db, nombreColeccion, jugadora.id));
-    jugadoras.value = jugadoras.value.filter(j => j.id !== jugadora.id);
-    mostrarMensaje('Jugadora eliminada correctamente', 'success');
-  } catch (err) {
-    console.error('Error eliminando jugadora:', err);
-    mostrarMensaje('Error al eliminar la jugadora', 'error');
-  }
+const confirmarEliminar = (jugadora) => {
+  modalConfig.value = {
+    titulo: '¿Eliminar jugadora?',
+    mensaje: `Estás a punto de eliminar a ${jugadora.nombre} ${jugadora.apellido} de las estadísticas.`,
+    detalles: 'Esta acción no se puede deshacer.',
+    tipo: 'danger',
+    textoConfirmar: 'Eliminar',
+    accion: async () => {
+      try {
+        modalCargando.value = true;
+        const nombreColeccion = obtenerNombreColeccion();
+        await deleteDoc(doc(db, nombreColeccion, jugadora.id));
+        jugadoras.value = jugadoras.value.filter(j => j.id !== jugadora.id);
+        mostrarMensaje('Jugadora eliminada correctamente', 'success');
+        mostrarModal.value = false;
+      } catch (err) {
+        console.error('Error eliminando jugadora:', err);
+        mostrarMensaje('Error al eliminar la jugadora', 'error');
+      } finally {
+        modalCargando.value = false;
+      }
+    }
+  };
+  mostrarModal.value = true;
 };
 
 // Inicializar datos de Ascenso
-const inicializarDatosAscenso = async () => {
-  if (!confirm('¿Estás seguro de cargar los datos iniciales? Esto creará registros nuevos para las jugadoras especificadas.')) {
-    return;
-  }
+const inicializarDatosAscenso = () => {
+  modalConfig.value = {
+    titulo: '¿Cargar datos iniciales?',
+    mensaje: 'Se crearán registros nuevos para las jugadoras especificadas.',
+    detalles: 'Esto agregará las estadísticas predefinidas al sistema.',
+    tipo: 'warning',
+    textoConfirmar: 'Cargar datos',
+    accion: async () => {
+      try {
+        modalCargando.value = true;
+        inicializando.value = true;
+        let agregadas = 0;
 
-  inicializando.value = true;
-  try {
-    let agregadas = 0;
+        for (const estadistica of estadisticasIniciales) {
+          await addDoc(collection(db, 'estadisticas'), {
+            nombre: estadistica.nombre,
+            apellido: estadistica.apellido,
+            equipo: 'ascenso',
+            goles: estadistica.goles,
+            asistencias: estadistica.asistencias,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          });
+          agregadas++;
+        }
 
-    for (const estadistica of estadisticasIniciales) {
-      await addDoc(collection(db, 'estadisticas'), {
-        nombre: estadistica.nombre,
-        apellido: estadistica.apellido,
-        equipo: 'ascenso',
-        goles: estadistica.goles,
-        asistencias: estadistica.asistencias,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      });
-      agregadas++;
+        mostrarMensaje(`✅ ${agregadas} jugadoras agregadas correctamente`, 'success');
+        await cargarEstadisticas();
+        mostrarModal.value = false;
+      } catch (err) {
+        console.error('Error inicializando datos:', err);
+        mostrarMensaje('Error al cargar los datos iniciales', 'error');
+      } finally {
+        inicializando.value = false;
+        modalCargando.value = false;
+      }
     }
-
-    mostrarMensaje(`✅ ${agregadas} jugadoras agregadas correctamente`, 'success');
-    await cargarEstadisticas();
-  } catch (err) {
-    console.error('Error inicializando datos:', err);
-    mostrarMensaje('Error al cargar los datos iniciales', 'error');
-  } finally {
-    inicializando.value = false;
-  }
+  };
+  mostrarModal.value = true;
 };
 
 // Manejar cambio de equipo

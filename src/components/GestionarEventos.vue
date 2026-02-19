@@ -187,11 +187,24 @@
         </div>
       </div>
     </div>
+    
+    <!-- Modal de confirmación -->
+    <ModalConfirmacion
+      v-model="mostrarModal"
+      :titulo="modalConfig.titulo"
+      :mensaje="modalConfig.mensaje"
+      :detalles="modalConfig.detalles"
+      :tipo="modalConfig.tipo"
+      :texto-confirmar="modalConfig.textoConfirmar"
+      :cargando="modalCargando"
+      @confirmar="modalConfig.accion"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import ModalConfirmacion from './ModalConfirmacion.vue';
 import { crearEvento, actualizarEvento, eliminarEvento, obtenerTodosEventos } from '../firebase/eventos';
 
 const formulario = ref({
@@ -207,6 +220,18 @@ const formulario = ref({
 const isLoading = ref(false);
 const editandoId = ref(null);
 const eventos = ref([]);
+
+// Control del modal de confirmación
+const mostrarModal = ref(false);
+const modalCargando = ref(false);
+const modalConfig = ref({
+  titulo: '',
+  mensaje: '',
+  detalles: null,
+  tipo: 'warning',
+  textoConfirmar: 'Confirmar',
+  accion: null
+});
 
 const eventosProximos = computed(() => {
   const hoy = new Date();
@@ -304,16 +329,30 @@ const cancelarEdicion = () => {
   resetFormulario();
 };
 
-const confirmarEliminar = async (id) => {
-  if (confirm('¿Estás seguro de que deseas eliminar este evento?')) {
-    try {
-      await eliminarEvento(id);
-      alert('Evento eliminado correctamente');
-      cargarEventos();
-    } catch (err) {
-      alert('Error: ' + err.message);
+const confirmarEliminar = (id) => {
+  const evento = eventos.value.find(e => e.id === id);
+  
+  modalConfig.value = {
+    titulo: '¿Eliminar evento?',
+    mensaje: `Estás a punto de eliminar el evento "${evento?.titulo || 'Sin título'}".`,
+    detalles: 'Esta acción no se puede deshacer.',
+    tipo: 'danger',
+    textoConfirmar: 'Eliminar',
+    accion: async () => {
+      try {
+        modalCargando.value = true;
+        await eliminarEvento(id);
+        alert('Evento eliminado correctamente');
+        cargarEventos();
+        mostrarModal.value = false;
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        modalCargando.value = false;
+      }
     }
-  }
+  };
+  mostrarModal.value = true;
 };
 
 const cargarEventos = async () => {

@@ -1,30 +1,39 @@
 <template>
-  <div class="rounded-xl overflow-hidden bg-black">
-    <!-- Header estilo jugadoras -->
-    <div class="bg-linear-to-b from-primary-dark to-transparent text-white p-6">
+  <div class="rounded-xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+    <!-- Header moderno -->
+    <div class="bg-gradient-to-r from-primary-dark via-primary to-primary-light text-white p-6 shadow-xl">
       <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-        <div>
-          <h2 class="text-3xl font-bold">Entrenamientos</h2>
-          <p class="text-sm opacity-90 tracking-widest mt-1">Panel Admin</p>
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+            <CalendarIcon class="w-8 h-8" />
+          </div>
+          <div>
+            <h2 class="text-3xl font-black uppercase tracking-wide">Entrenamientos</h2>
+            <p class="text-sm opacity-90 tracking-widest mt-1">Gestión de Actividades</p>
+          </div>
         </div>
         <button
           @click="mostrarFormularioNuevo"
-          class="bg-white text-primary-dark px-4 sm:px-6 py-2.5 sm:py-2 rounded-lg font-bold hover:bg-opacity-90 transition-colors whitespace-nowrap"
+          class="bg-white text-primary-dark px-6 py-3 rounded-xl font-bold hover:bg-opacity-90 hover:scale-105 transition-all shadow-lg flex items-center gap-2 whitespace-nowrap"
         >
-          + Crear nuevo
+          <PlusCircleIcon class="w-5 h-5" />
+          Crear nuevo
         </button>
       </div>
     </div>
 
     <div class="p-6 space-y-6">
-      <!-- Filtros -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Filtros mejorados -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Equipo</label>
+            <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-2">
+              <UserGroupIcon class="w-4 h-4" />
+              Equipo
+            </label>
             <select
               v-model="filtroEquipo"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-gray-50 font-semibold transition-all"
             >
               <option value="">Todos los equipos</option>
               <option value="ascenso">Ascenso</option>
@@ -32,12 +41,15 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Buscar</label>
+            <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-2">
+              <FlagIcon class="w-4 h-4" />
+              Buscar
+            </label>
             <input
               v-model="busqueda"
               type="text"
               placeholder="Buscar por nombre o lugar..."
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-gray-50"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-gray-50 font-semibold transition-all"
             />
           </div>
         </div>
@@ -45,36 +57,44 @@
 
     <!-- Modal Nuevo/Editar Entrenamiento -->
     <Teleport to="body">
-      <div v-if="mostrarFormulario" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-2 sm:p-4">
-        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
-          <!-- Encabezado Modal -->
-          <div class="sticky top-0 bg-primary text-white p-4 sm:p-6 border-b border-gray-200 z-10">
-            <h3 class="text-lg sm:text-xl font-bold">
-              {{ entrenamientoEditando ? 'Editar Entrenamiento' : 'Nuevo Entrenamiento' }}
-            </h3>
+      <div v-if="mostrarFormulario" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-2 sm:p-4 animate-fade-in">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+          <!-- Encabezado Modal mejorado -->
+          <div class="sticky top-0 bg-gradient-to-r from-primary-dark to-primary text-white p-6 z-10 shadow-lg">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                <CalendarIcon class="w-6 h-6" />
+              </div>
+              <div>
+                <h3 class="text-xl font-black uppercase tracking-wide">
+                  {{ entrenamientoEditando ? 'Editar Entrenamiento' : 'Nuevo Entrenamiento' }}
+                </h3>
+                <p class="text-xs opacity-90 mt-1">Completa los datos del entrenamiento</p>
+              </div>
+            </div>
           </div>
 
-        <!-- Formulario -->
-        <form @submit.prevent="guardarEntrenamiento" class="p-4 sm:p-6 space-y-4">
+        <!-- Formulario mejorado -->
+        <form @submit.prevent="guardarEntrenamiento" class="p-6 space-y-6">
           <!-- Nombre -->
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Nombre *</label>
+            <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide">Nombre *</label>
             <input
               v-model="formulario.nombre"
               type="text"
               required
               placeholder="Ej: Entrenamiento Técnico"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
             />
           </div>
 
           <!-- Equipo -->
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Equipo *</label>
+            <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide">Equipo *</label>
             <select
               v-model="formulario.equipo"
               required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
             >
               <option value="">Selecciona equipo</option>
               <option value="ascenso">Ascenso</option>
@@ -85,12 +105,12 @@
 
           <!-- Tipo de actividad -->
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Tipo de actividad *</label>
+            <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide">Tipo de actividad *</label>
             <select
               v-model="formulario.tipo"
               required
               @change="onTipoChange"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
             >
               <option value="">Selecciona tipo</option>
               <option value="entrenamiento">Entrenamiento</option>
@@ -101,8 +121,8 @@
           </div>
 
           <!-- Opción de convocatoria (solo para partidos/amistosos) -->
-          <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'" class="bg-blue-50 p-3 sm:p-4 rounded-lg border-2 border-blue-200">
-            <label class="flex items-start sm:items-center gap-2 sm:gap-3 cursor-pointer">
+          <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'" class="bg-gradient-to-br from-blue-50 to-purple-50 p-4 rounded-xl border-2 border-blue-200">
+            <label class="flex items-start sm:items-center gap-3 cursor-pointer">
               <input
                 v-model="formulario.esConvocatoria"
                 type="checkbox"
@@ -110,20 +130,23 @@
                 class="w-5 h-5 mt-0.5 sm:mt-0 text-primary-dark focus:ring-2 focus:ring-primary rounded shrink-0"
               />
               <div class="flex-1">
-                <span class="text-sm font-bold text-gray-700 block">Crear convocatoria/nómina</span>
-                <p class="text-xs text-gray-600 mt-1">Selecciona las jugadoras específicas que pueden anotarse a este partido</p>
+                <div class="flex items-center gap-2">
+                  <ClipboardDocumentListIcon class="w-5 h-5 text-purple-600" />
+                  <span class="text-sm font-black text-gray-700 uppercase tracking-wide">Crear convocatoria/nómina</span>
+                </div>
+                <p class="text-xs text-gray-600 mt-1 font-medium">Selecciona las jugadoras específicas que pueden anotarse a este partido</p>
               </div>
             </label>
             
             <!-- Selector de jugadoras para convocatoria -->
             <div v-if="formulario.esConvocatoria" class="mt-4 space-y-3">
               <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">Buscar jugadoras para convocar:</label>
+                <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide">Buscar jugadoras para convocar:</label>
                 <input
                   v-model="busquedaConvocatoria"
                   type="text"
                   placeholder="Buscar por nombre..."
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
                   @input="buscarJugadorasParaConvocar"
                 />
               </div>
@@ -184,79 +207,91 @@
           <!-- Fecha y Hora -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-2">Fecha *</label>
+              <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-2">
+                <CalendarIcon class="w-4 h-4" />
+                Fecha *
+              </label>
               <input
                 v-model="formulario.fecha"
                 type="date"
                 required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
               />
             </div>
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-2">Hora *</label>
+              <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-2">
+                <ClockIcon class="w-4 h-4" />
+                Hora *
+              </label>
               <input
                 v-model="formulario.hora"
                 type="time"
                 required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
               />
             </div>
           </div>
 
           <!-- Lugar -->
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Lugar *</label>
+            <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-2">
+              <MapPinIcon class="w-4 h-4" />
+              Lugar *
+            </label>
             <input
               v-model="formulario.lugar"
               type="text"
               required
               placeholder="Ej: Gimnasio Central"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
             />
           </div>
 
           <!-- Descripción -->
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Descripción</label>
+            <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide">Descripción</label>
             <textarea
               v-model="formulario.descripcion"
               rows="3"
               placeholder="Describe el entrenamiento..."
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold resize-none"
             ></textarea>
           </div>
 
           <!-- Capacidad máxima -->
           <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">Capacidad máxima (opcional)</label>
+            <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-2">
+              <UserGroupIcon class="w-4 h-4" />
+              Capacidad máxima (opcional)
+            </label>
             <input
               v-model.number="formulario.capacidadMaxima"
               type="number"
               min="1"
               placeholder="Ej: 20"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
             />
           </div>
 
           <!-- Error -->
-          <div v-if="error" class="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p class="text-red-600 text-sm font-semibold">{{ error }}</p>
+          <div v-if="error" class="p-4 bg-gradient-to-r from-red-50 to-red-100 border-2 border-red-200 rounded-xl">
+            <p class="text-red-700 text-sm font-bold">{{ error }}</p>
           </div>
 
           <!-- Botones -->
-          <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-4 border-t border-gray-200 sticky bottom-0 bg-white -mx-4 sm:-mx-6 px-4 sm:px-6 pb-4 sm:pb-0">
+          <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t-2 border-gray-200 sticky bottom-0 bg-white -mx-6 px-6 pb-6">
             <button
               type="button"
               @click="cerrarFormulario"
               :disabled="isLoading"
-              class="flex-1 px-4 py-2.5 sm:py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-50 transition-colors disabled:opacity-50 order-2 sm:order-1"
+              class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl font-bold hover:bg-gray-50 hover:scale-[1.02] transition-all disabled:opacity-50 order-2 sm:order-1"
             >
               Cancelar
             </button>
             <button
               type="submit"
               :disabled="isLoading"
-              class="flex-1 px-4 py-2.5 sm:py-2 bg-primary-dark text-white rounded-lg font-bold hover:bg-primary transition-colors disabled:opacity-50 order-1 sm:order-2"
+              class="flex-1 px-6 py-3 bg-gradient-to-r from-primary-dark to-primary text-white rounded-xl font-bold hover:scale-[1.02] transition-all disabled:opacity-50 order-1 sm:order-2 shadow-lg"
             >
               {{ isLoading ? 'Guardando...' : 'Guardar' }}
             </button>
@@ -275,227 +310,317 @@
         <div
           v-for="entrenamiento in entrenamientosFiltrados"
           :key="entrenamiento.id"
-          class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden"
+          class="bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-primary/30 hover:scale-[1.02]"
         >
-          <div class="p-6">
-            <div class="flex flex-col  justify-between items-start mb-4 gap-2">
-              <div class="min-w-0 ">
-                <h3 class="text-xl font-bold text-gray-900 mb-1 wrap-break-word">{{ entrenamiento.nombre }}</h3>
-                <div class="flex flex-wrap gap-2 mt-1">
+          <!-- Header de la card con gradiente -->
+          <div class="bg-gradient-to-r from-primary-dark to-primary p-4">
+            <div class="flex justify-between items-start gap-3">
+              <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-black text-white mb-2 wrap-break-word">{{ entrenamiento.nombre }}</h3>
+                <div class="flex flex-wrap gap-2">
                   <span
                     v-if="entrenamiento.tipo"
                     :class="[
-                      'inline-block text-xs px-2 py-1 rounded font-semibold whitespace-nowrap',
+                      'inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-bold whitespace-nowrap',
                       entrenamiento.tipo === 'partido' || entrenamiento.tipo === 'amistoso'
-                        ? 'bg-blue-100 text-blue-800'
+                        ? 'bg-blue-500 text-white'
                         : entrenamiento.tipo === 'evento'
-                        ? 'bg-indigo-100 text-indigo-800'
-                        : 'bg-green-100 text-green-800'
+                        ? 'bg-indigo-500 text-white'
+                        : 'bg-green-500 text-white'
                     ]"
                   >
                     {{ entrenamiento.tipo }}
                   </span>
-                  <span v-if="entrenamiento.esConvocatoria" class="inline-block text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded font-semibold whitespace-nowrap">
-                    📋 Convocatoria ({{ entrenamiento.jugadorasConvocadas?.length || 0 }})
+                  <span v-if="entrenamiento.esConvocatoria" class="inline-flex items-center gap-1 text-xs bg-purple-500 text-white px-2.5 py-1 rounded-full font-bold whitespace-nowrap">
+                    <ClipboardDocumentListIcon class="w-3 h-3" />
+                    Convocatoria ({{ entrenamiento.jugadorasConvocadas?.length || 0 }})
                   </span>
-                  <span v-if="fechaPasada(entrenamiento)" class="inline-block text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded font-semibold whitespace-nowrap">
-                    ⏰ Finalizado
+                  <span v-if="fechaPasada(entrenamiento)" class="inline-flex items-center gap-1 text-xs bg-gray-500 text-white px-2.5 py-1 rounded-full font-bold whitespace-nowrap">
+                    <ClockIcon class="w-3 h-3" />
+                    Finalizado
                   </span>
                 </div>
               </div>
-              <span class="px-3 py-1 rounded-full text-xs font-bold capitalize whitespace-nowrap bg-primary text-white shrink-0">
+              <span class="px-3 py-1.5 rounded-full text-xs font-black capitalize whitespace-nowrap bg-white/20 text-white backdrop-blur-sm shrink-0">
                 {{ entrenamiento.equipo }}
               </span>
             </div>
+          </div>
 
-            <div class="space-y-2 mb-4 text-sm text-gray-600">
-              <div class="flex items-center gap-2">
-                <span class="font-bold w-24">📅 Fecha:</span>
-                <span>{{ formatearFecha(entrenamiento.fecha) }}</span>
+          <!-- Contenido de la card -->
+          <div class="p-5">
+
+            <div class="space-y-3 mb-5">
+              <div class="flex items-center gap-3 text-sm">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                  <CalendarIcon class="w-5 h-5 text-white" />
+                </div>
+                <div class="flex-1">
+                  <div class="text-xs text-gray-500 font-semibold uppercase">Fecha</div>
+                  <div class="text-sm font-bold text-gray-900">{{ formatearFecha(entrenamiento.fecha) }}</div>
+                </div>
               </div>
-              <div class="flex items-center gap-2">
-                <span class="font-bold w-24">🕐 Hora:</span>
-                <span>{{ entrenamiento.hora }}</span>
+              <div class="flex items-center gap-3 text-sm">
+                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shrink-0">
+                  <ClockIcon class="w-5 h-5 text-white" />
+                </div>
+                <div class="flex-1">
+                  <div class="text-xs text-gray-500 font-semibold uppercase">Hora</div>
+                  <div class="text-sm font-bold text-gray-900">{{ entrenamiento.hora }}</div>
+                </div>
               </div>
-              <div class="flex items-center gap-2">
-                <span class="font-bold w-24">📍 Lugar:</span>
-                <span class="truncate" :title="entrenamiento.lugar">{{ entrenamiento.lugar }}</span>
+              <div class="flex items-center gap-3 text-sm">
+                <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shrink-0">
+                  <MapPinIcon class="w-5 h-5 text-white" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-xs text-gray-500 font-semibold uppercase">Lugar</div>
+                  <div class="text-sm font-bold text-gray-900 truncate" :title="entrenamiento.lugar">{{ entrenamiento.lugar }}</div>
+                </div>
               </div>
-          
             </div>
 
             <p v-if="entrenamiento.descripcion" class="text-gray-600 text-sm mb-4 line-clamp-2">
               {{ entrenamiento.descripcion }}
             </p>
 
-            <!-- Resumen de estados -->
-            <div class="grid grid-cols-1 gap-2 mb-4 text-xs">
-              <div class="bg-green-50 p-2 rounded border border-green-200">
-                <p class="text-green-700 font-bold">✓ {{ contarPorEstado(entrenamiento.id, 'confirmada') }}</p>
-                <p class="text-green-600">Confirmadas</p>
+            <!-- Resumen de estados mejorado -->
+            <div class="grid grid-cols-3 gap-2 mb-5">
+              <div class="bg-gradient-to-br from-green-50 to-green-100 p-3 rounded-xl border-2 border-green-200 text-center">
+                <div class="flex items-center justify-center mb-1">
+                  <CheckCircleIcon class="w-5 h-5 text-green-600" />
+                </div>
+                <p class="text-2xl font-black text-green-700">{{ contarPorEstado(entrenamiento.id, 'confirmada') }}</p>
+                <p class="text-[10px] text-green-600 font-bold uppercase tracking-wide">Confirmadas</p>
               </div>
-              <div class="bg-red-50 p-2 rounded border border-red-200">
-                <p class="text-red-700 font-bold">✕ {{ contarPorEstado(entrenamiento.id, 'baja') }}</p>
-                <p class="text-red-600">Bajas</p>
+              <div class="bg-gradient-to-br from-red-50 to-red-100 p-3 rounded-xl border-2 border-red-200 text-center">
+                <div class="flex items-center justify-center mb-1">
+                  <XCircleIcon class="w-5 h-5 text-red-600" />
+                </div>
+                <p class="text-2xl font-black text-red-700">{{ contarPorEstado(entrenamiento.id, 'baja') }}</p>
+                <p class="text-[10px] text-red-600 font-bold uppercase tracking-wide">Bajas</p>
               </div>
-              <div class="bg-yellow-50 p-2 rounded border border-yellow-200">
-                <p class="text-yellow-700 font-bold">? {{ contarPorEstado(entrenamiento.id, 'pendiente') }}</p>
-                <p class="text-yellow-600">Sin respuesta</p>
+              <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-3 rounded-xl border-2 border-yellow-200 text-center">
+                <div class="flex items-center justify-center mb-1">
+                  <QuestionMarkCircleIcon class="w-5 h-5 text-yellow-600" />
+                </div>
+                <p class="text-2xl font-black text-yellow-700">{{ contarPorEstado(entrenamiento.id, 'pendiente') }}</p>
+                <p class="text-[10px] text-yellow-600 font-bold uppercase tracking-wide">Pendientes</p>
               </div>
             </div>
 
-            <div class="flex flex-col lg:flex-row gap-2">
+            <div class="space-y-2">
               <button
                 @click="verDetallesEntrenamiento(entrenamiento)"
-                class="flex-1 px-3 py-2 border border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors text-sm"
+                class="w-full px-4 py-3 bg-gradient-to-r from-primary-dark to-primary text-white rounded-xl font-bold hover:scale-[1.02] transition-all text-sm shadow-md flex items-center justify-center gap-2"
               >
+                <UserGroupIcon class="w-4 h-4" />
                 Ver Detalles
               </button>
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  @click="editarEntrenamiento(entrenamiento)"
+                  class="px-3 py-2.5 rounded-xl font-bold transition-all text-sm bg-blue-500 text-white hover:bg-blue-600 hover:scale-[1.02] shadow-sm flex items-center justify-center gap-1.5"
+                >
+                  <PencilSquareIcon class="w-4 h-4" />
+                  Editar
+                </button>
+                <button
+                  @click="confirmarEliminar(entrenamiento.id)"
+                  class="px-3 py-2.5 rounded-xl font-bold transition-all text-sm bg-red-500 text-white hover:bg-red-600 hover:scale-[1.02] shadow-sm flex items-center justify-center gap-1.5"
+                >
+                  <TrashIcon class="w-4 h-4" />
+                  Eliminar
+                </button>
+              </div>
               <button
-                @click="editarEntrenamiento(entrenamiento)"
-                class="flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm bg-blue-500 text-white hover:bg-blue-600"
+                @click="regenerarInscripciones(entrenamiento)"
+                class="w-full px-3 py-2.5 rounded-xl font-bold transition-all text-sm bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:from-yellow-600 hover:to-orange-600 hover:scale-[1.02] shadow-sm flex items-center justify-center gap-2"
+                title="Crear inscripciones pendientes para jugadoras que faltan"
               >
-                Editar
-              </button>
-              <button
-                @click="confirmarEliminar(entrenamiento.id)"
-                class="flex-1 px-3 py-2 rounded-lg font-bold transition-colors text-sm bg-red-500 text-white hover:bg-red-600"
-              >
-                Eliminar
+                <ArrowPathIcon class="w-4 h-4" />
+                Regenerar inscripciones
               </button>
             </div>
-
-            <button
-              @click="regenerarInscripciones(entrenamiento)"
-              class="w-full mt-2 px-3 py-2 rounded-lg font-bold transition-colors text-sm bg-yellow-500 text-white hover:bg-yellow-600"
-              title="Crear inscripciones pendientes para jugadoras que faltan"
-            >
-              🔄 Regenerar inscripciones
-            </button>
           </div>
         </div>
       </div>
 
       <!-- Sin resultados -->
-      <div v-else class="bg-white rounded-lg shadow p-12 text-center">
-        <p class="text-gray-500 text-lg">No hay entrenamientos disponibles</p>
+      <div v-else class="bg-white rounded-2xl shadow-lg p-12 text-center border-2 border-gray-200">
+        <div class="w-20 h-20 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">
+          <CalendarIcon class="w-10 h-10 text-gray-400" />
+        </div>
+        <p class="text-gray-500 text-lg font-semibold mb-2">No hay entrenamientos disponibles</p>
+        <p class="text-gray-400 text-sm mb-6">Comienza creando tu primer entrenamiento</p>
         <button
           @click="mostrarFormularioNuevo"
-          class="mt-4 px-6 py-2 bg-primary-dark text-white rounded-lg font-bold hover:bg-primary transition-colors"
+          class="px-6 py-3 bg-gradient-to-r from-primary-dark to-primary text-white rounded-xl font-bold hover:scale-105 transition-all shadow-lg inline-flex items-center gap-2"
         >
+          <PlusCircleIcon class="w-5 h-5" />
           Crear el primer entrenamiento
         </button>
       </div>
 
     <!-- Modal de detalles de inscripciones -->
-    <div v-if="entrenamientoDetallado" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
-      <div class="bg-white rounded-xl shadow-xl max-w-5xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
-        <!-- Header del modal -->
-        <div class="sticky top-0 bg-linear-to-b from-primary-dark to-primary text-white p-4 sm:p-6 z-10">
+    <div v-if="entrenamientoDetallado" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4 animate-fade-in">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+        <!-- Header del modal mejorado -->
+        <div class="sticky top-0 bg-gradient-to-r from-primary-dark via-primary to-primary-light text-white p-6 z-10 shadow-lg">
           <div class="flex justify-between items-start gap-4">
-            <div class="flex-1 min-w-0">
-              <h2 class="text-lg sm:text-2xl font-black uppercase tracking-wide wrap-break-word">{{ entrenamientoDetallado.nombre }}</h2>
-              <div class="text-xs sm:text-sm mt-1 opacity-90">
-                {{ formatearFecha(entrenamientoDetallado.fecha) }} • {{ entrenamientoDetallado.hora }}
+            <div class="flex-1 min-w-0 flex items-start gap-4">
+              <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm shrink-0">
+                <CalendarIcon class="w-8 h-8" />
               </div>
-              <div class="flex flex-wrap gap-2 mt-3">
-                <span class="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-bold capitalize">{{ entrenamientoDetallado.equipo }}</span>
-                <span v-if="entrenamientoDetallado.tipo" class="bg-white/20 text-white px-3 py-1 rounded-full text-xs font-bold capitalize">{{ entrenamientoDetallado.tipo }}</span>
-                <span v-if="entrenamientoDetallado.esConvocatoria" class="bg-purple-500/80 text-white px-3 py-1 rounded-full text-xs font-bold">📋 Convocatoria</span>
+              <div class="flex-1 min-w-0">
+                <h2 class="text-2xl font-black uppercase tracking-wide wrap-break-word">{{ entrenamientoDetallado.nombre }}</h2>
+                <div class="flex items-center gap-3 text-sm mt-2 opacity-90">
+                  <div class="flex items-center gap-1.5">
+                    <CalendarIcon class="w-4 h-4" />
+                    {{ formatearFecha(entrenamientoDetallado.fecha) }}
+                  </div>
+                  <span class="text-white/50">•</span>
+                  <div class="flex items-center gap-1.5">
+                    <ClockIcon class="w-4 h-4" />
+                    {{ entrenamientoDetallado.hora }}
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-3">
+                  <span class="bg-white/20 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-black capitalize">{{ entrenamientoDetallado.equipo }}</span>
+                  <span v-if="entrenamientoDetallado.tipo" class="bg-white/20 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-black capitalize">{{ entrenamientoDetallado.tipo }}</span>
+                  <span v-if="entrenamientoDetallado.esConvocatoria" class="bg-purple-500/80 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-black flex items-center gap-1">
+                    <ClipboardDocumentListIcon class="w-3 h-3" />
+                    Convocatoria
+                  </span>
+                </div>
               </div>
             </div>
             <button
               @click="entrenamientoDetallado = null"
-              class="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors shrink-0"
+              class="w-12 h-12 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center transition-all shrink-0 backdrop-blur-sm"
               aria-label="Cerrar"
             >
-              ✕
+              <XCircleIcon class="w-6 h-6" />
             </button>
           </div>
         </div>
 
-        <!-- Contenido -->
-        <div class="p-2 sm:p-6 bg-gray-50">
+        <!-- Contenido mejorado -->
+        <div class="p-6 bg-gradient-to-br from-gray-50 to-gray-100">
           <!-- Acciones y Notificaciones -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <!-- Acciones rápidas -->
-            <div class="bg-white rounded-lg border border-primary-dark p-4">
-              <div class="text-xs text-gray-500 font-bold uppercase">⚡ Acciones rápidas</div>
+            <div class="bg-white rounded-xl border-2 border-orange-200 p-5 shadow-sm">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+                  <ArrowPathIcon class="w-5 h-5 text-white" />
+                </div>
+                <div class="text-xs text-gray-600 font-black uppercase tracking-wide">Acciones rápidas</div>
+              </div>
               <button
                 @click="regenerarInscripciones(entrenamientoDetallado)"
-                class="mt-2 w-full px-3 py-2 rounded-lg font-bold transition-colors text-sm bg-yellow-500 text-white hover:bg-yellow-600"
+                class="w-full px-4 py-3 rounded-xl font-bold transition-all text-sm bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:from-yellow-600 hover:to-orange-600 hover:scale-[1.02] shadow-md flex items-center justify-center gap-2"
                 title="Crear inscripciones pendientes para jugadoras que faltan"
               >
-                🔄 Regenerar pendientes
+                <ArrowPathIcon class="w-5 h-5" />
+                Regenerar pendientes
               </button>
             </div>
             <!-- Enviar Notificación -->
-            <div class="bg-white rounded-lg border border-primary-dark p-4">
-              <div class="text-xs text-gray-500 font-bold uppercase">🔔 Enviar Notificación</div>
-              <div class="space-y-2 mt-2">
-                <input type="text" v-model="notificationData.title" placeholder="Título" class="w-full px-2 py-1 border border-gray-300 rounded-md text-sm">
-                <textarea v-model="notificationData.body" placeholder="Mensaje" rows="2" class="w-full px-2 py-1 border border-gray-300 rounded-md text-sm"></textarea>
+            <div class="bg-white rounded-xl border-2 border-blue-200 p-5 shadow-sm">
+              <div class="flex items-center gap-2 mb-4">
+                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                  <BellIcon class="w-5 h-5 text-white" />
+                </div>
+                <div class="text-xs text-gray-600 font-black uppercase tracking-wide">Enviar Notificación</div>
+              </div>
+              <div class="space-y-3">
+                <input type="text" v-model="notificationData.title" placeholder="Título" class="w-full px-3 py-2.5 border-2 border-gray-200 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                <textarea v-model="notificationData.body" placeholder="Mensaje" rows="2" class="w-full px-3 py-2.5 border-2 border-gray-200 rounded-lg text-sm font-semibold resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"></textarea>
                 <button
                   @click="enviarNotificacionEntrenamiento"
                   :disabled="isSendingNotification"
-                  class="w-full px-3 py-2 rounded-lg font-bold transition-colors text-sm bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400"
+                  class="w-full px-4 py-3 rounded-xl font-bold transition-all text-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-400 hover:scale-[1.02] shadow-md flex items-center justify-center gap-2"
                 >
+                  <BellIcon class="w-5 h-5" />
                   {{ isSendingNotification ? 'Enviando...' : 'Enviar' }}
                 </button>
               </div>
             </div>
           </div>
 
-          <!-- Tabs -->
-          <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="flex bg-gray-100 border-b-2 border-gray-200 overflow-visible">
+          <!-- Tabs mejorados -->
+          <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-gray-200">
+            <div class="flex bg-gradient-to-r from-gray-100 to-gray-50 border-b-2 border-gray-200">
               <button
                 @click="tabDetalleAdmin = 'confirmadas'"
                 :class="[
-                  'flex-1 py-3 px-4 text-xs font-bold uppercase tracking-wide transition-all relative min-h-11',
+                  'flex-1 py-4 px-4 text-xs font-black uppercase tracking-wide transition-all relative',
                   tabDetalleAdmin === 'confirmadas'
-                    ? 'text-green-700 bg-white'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    ? 'text-green-700 bg-white shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
                 ]"
               >
                 <span class="flex flex-col items-center justify-center gap-2">
-                  <span class="bg-green-700 text-white rounded-full px-2 py-0.5 text-[10px]">{{ inscritasOrganizadasAdmin.confirmadas.length }}</span>
-
-                  ✓ Confirmadas
+                  <div class="flex items-center gap-2">
+                    <CheckCircleIcon class="w-5 h-5" />
+                    Confirmadas
+                  </div>
+                  <span :class="[
+                    'rounded-full px-3 py-1 text-xs font-black',
+                    tabDetalleAdmin === 'confirmadas' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700'
+                  ]">
+                    {{ inscritasOrganizadasAdmin.confirmadas.length }}
+                  </span>
                 </span>
-                <div v-if="tabDetalleAdmin === 'confirmadas'" class="absolute bottom-0 left-0 right-0 h-1 bg-green-700"></div>
+                <div v-if="tabDetalleAdmin === 'confirmadas'" class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-green-600"></div>
               </button>
               <button
                 @click="tabDetalleAdmin = 'bajas'"
                 :class="[
-                  'flex-1 py-3 px-4 text-xs font-bold uppercase tracking-wide transition-all relative min-h-11',
+                  'flex-1 py-4 px-4 text-xs font-black uppercase tracking-wide transition-all relative',
                   tabDetalleAdmin === 'bajas'
-                    ? 'text-red-700 bg-white'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    ? 'text-red-700 bg-white shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
                 ]"
               >
                 <span class="flex flex-col items-center justify-center gap-2">
-                  ✕ Ausentes
-                  <span class="bg-red-700 text-white rounded-full px-2 py-0.5 text-[10px]">{{ inscritasOrganizadasAdmin.bajas.length }}</span>
+                  <div class="flex items-center gap-2">
+                    <XCircleIcon class="w-5 h-5" />
+                    Ausentes
+                  </div>
+                  <span :class="[
+                    'rounded-full px-3 py-1 text-xs font-black',
+                    tabDetalleAdmin === 'bajas' ? 'bg-red-600 text-white' : 'bg-red-100 text-red-700'
+                  ]">
+                    {{ inscritasOrganizadasAdmin.bajas.length }}
+                  </span>
                 </span>
-                <div v-if="tabDetalleAdmin === 'bajas'" class="absolute bottom-0 left-0 right-0 h-1 bg-red-700"></div>
+                <div v-if="tabDetalleAdmin === 'bajas'" class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 to-red-600"></div>
               </button>
               <button
                 @click="tabDetalleAdmin = 'pendientes'"
                 :class="[
-                  'flex-1 py-3 px-4 text-xs font-bold uppercase tracking-wide transition-all relative min-h-11',
+                  'flex-1 py-4 px-4 text-xs font-black uppercase tracking-wide transition-all relative',
                   tabDetalleAdmin === 'pendientes'
-                    ? 'text-yellow-700 bg-white'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    ? 'text-yellow-700 bg-white shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
                 ]"
               >
-                <span class="flex flex-col  items-center justify-center gap-2">
-                  ? Pendientes
-                  <span class="bg-yellow-700 text-white rounded-full px-2 py-0.5 text-[10px]">{{ inscritasOrganizadasAdmin.pendientes.length }}</span>
+                <span class="flex flex-col items-center justify-center gap-2">
+                  <div class="flex items-center gap-2">
+                    <QuestionMarkCircleIcon class="w-5 h-5" />
+                    Pendientes
+                  </div>
+                  <span :class="[
+                    'rounded-full px-3 py-1 text-xs font-black',
+                    tabDetalleAdmin === 'pendientes' ? 'bg-yellow-600 text-white' : 'bg-yellow-100 text-yellow-700'
+                  ]">
+                    {{ inscritasOrganizadasAdmin.pendientes.length }}
+                  </span>
                 </span>
-                <div v-if="tabDetalleAdmin === 'pendientes'" class="absolute bottom-0 left-0 right-0 h-1 bg-yellow-500"></div>
+                <div v-if="tabDetalleAdmin === 'pendientes'" class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-500 to-yellow-600"></div>
               </button>
-             
             </div>
 
             <!-- Contenido tabs -->
@@ -694,11 +819,40 @@
       </div>
     </div>
     </div>
+    
+    <!-- Modal de confirmaci\u00f3n -->
+    <ModalConfirmacion
+      v-model="mostrarModal"
+      :titulo="modalConfig.titulo"
+      :mensaje="modalConfig.mensaje"
+      :detalles="modalConfig.detalles"
+      :tipo="modalConfig.tipo"
+      :texto-confirmar="modalConfig.textoConfirmar"
+      :cargando="modalCargando"
+      @confirmar="modalConfig.accion"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { 
+  CalendarIcon, 
+  MapPinIcon, 
+  ClockIcon, 
+  UserGroupIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  QuestionMarkCircleIcon,
+  PencilSquareIcon,
+  TrashIcon,
+  ArrowPathIcon,
+  BellIcon,
+  PlusCircleIcon,
+  ClipboardDocumentListIcon,
+  FlagIcon
+} from '@heroicons/vue/24/outline';
+import ModalConfirmacion from './ModalConfirmacion.vue';
 import {
   crearEntrenamiento,
   fetchEntrenamientosPorEquipo,
@@ -709,7 +863,7 @@ import {
   errorEntrenamientos,
   entrenamientos
 } from '../firebase/entrenamientos';
-import { escucharInscripcionesEntrenamiento, cambiarEstadoInscripcion, inscribirJugadoraManual, crearInscripcionesPendientes } from '../firebase/inscripciones';
+import { escucharInscripcionesEntrenamiento, cambiarEstadoInscripcion, inscribirJugadoraManual, crearInscripcionesPendientes, sincronizarInscripcionesConvocatoria } from '../firebase/inscripciones';
 import { fetchJugadorasRegistradasPorEquipo } from '../firebase/jugadorasAuth';
 import { sendPushNotification } from '../firebase/notificaciones';
 
@@ -734,6 +888,18 @@ const notificationData = ref({ title: '', body: '' });
 
 // Mapeo para contar inscritas por estado
 const conteoInscritas = ref({});
+
+// Control del modal de confirmación
+const mostrarModal = ref(false);
+const modalCargando = ref(false);
+const modalConfig = ref({
+  titulo: '',
+  mensaje: '',
+  detalles: null,
+  tipo: 'warning',
+  textoConfirmar: 'Confirmar',
+  accion: null
+});
 
 const formulario = ref({
   nombre: '',
@@ -1118,6 +1284,14 @@ const guardarEntrenamiento = async () => {
         esConvocatoria: formulario.value.esConvocatoria,
         jugadorasConvocadas: formulario.value.jugadorasConvocadas
       });
+      
+      // Si es una convocatoria, sincronizar las inscripciones
+      if (formulario.value.esConvocatoria && formulario.value.jugadorasConvocadas.length > 0) {
+        await sincronizarInscripcionesConvocatoria(
+          entrenamientoEditando.value.id,
+          formulario.value.jugadorasConvocadas
+        );
+      }
       // // console.log('Entrenamiento actualizado');
     } else {
       // Crear
@@ -1152,41 +1326,62 @@ const guardarEntrenamiento = async () => {
   }
 };
 
-const confirmarEliminar = async (entrenamientoId) => {
-  if (confirm('¿Estás seguro que deseas eliminar este entrenamiento? También se eliminarán todas las inscripciones.')) {
-    try {
-      await eliminarEntrenamiento(entrenamientoId);
-      // // console.log('Entrenamiento eliminado');
-
-      // Recargar
-      if (filtroEquipo.value) {
-        await fetchEntrenamientosPorEquipo(filtroEquipo.value);
-      } else {
-        await fetchTodosEntrenamientos();
+const confirmarEliminar = (entrenamientoId) => {
+  modalConfig.value = {
+    titulo: '¿Eliminar entrenamiento?',
+    mensaje: 'Esta acción eliminará el entrenamiento y todas las inscripciones asociadas.',
+    detalles: 'Esta acción no se puede deshacer.',
+    tipo: 'danger',
+    textoConfirmar: 'Eliminar',
+    accion: async () => {
+      try {
+        modalCargando.value = true;
+        await eliminarEntrenamiento(entrenamientoId);
+        
+        // Recargar
+        if (filtroEquipo.value) {
+          await fetchEntrenamientosPorEquipo(filtroEquipo.value);
+        } else {
+          await fetchTodosEntrenamientos();
+        }
+        
+        mostrarModal.value = false;
+      } catch (err) {
+        alert('Error al eliminar: ' + err.message);
+      } finally {
+        modalCargando.value = false;
       }
-    } catch (err) {
-      alert('Error al eliminar: ' + err.message);
     }
-  }
+  };
+  mostrarModal.value = true;
 };
 
 // Regenerar inscripciones pendientes para un entrenamiento
-const regenerarInscripciones = async (entrenamiento) => {
-  if (confirm(`¿Crear inscripciones pendientes para todas las jugadoras del equipo ${entrenamiento.equipo}?`)) {
-    try {
-      isLoading.value = true;
-      const success = await crearInscripcionesPendientes(entrenamiento.id, entrenamiento.equipo);
-      if (success) {
-        alert('Inscripciones pendientes creadas correctamente');
-      } else {
-        alert('No se pudieron crear las inscripciones. Verifica la consola.');
+const regenerarInscripciones = (entrenamiento) => {
+  modalConfig.value = {
+    titulo: '¿Crear inscripciones?',
+    mensaje: `Se crearán inscripciones pendientes para todas las jugadoras del equipo ${entrenamiento.equipo}.`,
+    detalles: 'Esto facilitará el control de asistencia.',
+    tipo: 'info',
+    textoConfirmar: 'Crear inscripciones',
+    accion: async () => {
+      try {
+        modalCargando.value = true;
+        const success = await crearInscripcionesPendientes(entrenamiento.id, entrenamiento.equipo);
+        if (success) {
+          alert('Inscripciones pendientes creadas correctamente');
+          mostrarModal.value = false;
+        } else {
+          alert('No se pudieron crear las inscripciones. Verifica la consola.');
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        modalCargando.value = false;
       }
-    } catch (err) {
-      alert('Error: ' + err.message);
-    } finally {
-      isLoading.value = false;
     }
-  }
+  };
+  mostrarModal.value = true;
 };
 
 const formatearFecha = (fecha) => {

@@ -122,11 +122,24 @@
         </div>
       </div>
     </div>
+    
+    <!-- Modal de confirmación -->
+    <ModalConfirmacion
+      v-model="mostrarModal"
+      :titulo="modalConfig.titulo"
+      :mensaje="modalConfig.mensaje"
+      :detalles="modalConfig.detalles"
+      :tipo="modalConfig.tipo"
+      :texto-confirmar="modalConfig.textoConfirmar"
+      :cargando="modalCargando"
+      @confirmar="modalConfig.accion"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import ModalConfirmacion from './ModalConfirmacion.vue';
 import { 
   crearGaleria as crearGaleriaFirebase,
   obtenerGalerias,
@@ -145,6 +158,18 @@ const formularioGaleria = ref({
   titulo: '',
   descripcion: '',
   orden: 0
+});
+
+// Control del modal de confirmación
+const mostrarModal = ref(false);
+const modalCargando = ref(false);
+const modalConfig = ref({
+  titulo: '',
+  mensaje: '',
+  detalles: null,
+  tipo: 'warning',
+  textoConfirmar: 'Confirmar',
+  accion: null
 });
 
 const cargarGalerias = async () => {
@@ -210,35 +235,53 @@ const actualizarOrden = async (id, nuevoOrden) => {
   }
 };
 
-const eliminarGaleriaConfirm = async (id) => {
-  if (!confirm('¿Estás seguro de que quieres eliminar esta galería?')) return;
-
-  cargando.value = true;
-  try {
-    await eliminarGaleria(id);
-    await cargarGalerias();
-    alert('Galería eliminada');
-  } catch (error) {
-    // console.error('Error:', error);
-    alert('Error al eliminar galería');
-  } finally {
-    cargando.value = false;
-  }
+const eliminarGaleriaConfirm = (id) => {
+  const galeria = galerias.value.find(g => g.id === id);
+  
+  modalConfig.value = {
+    titulo: '¿Eliminar galería?',
+    mensaje: `Estás a punto de eliminar la galería "${galeria?.titulo || 'Sin título'}".`,
+    detalles: 'Se eliminarán todas las fotos asociadas. Esta acción no se puede deshacer.',
+    tipo: 'danger',
+    textoConfirmar: 'Eliminar',
+    accion: async () => {
+      try {
+        modalCargando.value = true;
+        await eliminarGaleria(id);
+        await cargarGalerias();
+        alert('Galería eliminada');
+        mostrarModal.value = false;
+      } catch (error) {
+        alert('Error al eliminar galería');
+      } finally {
+        modalCargando.value = false;
+      }
+    }
+  };
+  mostrarModal.value = true;
 };
 
-const eliminarFoto = async (galeriaId, fotoUrl) => {
-  if (!confirm('¿Estás seguro?')) return;
-
-  cargando.value = true;
-  try {
-    await eliminarFotoDeGaleria(galeriaId, fotoUrl);
-    await cargarGalerias();
-  } catch (error) {
-    // console.error('Error:', error);
-    alert('Error al eliminar foto');
-  } finally {
-    cargando.value = false;
-  }
+const eliminarFoto = (galeriaId, fotoUrl) => {
+  modalConfig.value = {
+    titulo: '¿Eliminar foto?',
+    mensaje: 'Estás a punto de eliminar esta foto de la galería.',
+    detalles: 'Esta acción no se puede deshacer.',
+    tipo: 'danger',
+    textoConfirmar: 'Eliminar',
+    accion: async () => {
+      try {
+        modalCargando.value = true;
+        await eliminarFotoDeGaleria(galeriaId, fotoUrl);
+        await cargarGalerias();
+        mostrarModal.value = false;
+      } catch (error) {
+        alert('Error al eliminar foto');
+      } finally {
+        modalCargando.value = false;
+      }
+    }
+  };
+  mostrarModal.value = true;
 };
 
 onMounted(() => {
