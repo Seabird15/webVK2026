@@ -740,7 +740,7 @@
           </div>
 
           <!-- Footer fijo con acciones -->
-          <div class="fixed bottom-0 left-0 right-0 bg-gray-900 p-4 border-t border-gray-700 z-20 shadow-2xl">
+          <div class="fixed bottom-0 left-0 right-0 bg-white p-4 border-t border-gray-700 z-20 shadow-2xl">
             <div class="max-w-4xl mx-auto">
           <!-- Mensaje si la fecha pasó -->
           <div v-if="fechaPasada(entrenamientoSeleccionado)" class="mb-4 p-3 bg-gray-100 border border-gray-300 rounded-lg">
