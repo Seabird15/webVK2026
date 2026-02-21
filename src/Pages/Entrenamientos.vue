@@ -10,12 +10,18 @@
               <span v-if="equipoSeleccionado">{{ equipoSeleccionado === 'ascenso' ? 'Equipo Ascenso' : 'Equipo Escuela' }}</span>
             </p>
           </div>
-          <button
-            @click="handleLogout"
-            class="bg-white text-red-500 my-2 hover:bg-opacity-90 px-4 py-2 rounded-lg font-bold transition-colors cursor-pointer"
-          >
-            Cerrar Sesión
-          </button>
+          <div class="flex items-center gap-2 my-2">
+            <button
+              @click="handleLogout"
+              class="bg-white text-red-500 hover:bg-opacity-90 px-4 py-2 rounded-lg font-bold transition-colors cursor-pointer"
+            >
+              Cerrar Sesión
+            </button>
+
+
+          </div>
+            <InfoUltimaActualizacion />
+
         </div>
       </div>
     </div>
@@ -23,24 +29,67 @@
     <!-- Contenido -->
     <div class="max-w-6xl mx-auto p-6">
       <!-- Información de jugadora -->
-      <div v-if="jugadoraData" class="bg-white rounded-lg shadow mb-6 p-6">
-        <div class="flex justify-between items-start">
-          <div class="flex flex-col lg:flex-row gap-4 flex-1">
-            <div v-if="jugadoraData.fotoPerfil" class="w-20 h-20 rounded-lg overflow-hidden bg-gray-100">
+      <div v-if="jugadoraData" class="mb-6 p-4 sm:p-6 bg-linear-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-white/60">
+        <div class="flex flex-col  gap-4 lg:gap-6">
+          <div class="flex flex-col  gap-4 sm:gap-5 flex-1 ">
+            <div v-if="jugadoraData.fotoPerfil" class="w-40 h-40 mx-auto  rounded-2xl overflow-hidden bg-gray-100 ring-4 ring-primary/10 shrink-0 shadow-md">
               <img :src="jugadoraData.fotoPerfil" alt="Perfil" class="w-full h-full object-cover" />
             </div>
-            <div class="flex-1">
-              <h2 class="text-2xl font-bold text-gray-900">
+            <div class="flex-1 min-w-0">
+              <h2 class="text-xl text-center sm:text-2xl font-black text-gray-900 leading-tight wrap-break-word">
                 {{ jugadoraData.nombre }} {{ jugadoraData.apellido }}
               </h2>
-              <p class="text-gray-600">{{ jugadoraData.posicion }} - Dorsal #{{ jugadoraData.dorsal }}</p>
-              
+              <p class="text-gray-600 text-center font-semibold mt-1 text-sm sm:text-base">{{ jugadoraData.posicion }} - Dorsal #{{ jugadoraData.dorsal }}</p>
+              <div class="mt-2 flex justify-center">
+                <span :class="[
+                  'inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border',
+                  jugadoraData.estadoSalud === 'lesionada'
+                    ? 'bg-red-100 text-red-700 border-red-200'
+                    : jugadoraData.estadoSalud === 'recuperacion'
+                    ? 'bg-yellow-100 text-yellow-700 border-yellow-200'
+                    : jugadoraData.estadoSalud === 'no_disponible'
+                    ? 'bg-gray-100 text-gray-700 border-gray-200'
+                    : 'bg-green-100 text-green-700 border-green-200'
+                ]">
+                  Estado: {{ formatearEstadoSalud(jugadoraData.estadoSalud) }}
+                </span>
+              </div>
+
+              <div v-if="rachaReciente" class="mt-3 bg-white border border-gray-200 rounded-xl p-3 shadow-sm">
+                <div class="flex items-center justify-between gap-3">
+                  <div>
+                    <p class="text-[11px] uppercase tracking-wide font-black text-gray-500">Racha reciente</p>
+                    <p :class="[
+                      'text-sm font-black mt-0.5',
+                      rachaReciente.estado === 'confirmada' ? 'text-green-700' : 'text-red-700'
+                    ]">
+                      {{ rachaReciente.cantidad }} {{ rachaReciente.estado === 'confirmada' ? (rachaReciente.cantidad === 1 ? 'confirmación seguida' : 'confirmaciones seguidas') : (rachaReciente.cantidad === 1 ? 'baja seguida' : 'bajas seguidas') }}
+                    </p>
+                  </div>
+                  <div :class="[
+                    'w-9 h-9 rounded-full flex items-center justify-center shrink-0',
+                    rachaReciente.estado === 'confirmada' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                  ]">
+                    <CheckIcon v-if="rachaReciente.estado === 'confirmada'" class="w-5 h-5" />
+                    <XMarkIcon v-else class="w-5 h-5" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="my-7">
+           <router-link
+            to="/perfil"
+            class="self-start mx-auto lg:w-fit justify-center flex lg:self-start shrink-0 px-4 py-2.5 bg-primary-dark text-white rounded-xl font-bold hover:bg-primary transition-colors shadow-md"
+          >
+           Editar Mi Perfil
+          </router-link>
+              </div>
               <!-- Tarjeta de Cumpleaños Mejorada -->
-              <div v-if="cumpleaniosHoy.length > 0 || proximoCumpleanios.length > 0" class="mt-3 space-y-2">
+              <div v-if="cumpleaniosHoy.length > 0 || proximoCumpleanios.length > 0" class="mt-3 space-y-2 lg:w-fit mx-auto">
                 <!-- Cumpleaños HOY -->
-                <div v-if="cumpleaniosHoy.length > 0" class="bg-linear-to-r from-pink-500 via-purple-500 to-indigo-500 p-3 rounded-xl shadow-lg border border-white/20 animate-pulse">
+                <div v-if="cumpleaniosHoy.length > 0" class="bg-linear-to-r from-pink-500 via-purple-500 to-indigo-500 p-3 sm:p-4 rounded-2xl shadow-xl border border-white/20">
                   <div class="flex items-center gap-2 mb-2">
-                    <div class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center animate-bounce">
+                    <div class="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-sm">
                       <CakeIcon class="w-5 h-5 text-white" />
                     </div>
                     <div class="flex-1">
@@ -51,23 +100,24 @@
                       <p class="text-white/90 text-[10px] font-medium">{{ cumpleaniosHoy.length === 1 ? 'Felicitemos a:' : 'Felicitemos a todas:' }}</p>
                     </div>
                   </div>
+                  
                   <div class="space-y-1.5">
                     <div
                       v-for="(cumple, index) in cumpleaniosHoy"
                       :key="index"
-                      class="bg-white/95 backdrop-blur-sm p-2 rounded-lg border border-pink-300 shadow-sm hover:shadow-md transition-shadow"
+                      class="bg-white/95 backdrop-blur-sm p-2.5 rounded-xl border border-pink-300 shadow-sm hover:shadow-md transition-shadow"
                     >
-                      <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                          <div class="w-7 h-7 bg-linear-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-[10px] shadow-sm">
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                          <div class="w-8 h-8 bg-linear-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-[10px] shadow-sm shrink-0">
                             {{ obtenerIniciales(cumple.nombre) }}
                           </div>
-                          <div>
-                            <p class="font-bold text-gray-900 text-xs">{{ cumple.nombre }}</p>
+                          <div class="min-w-0">
+                            <p class="font-bold text-gray-900 text-xs truncate">{{ cumple.nombre }}</p>
                             <p class="text-pink-600 text-[10px] font-medium">{{ cumple.edad }} años</p>
                           </div>
                         </div>
-                        <div class="flex flex-col items-end gap-0.5">
+                        <div class="flex flex-col items-end gap-0.5 shrink-0">
                           <span class="bg-linear-to-r from-pink-500 to-purple-500 text-white px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm">HOY</span>
                           <span class="text-gray-600 text-[9px] font-medium">{{ cumple.fechaFormateada }}</span>
                         </div>
@@ -77,9 +127,9 @@
                 </div>
 
                 <!-- Próximos Cumpleaños (si no hay hoy) -->
-                <div v-else-if="proximoCumpleanios.length > 0" class="bg-linear-to-r from-pink-50 via-purple-50 to-indigo-50 p-3 rounded-xl border border-pink-200 shadow-sm">
+                <div v-else-if="proximoCumpleanios.length > 0" class="w-bg-linear-to-r from-pink-50 via-purple-50 to-indigo-50 p-3 sm:p-4 rounded-2xl border border-pink-200 shadow-md">
                   <div class="flex items-center gap-2 mb-2">
-                    <div class="w-8 h-8 bg-linear-to-br from-pink-400 to-purple-400 rounded-lg flex items-center justify-center">
+                    <div class="w-9 h-9 bg-linear-to-br from-pink-400 to-purple-400 rounded-xl flex items-center justify-center shadow-sm">
                       <CakeIcon class="w-5 h-5 text-white" />
                     </div>
                     <div class="flex-1">
@@ -91,18 +141,18 @@
                     <div
                       v-for="(cumple, index) in proximoCumpleanios"
                       :key="index"
-                      class="bg-white p-2 rounded-lg border border-pink-200 hover:border-pink-300 hover:shadow-sm transition-all"
+                      class="bg-white p-2.5 rounded-xl border border-pink-200 hover:border-pink-300 hover:shadow-sm transition-all"
                     >
-                      <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                          <div class="w-7 h-7 bg-linear-to-br from-pink-300 to-purple-300 rounded-full flex items-center justify-center text-white font-bold text-[10px] shadow-sm">
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                          <div class="w-8 h-8 bg-linear-to-br from-pink-300 to-purple-300 rounded-full flex items-center justify-center text-white font-bold text-[10px] shadow-sm shrink-0">
                             {{ obtenerIniciales(cumple.nombre) }}
                           </div>
-                          <div>
-                            <p class="font-bold text-gray-900 text-xs">{{ cumple.nombre }}</p>
+                          <div class="min-w-0">
+                            <p class="font-bold text-gray-900 text-xs truncate">{{ cumple.nombre }}</p>
                           </div>
                         </div>
-                        <div class="text-right">
+                        <div class="text-right shrink-0">
                           <p class="text-gray-900 font-bold text-[10px]">{{ cumple.fechaFormateada }}</p>
                           <p class="text-pink-600 text-[9px] font-medium">
                             {{ cumple.diasRestantes === 1 ? '¡Mañana!' : `${cumple.diasRestantes} días` }}
@@ -115,23 +165,23 @@
               </div>
 
               <!-- Recordatorio Camiseta 2026 -->
-              <div class="mt-2">
-                <div class="bg-linear-to-r from-blue-500 via-blue-600 to-indigo-600 p-3 rounded-xl shadow-lg border border-blue-400/30">
+              <div class="mt-2 w-fit mx-auto">
+                <div class="bg-linear-to-r from-blue-500 via-blue-600 to-indigo-600 p-3 sm:p-4 rounded-2xl shadow-xl border border-blue-400/30">
                   <div class="flex items-center gap-2 mb-2">
-                    <div class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                    <div class="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-sm">
                       <ShoppingBagIcon class="w-5 h-5 text-white" />
                     </div>
                     <div class="flex-1">
-                      <h3 class="text-white font-bold text-sm uppercase tracking-wide">Pedido camiseta 2026</h3>
+                      <h3 class="text-white font-black text-sm uppercase tracking-wide">Pedido camiseta 2026</h3>
                     </div>
                   </div>
-                  <div class="bg-white/95 backdrop-blur-sm p-2.5 rounded-lg border border-blue-300 shadow-sm">
-                    <p class="text-gray-700 text-[11px] font-medium mb-2">Anota tu talla y número para el próximo pedido de camisetas</p>
+                  <div class="bg-white/95 backdrop-blur-sm p-3 rounded-xl border border-blue-300 shadow-sm">
+                    <p class="text-gray-700 text-[11px] font-semibold mb-2">Anota tu talla y número para el próximo pedido de camisetas</p>
                     <a
                       href="https://docs.google.com/spreadsheets/d/1u-22axEvNqGepC_yLpddVSYeWt2ZAUaQUZihyZlBRns/edit?usp=drivesdk"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="flex items-center justify-center gap-1.5 w-full px-3 py-2 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-xs font-bold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
+                      class="flex items-center justify-center gap-1.5 w-full px-3 py-2.5 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs font-bold hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
                     >
                       <ShoppingBagIcon class="w-4 h-4" />
                       Pedir Camiseta
@@ -142,12 +192,7 @@
               </div>
             </div>
           </div>
-          <router-link
-            to="/perfil"
-            class="px-4 py-2 bg-primary-dark text-white rounded-lg font-bold hover:bg-primary-dark transition-colors"
-          >
-            Mi Perfil
-          </router-link>
+ 
         </div>
       </div>
 
@@ -431,14 +476,14 @@
       leave-from-class="opacity-100 translate-x-0"
       leave-to-class="opacity-0 translate-x-full"
     >
-      <div v-if="entrenamientoSeleccionado" class="fixed inset-0 bg-black z-50 overflow-y-auto">
-        <div class="min-h-screen pb-24">
+      <div v-if="entrenamientoSeleccionado" class="fixed inset-0 bg-white overscroll-none z-50 overflow-y-auto">
+        <div class="min-h-screen pb-10">
           <!-- Header con gradiente -->
-          <div class="sticky top-0 bg-linear-to-r from-primary-dark to-primary text-white p-6 z-20 shadow-lg">
+          <div class="bg-linear-to-r from-primary-dark to-primary text-white p-5 sm:p-6 shadow-lg border-b border-white/10">
             <div class="max-w-4xl mx-auto">
               <button
                 @click="entrenamientoSeleccionadoId = null"
-                class="mb-4 flex items-center gap-2 text-white/90 hover:text-white transition-colors group"
+                class="mb-4 inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors group bg-white/10 px-3 py-2 rounded-xl"
               >
                 <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -449,7 +494,7 @@
               <div class="flex justify-between items-start gap-4">
                 <div class="flex-1">
                   <h2 class="text-2xl font-bold mb-2">{{ entrenamientoSeleccionado.nombre }}</h2>
-                  <div class="flex items-center gap-3 text-sm opacity-90">
+                  <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-sm opacity-90">
                     <span class="flex items-center gap-1">
                       <CalendarIcon class="w-4 h-4" />
                       {{ formatearFecha(entrenamientoSeleccionado.fecha) }}
@@ -512,73 +557,76 @@
      
 
             <!-- CONVOCATORIA - Estilo App Deportiva -->
-            <div class="bg-linear-to-b from-gray-50 to-white rounded-xl border border-gray-200 overflow-hidden">
+            <div class="bg-linear-to-b from-gray-50 to-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
               <!-- Stats Bar -->
-              <div class=" px-4 py-3">
-                <h3 class="text-black font-black text-xs uppercase tracking-wider mb-2">Lista de Convocatoria</h3>
+              <div class="px-4 py-3 bg-white border-b border-gray-100">
+                <h3 class="text-gray-900 font-black text-xs uppercase tracking-wider mb-2">Lista de Convocatoria</h3>
                 <div class="grid grid-cols-3 gap-2">
-                  <div class="bg-white/10 backdrop-blur rounded-lg px-2 py-1.5 text-center">
-                    <div class="text-green-400 font-black text-lg">{{ inscritasOrganizadas.confirmadas.length }}</div>
-                    <div class="text-white/70 text-[9px] font-bold uppercase">Confirmadas</div>
+                  <div class="bg-green-50 rounded-lg px-2 py-1.5 text-center border border-green-100">
+                    <div class="text-green-600 font-black text-lg">{{ inscritasOrganizadas.confirmadas.length }}</div>
+                    <div class="text-green-700 text-[9px] font-bold uppercase truncate">Confirmadas</div>
                   </div>
-                  <div class="bg-white/10 backdrop-blur rounded-lg px-2 py-1.5 text-center">
-                    <div class="text-red-400 font-black text-lg">{{ inscritasOrganizadas.bajas.length }}</div>
-                    <div class="text-white/70 text-[9px] font-bold uppercase">Ausentes</div>
+                  <div class="bg-red-50 rounded-lg px-2 py-1.5 text-center border border-red-100">
+                    <div class="text-red-600 font-black text-lg">{{ inscritasOrganizadas.bajas.length }}</div>
+                    <div class="text-red-700 text-[9px] font-bold uppercase">Ausentes</div>
                   </div>
-                  <div class="bg-white/10 backdrop-blur shadow rounded-lg px-2 py-1.5 text-center">
-                    <div class="text-yellow-400 font-black text-lg">{{ inscritasOrganizadas.pendientes.length }}</div>
-                    <div class="text-white/70 text-[9px] font-bold uppercase">Sin Respuesta</div>
+                  <div class="bg-yellow-50 rounded-lg px-2 py-1.5 text-center border border-yellow-100">
+                    <div class="text-yellow-600 font-black text-lg">{{ inscritasOrganizadas.pendientes.length }}</div>
+                    <div class="text-yellow-700 text-[9px] font-bold uppercase">Pendientes</div>
                   </div>
                 </div>
               </div>
 
               <!-- Tabs -->
-              <div class="flex bg-gray-100 border-b border-gray-200">
+              <div class="grid grid-cols-3 bg-gray-100 border-b border-gray-200">
                 <button
                   @click="tabActivo = 'confirmadas'"
                   :class="[
-                    'flex-1 py-2 px-3 text-[10px] font-bold uppercase tracking-wide transition-all relative cursor-pointer',
+                    'w-full py-2 px-1.5 sm:px-3 text-[9px] sm:text-[10px] font-bold uppercase tracking-wide transition-all relative cursor-pointer',
                     tabActivo === 'confirmadas'
                       ? 'text-green-700 bg-white'
                       : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                   ]"
                 >
-                  <span class="flex items-center justify-center gap-1">
+                  <span class="flex items-center justify-center gap-1 min-w-0">
                     <span>✓</span>
-                    <span>Confirmadas</span>
-                    <span class="ml-1 bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px]">{{ inscritasOrganizadas.confirmadas.length }}</span>
+                    <span class="hidden sm:inline truncate">Confirmadas</span>
+                    <span class="sm:hidden">Conf.</span>
+                    <span class="ml-1 bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] shrink-0">{{ inscritasOrganizadas.confirmadas.length }}</span>
                   </span>
                   <div v-if="tabActivo === 'confirmadas'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-green-500"></div>
                 </button>
                 <button
                   @click="tabActivo = 'bajas'"
                   :class="[
-                    'flex-1 py-2 px-3 text-[10px] font-bold uppercase tracking-wide transition-all relative cursor-pointer',
+                    'w-full py-2 px-1.5 sm:px-3 text-[9px] sm:text-[10px] font-bold uppercase tracking-wide transition-all relative cursor-pointer',
                     tabActivo === 'bajas'
                       ? 'text-red-700 bg-white'
                       : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                   ]"
                 >
-                  <span class="flex items-center justify-center gap-1">
+                  <span class="flex items-center justify-center gap-1 min-w-0">
                     <span>✕</span>
-                    <span>Ausentes</span>
-                    <span class="ml-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px]">{{ inscritasOrganizadas.bajas.length }}</span>
+                    <span class="hidden sm:inline">Ausentes</span>
+                    <span class="sm:hidden">Aus.</span>
+                    <span class="ml-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] shrink-0">{{ inscritasOrganizadas.bajas.length }}</span>
                   </span>
                   <div v-if="tabActivo === 'bajas'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500"></div>
                 </button>
                 <button
                   @click="tabActivo = 'pendientes'"
                   :class="[
-                    'flex-1 py-2 px-3 text-[10px] font-bold uppercase tracking-wide transition-all relative cursor-pointer',
+                    'w-full py-2 px-1.5 sm:px-3 text-[9px] sm:text-[10px] font-bold uppercase tracking-wide transition-all relative cursor-pointer',
                     tabActivo === 'pendientes'
                       ? 'text-yellow-700 bg-white'
                       : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                   ]"
                 >
-                  <span class="flex items-center justify-center gap-1">
+                  <span class="flex items-center justify-center gap-1 min-w-0">
                     <span>⏳</span>
-                    <span>Pendientes</span>
-                    <span class="ml-1 bg-yellow-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px]">{{ inscritasOrganizadas.pendientes.length }}</span>
+                    <span class="hidden sm:inline">Pendientes</span>
+                    <span class="sm:hidden">Pend.</span>
+                    <span class="ml-1 bg-yellow-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] shrink-0">{{ inscritasOrganizadas.pendientes.length }}</span>
                   </span>
                   <div v-if="tabActivo === 'pendientes'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-500"></div>
                 </button>
@@ -739,9 +787,9 @@
             </div>
           </div>
 
-          <!-- Footer fijo con acciones -->
-          <div class="fixed bottom-0 left-0 right-0 bg-white p-4 border-t border-gray-700 z-20 shadow-2xl">
-            <div class="max-w-4xl mx-auto">
+          <!-- Acciones del evento -->
+          <div class="max-w-4xl mx-auto px-4 pb-6">
+            <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-lg">
           <!-- Mensaje si la fecha pasó -->
           <div v-if="fechaPasada(entrenamientoSeleccionado)" class="mb-4 p-3 bg-gray-100 border border-gray-300 rounded-lg">
             <p class="text-sm text-gray-700 font-semibold">
@@ -779,6 +827,14 @@
           </div>
           
           <div class="flex flex-col gap-2">
+            <div v-if="mensajeDetalle" :class="[
+              'mb-2 px-3 py-2 rounded-lg border text-sm font-semibold',
+              tipoMensajeDetalle === 'success'
+                ? 'bg-green-50 border-green-300 text-green-700'
+                : 'bg-red-50 border-red-300 text-red-700'
+            ]">
+              {{ mensajeDetalle }}
+            </div>
             <!-- Si ya confirmó - botón para cambiar a baja -->
             <button
               v-if="estadoInscripcion[entrenamientoSeleccionado.id] === 'confirmada'"
@@ -835,8 +891,8 @@
               </button>
             </template>
           </div>
-            </div>
           </div>
+            </div>
         </div>
       </div>
     </Transition>
@@ -930,6 +986,7 @@ import {
 } from '../firebase/inscripciones';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
 
 const router = useRouter();
 const equipoSeleccionado = ref(localStorage.getItem('categoriaSeleccionada') || jugadoraData.value?.equipo || 'ascenso');
@@ -941,6 +998,8 @@ const estadoInscripcion = ref({});
 const conteoInscritas = ref({}); // NUEVO: Mapeo de conteos por entrenamiento
 const toastMensaje = ref(null);
 const toastTipo = ref('success');
+const mensajeDetalle = ref('');
+const tipoMensajeDetalle = ref('success');
 const isLoadingAccion = ref(false);
 const unsubscribers = ref([]);
 const unsubEntrenamientos = ref(null);
@@ -952,6 +1011,7 @@ const cumpleaniosHoy = ref([]); // Cumpleaños de hoy
 const proximoCumpleanios = ref([]); // Próximos cumpleaños (mismo día)
 const cargandoInscripciones = ref({}); // Estado de carga por entrenamiento
 const primeraCarga = ref(true); // Para mostrar loader en primera carga
+let timeoutMensajeDetalle = null;
 
 // Computed para obtener el entrenamiento seleccionado actualizado en tiempo real
 const entrenamientoSeleccionado = computed(() => {
@@ -1008,6 +1068,36 @@ const entrenamientosFiltered = computed(() => {
       const fechaB = new Date(b.fecha?.seconds ? b.fecha.seconds * 1000 : b.fecha || 0);
       return fechaA.getTime() - fechaB.getTime();
     });
+});
+
+const rachaReciente = computed(() => {
+  const historialConRespuesta = entrenamientos.value
+    .filter(e => e.equipo === equipoSeleccionado.value)
+    .map(e => {
+      const fecha = new Date(e.fecha?.seconds ? e.fecha.seconds * 1000 : e.fecha || 0);
+      return {
+        id: e.id,
+        fechaMs: Number.isNaN(fecha.getTime()) ? 0 : fecha.getTime(),
+        estado: estadoInscripcion.value[e.id]
+      };
+    })
+    .filter(item => item.estado === 'confirmada' || item.estado === 'baja')
+    .sort((a, b) => b.fechaMs - a.fechaMs);
+
+  if (!historialConRespuesta.length) return null;
+
+  const estadoBase = historialConRespuesta[0].estado;
+  let cantidad = 0;
+
+  for (const item of historialConRespuesta) {
+    if (item.estado !== estadoBase) break;
+    cantidad += 1;
+  }
+
+  return {
+    estado: estadoBase,
+    cantidad
+  };
 });
 
 // Retorna true si el evento terminó hace más de 24 horas
@@ -1146,6 +1236,16 @@ const estaInscrita = (entrenamientoId) => {
 
 const verDetalles = (entrenamiento) => {
   entrenamientoSeleccionadoId.value = entrenamiento.id;
+  mensajeDetalle.value = '';
+};
+
+const mostrarMensajeDetalle = (mensaje, tipo = 'success') => {
+  mensajeDetalle.value = mensaje;
+  tipoMensajeDetalle.value = tipo;
+  if (timeoutMensajeDetalle) clearTimeout(timeoutMensajeDetalle);
+  timeoutMensajeDetalle = setTimeout(() => {
+    mensajeDetalle.value = '';
+  }, 3000);
 };
 
 const handleInscribirse = async (entrenamiento) => {
@@ -1176,6 +1276,9 @@ const handleInscribirse = async (entrenamiento) => {
 
   if (success) {
     mostrarToast('¡Asistencia confirmada!', 'success');
+    if (entrenamientoSeleccionadoId.value === entrenamiento.id) {
+      mostrarMensajeDetalle('✅ Asistencia confirmada correctamente', 'success');
+    }
     await actualizarEstados();
   } else {
     mostrarToast(errorInscripciones.value || 'Error al inscribirse', 'error');
@@ -1212,9 +1315,11 @@ const confirmarBaja = async () => {
 
   if (success) {
     mostrarToast('Te diste de baja correctamente', 'success');
+    if (entrenamientoSeleccionadoId.value === entrenamientoParaBaja.value.id) {
+      mostrarMensajeDetalle('✕ Te diste de baja correctamente', 'error');
+    }
     await actualizarEstados();
     cerrarModalBaja();
-    entrenamientoSeleccionadoId.value = null;
   } else {
     mostrarToast(errorInscripciones.value || 'Error al darse de baja', 'error');
   }
@@ -1269,6 +1374,16 @@ const formatearFechaInscripcion = (date) => {
     hour: '2-digit',
     minute: '2-digit'
   });
+};
+
+const formatearEstadoSalud = (estado) => {
+  const map = {
+    disponible: 'Disponible',
+    lesionada: 'Lesionada',
+    recuperacion: 'En recuperación',
+    no_disponible: 'No disponible'
+  };
+  return map[estado] || 'Disponible';
 };
 
 // Función para calcular cumpleaños de hoy y próximos
@@ -1374,6 +1489,11 @@ onMounted(() => {
 
 // Limpiar listeners cuando se desmonta el componente
 onUnmounted(() => {
+  if (timeoutMensajeDetalle) {
+    clearTimeout(timeoutMensajeDetalle);
+    timeoutMensajeDetalle = null;
+  }
+
   // Limpiar listener de entrenamientos
   if (unsubEntrenamientos.value) {
     unsubEntrenamientos.value();

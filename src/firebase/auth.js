@@ -2,7 +2,9 @@ import { ref } from 'vue';
 import { 
   signInWithEmailAndPassword, 
   signOut, 
-  onAuthStateChanged 
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence
 } from 'firebase/auth';
 import { auth, db } from './config';
 import { doc, getDoc } from 'firebase/firestore';
@@ -48,6 +50,7 @@ export const login = async (email, password) => {
   isLoading.value = true;
   error.value = null;
   try {
+    await setPersistence(auth, browserLocalPersistence);
     const result = await signInWithEmailAndPassword(auth, email, password);
     const uid = result.user.uid;
     // // console.log('Usuario autenticado. UID:', uid);

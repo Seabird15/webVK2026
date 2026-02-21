@@ -100,13 +100,13 @@
           <!-- Contenido principal -->
           <div class="text-center md:text-left">
             <h2 class="text-2xl md:text-4xl font-black text-black mb-1 uppercase" style="font-family: 'Gobold High', sans-serif;">
-              ¡Revisa los Resultados del Campeonato Interno VKS!
+              ¡HOY: FECHA 3 DEL CAMPEONATO INTERNO VKS!
             </h2>
             <p class="text-black/90 font-bold text-sm md:text-base mb-2">
-              1er Campeonato Interno Vikingas - Resultados Actualizados
+              Última jornada de la fase regular • Resultados en vivo y edición en tiempo real
             </p>
             <p class="text-black/70 text-xs md:text-sm font-semibold">
-              Sábado 7 de Febrero 2026 | Tricolor La Florida | 3 equipos mixtos
+              Sábado 21 de Febrero 2026 | Tricolor La Florida | 3 equipos mixtos
             </p>
           </div>
           
@@ -116,20 +116,24 @@
             <button
               @click="toggleLike"
               :disabled="isLikeLoading"
-              class="flex items-center gap-2 bg-white/20 backdrop-blur-md hover:bg-white/30 text-black border-2 border-black/30 px-4 py-3 rounded-lg font-bold text-sm transition-all transform hover:scale-105 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              class="flex items-center gap-2.5 bg-white/30 backdrop-blur-md hover:bg-white/40 text-black border-2 border-black/30 px-4 py-3 rounded-lg font-black text-sm transition-all transform hover:scale-105 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed min-w-40 justify-center"
             >
               <HeartIconSolid v-if="hasLiked" class="w-6 h-6 text-red-500 transition-all" />
               <HeartIcon v-else class="w-6 h-6 text-black transition-all" />
               <span>{{ likesCount }}</span>
+              <span class="text-xs font-bold opacity-80">likes</span>
             </button>
             
             <!-- CTA Ver Resultados -->
             <router-link
               to="/competencias"
-              class="inline-block bg-black hover:bg-gray-900 text-primary px-6 py-3 rounded-lg font-bold text-sm transition-all transform hover:scale-105 shadow-xl"
+              class="inline-flex items-center gap-2 bg-black hover:bg-gray-900 text-primary px-6 py-3 rounded-lg font-black text-sm transition-all transform hover:scale-105 shadow-xl"
             >
-              Ver Resultados →
+              Ver Fecha 3 ahora
+              <span aria-hidden="true">→</span>
             </router-link>
+
+        
           </div>
         </div>
       </div>
@@ -219,7 +223,7 @@ const toggleLike = async () => {
       await updateDoc(docRef, {
         count: increment(-1)
       });
-      likesCount.value--;
+      likesCount.value = Math.max(0, likesCount.value - 1);
       hasLiked.value = false;
       localStorage.removeItem('campeonato_liked');
     } else {

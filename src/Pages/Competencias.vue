@@ -558,6 +558,19 @@
             </button>
           </div>
 
+          <!-- Botón Admin: Inicializar Fecha 3 -->
+          <div v-if="isAdmin" class="mt-4 text-center">
+            <button
+              @click="iniciarFecha3"
+              :disabled="inicializandoFecha3 || tieneFecha3"
+              class="bg-primary hover:bg-primary/90 text-black px-6 py-3 rounded-lg font-bold transition-all transform hover:scale-105 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span v-if="inicializandoFecha3">Inicializando...</span>
+              <span v-else-if="tieneFecha3">✅ Fecha 3 ya inicializada</span>
+              <span v-else>➕ Inicializar Fecha 3 (Hoy)</span>
+            </button>
+          </div>
+
           <!-- Resultados por Fecha (Dinámico) -->
           <div v-for="numeroFecha in fechasOrdenadas" :key="`fecha-${numeroFecha}`" class="bg-black border-2 border-primary rounded-lg p-4 sm:p-8 mt-8">
             <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4 sm:mb-6 text-center flex items-center justify-center gap-2 sm:gap-3" style="font-family: 'Collegiate Black', sans-serif;">
@@ -1165,7 +1178,8 @@ import {
   escucharPartidos,
   escucharTabla,
   calcularTabla,
-  inicializarFecha2
+  inicializarFecha2,
+  inicializarFecha3
 } from '../firebase/campeonatoInterno';
 
 const tabla = ref([]);
@@ -1194,6 +1208,7 @@ const modalConfig = ref({
   accion: null
 });
 const inicializandoFecha2 = ref(false);
+const inicializandoFecha3 = ref(false);
 
 // Equipos del torneo interno (ahora vinculados a Firebase)
 const equipos = computed(() => equiposCampeonato.value);
@@ -1366,6 +1381,39 @@ const iniciarFecha2 = () => {
   mostrarModal.value = true;
 };
 
+const iniciarFecha3 = () => {
+  if (inicializandoFecha3.value) return;
+
+  modalConfig.value = {
+    titulo: '¿Inicializar Fecha 3?',
+    mensaje: 'Se agregarán los 3 partidos de la tercera fecha del campeonato (hoy).',
+    detalles: 'Esta acción creará nuevos partidos en el sistema.',
+    tipo: 'warning',
+    textoConfirmar: 'Inicializar',
+    accion: async () => {
+      try {
+        modalCargando.value = true;
+        inicializandoFecha3.value = true;
+        const resultado = await inicializarFecha3();
+        if (resultado.success) {
+          alert('Fecha 3 inicializada correctamente');
+          await cargarPartidos();
+          mostrarModal.value = false;
+        } else {
+          alert(resultado.message);
+        }
+      } catch (err) {
+        console.error('Error inicializando Fecha 3:', err);
+        alert('Error al inicializar Fecha 3. Por favor intenta nuevamente.');
+      } finally {
+        inicializandoFecha3.value = false;
+        modalCargando.value = false;
+      }
+    }
+  };
+  mostrarModal.value = true;
+};
+
 const cambiarEstadoPartido = async (partidoId, nuevoEstado) => {
   try {
     await actualizarEstadoPartido(partidoId, nuevoEstado);
@@ -1392,6 +1440,8 @@ const obtenerTituloFecha = (numeroFecha) => {
     return 'FECHA 1 - SÁBADO 7 DE FEBRERO';
   } else if (numeroFecha == 2) {
     return 'FECHA 2 - SÁBADO 14 DE FEBRERO';
+  } else if (numeroFecha == 3) {
+    return 'FECHA 3 - SÁBADO 21 DE FEBRERO';
   }
   return `FECHA ${numeroFecha}`;
 };
@@ -1409,6 +1459,8 @@ const obtenerEstadoFecha = (partidos) => {
 const fechasOrdenadas = computed(() => {
   return Object.keys(partidosPorFecha.value).map(Number).sort((a, b) => a - b);
 });
+
+const tieneFecha3 = computed(() => fechasOrdenadas.value.includes(3));
 
 const obtenerDatosEquipo = (equipoKey) => {
   const equiposData = {

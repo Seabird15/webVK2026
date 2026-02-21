@@ -28,7 +28,7 @@
     </div>
 
     <!-- Contenido principal -->
-    <div v-if="entrenamiento" class="max-w-6xl mx-auto p-4 bg-linear-to-b from-primary-dark to-transparent">
+    <div v-if="entrenamiento" class="max-w-6xl mx-auto p-4 bg-black">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <!-- Columna izquierda - Info del evento -->
         <div class="lg:col-span-1 space-y-4">

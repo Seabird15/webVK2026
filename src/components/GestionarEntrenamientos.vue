@@ -8,7 +8,7 @@
             <CalendarIcon class="w-8 h-8" />
           </div>
           <div>
-            <h2 class="text-3xl font-black uppercase tracking-wide">Entrenamientos</h2>
+            <h2 class="lg:text-3xl text-xl font-black uppercase tracking-wide">Entrenamientos</h2>
             <p class="text-sm opacity-90 tracking-widest mt-1">Gestión de Actividades</p>
           </div>
         </div>
@@ -391,7 +391,7 @@
                   <CheckCircleIcon class="w-5 h-5 text-green-600" />
                 </div>
                 <p class="text-2xl font-black text-green-700">{{ contarPorEstado(entrenamiento.id, 'confirmada') }}</p>
-                <p class="text-[10px] text-green-600 font-bold uppercase tracking-wide">Confirmadas</p>
+                <p class="text-[10px] text-green-600 font-bold uppercase tracking-wide">Anotadas</p>
               </div>
               <div class="bg-gradient-to-br from-red-50 to-red-100 p-3 rounded-xl border-2 border-red-200 text-center">
                 <div class="flex items-center justify-center mb-1">
@@ -471,7 +471,7 @@
       leave-from-class="opacity-100 translate-x-0"
       leave-to-class="opacity-0 translate-x-full"
     >
-      <div v-if="entrenamientoDetallado" class="fixed inset-0 bg-gradient-to-br from-gray-50 to-gray-100 z-50 overflow-y-auto">
+      <div v-if="entrenamientoDetallado" class="fixed inset-0 bg-gradient-to-br from-gray-50 to-gray-100 z-50 overflow-y-auto overflow-x-hidden">
         <div class="min-h-screen pb-20">
           <!-- Header mejorado -->
           <div class="sticky top-0 bg-gradient-to-r from-primary-dark via-primary to-primary-light text-white p-6 z-10 shadow-lg">
@@ -492,8 +492,8 @@
                 <CalendarIcon class="w-8 h-8" />
               </div>
               <div class="flex-1 min-w-0">
-                <h2 class="text-2xl font-black uppercase tracking-wide wrap-break-word">{{ entrenamientoDetallado.nombre }}</h2>
-                <div class="flex items-center gap-3 text-sm mt-2 opacity-90">
+                <h2 class="lg:text-2xl text-xl font-black uppercase tracking-wide wrap-break-word">{{ entrenamientoDetallado.nombre }}</h2>
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-sm mt-2 opacity-90">
                   <div class="flex items-center gap-1.5">
                     <CalendarIcon class="w-4 h-4" />
                     {{ formatearFecha(entrenamientoDetallado.fecha) }}
@@ -519,7 +519,7 @@
           </div>
 
           <!-- Contenido mejorado -->
-          <div class="max-w-7xl mx-auto p-6">
+          <div class="max-w-7xl mx-auto p-4 sm:p-6">
           <!-- Lista de Convocadas (solo si es convocatoria) -->
           <div v-if="entrenamientoDetallado.esConvocatoria && entrenamientoDetallado.jugadorasConvocadas && entrenamientoDetallado.jugadorasConvocadas.length > 0" class="bg-white rounded-xl border-2 border-purple-200 p-5 shadow-sm mb-6">
             <div class="flex items-center gap-2 mb-4">
@@ -593,23 +593,24 @@
 
           <!-- Tabs mejorados -->
           <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-gray-200">
-            <div class="flex bg-gradient-to-r from-gray-100 to-gray-50 border-b-2 border-gray-200">
+            <div class="grid grid-cols-3 bg-gradient-to-r from-gray-100 to-gray-50 border-b-2 border-gray-200">
               <button
                 @click="tabDetalleAdmin = 'confirmadas'"
                 :class="[
-                  'flex-1 py-4 px-4 text-xs font-black uppercase tracking-wide transition-all relative',
+                  'w-full py-2.5 sm:py-4 px-1.5 sm:px-4 text-[10px] sm:text-xs font-black uppercase tracking-wide transition-all relative',
                   tabDetalleAdmin === 'confirmadas'
                     ? 'text-green-700 bg-white shadow-sm'
                     : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
                 ]"
               >
                 <span class="flex flex-col items-center justify-center gap-2">
-                  <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1 sm:gap-2">
                     <CheckCircleIcon class="w-5 h-5" />
-                    Confirmadas
+                    <span class="sm:hidden">Anot.</span>
+                    <span class="hidden sm:inline">Anotadas</span>
                   </div>
                   <span :class="[
-                    'rounded-full px-3 py-1 text-xs font-black',
+                    'rounded-full px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-black',
                     tabDetalleAdmin === 'confirmadas' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700'
                   ]">
                     {{ inscritasOrganizadasAdmin.confirmadas.length }}
@@ -620,19 +621,20 @@
               <button
                 @click="tabDetalleAdmin = 'bajas'"
                 :class="[
-                  'flex-1 py-4 px-4 text-xs font-black uppercase tracking-wide transition-all relative',
+                  'w-full py-2.5 sm:py-4 px-1.5 sm:px-4 text-[10px] sm:text-xs font-black uppercase tracking-wide transition-all relative',
                   tabDetalleAdmin === 'bajas'
                     ? 'text-red-700 bg-white shadow-sm'
                     : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
                 ]"
               >
                 <span class="flex flex-col items-center justify-center gap-2">
-                  <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1 sm:gap-2">
                     <XCircleIcon class="w-5 h-5" />
-                    Ausentes
+                    <span class="sm:hidden">Aus.</span>
+                    <span class="hidden sm:inline">Ausentes</span>
                   </div>
                   <span :class="[
-                    'rounded-full px-3 py-1 text-xs font-black',
+                    'rounded-full px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-black',
                     tabDetalleAdmin === 'bajas' ? 'bg-red-600 text-white' : 'bg-red-100 text-red-700'
                   ]">
                     {{ inscritasOrganizadasAdmin.bajas.length }}
@@ -643,19 +645,20 @@
               <button
                 @click="tabDetalleAdmin = 'pendientes'"
                 :class="[
-                  'flex-1 py-4 px-4 text-xs font-black uppercase tracking-wide transition-all relative',
+                  'w-full py-2.5 sm:py-4 px-1.5 sm:px-4 text-[10px] sm:text-xs font-black uppercase tracking-wide transition-all relative',
                   tabDetalleAdmin === 'pendientes'
                     ? 'text-yellow-700 bg-white shadow-sm'
                     : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
                 ]"
               >
                 <span class="flex flex-col items-center justify-center gap-2">
-                  <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-1 sm:gap-2">
                     <QuestionMarkCircleIcon class="w-5 h-5" />
-                    Pendientes
+                    <span class="sm:hidden">Pend.</span>
+                    <span class="hidden sm:inline">Pendientes</span>
                   </div>
                   <span :class="[
-                    'rounded-full px-3 py-1 text-xs font-black',
+                    'rounded-full px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-black',
                     tabDetalleAdmin === 'pendientes' ? 'bg-yellow-600 text-white' : 'bg-yellow-100 text-yellow-700'
                   ]">
                     {{ inscritasOrganizadasAdmin.pendientes.length }}
@@ -690,7 +693,7 @@
                 <div
                   v-for="inscrita in inscritasOrganizadasAdmin.confirmadas"
                   :key="inscrita.id"
-                  class="flex items-center gap-3 bg-white p-3 rounded-lg border-2 border-green-200 hover:border-green-400 hover:shadow-lg transition-all"
+                  class="flex flex-col sm:flex-row sm:items-center gap-3 bg-white p-3 rounded-lg border-2 border-green-200 hover:border-green-400 hover:shadow-lg transition-all"
                 >
                   <div class="w-12 h-12 bg-linear-to-br from-primary-dark to-primary-light rounded-full flex items-center justify-center text-white font-black shadow-md">
                     {{ obtenerIniciales(inscrita.jugadoraNombre) }}
@@ -701,17 +704,17 @@
                       Anotada: {{ formatFechaHora(inscrita.updatedAt || inscrita.createdAt) }}
                     </div>
                   </div>
-                  <div class="flex gap-2">
+                  <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <button
                       @click="cambiarEstado(inscrita.id, 'pendiente')"
-                      class="px-3 py-2 text-xs bg-yellow-600 text-white rounded-lg font-bold hover:bg-yellow-700 transition-colors whitespace-nowrap"
+                      class="px-3 py-2 text-xs bg-yellow-600 text-white rounded-lg font-bold hover:bg-yellow-700 transition-colors whitespace-nowrap w-full sm:w-auto"
                       title="Marcar como pendiente"
                     >
                       Pendiente
                     </button>
                     <button
                       @click="cambiarEstado(inscrita.id, 'baja')"
-                      class="px-3 py-2 text-xs bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors whitespace-nowrap"
+                      class="px-3 py-2 text-xs bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors whitespace-nowrap w-full sm:w-auto"
                       title="Marcar como ausente"
                     >
                       Ausente
@@ -731,7 +734,7 @@
                   :key="inscrita.id"
                   class="bg-white rounded-lg border-2 border-red-200 hover:border-red-400 hover:shadow-lg transition-all overflow-hidden"
                 >
-                  <div class="flex items-center gap-3 p-3">
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3 p-3">
                     <div class="w-12 h-12 bg-linear-to-br from-primary-dark to-primary-light rounded-full flex items-center justify-center text-white font-black shadow-md shrink-0">
                       {{ obtenerIniciales(inscrita.jugadoraNombre) }}
                     </div>
@@ -787,7 +790,7 @@
                 <div
                   v-for="inscrita in inscritasOrganizadasAdmin.pendientes"
                   :key="inscrita.id"
-                  class="flex items-center gap-3 bg-white p-3 rounded-lg border-2 border-yellow-200 hover:border-yellow-400 hover:shadow-lg transition-all"
+                  class="flex flex-col sm:flex-row sm:items-center gap-3 bg-white p-3 rounded-lg border-2 border-yellow-200 hover:border-yellow-400 hover:shadow-lg transition-all"
                 >
                   <div class="w-12 h-12 bg-linear-to-br from-primary-dark to-primary-light rounded-full flex items-center justify-center text-white font-black shadow-md">
                     {{ obtenerIniciales(inscrita.jugadoraNombre) }}
@@ -798,17 +801,17 @@
                       Anotada: {{ formatFechaHora(inscrita.updatedAt || inscrita.createdAt) }}
                     </div>
                   </div>
-                  <div class="flex gap-2">
+                  <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <button
                       @click="cambiarEstado(inscrita.id, 'confirmada')"
-                      class="px-3 py-2 text-xs bg-green-700 text-white rounded-lg font-bold hover:bg-green-800 transition-colors whitespace-nowrap"
+                      class="px-3 py-2 text-xs bg-green-700 text-white rounded-lg font-bold hover:bg-green-800 transition-colors whitespace-nowrap w-full sm:w-auto"
                       title="Marcar como presente"
                     >
                       Presente
                     </button>
                     <button
                       @click="cambiarEstado(inscrita.id, 'baja')"
-                      class="px-3 py-2 text-xs bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors whitespace-nowrap"
+                      class="px-3 py-2 text-xs bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors whitespace-nowrap w-full sm:w-auto"
                       title="Marcar como ausente"
                     >
                       Ausente

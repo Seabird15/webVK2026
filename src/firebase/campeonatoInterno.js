@@ -414,6 +414,75 @@ export const inicializarFecha2 = async () => {
 };
 
 /**
+ * Inicializar partidos de la Fecha 3
+ */
+export const inicializarFecha3 = async () => {
+  try {
+    const docRef = doc(db, CAMPEONATO_INTERNO_2026, 'partidos');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const datos = docSnap.data();
+
+      const tieneFecha3 = datos.partidos.some(p => p.numeroFecha === 3);
+      if (tieneFecha3) {
+        return { success: false, message: 'La Fecha 3 ya está inicializada' };
+      }
+
+      const nuevoId = Math.max(...datos.partidos.map(p => p.id)) + 1;
+      const partidosFecha3 = [
+        {
+          id: nuevoId,
+          equipoLocal: 'verserkers',
+          equipoVisita: 'internadas',
+          golesLocal: 0,
+          golesVisita: 0,
+          horario: '20:00 - 20:35',
+          fecha: '2026-02-21',
+          numeroFecha: 3,
+          estado: 'PROGRAMADO',
+          goleadoras: []
+        },
+        {
+          id: nuevoId + 1,
+          equipoLocal: 'internadas',
+          equipoVisita: 'siemprealpalo',
+          golesLocal: 0,
+          golesVisita: 0,
+          horario: '20:40 - 21:15',
+          fecha: '2026-02-21',
+          numeroFecha: 3,
+          estado: 'PROGRAMADO',
+          goleadoras: []
+        },
+        {
+          id: nuevoId + 2,
+          equipoLocal: 'verserkers',
+          equipoVisita: 'siemprealpalo',
+          golesLocal: 0,
+          golesVisita: 0,
+          horario: '21:20 - 21:55',
+          fecha: '2026-02-21',
+          numeroFecha: 3,
+          estado: 'PROGRAMADO',
+          goleadoras: []
+        }
+      ];
+
+      datos.partidos = [...datos.partidos, ...partidosFecha3];
+      datos.lastUpdated = new Date().toISOString();
+
+      await updateDoc(docRef, datos);
+      return { success: true, message: 'Fecha 3 inicializada correctamente', partidos: partidosFecha3 };
+    }
+    return { success: false, message: 'No se encontró el documento de partidos' };
+  } catch (err) {
+    console.error('Error inicializando Fecha 3:', err);
+    throw err;
+  }
+};
+
+/**
  * Obtener todos los partidos
  */
 export const obtenerPartidos = async () => {

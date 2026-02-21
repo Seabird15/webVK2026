@@ -46,6 +46,7 @@
                 <p><strong>Posición:</strong> {{ formData.posicion }}</p>
                 <p><strong>Dorsal:</strong> #{{ formData.dorsal }}</p>
                 <p><strong>Equipo:</strong> {{ formData.equipo === 'ambos' ? 'Ascenso y Escuela' : formData.equipo }}</p>
+                <p><strong>Estado:</strong> {{ formatearEstadoSalud(formData.estadoSalud) }}</p>
                 <p><strong>Fecha de nacimiento:</strong> {{ formatearFecha(formData.fechaNacimiento) }}</p>
               </div>
             </div>
@@ -145,6 +146,20 @@
                 :disabled="isLoading"
               />
             </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Estado actual</label>
+            <select
+              v-model="formData.estadoSalud"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              :disabled="isLoading"
+            >
+              <option value="disponible">Disponible</option>
+              <option value="lesionada">Lesionada</option>
+              <option value="recuperacion">En recuperación</option>
+              <option value="no_disponible">No disponible</option>
+            </select>
           </div>
 
           <!-- Foto de perfil -->
@@ -280,8 +295,19 @@ const formData = reactive({
   dorsal: jugadoraData.value?.dorsal || null,
   posicion: jugadoraData.value?.posicion || '',
   equipo: jugadoraData.value?.equipo || 'ascenso',
-  fechaNacimiento: jugadoraData.value?.fechaNacimiento || ''
+  fechaNacimiento: jugadoraData.value?.fechaNacimiento || '',
+  estadoSalud: jugadoraData.value?.estadoSalud || 'disponible'
 });
+
+const formatearEstadoSalud = (estado) => {
+  const map = {
+    disponible: 'Disponible',
+    lesionada: 'Lesionada',
+    recuperacion: 'En recuperación',
+    no_disponible: 'No disponible'
+  };
+  return map[estado] || 'Disponible';
+};
 
 // Verificar autenticación
 if (!jugadoraAuthUser.value) {
@@ -326,6 +352,7 @@ const cancelarEdicion = () => {
   formData.posicion = jugadoraData.value?.posicion || '';
   formData.equipo = jugadoraData.value?.equipo || 'ascenso';
   formData.fechaNacimiento = jugadoraData.value?.fechaNacimiento || '';
+  formData.estadoSalud = jugadoraData.value?.estadoSalud || 'disponible';
   previewFoto.value = null;
   fotoFile.value = null;
   error.value = null;
@@ -366,7 +393,8 @@ const handleGuardar = async () => {
       dorsal: formData.dorsal,
       posicion: formData.posicion,
       equipo: formData.equipo,
-      fechaNacimiento: formData.fechaNacimiento
+      fechaNacimiento: formData.fechaNacimiento,
+      estadoSalud: formData.estadoSalud
     },
     fotoFile.value
   );
@@ -404,6 +432,7 @@ onMounted(() => {
     formData.posicion = jugadoraData.value.posicion || '';
     formData.equipo = jugadoraData.value.equipo || 'ascenso';
     formData.fechaNacimiento = jugadoraData.value.fechaNacimiento || '';
+    formData.estadoSalud = jugadoraData.value?.estadoSalud || 'disponible';
     fotoPerfil.value = jugadoraData.value.fotoPerfil || null;
   }
 });

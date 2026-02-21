@@ -9,16 +9,19 @@
               <HomeIcon class="w-7 h-7 text-white" />
             </div>
             <div>
-              <h1 class="text-2xl sm:text-3xl font-black">Panel de Administración</h1>
+              <h1 class="text-xl sm:text-3xl font-black">Panel de Administración</h1>
               <p class="text-xs sm:text-sm text-white/80 mt-0.5">{{ userGreeting }}</p>
             </div>
           </div>
-          <button
-            @click="handleLogout"
-            class="bg-white/20 hover:bg-white/30 px-5 py-2.5 rounded-xl font-bold transition-all cursor-pointer backdrop-blur-sm border border-white/30 hover:border-white/50 hover:scale-105 active:scale-95"
-          >
-            Cerrar Sesión
-          </button>
+          <div class="flex items-center gap-2">
+            <InfoUltimaActualizacion />
+            <button
+              @click="handleLogout"
+              class="bg-white/20 hover:bg-white/30 px-5 py-2.5 rounded-xl font-bold transition-all cursor-pointer backdrop-blur-sm border border-white/30 hover:border-white/50 hover:scale-105 active:scale-95"
+            >
+              Cerrar Sesión
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -71,7 +74,7 @@
                   <UsersIcon class="w-9 h-9 text-white" />
                 </div>
                 <div>
-                  <h2 class="text-3xl font-black text-gray-900">¡Bienvenida DT Yesi!</h2>
+                  <h2 class="lg:text-3xl text-xl font-black text-gray-900">¡Bienvenida DT Yesi!</h2>
                   <p class="text-sm text-gray-500 mt-1">Gestiona tu equipo desde un solo lugar</p>
                 </div>
               </div>
@@ -87,7 +90,7 @@
                   </div>
                   <p class="text-sm font-medium opacity-90 mb-1">Próximo Entrenamiento</p>
                   <div v-if="proximoEntrenamiento">
-                    <p class="text-2xl font-black mb-2 line-clamp-1">{{ proximoEntrenamiento.nombre }}</p>
+                    <p class="text-sm lg:text-xl font-black mb-2 line-clamp-1">{{ proximoEntrenamiento.nombre }}</p>
                     <div class="space-y-1 text-xs opacity-90">
                       <p>📅 En {{ proximoEntrenamiento.diasRestantes }} {{ proximoEntrenamiento.diasRestantes === 1 ? 'día' : 'días' }}</p>
                       <p>✓ {{ proximoEntrenamiento.inscripciones.confirmadas }} confirmadas</p>
@@ -190,7 +193,7 @@
                     <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform shadow-lg">
                       <CalendarIcon class="w-6 h-6 text-white" />
                     </div>
-                    <div class="text-sm font-black text-blue-700">Entrenamientos</div>
+                    <div class="text-sm truncate font-black text-blue-700">Entrenamientos</div>
                   </button>
                   <button
                     @click="activeTab = 'jugadoras'"
@@ -392,6 +395,7 @@ import GestionarPartidos from '../components/GestionarPartidos.vue';
 import { entrenamientos, fetchTodosEntrenamientos } from '../firebase/entrenamientos';
 import VistaJugadorasAdmin from '../components/VistaJugadorasAdmin.vue';
 import ListadoJugadorasAdmin from '../components/ListadoJugadorasAdmin.vue';
+import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
