@@ -119,6 +119,11 @@ let unsubscribeConvocatorias = null;
 const partidosInternos = ref([]);
 const partidosAdmin = ref([]);
 
+const logoUrlVikingas = new URL('../assets/logoVk.png', import.meta.url).href;
+const logoUrlVerserkers = new URL('../assets/versekersLogo.jpeg', import.meta.url).href;
+const logoUrlInternadas = new URL('../assets/internadasLogo.jpeg', import.meta.url).href;
+const logoUrlSiempreAlPalo = new URL('../assets/siemprealpaloLogo.jpeg', import.meta.url).href;
+
 // Función para formatear fecha
 const formatearFecha = (fecha) => {
   if (!fecha) return '';
@@ -134,17 +139,17 @@ const formatearFecha = (fecha) => {
 const datosEquipo = {
     verserkers: {
         nombre: 'Las Verserkers',
-        logo: '/src/assets/versekersLogo.jpeg',
+        logo: logoUrlVerserkers,
         liga: 'Campeonato Interno'
     },
     internadas: {
         nombre: 'Inter Nadas',
-        logo: '/src/assets/internadasLogo.jpeg',
+        logo: logoUrlInternadas,
         liga: 'Campeonato Interno'
     },
     siemprealpalo: {
         nombre: 'Siempre al Palo FC',
-        logo: '/src/assets/siemprealpaloLogo.jpeg',
+        logo: logoUrlSiempreAlPalo,
         liga: 'Campeonato Interno'
     }
 };
@@ -288,7 +293,7 @@ const cargarProximoPartido = () => {
                         hora: (entrenamiento.hora || '00:00').split('-')[0]?.trim() || '00:00',
                         equipo1: {
                             nombre: 'CD Vikingas',
-                            logo: '/src/assets/logoVk.png'
+                            logo: logoUrlVikingas
                         },
                         equipo2: {
                             nombre: extraerRival(entrenamiento.nombre),

@@ -662,7 +662,7 @@
                 <div v-if="!partidoEditando || partidoEditando.id !== partido.id" class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
                   <div class="flex items-center gap-2 sm:gap-3 flex-1">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                      <img :src="`/src/assets/${obtenerDatosEquipo(partido.equipoLocal).logo}`" :alt="obtenerDatosEquipo(partido.equipoLocal).nombre" class="w-full h-full object-contain" />
+                      <img :src="resolverLogoEquipo(obtenerDatosEquipo(partido.equipoLocal).logo)" :alt="obtenerDatosEquipo(partido.equipoLocal).nombre" class="w-full h-full object-contain" />
                     </div>
                     <span 
                       class="font-bold text-sm sm:text-lg"
@@ -694,7 +694,7 @@
                       {{ obtenerDatosEquipo(partido.equipoVisita).nombre }}
                     </span>
                     <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                      <img :src="`/src/assets/${obtenerDatosEquipo(partido.equipoVisita).logo}`" :alt="obtenerDatosEquipo(partido.equipoVisita).nombre" class="w-full h-full object-contain" />
+                      <img :src="resolverLogoEquipo(obtenerDatosEquipo(partido.equipoVisita).logo)" :alt="obtenerDatosEquipo(partido.equipoVisita).nombre" class="w-full h-full object-contain" />
                     </div>
                   </div>
                 </div>
@@ -704,7 +704,7 @@
                   <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
                     <div class="flex items-center gap-2 sm:gap-3 flex-1">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                        <img :src="`/src/assets/${obtenerDatosEquipo(partido.equipoLocal).logo}`" :alt="obtenerDatosEquipo(partido.equipoLocal).nombre" class="w-full h-full object-contain" />
+                        <img :src="resolverLogoEquipo(obtenerDatosEquipo(partido.equipoLocal).logo)" :alt="obtenerDatosEquipo(partido.equipoLocal).nombre" class="w-full h-full object-contain" />
                       </div>
                       <span class="text-white font-bold text-sm sm:text-lg">{{ obtenerDatosEquipo(partido.equipoLocal).nombre }}</span>
                     </div>
@@ -725,7 +725,7 @@
                   <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
                     <div class="flex items-center gap-2 sm:gap-3 flex-1">
                       <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                        <img :src="`/src/assets/${obtenerDatosEquipo(partido.equipoVisita).logo}`" :alt="obtenerDatosEquipo(partido.equipoVisita).nombre" class="w-full h-full object-contain" />
+                        <img :src="resolverLogoEquipo(obtenerDatosEquipo(partido.equipoVisita).logo)" :alt="obtenerDatosEquipo(partido.equipoVisita).nombre" class="w-full h-full object-contain" />
                       </div>
                       <span class="text-white font-bold text-sm sm:text-lg">{{ obtenerDatosEquipo(partido.equipoVisita).nombre }}</span>
                     </div>
@@ -817,7 +817,7 @@
                       <td class="px-2 py-2">
                         <div class="flex items-center gap-2">
                           <div class="w-5 h-5 bg-white rounded-full p-0.5 shrink-0">
-                            <img :src="`/src/assets/${equipo.logo}`" :alt="equipo.nombre" class="w-full h-full object-contain" />
+                            <img :src="resolverLogoEquipo(equipo.logo)" :alt="equipo.nombre" class="w-full h-full object-contain" />
                           </div>
                           <span class="text-white font-bold text-xs">{{ equipo.nombre }}</span>
                         </div>
@@ -1181,6 +1181,14 @@ import {
   inicializarFecha2,
   inicializarFecha3
 } from '../firebase/campeonatoInterno';
+
+const logoEquipos = {
+  'versekersLogo.jpeg': new URL('../assets/versekersLogo.jpeg', import.meta.url).href,
+  'internadasLogo.jpeg': new URL('../assets/internadasLogo.jpeg', import.meta.url).href,
+  'siemprealpaloLogo.jpeg': new URL('../assets/siemprealpaloLogo.jpeg', import.meta.url).href
+};
+
+const resolverLogoEquipo = (logo) => logoEquipos[logo] || logo || '';
 
 const tabla = ref([]);
 const loading = ref(true);
