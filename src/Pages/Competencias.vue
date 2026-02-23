@@ -24,6 +24,33 @@
             Ver Estadísticas por Equipo
           </router-link>
         </div>
+
+        <div class="mt-6 max-w-3xl mx-auto bg-linear-to-r from-primary/20 via-primary/10 to-primary/20 border-2 border-primary rounded-xl px-4 py-4 sm:px-6 sm:py-5 shadow-xl">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-left">
+            <div>
+              <p class="text-primary text-xs sm:text-sm font-black uppercase tracking-[0.2em]">Gran Final</p>
+              <h2 class="text-white text-lg sm:text-2xl font-400" style="font-family: 'Collegiate Black', sans-serif;">
+                Verserkers vs Inter Nadas
+              </h2>
+              <p class="text-white/80 text-sm sm:text-base font-semibold mt-1">Sábado 28 de febrero</p>
+            </div>
+            <div class="flex flex-col items-start sm:items-end gap-2">
+              <button
+                @click="reaccionarConFuego"
+                :class="[
+                  'inline-flex items-center gap-2 px-3 py-2 rounded-lg font-400 text-xs sm:text-sm transition-all duration-200 hover:scale-105',
+                  dioFuegoFinal ? 'bg-primary text-black' : 'bg-white/10 text-white border border-primary/50 hover:bg-primary/20'
+                ]"
+                type="button"
+              >
+                <span class="text-base" :class="dioFuegoFinal ? 'animate-pulse' : ''">🔥</span>
+                <span>{{ dioFuegoFinal ? 'Le di fueguito' : 'Dale fueguito' }}</span>
+                <span class="bg-black/20 px-2 py-0.5 rounded-full">{{ fuegitosFinal }}</span>
+              </button>
+              <p class="text-white/60 text-[11px] sm:text-xs">Toca el fueguito para apoyar la final</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- CAMPEONATO INTERNO VIKINGAS 2026 -->
@@ -625,9 +652,9 @@
                   </div>
                   <div class="flex items-center gap-2">
                     <span 
-                      :class="['text-xs font-bold px-2 sm:px-3 py-1 rounded-full', obtenerEstadoBadge(partido.estado).class]"
+                      :class="['text-xs font-bold px-2 sm:px-3 py-1 rounded-full', obtenerEstadoBadge(partido).class]"
                     >
-                      {{ obtenerEstadoBadge(partido.estado).text }}
+                      {{ obtenerEstadoBadge(partido).text }}
                     </span>
                     
                     <!-- Botones de admin -->
@@ -659,43 +686,55 @@
                 </div>
                 
                 <!-- Vista normal del partido -->
-                <div v-if="!partidoEditando || partidoEditando.id !== partido.id" class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
-                  <div class="flex items-center gap-2 sm:gap-3 flex-1">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                      <img :src="resolverLogoEquipo(obtenerDatosEquipo(partido.equipoLocal).logo)" :alt="obtenerDatosEquipo(partido.equipoLocal).nombre" class="w-full h-full object-contain" />
+                <div v-if="!partidoEditando || partidoEditando.id !== partido.id" class="space-y-3">
+                  <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+                    <div class="flex items-center gap-2 sm:gap-3 flex-1">
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
+                        <img :src="resolverLogoEquipo(obtenerDatosEquipo(partido.equipoLocal).logo)" :alt="obtenerDatosEquipo(partido.equipoLocal).nombre" class="w-full h-full object-contain" />
+                      </div>
+                      <span 
+                        class="font-bold text-sm sm:text-lg"
+                        :class="partido.golesLocal > partido.golesVisita ? 'text-primary' : 'text-white/70'"
+                      >
+                        {{ obtenerDatosEquipo(partido.equipoLocal).nombre }}
+                      </span>
                     </div>
-                    <span 
-                      class="font-bold text-sm sm:text-lg"
-                      :class="partido.golesLocal > partido.golesVisita ? 'text-primary' : 'text-white/70'"
-                    >
-                      {{ obtenerDatosEquipo(partido.equipoLocal).nombre }}
-                    </span>
-                  </div>
-                  <div class="flex items-center gap-3 sm:gap-4">
-                    <span 
-                      class="font-black text-2xl sm:text-3xl"
-                      :class="partido.golesLocal > partido.golesVisita ? 'text-primary' : 'text-white/70'"
-                    >
-                      {{ partido.golesLocal }}
-                    </span>
-                    <span class="text-primary/50 font-bold text-lg">-</span>
-                    <span 
-                      class="font-black text-2xl sm:text-3xl"
-                      :class="partido.golesVisita > partido.golesLocal ? 'text-primary' : 'text-white/70'"
-                    >
-                      {{ partido.golesVisita }}
-                    </span>
-                  </div>
-                  <div class="flex items-center gap-2 sm:gap-3 flex-1 justify-end">
-                    <span 
-                      class="font-bold text-sm sm:text-lg text-right"
-                      :class="partido.golesVisita > partido.golesLocal ? 'text-primary' : 'text-white/70'"
-                    >
-                      {{ obtenerDatosEquipo(partido.equipoVisita).nombre }}
-                    </span>
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                      <img :src="resolverLogoEquipo(obtenerDatosEquipo(partido.equipoVisita).logo)" :alt="obtenerDatosEquipo(partido.equipoVisita).nombre" class="w-full h-full object-contain" />
+                    <div class="flex items-center gap-3 sm:gap-4">
+                      <span 
+                        class="font-black text-2xl sm:text-3xl"
+                        :class="partido.golesLocal > partido.golesVisita ? 'text-primary' : 'text-white/70'"
+                      >
+                        {{ partido.golesLocal }}
+                      </span>
+                      <span class="text-primary/50 font-bold text-lg">-</span>
+                      <span 
+                        class="font-black text-2xl sm:text-3xl"
+                        :class="partido.golesVisita > partido.golesLocal ? 'text-primary' : 'text-white/70'"
+                      >
+                        {{ partido.golesVisita }}
+                      </span>
                     </div>
+                    <div class="flex items-center gap-2 sm:gap-3 flex-1 justify-end">
+                      <span 
+                        class="font-bold text-sm sm:text-lg text-right"
+                        :class="partido.golesVisita > partido.golesLocal ? 'text-primary' : 'text-white/70'"
+                      >
+                        {{ obtenerDatosEquipo(partido.equipoVisita).nombre }}
+                      </span>
+                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
+                        <img :src="resolverLogoEquipo(obtenerDatosEquipo(partido.equipoVisita).logo)" :alt="obtenerDatosEquipo(partido.equipoVisita).nombre" class="w-full h-full object-contain" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div v-if="partido.empate" class="bg-yellow-500/10 border border-yellow-400/40 rounded-lg p-3 text-center">
+                    <p class="text-yellow-300 text-xs font-bold uppercase tracking-wide mb-1">Definición por penales</p>
+                    <p class="text-white text-sm font-bold">
+                      {{ obtenerDatosEquipo(partido.equipoLocal).nombre }} {{ partido.penalesLocal || 0 }} - {{ partido.penalesVisita || 0 }} {{ obtenerDatosEquipo(partido.equipoVisita).nombre }}
+                    </p>
+                    <p v-if="partido.ganadorPenales" class="text-primary text-xs font-bold mt-1">
+                      Ganador: {{ obtenerDatosEquipo(partido.ganadorPenales).nombre }}
+                    </p>
                   </div>
                 </div>
                 
@@ -742,6 +781,80 @@
                       >+</button>
                     </div>
                   </div>
+
+                  <div class="bg-black/30 border border-primary/20 rounded-lg p-3 space-y-3">
+                    <label class="flex items-center gap-2 text-sm font-bold text-primary cursor-pointer">
+                      <input
+                        v-model="partidoEditando.empateEdit"
+                        type="checkbox"
+                        class="w-4 h-4"
+                      />
+                      Definido por penales (empate en tiempo regular)
+                    </label>
+
+                    <div v-if="partidoEditando.empateEdit" class="space-y-3">
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="bg-white/5 rounded p-2">
+                          <p class="text-white/70 text-xs mb-2">Penales {{ obtenerDatosEquipo(partido.equipoLocal).nombre }}</p>
+                          <div class="flex items-center justify-center gap-2">
+                            <button
+                              @click="decrementarPenal('local')"
+                              :disabled="partidoEditando.penalesLocalEdit === 0"
+                              class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            >-</button>
+                            <span class="text-primary font-black text-2xl w-10 text-center">{{ partidoEditando.penalesLocalEdit }}</span>
+                            <button
+                              @click="incrementarPenal('local')"
+                              class="bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded font-bold transition"
+                            >+</button>
+                          </div>
+                        </div>
+                        <div class="bg-white/5 rounded p-2">
+                          <p class="text-white/70 text-xs mb-2">Penales {{ obtenerDatosEquipo(partido.equipoVisita).nombre }}</p>
+                          <div class="flex items-center justify-center gap-2">
+                            <button
+                              @click="decrementarPenal('visita')"
+                              :disabled="partidoEditando.penalesVisitaEdit === 0"
+                              class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            >-</button>
+                            <span class="text-primary font-black text-2xl w-10 text-center">{{ partidoEditando.penalesVisitaEdit }}</span>
+                            <button
+                              @click="incrementarPenal('visita')"
+                              class="bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded font-bold transition"
+                            >+</button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <p class="text-white/70 text-xs mb-2">Ganador por penales</p>
+                        <div class="flex flex-wrap gap-2">
+                          <button
+                            @click="seleccionarGanadorPenales(partido.equipoLocal)"
+                            :class="[
+                              'px-3 py-1.5 rounded text-xs font-bold transition',
+                              partidoEditando.ganadorPenalesEdit === partido.equipoLocal
+                                ? 'bg-primary text-black'
+                                : 'bg-white/10 text-white hover:bg-white/20'
+                            ]"
+                          >
+                            {{ obtenerDatosEquipo(partido.equipoLocal).nombre }}
+                          </button>
+                          <button
+                            @click="seleccionarGanadorPenales(partido.equipoVisita)"
+                            :class="[
+                              'px-3 py-1.5 rounded text-xs font-bold transition',
+                              partidoEditando.ganadorPenalesEdit === partido.equipoVisita
+                                ? 'bg-primary text-black'
+                                : 'bg-white/10 text-white hover:bg-white/20'
+                            ]"
+                          >
+                            {{ obtenerDatosEquipo(partido.equipoVisita).nombre }}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   
                   <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
                     <button
@@ -780,6 +893,7 @@
                       <th class="px-2 py-2 text-left text-primary font-bold text-xs uppercase">Equipo</th>
                       <th class="px-2 py-2 text-center text-primary font-bold text-xs">PJ</th>
                       <th class="px-2 py-2 text-center text-primary font-bold text-xs">G</th>
+                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">E</th>
                       <th class="px-2 py-2 text-center text-primary font-bold text-xs">P</th>
                       <th class="px-2 py-2 text-center text-primary font-bold text-xs">GF</th>
                       <th class="px-2 py-2 text-center text-primary font-bold text-xs">GC</th>
@@ -824,6 +938,7 @@
                       </td>
                       <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">{{ equipo.pj }}</td>
                       <td class="px-2 py-2 text-center text-primary font-bold text-xs">{{ equipo.pg }}</td>
+                      <td class="px-2 py-2 text-center text-yellow-300 font-bold text-xs">{{ equipo.pe || 0 }}</td>
                       <td class="px-2 py-2 text-center text-red-400 font-bold text-xs">{{ equipo.pp }}</td>
                       <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">{{ equipo.gf }}</td>
                       <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">{{ equipo.gc }}</td>
@@ -839,6 +954,7 @@
                 <p class="text-white/60 text-xs text-center leading-relaxed">
                   <span class="font-semibold text-white">PJ:</span> Partidos Jugados • 
                   <span class="font-semibold text-white">G:</span> Ganados • 
+                  <span class="font-semibold text-white">E:</span> Empatados • 
                   <span class="font-semibold text-white">P:</span> Perdidos • 
                   <span class="font-semibold text-white">GF:</span> Goles a Favor • 
                   <span class="font-semibold text-white">GC:</span> Goles en Contra • 
@@ -1228,8 +1344,23 @@ const mostrarTablaGoleadoras = ref(false);
 const isAdmin = computed(() => userRole.value === 'admin');
 const mostrarPanelGoles = ref(false);
 const guardandoGol = ref(false);
+const fuegitosFinal = ref(0);
+const dioFuegoFinal = ref(false);
 
 let unsubscribe = null;
+
+const reaccionarConFuego = () => {
+  if (dioFuegoFinal.value) {
+    fuegitosFinal.value = Math.max(0, fuegitosFinal.value - 1);
+    dioFuegoFinal.value = false;
+  } else {
+    fuegitosFinal.value += 1;
+    dioFuegoFinal.value = true;
+  }
+
+  localStorage.setItem('final_fueguitos_count', String(fuegitosFinal.value));
+  localStorage.setItem('final_fueguitos_user_reacted', dioFuegoFinal.value ? '1' : '0');
+};
 
 const agregarGol = async (equipoKey, jugadoraIndex) => {
   if (guardandoGol.value) return;
@@ -1433,8 +1564,12 @@ const cambiarEstadoPartido = async (partidoId, nuevoEstado) => {
   }
 };
 
-const obtenerEstadoBadge = (estado) => {
+const obtenerEstadoBadge = (partido) => {
+  const estado = partido?.estado;
   if (estado === 'FINALIZADO') {
+    if (partido?.empate) {
+      return { text: '✓ FINALIZADO (PENALES)', class: 'bg-yellow-500/20 text-yellow-300 border border-yellow-400' };
+    }
     return { text: '✓ FINALIZADO', class: 'bg-green-500/20 text-green-400 border border-green-400' };
   } else if (estado === 'EN_CURSO') {
     return { text: '⚽ EN CURSO', class: 'bg-yellow-500/20 text-yellow-400 border border-yellow-400 animate-pulse' };
@@ -1492,10 +1627,23 @@ const obtenerDatosEquipo = (equipoKey) => {
 };
 
 const editarResultado = (partido) => {
+  const empateEdit = partido.golesLocal === partido.golesVisita && (partido.empate === true || (partido.penalesLocal || 0) !== (partido.penalesVisita || 0));
+  let ganadorPenalesEdit = partido.ganadorPenales || null;
+
+  if (empateEdit && !ganadorPenalesEdit && (partido.penalesLocal || 0) !== (partido.penalesVisita || 0)) {
+    ganadorPenalesEdit = (partido.penalesLocal || 0) > (partido.penalesVisita || 0)
+      ? partido.equipoLocal
+      : partido.equipoVisita;
+  }
+
   partidoEditando.value = {
     ...partido,
     golesLocalEdit: partido.golesLocal,
-    golesVisitaEdit: partido.golesVisita
+    golesVisitaEdit: partido.golesVisita,
+    empateEdit,
+    penalesLocalEdit: partido.penalesLocal || 0,
+    penalesVisitaEdit: partido.penalesVisita || 0,
+    ganadorPenalesEdit
   };
 };
 
@@ -1505,13 +1653,36 @@ const cancelarEdicion = () => {
 
 const guardarResultado = async (partidoId) => {
   if (!partidoEditando.value || editandoResultado.value) return;
+
+  if (partidoEditando.value.empateEdit) {
+    if (partidoEditando.value.golesLocalEdit !== partidoEditando.value.golesVisitaEdit) {
+      alert('Para definir por penales, el marcador del partido debe estar empatado.');
+      return;
+    }
+
+    if (partidoEditando.value.penalesLocalEdit === partidoEditando.value.penalesVisitaEdit) {
+      alert('El marcador de penales no puede terminar empatado.');
+      return;
+    }
+
+    if (!partidoEditando.value.ganadorPenalesEdit) {
+      alert('Debes seleccionar quién ganó en penales.');
+      return;
+    }
+  }
   
   editandoResultado.value = true;
   try {
     await actualizarResultadoPartido(
       partidoId,
       partidoEditando.value.golesLocalEdit,
-      partidoEditando.value.golesVisitaEdit
+      partidoEditando.value.golesVisitaEdit,
+      {
+        empate: partidoEditando.value.empateEdit,
+        penalesLocal: partidoEditando.value.penalesLocalEdit,
+        penalesVisita: partidoEditando.value.penalesVisitaEdit,
+        ganadorPenales: partidoEditando.value.empateEdit ? partidoEditando.value.ganadorPenalesEdit : null
+      }
     );
     partidoEditando.value = null;
     await cargarPartidos();
@@ -1542,6 +1713,29 @@ const decrementarGol = (tipo) => {
   }
 };
 
+const incrementarPenal = (tipo) => {
+  if (!partidoEditando.value) return;
+  if (tipo === 'local') {
+    partidoEditando.value.penalesLocalEdit++;
+  } else {
+    partidoEditando.value.penalesVisitaEdit++;
+  }
+};
+
+const decrementarPenal = (tipo) => {
+  if (!partidoEditando.value) return;
+  if (tipo === 'local' && partidoEditando.value.penalesLocalEdit > 0) {
+    partidoEditando.value.penalesLocalEdit--;
+  } else if (tipo === 'visita' && partidoEditando.value.penalesVisitaEdit > 0) {
+    partidoEditando.value.penalesVisitaEdit--;
+  }
+};
+
+const seleccionarGanadorPenales = (equipoKey) => {
+  if (!partidoEditando.value) return;
+  partidoEditando.value.ganadorPenalesEdit = equipoKey;
+};
+
 const obtenerIconoMedalla = (posicion) => {
   if (posicion === 0) return '🥇';
   if (posicion === 1) return '🥈';
@@ -1564,6 +1758,10 @@ const obtenerColorTexto = (equipoData) => {
 };
 
 onMounted(async () => {
+  const fueguitosGuardados = Number(localStorage.getItem('final_fueguitos_count') || '0');
+  fuegitosFinal.value = Number.isFinite(fueguitosGuardados) && fueguitosGuardados >= 0 ? fueguitosGuardados : 0;
+  dioFuegoFinal.value = localStorage.getItem('final_fueguitos_user_reacted') === '1';
+
   fetchTabla();
   
   // Cargar datos del campeonato desde Firebase

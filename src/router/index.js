@@ -31,9 +31,10 @@ const routes = [
     component: () => import('../Pages/Calendario.vue')
   },
   {
-    path: '/indumentaria',
-    name: 'Indumentaria',
-    component: () => import('../Pages/Indumentaria.vue')
+    path: '/indumentarias',
+    alias: '/indumentaria',
+    name: 'Indumentarias',
+    component: () => import('../Pages/Indumentarias.vue')
   },
   {
     path: '/fotos',

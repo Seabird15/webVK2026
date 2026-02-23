@@ -120,6 +120,31 @@
             </select>
           </div>
 
+          <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'">
+            <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide">Rival <span v-if="formulario.tipo === 'partido'">*</span></label>
+            <input
+              v-model="formulario.rival"
+              type="text"
+              :required="formulario.tipo === 'partido'"
+              placeholder="Ej: Club Deportivo XYZ"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
+            />
+          </div>
+
+          <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'" class="bg-gradient-to-br from-yellow-50 to-orange-50 p-4 rounded-xl border-2 border-yellow-200">
+            <label class="flex items-start sm:items-center gap-3 cursor-pointer">
+              <input
+                v-model="formulario.mostrarEnProximoPartido"
+                type="checkbox"
+                class="w-5 h-5 mt-0.5 sm:mt-0 text-primary-dark focus:ring-2 focus:ring-primary rounded shrink-0"
+              />
+              <div class="flex-1">
+                <span class="text-sm font-black text-gray-700 uppercase tracking-wide">Mostrar en caja “Próximo Partido” del home</span>
+                <p class="text-xs text-gray-600 mt-1 font-medium">Si activas esta opción, este partido quedará como destacado en el inicio.</p>
+              </div>
+            </label>
+          </div>
+
           <!-- Opción de convocatoria (solo para partidos/amistosos) -->
           <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'" class="bg-gradient-to-br from-blue-50 to-purple-50 p-4 rounded-xl border-2 border-blue-200">
             <label class="flex items-start sm:items-center gap-3 cursor-pointer">
@@ -335,6 +360,9 @@
                     <ClipboardDocumentListIcon class="w-3 h-3" />
                     Convocatoria ({{ entrenamiento.jugadorasConvocadas?.length || 0 }})
                   </span>
+                  <span v-if="entrenamiento.mostrarEnProximoPartido" class="inline-flex items-center gap-1 text-xs bg-yellow-500 text-black px-2.5 py-1 rounded-full font-bold whitespace-nowrap">
+                    Próximo partido Home
+                  </span>
                   <span v-if="fechaPasada(entrenamiento)" class="inline-flex items-center gap-1 text-xs bg-gray-500 text-white px-2.5 py-1 rounded-full font-bold whitespace-nowrap">
                     <ClockIcon class="w-3 h-3" />
                     Finalizado
@@ -376,6 +404,15 @@
                 <div class="flex-1 min-w-0">
                   <div class="text-xs text-gray-500 font-semibold uppercase">Lugar</div>
                   <div class="text-sm font-bold text-gray-900 truncate" :title="entrenamiento.lugar">{{ entrenamiento.lugar }}</div>
+                </div>
+              </div>
+              <div v-if="entrenamiento.rival" class="flex items-center gap-3 text-sm">
+                <div class="w-10 h-10 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center shrink-0">
+                  <FlagIcon class="w-5 h-5 text-white" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-xs text-gray-500 font-semibold uppercase">Rival</div>
+                  <div class="text-sm font-bold text-gray-900 truncate" :title="entrenamiento.rival">{{ entrenamiento.rival }}</div>
                 </div>
               </div>
             </div>
@@ -507,6 +544,12 @@
                 <div class="flex flex-wrap gap-2 mt-3">
                   <span class="bg-white/20 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-black capitalize">{{ entrenamientoDetallado.equipo }}</span>
                   <span v-if="entrenamientoDetallado.tipo" class="bg-white/20 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-black capitalize">{{ entrenamientoDetallado.tipo }}</span>
+                  <span v-if="entrenamientoDetallado.rival" class="bg-yellow-400/90 backdrop-blur-sm text-black px-3 py-1.5 rounded-full text-xs font-black">
+                    Rival: {{ entrenamientoDetallado.rival }}
+                  </span>
+                  <span v-if="entrenamientoDetallado.mostrarEnProximoPartido" class="bg-yellow-500/90 backdrop-blur-sm text-black px-3 py-1.5 rounded-full text-xs font-black">
+                    Destacado en Home
+                  </span>
                   <span v-if="entrenamientoDetallado.esConvocatoria" class="bg-purple-500/80 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-black flex items-center gap-1">
                     <ClipboardDocumentListIcon class="w-3 h-3" />
                     Convocatoria
@@ -974,11 +1017,13 @@ const formulario = ref({
   nombre: '',
   equipo: '',
   tipo: '',
+  rival: '',
   fecha: '',
   hora: '',
   lugar: '',
   descripcion: '',
   capacidadMaxima: null,
+  mostrarEnProximoPartido: false,
   esConvocatoria: false,
   jugadorasConvocadas: []
 });
@@ -1046,11 +1091,13 @@ const mostrarFormularioNuevo = () => {
     nombre: '',
     equipo: '',
     tipo: '',
+    rival: '',
     fecha: '',
     hora: '',
     lugar: '',
     descripcion: '',
     capacidadMaxima: null,
+    mostrarEnProximoPartido: false,
     esConvocatoria: false,
     jugadorasConvocadas: []
   };
@@ -1082,11 +1129,13 @@ const editarEntrenamiento = (entrenamiento) => {
     nombre: entrenamiento.nombre,
     equipo: entrenamiento.equipo,
     tipo: entrenamiento.tipo || 'entrenamiento',
+    rival: entrenamiento.rival || '',
     fecha: fechaFormato,
     hora: entrenamiento.hora,
     lugar: entrenamiento.lugar,
     descripcion: entrenamiento.descripcion || '',
     capacidadMaxima: entrenamiento.capacidadMaxima || null,
+    mostrarEnProximoPartido: entrenamiento.mostrarEnProximoPartido || false,
     esConvocatoria: entrenamiento.esConvocatoria || false,
     jugadorasConvocadas: entrenamiento.jugadorasConvocadas || []
   };
@@ -1276,6 +1325,8 @@ const desconvocarJugadora = async (jugadoraId) => {
 const onTipoChange = () => {
   // Si no es partido o amistoso, desactivar convocatoria
   if (formulario.value.tipo !== 'partido' && formulario.value.tipo !== 'amistoso') {
+    formulario.value.rival = '';
+    formulario.value.mostrarEnProximoPartido = false;
     formulario.value.esConvocatoria = false;
     formulario.value.jugadorasConvocadas = [];
   }
@@ -1365,6 +1416,11 @@ const guardarEntrenamiento = async () => {
     return;
   }
 
+  if (formulario.value.tipo === 'partido' && !formulario.value.rival?.trim()) {
+    error.value = 'Para un partido debes ingresar el nombre del rival';
+    return;
+  }
+
   // Validar convocatoria
   if (formulario.value.esConvocatoria && formulario.value.jugadorasConvocadas.length === 0) {
     error.value = 'Debes seleccionar al menos una jugadora para la convocatoria';
@@ -1384,11 +1440,13 @@ const guardarEntrenamiento = async () => {
         nombre: formulario.value.nombre,
         equipo: formulario.value.equipo,
         tipo: formulario.value.tipo,
+        rival: formulario.value.rival?.trim() || '',
         fecha: fechaCorrecta,
         hora: formulario.value.hora,
         lugar: formulario.value.lugar,
         descripcion: formulario.value.descripcion,
         capacidadMaxima: formulario.value.capacidadMaxima,
+        mostrarEnProximoPartido: formulario.value.mostrarEnProximoPartido,
         esConvocatoria: formulario.value.esConvocatoria,
         jugadorasConvocadas: formulario.value.jugadorasConvocadas
       });
@@ -1407,11 +1465,13 @@ const guardarEntrenamiento = async () => {
         nombre: formulario.value.nombre,
         equipo: formulario.value.equipo,
         tipo: formulario.value.tipo,
+        rival: formulario.value.rival?.trim() || '',
         fecha: fechaCorrecta,
         hora: formulario.value.hora,
         lugar: formulario.value.lugar,
         descripcion: formulario.value.descripcion,
         capacidadMaxima: formulario.value.capacidadMaxima,
+        mostrarEnProximoPartido: formulario.value.mostrarEnProximoPartido,
         esConvocatoria: formulario.value.esConvocatoria,
         jugadorasConvocadas: formulario.value.jugadorasConvocadas
       });

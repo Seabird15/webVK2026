@@ -16,6 +16,38 @@ export const error = ref(null);
 // Referencia a la colección del campeonato interno
 const CAMPEONATO_INTERNO_2026 = 'campeonato_interno_2026';
 
+const normalizarPartidoConPenales = (partido) => ({
+  ...partido,
+  empate: partido?.empate === true,
+  penalesLocal: Number.isFinite(partido?.penalesLocal) ? Math.max(0, partido.penalesLocal) : 0,
+  penalesVisita: Number.isFinite(partido?.penalesVisita) ? Math.max(0, partido.penalesVisita) : 0,
+  ganadorPenales: partido?.ganadorPenales || null
+});
+
+const normalizarNumeroGoles = (valor) => {
+  const numero = Number(valor);
+  return Number.isFinite(numero) ? Math.max(0, numero) : 0;
+};
+
+const normalizarDatosEquipos = (datos = {}) => {
+  const normalizado = { ...datos };
+
+  ['verserkers', 'internadas', 'siemprealpalo'].forEach((equipoKey) => {
+    const equipo = normalizado[equipoKey];
+    if (!equipo?.jugadoras) return;
+
+    normalizado[equipoKey] = {
+      ...equipo,
+      jugadoras: equipo.jugadoras.map((jugadora) => ({
+        ...jugadora,
+        goles: normalizarNumeroGoles(jugadora?.goles)
+      }))
+    };
+  });
+
+  return normalizado;
+};
+
 /**
  * Inicializar datos del campeonato si no existen
  */
@@ -84,7 +116,8 @@ export const inicializarCampeonato = async () => {
           { nombre: 'Eli O', goles: 0 },
           { nombre: 'Caro', goles: 0 },
           { nombre: 'Dani F', goles: 0, capitana: true },
-          { nombre: 'Dani O', goles: 0 }
+          { nombre: 'Dani O', goles: 0 },
+          { nombre: 'Pau G', goles: 1 }
         ]
       },
       lastUpdated: new Date().toISOString(),
@@ -110,7 +143,7 @@ export const obtenerDatosCampeonato = async () => {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      equiposCampeonato.value = docSnap.data();
+      equiposCampeonato.value = normalizarDatosEquipos(docSnap.data());
       return equiposCampeonato.value;
     } else {
       // Si no existe, inicializar
@@ -135,8 +168,9 @@ export const escucharCampeonato = (callback) => {
   
   return onSnapshot(docRef, (docSnap) => {
     if (docSnap.exists()) {
-      equiposCampeonato.value = docSnap.data();
-      if (callback) callback(docSnap.data());
+      const datosNormalizados = normalizarDatosEquipos(docSnap.data());
+      equiposCampeonato.value = datosNormalizados;
+      if (callback) callback(datosNormalizados);
     }
   }, (err) => {
     error.value = err.message;
@@ -157,7 +191,7 @@ export const actualizarGolesJugadora = async (equipoKey, jugadoraIndex, nuevoVal
       
       // Actualizar los goles de la jugadora específica
       if (datos[equipoKey] && datos[equipoKey].jugadoras[jugadoraIndex]) {
-        datos[equipoKey].jugadoras[jugadoraIndex].goles = Math.max(0, nuevoValorGoles);
+        datos[equipoKey].jugadoras[jugadoraIndex].goles = normalizarNumeroGoles(nuevoValorGoles);
         datos.lastUpdated = new Date().toISOString();
 
         await updateDoc(docRef, datos);
@@ -182,7 +216,7 @@ export const agregarGol = async (equipoKey, jugadoraIndex) => {
 
   if (docSnap.exists()) {
     const datos = docSnap.data();
-    const golesActuales = datos[equipoKey].jugadoras[jugadoraIndex].goles || 0;
+    const golesActuales = normalizarNumeroGoles(datos[equipoKey].jugadoras[jugadoraIndex].goles);
     return await actualizarGolesJugadora(equipoKey, jugadoraIndex, golesActuales + 1);
   }
   return false;
@@ -197,7 +231,7 @@ export const restarGol = async (equipoKey, jugadoraIndex) => {
 
   if (docSnap.exists()) {
     const datos = docSnap.data();
-    const golesActuales = datos[equipoKey].jugadoras[jugadoraIndex].goles || 0;
+    const golesActuales = normalizarNumeroGoles(datos[equipoKey].jugadoras[jugadoraIndex].goles);
     if (golesActuales > 0) {
       return await actualizarGolesJugadora(equipoKey, jugadoraIndex, golesActuales - 1);
     }
@@ -216,9 +250,11 @@ export const obtenerTablaGoleadoras = async () => {
     Object.keys(datos).forEach((equipoKey) => {
       if (datos[equipoKey].jugadoras) {
         datos[equipoKey].jugadoras.forEach((jugadora) => {
-          if (jugadora.goles > 0) {
+          const goles = normalizarNumeroGoles(jugadora?.goles);
+          if (goles > 0) {
             todasLasJugadoras.push({
               ...jugadora,
+              goles,
               equipo: datos[equipoKey].nombre,
               equipoKey,
               color: datos[equipoKey].color
@@ -243,7 +279,7 @@ export const calcularTotalGoles = (equipoKey) => {
   if (!equiposCampeonato.value[equipoKey] || !equiposCampeonato.value[equipoKey].jugadoras) {
     return 0;
   }
-  return equiposCampeonato.value[equipoKey].jugadoras.reduce((sum, j) => sum + (j.goles || 0), 0);
+  return equiposCampeonato.value[equipoKey].jugadoras.reduce((sum, j) => sum + normalizarNumeroGoles(j?.goles), 0);
 };
 
 /**
@@ -301,6 +337,10 @@ export const inicializarPartidos = async () => {
           equipoVisita: 'siemprealpalo',
           golesLocal: 0,
           golesVisita: 2,
+          empate: false,
+          penalesLocal: 0,
+          penalesVisita: 0,
+          ganadorPenales: null,
           horario: '19:00 - 19:35',
           fecha: '2026-02-07',
           numeroFecha: 1,
@@ -313,6 +353,10 @@ export const inicializarPartidos = async () => {
           equipoVisita: 'verserkers',
           golesLocal: 1,
           golesVisita: 7,
+          empate: false,
+          penalesLocal: 0,
+          penalesVisita: 0,
+          ganadorPenales: null,
           horario: '19:40 - 20:15',
           fecha: '2026-02-07',
           numeroFecha: 1,
@@ -325,6 +369,10 @@ export const inicializarPartidos = async () => {
           equipoVisita: 'verserkers',
           golesLocal: 5,
           golesVisita: 1,
+          empate: false,
+          penalesLocal: 0,
+          penalesVisita: 0,
+          ganadorPenales: null,
           horario: '20:20 - 20:55',
           fecha: '2026-02-07',
           numeroFecha: 1,
@@ -368,6 +416,10 @@ export const inicializarFecha2 = async () => {
           equipoVisita: 'verserkers',
           golesLocal: 0,
           golesVisita: 0,
+          empate: false,
+          penalesLocal: 0,
+          penalesVisita: 0,
+          ganadorPenales: null,
           horario: '20:00 - 20:35',
           fecha: '2026-02-14',
           numeroFecha: 2,
@@ -380,6 +432,10 @@ export const inicializarFecha2 = async () => {
           equipoVisita: 'verserkers',
           golesLocal: 0,
           golesVisita: 0,
+          empate: false,
+          penalesLocal: 0,
+          penalesVisita: 0,
+          ganadorPenales: null,
           horario: '20:40 - 21:15',
           fecha: '2026-02-14',
           numeroFecha: 2,
@@ -392,6 +448,10 @@ export const inicializarFecha2 = async () => {
           equipoVisita: 'siemprealpalo',
           golesLocal: 0,
           golesVisita: 0,
+          empate: false,
+          penalesLocal: 0,
+          penalesVisita: 0,
+          ganadorPenales: null,
           horario: '21:20 - 21:55',
           fecha: '2026-02-14',
           numeroFecha: 2,
@@ -437,6 +497,10 @@ export const inicializarFecha3 = async () => {
           equipoVisita: 'internadas',
           golesLocal: 0,
           golesVisita: 0,
+          empate: false,
+          penalesLocal: 0,
+          penalesVisita: 0,
+          ganadorPenales: null,
           horario: '20:00 - 20:35',
           fecha: '2026-02-21',
           numeroFecha: 3,
@@ -449,6 +513,10 @@ export const inicializarFecha3 = async () => {
           equipoVisita: 'siemprealpalo',
           golesLocal: 0,
           golesVisita: 0,
+          empate: false,
+          penalesLocal: 0,
+          penalesVisita: 0,
+          ganadorPenales: null,
           horario: '20:40 - 21:15',
           fecha: '2026-02-21',
           numeroFecha: 3,
@@ -461,6 +529,10 @@ export const inicializarFecha3 = async () => {
           equipoVisita: 'siemprealpalo',
           golesLocal: 0,
           golesVisita: 0,
+          empate: false,
+          penalesLocal: 0,
+          penalesVisita: 0,
+          ganadorPenales: null,
           horario: '21:20 - 21:55',
           fecha: '2026-02-21',
           numeroFecha: 3,
@@ -491,10 +563,10 @@ export const obtenerPartidos = async () => {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      return docSnap.data().partidos || [];
+      return (docSnap.data().partidos || []).map(normalizarPartidoConPenales);
     } else {
       const partidosIniciales = await inicializarPartidos();
-      return partidosIniciales.partidos || [];
+      return (partidosIniciales.partidos || []).map(normalizarPartidoConPenales);
     }
   } catch (err) {
     console.error('Error obteniendo partidos:', err);
@@ -505,7 +577,7 @@ export const obtenerPartidos = async () => {
 /**
  * Actualizar resultado de un partido
  */
-export const actualizarResultadoPartido = async (partidoId, golesLocal, golesVisita) => {
+export const actualizarResultadoPartido = async (partidoId, golesLocal, golesVisita, opciones = {}) => {
   try {
     const docRef = doc(db, CAMPEONATO_INTERNO_2026, 'partidos');
     const docSnap = await getDoc(docRef);
@@ -515,8 +587,37 @@ export const actualizarResultadoPartido = async (partidoId, golesLocal, golesVis
       const partidoIndex = datos.partidos.findIndex(p => p.id === partidoId);
       
       if (partidoIndex !== -1) {
-        datos.partidos[partidoIndex].golesLocal = Math.max(0, golesLocal);
-        datos.partidos[partidoIndex].golesVisita = Math.max(0, golesVisita);
+        const empate = opciones?.empate === true;
+        const golesLocalNormalizados = Math.max(0, golesLocal);
+        const golesVisitaNormalizados = Math.max(0, golesVisita);
+
+        if (empate && golesLocalNormalizados !== golesVisitaNormalizados) {
+          throw new Error('Para definir por penales, el resultado debe terminar empatado en tiempo regular.');
+        }
+
+        const penalesLocal = empate ? Math.max(0, Number(opciones?.penalesLocal) || 0) : 0;
+        const penalesVisita = empate ? Math.max(0, Number(opciones?.penalesVisita) || 0) : 0;
+
+        let ganadorPenales = null;
+        if (empate) {
+          if (penalesLocal === penalesVisita) {
+            throw new Error('En penales no puede haber empate.');
+          }
+
+          ganadorPenales = opciones?.ganadorPenales;
+          if (!ganadorPenales) {
+            ganadorPenales = penalesLocal > penalesVisita
+              ? datos.partidos[partidoIndex].equipoLocal
+              : datos.partidos[partidoIndex].equipoVisita;
+          }
+        }
+
+        datos.partidos[partidoIndex].golesLocal = golesLocalNormalizados;
+        datos.partidos[partidoIndex].golesVisita = golesVisitaNormalizados;
+        datos.partidos[partidoIndex].empate = empate;
+        datos.partidos[partidoIndex].penalesLocal = penalesLocal;
+        datos.partidos[partidoIndex].penalesVisita = penalesVisita;
+        datos.partidos[partidoIndex].ganadorPenales = ganadorPenales;
         datos.lastUpdated = new Date().toISOString();
 
         await updateDoc(docRef, datos);
@@ -546,19 +647,19 @@ export const calcularTabla = async () => {
       verserkers: { 
         nombre: 'Las Verserkers',
         logo: 'versekersLogo.jpeg',
-        pj: 0, pg: 0, pp: 0, gf: 0, gc: 0, dg: 0, pts: 0,
+        pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dg: 0, pts: 0,
         color: 'cyan'
       },
       internadas: { 
         nombre: 'Inter Nadas',
         logo: 'internadasLogo.jpeg',
-        pj: 0, pg: 0, pp: 0, gf: 0, gc: 0, dg: 0, pts: 0,
+        pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dg: 0, pts: 0,
         color: 'gray'
       },
       siemprealpalo: { 
         nombre: 'Siempre al Palo FC',
         logo: 'siemprealpaloLogo.jpeg',
-        pj: 0, pg: 0, pp: 0, gf: 0, gc: 0, dg: 0, pts: 0,
+        pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dg: 0, pts: 0,
         color: 'red'
       }
     };
@@ -570,6 +671,9 @@ export const calcularTabla = async () => {
         const visita = partido.equipoVisita;
         const golesLocal = partido.golesLocal;
         const golesVisita = partido.golesVisita;
+        const empate = partido?.empate === true;
+        const penalesLocal = Number(partido?.penalesLocal || 0);
+        const penalesVisita = Number(partido?.penalesVisita || 0);
 
         // Actualizar estadísticas del equipo local
         tabla[local].pj++;
@@ -592,6 +696,23 @@ export const calcularTabla = async () => {
           tabla[visita].pg++;
           tabla[visita].pts += 3;
           tabla[local].pp++;
+        } else if (empate) {
+          // Empate en tiempo regular, definido a penales:
+          // ganador suma 3 pts, perdedor 0 pts
+          let ganador = partido.ganadorPenales;
+          if (!ganador && penalesLocal !== penalesVisita) {
+            ganador = penalesLocal > penalesVisita ? local : visita;
+          }
+
+          if (ganador) {
+            const perdedor = ganador === local ? visita : local;
+            tabla[ganador].pg++;
+            tabla[ganador].pts += 3;
+            tabla[perdedor].pp++;
+          }
+        } else {
+          // Si quedó empatado y NO hubo definición por penales, no se asignan puntos.
+          // Regla del torneo: no existe reparto de 1 punto por empate.
         }
       }
     });
@@ -629,15 +750,8 @@ export const calcularTabla = async () => {
  */
 export const obtenerTabla = async () => {
   try {
-    const docRef = doc(db, CAMPEONATO_INTERNO_2026, 'tabla');
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      return docSnap.data().posiciones || [];
-    } else {
-      // Si no existe, calcular por primera vez
-      return await calcularTabla();
-    }
+    // Recalcular siempre para evitar tabla desactualizada por cambios de reglas.
+    return await calcularTabla();
   } catch (err) {
     console.error('Error obteniendo tabla:', err);
     throw err;
@@ -652,7 +766,8 @@ export const escucharPartidos = (callback) => {
   
   return onSnapshot(docRef, (docSnap) => {
     if (docSnap.exists()) {
-      if (callback) callback(docSnap.data().partidos || []);
+      const partidosNormalizados = (docSnap.data().partidos || []).map(normalizarPartidoConPenales);
+      if (callback) callback(partidosNormalizados);
     }
   }, (err) => {
     console.error('Error escuchando partidos:', err);

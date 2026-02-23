@@ -9,13 +9,72 @@ import {
   query,
   where,
   getDoc,
-  onSnapshot
+  onSnapshot,
+  writeBatch,
+  setDoc
 } from 'firebase/firestore';
 import { db } from './config';
 
 export const entrenamientos = ref([]);
 export const isLoadingEntrenamientos = ref(false);
 export const errorEntrenamientos = ref(null);
+
+const limpiarProximoPartidoHome = async (entrenamientoIdActivo = null) => {
+  const q = query(
+    collection(db, 'entrenamientos'),
+    where('mostrarEnProximoPartido', '==', true)
+  );
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) return;
+
+  const batch = writeBatch(db);
+  let cambios = 0;
+
+  snapshot.docs.forEach((docSnap) => {
+    if (docSnap.id !== entrenamientoIdActivo) {
+      batch.update(docSnap.ref, {
+        mostrarEnProximoPartido: false,
+        updatedAt: new Date()
+      });
+      cambios++;
+    }
+  });
+
+  if (cambios > 0) {
+    await batch.commit();
+  }
+};
+
+const actualizarConfigProximoPartidoHome = async (entrenamientoId, entrenamientoData) => {
+  await setDoc(doc(db, 'configuracion', 'proximoPartidoHome'), {
+    entrenamientoId,
+    activo: true,
+    nombre: entrenamientoData?.nombre || '',
+    tipo: entrenamientoData?.tipo || '',
+    rival: entrenamientoData?.rival || '',
+    fecha: entrenamientoData?.fecha || '',
+    hora: entrenamientoData?.hora || '',
+    lugar: entrenamientoData?.lugar || '',
+    descripcion: entrenamientoData?.descripcion || '',
+    equipo: entrenamientoData?.equipo || '',
+    updatedAt: new Date()
+  }, { merge: true });
+};
+
+const limpiarConfigProximoPartidoHomeSiCorresponde = async (entrenamientoId) => {
+  const refConfig = doc(db, 'configuracion', 'proximoPartidoHome');
+  const snap = await getDoc(refConfig);
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+  if (data?.entrenamientoId === entrenamientoId) {
+    await setDoc(refConfig, {
+      activo: false,
+      updatedAt: new Date()
+    }, { merge: true });
+  }
+};
 
 // Crear entrenamiento (admin)
 export const crearEntrenamiento = async (entrenamientoData) => {
@@ -29,6 +88,11 @@ export const crearEntrenamiento = async (entrenamientoData) => {
     });
 
     const entrenamientoId = docRef.id;
+
+    if (entrenamientoData.mostrarEnProximoPartido) {
+      await limpiarProximoPartidoHome(entrenamientoId);
+      await actualizarConfigProximoPartidoHome(entrenamientoId, entrenamientoData);
+    }
 
     // Si es una convocatoria, crear inscripciones solo para las jugadoras convocadas
     if (entrenamientoData.esConvocatoria && entrenamientoData.jugadorasConvocadas && entrenamientoData.jugadorasConvocadas.length > 0) {
@@ -147,6 +211,13 @@ export const actualizarEntrenamiento = async (entrenamientoId, data) => {
       ...data,
       updatedAt: new Date()
     });
+
+    if (data.mostrarEnProximoPartido) {
+      await limpiarProximoPartidoHome(entrenamientoId);
+      await actualizarConfigProximoPartidoHome(entrenamientoId, data);
+    } else {
+      await limpiarConfigProximoPartidoHomeSiCorresponde(entrenamientoId);
+    }
 
     return true;
   } catch (err) {

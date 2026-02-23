@@ -147,8 +147,8 @@ const navLinks = [
   { id: 3, label: 'Equipo', path: '/equipo', icon: UserGroupIcon },
   { id: 4, label: 'Competencias', path: '/competencias', icon: TrophyIcon },
   { id: 5, label: 'Estadísticas', path: '/estadisticas', icon: ChartBarIcon },
-  // { id: 5, label: 'Indumentaria', path: '/indumentaria' },
-  { id: 6, label: 'Fotos', path: '/fotos', icon: PhotoIcon },
-  { id: 7, label: 'Contacto', path: '/contacto', icon: EnvelopeIcon },
+  { id: 6, label: 'Indumentarias', path: '/indumentarias', icon: PhotoIcon },
+  { id: 7, label: 'Fotos', path: '/fotos', icon: PhotoIcon },
+  { id: 8, label: 'Contacto', path: '/contacto', icon: EnvelopeIcon },
 ];
 </script>

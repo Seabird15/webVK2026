@@ -14,6 +14,9 @@
                         <div class="text-center space-y-1">
                             <p class="text-white text-sm uppercase">{{ proximoPartido.fecha }}</p>
                             <p class="text-white/70 text-xs uppercase">{{ proximoPartido.liga }}</p>
+                                                        <p v-if="proximoPartido.equipoCategoria" class="text-primary text-[11px] font-bold uppercase">
+                                                            Equipo: {{ proximoPartido.equipoCategoria }}
+                                                        </p>
                         </div>
 
                         <!-- Equipos -->
@@ -116,8 +119,10 @@ const ultimoPartido = ref(null);
 const cargando = ref(true);
 let unsubscribeProximoPartido = null;
 let unsubscribeConvocatorias = null;
+let unsubscribeProximoPartidoHomeConfig = null;
 const partidosInternos = ref([]);
 const partidosAdmin = ref([]);
+const partidoDestacadoHome = ref(null);
 
 const logoUrlVikingas = new URL('../assets/logoVk.png', import.meta.url).href;
 const logoUrlVerserkers = new URL('../assets/versekersLogo.jpeg', import.meta.url).href;
@@ -214,7 +219,20 @@ const normalizarEstado = (estado) => {
     return 'PROGRAMADO';
 };
 
+const normalizarEquipoCategoria = (equipo) => {
+    const valor = (equipo || '').toString().toLowerCase().trim();
+    if (valor === 'ascenso') return 'Ascenso';
+    if (valor === 'escuela') return 'Escuela';
+    if (valor === 'ambos') return 'Ascenso y Escuela';
+    return '';
+};
+
 const recalcularProximoPartido = () => {
+    if (partidoDestacadoHome.value) {
+        proximoPartido.value = partidoDestacadoHome.value;
+        return;
+    }
+
     const ahora = new Date();
     const limitePasadoMs = 6 * 60 * 60 * 1000;
 
@@ -233,9 +251,50 @@ const recalcularProximoPartido = () => {
     proximoPartido.value = candidatos.length > 0 ? candidatos[0] : null;
 };
 
+const mapearPartidoDestacadoDesdeConfig = (configData) => {
+    if (!configData || configData.activo === false) return null;
+
+    const rival = (configData.rival || '').trim() || extraerRival(configData.nombre || '');
+    const fechaHora = getFechaHoraEntrenamiento({
+        fecha: configData.fecha,
+        hora: configData.hora
+    });
+
+    return {
+        id: configData.entrenamientoId || 'proximoPartidoHome',
+        fecha: formatearFecha(configData.fecha),
+        liga: configData.tipo === 'amistoso' ? 'Partido Amistoso' : 'Partido Programado',
+        equipoCategoria: normalizarEquipoCategoria(configData.equipo),
+        hora: (configData.hora || '00:00').split('-')[0]?.trim() || '00:00',
+        equipo1: {
+            nombre: 'CD Vikingas',
+            logo: logoUrlVikingas
+        },
+        equipo2: {
+            nombre: rival || 'Rival por confirmar',
+            logo: null
+        },
+        lugar: configData.lugar || 'Por confirmar',
+        estado: 'PROGRAMADO',
+        numeroFecha: null,
+        fechaDate: fechaHora,
+        fuente: 'admin_destacado'
+    };
+};
+
 // Cargar próximo partido desde campeonato interno (estructura admin)
 const cargarProximoPartido = () => {
   try {
+        const proximoPartidoHomeRef = doc(db, 'configuracion', 'proximoPartidoHome');
+        unsubscribeProximoPartidoHomeConfig = onSnapshot(proximoPartidoHomeRef, (docSnap) => {
+            if (docSnap.exists()) {
+                partidoDestacadoHome.value = mapearPartidoDestacadoDesdeConfig(docSnap.data());
+            } else {
+                partidoDestacadoHome.value = null;
+            }
+            recalcularProximoPartido();
+        });
+
         const partidosRef = doc(db, 'campeonato_interno_2026', 'partidos');
 
         unsubscribeProximoPartido = onSnapshot(partidosRef, (docSnap) => {
@@ -256,6 +315,7 @@ const cargarProximoPartido = () => {
                         id: partido.id,
                         fecha: formatearFecha(partido.fecha),
                         liga: equipoLocal.liga,
+                        equipoCategoria: '',
                         hora: (partido.horario || '').split('-')[0]?.trim() || '00:00',
                         equipo1: {
                             nombre: equipoLocal.nombre,
@@ -290,13 +350,14 @@ const cargarProximoPartido = () => {
                         id: item.id,
                         fecha: formatearFecha(entrenamiento.fecha),
                         liga: entrenamiento.tipo === 'amistoso' ? 'Partido Amistoso' : 'Convocatoria Admin',
+                        equipoCategoria: normalizarEquipoCategoria(entrenamiento.equipo),
                         hora: (entrenamiento.hora || '00:00').split('-')[0]?.trim() || '00:00',
                         equipo1: {
                             nombre: 'CD Vikingas',
                             logo: logoUrlVikingas
                         },
                         equipo2: {
-                            nombre: extraerRival(entrenamiento.nombre),
+                            nombre: (entrenamiento.rival || '').trim() || extraerRival(entrenamiento.nombre),
                             logo: null
                         },
                         lugar: entrenamiento.lugar || 'Por confirmar',
@@ -330,6 +391,9 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+    if (unsubscribeProximoPartidoHomeConfig) {
+        unsubscribeProximoPartidoHomeConfig();
+    }
     if (unsubscribeProximoPartido) {
         unsubscribeProximoPartido();
     }

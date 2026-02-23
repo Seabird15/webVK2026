@@ -100,13 +100,13 @@
           <!-- Contenido principal -->
           <div class="text-center md:text-left">
             <h2 class="text-2xl md:text-4xl font-black text-black mb-1 uppercase" style="font-family: 'Gobold High', sans-serif;">
-              ¡HOY: FECHA 3 DEL CAMPEONATO INTERNO VKS!
+              PRÓXIMO SÁBADO, FINAL CAMPEONATO INTERNO
             </h2>
             <p class="text-black/90 font-bold text-sm md:text-base mb-2">
-              Última jornada de la fase regular • Resultados en vivo y edición en tiempo real
+             Verserkers vs Internadas, van por la final del campeonato interno de nuestro Club ¡No te lo pierdas!
             </p>
             <p class="text-black/70 text-xs md:text-sm font-semibold">
-              Sábado 21 de Febrero 2026 | Tricolor La Florida | 3 equipos mixtos
+              Sábado 28 de Febrero 2026 | Tricolor La Florida 
             </p>
           </div>
           
@@ -129,7 +129,7 @@
               to="/competencias"
               class="inline-flex items-center gap-2 bg-black hover:bg-gray-900 text-primary px-6 py-3 rounded-lg font-black text-sm transition-all transform hover:scale-105 shadow-xl"
             >
-              Ver Fecha 3 ahora
+              Ver detalles
               <span aria-hidden="true">→</span>
             </router-link>
 
