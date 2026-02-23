@@ -736,6 +736,41 @@
                       Ganador: {{ obtenerDatosEquipo(partido.ganadorPenales).nombre }}
                     </p>
                   </div>
+
+                  <div class="bg-black/30 border border-primary/20 rounded-lg p-3">
+                    <div class="flex items-center justify-between mb-2">
+                      <p class="text-primary text-xs font-bold uppercase tracking-wide">Ficha del partido</p>
+                      <span class="text-white/60 text-[11px]">{{ partido.fecha }}</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                      <div class="bg-white/5 rounded p-2">
+                        <p class="text-white/60">Sede</p>
+                        <p class="text-white font-semibold">{{ partido.ficha?.lugar || 'Tricolor La Florida' }}</p>
+                      </div>
+                      <div class="bg-white/5 rounded p-2">
+                        <p class="text-white/60">Árbitra</p>
+                        <p class="text-white font-semibold">{{ partido.ficha?.arbitra || 'Por confirmar' }}</p>
+                      </div>
+                    </div>
+
+                    <div v-if="(partido.ficha?.goleadorasLocal?.length || 0) + (partido.ficha?.goleadorasVisita?.length || 0) > 0" class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                      <div class="bg-white/5 rounded p-2">
+                        <p class="text-cyan-300 font-bold mb-1">Goleadoras {{ obtenerDatosEquipo(partido.equipoLocal).nombre }}</p>
+                        <p class="text-white/80">{{ (partido.ficha?.goleadorasLocal || []).join(', ') }}</p>
+                      </div>
+                      <div class="bg-white/5 rounded p-2">
+                        <p class="text-red-300 font-bold mb-1">Goleadoras {{ obtenerDatosEquipo(partido.equipoVisita).nombre }}</p>
+                        <p class="text-white/80">{{ (partido.ficha?.goleadorasVisita || []).join(', ') }}</p>
+                      </div>
+                    </div>
+
+                    <div v-if="partido.ficha?.figura || partido.ficha?.resumen" class="mt-2 bg-white/5 rounded p-2 text-xs">
+                      <p v-if="partido.ficha?.figura" class="text-primary font-bold">MVP del partido: <span class="text-white">{{ partido.ficha.figura }}</span></p>
+                      <p v-if="partido.ficha?.resumen" class="text-white/80 mt-1">{{ partido.ficha.resumen }}</p>
+                    </div>
+                  </div>
+
                 </div>
                 
                 <!-- Modo de edición (solo admin) -->
@@ -853,6 +888,72 @@
                           </button>
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  <div class="bg-black/30 border border-primary/20 rounded-lg p-3 space-y-3">
+                    <p class="text-primary text-sm font-bold uppercase tracking-wide">Ficha completa del partido</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label class="block text-white/70 text-xs mb-1">Sede / cancha</label>
+                        <input
+                          v-model="partidoEditando.lugarEdit"
+                          type="text"
+                          class="w-full bg-white/5 border border-white/20 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+                          placeholder="Ej: Tricolor La Florida"
+                        />
+                      </div>
+                      <div>
+                        <label class="block text-white/70 text-xs mb-1">Árbitra</label>
+                        <input
+                          v-model="partidoEditando.arbitraEdit"
+                          type="text"
+                          class="w-full bg-white/5 border border-white/20 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+                          placeholder="Ej: Carla"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label class="block text-white/70 text-xs mb-1">Goleadoras local (separadas por coma)</label>
+                        <input
+                          v-model="partidoEditando.goleadorasLocalEditText"
+                          type="text"
+                          class="w-full bg-white/5 border border-white/20 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+                          placeholder="Ej: Barby, May"
+                        />
+                      </div>
+                      <div>
+                        <label class="block text-white/70 text-xs mb-1">Goleadoras visita (separadas por coma)</label>
+                        <input
+                          v-model="partidoEditando.goleadorasVisitaEditText"
+                          type="text"
+                          class="w-full bg-white/5 border border-white/20 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+                          placeholder="Ej: Motta, Eli López"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-white/70 text-xs mb-1">Figura del partido</label>
+                      <input
+                        v-model="partidoEditando.figuraEdit"
+                        type="text"
+                        class="w-full bg-white/5 border border-white/20 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+                        placeholder="Ej: Motta"
+                      />
+                    </div>
+
+                    <div>
+                      <label class="block text-white/70 text-xs mb-1">Resumen del partido</label>
+                      <textarea
+                        v-model="partidoEditando.resumenEdit"
+                        rows="3"
+                        class="w-full bg-white/5 border border-white/20 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+                        placeholder="Describe lo más importante del partido"
+                      ></textarea>
                     </div>
                   </div>
                   
@@ -1289,6 +1390,7 @@ import {
   obtenerPartidos,
   obtenerPartidosPorFecha,
   actualizarResultadoPartido,
+  actualizarFichaPartido,
   actualizarEstadoPartido,
   obtenerTabla,
   escucharPartidos,
@@ -1629,6 +1731,7 @@ const obtenerDatosEquipo = (equipoKey) => {
 const editarResultado = (partido) => {
   const empateEdit = partido.golesLocal === partido.golesVisita && (partido.empate === true || (partido.penalesLocal || 0) !== (partido.penalesVisita || 0));
   let ganadorPenalesEdit = partido.ganadorPenales || null;
+  const fichaActual = partido?.ficha || {};
 
   if (empateEdit && !ganadorPenalesEdit && (partido.penalesLocal || 0) !== (partido.penalesVisita || 0)) {
     ganadorPenalesEdit = (partido.penalesLocal || 0) > (partido.penalesVisita || 0)
@@ -1643,7 +1746,13 @@ const editarResultado = (partido) => {
     empateEdit,
     penalesLocalEdit: partido.penalesLocal || 0,
     penalesVisitaEdit: partido.penalesVisita || 0,
-    ganadorPenalesEdit
+    ganadorPenalesEdit,
+    lugarEdit: fichaActual.lugar || 'Tricolor La Florida',
+    arbitraEdit: fichaActual.arbitra || '',
+    figuraEdit: fichaActual.figura || '',
+    resumenEdit: fichaActual.resumen || '',
+    goleadorasLocalEditText: Array.isArray(fichaActual.goleadorasLocal) ? fichaActual.goleadorasLocal.join(', ') : '',
+    goleadorasVisitaEditText: Array.isArray(fichaActual.goleadorasVisita) ? fichaActual.goleadorasVisita.join(', ') : ''
   };
 };
 
@@ -1684,6 +1793,22 @@ const guardarResultado = async (partidoId) => {
         ganadorPenales: partidoEditando.value.empateEdit ? partidoEditando.value.ganadorPenalesEdit : null
       }
     );
+
+    const parsearListadoGoleadoras = (texto = '') =>
+      texto
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean);
+
+    await actualizarFichaPartido(partidoId, {
+      lugar: partidoEditando.value.lugarEdit,
+      arbitra: partidoEditando.value.arbitraEdit,
+      figura: partidoEditando.value.figuraEdit,
+      resumen: partidoEditando.value.resumenEdit,
+      goleadorasLocal: parsearListadoGoleadoras(partidoEditando.value.goleadorasLocalEditText),
+      goleadorasVisita: parsearListadoGoleadoras(partidoEditando.value.goleadorasVisitaEditText)
+    });
+
     partidoEditando.value = null;
     await cargarPartidos();
     await cargarTablaPosiciones();

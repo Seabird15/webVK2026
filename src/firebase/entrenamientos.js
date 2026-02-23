@@ -19,6 +19,18 @@ export const entrenamientos = ref([]);
 export const isLoadingEntrenamientos = ref(false);
 export const errorEntrenamientos = ref(null);
 
+const normalizarVotosMvp = (mvpVotos = []) => {
+  if (!Array.isArray(mvpVotos)) return [];
+
+  return mvpVotos
+    .map((item) => ({
+      nombre: (item?.nombre || '').toString().trim(),
+      votos: Math.max(0, Number(item?.votos) || 0)
+    }))
+    .filter((item) => item.nombre)
+    .sort((a, b) => b.votos - a.votos);
+};
+
 const limpiarProximoPartidoHome = async (entrenamientoIdActivo = null) => {
   const q = query(
     collection(db, 'entrenamientos'),
@@ -83,6 +95,9 @@ export const crearEntrenamiento = async (entrenamientoData) => {
   try {
     const docRef = await addDoc(collection(db, 'entrenamientos'), {
       ...entrenamientoData,
+      mvpHabilitado: entrenamientoData?.mvpHabilitado === true,
+      mvpCerrada: entrenamientoData?.mvpCerrada === true,
+      mvpVotos: Array.isArray(entrenamientoData?.mvpVotos) ? normalizarVotosMvp(entrenamientoData.mvpVotos) : [],
       createdAt: new Date(),
       updatedAt: new Date()
     });
@@ -209,6 +224,7 @@ export const actualizarEntrenamiento = async (entrenamientoId, data) => {
   try {
     await updateDoc(doc(db, 'entrenamientos', entrenamientoId), {
       ...data,
+      ...(Object.prototype.hasOwnProperty.call(data, 'mvpVotos') ? { mvpVotos: normalizarVotosMvp(data.mvpVotos) } : {}),
       updatedAt: new Date()
     });
 
@@ -224,6 +240,125 @@ export const actualizarEntrenamiento = async (entrenamientoId, data) => {
     // // console.error('Error actualizando entrenamiento:', err);
     errorEntrenamientos.value = err.message;
     return false;
+  } finally {
+    isLoadingEntrenamientos.value = false;
+  }
+};
+
+// Votar MVP en un partido/amistoso creado por admin
+export const votarMvpEntrenamiento = async (entrenamientoId, jugadoraNombre, votoAnterior = null) => {
+  isLoadingEntrenamientos.value = true;
+  errorEntrenamientos.value = null;
+
+  try {
+    const nombreVoto = (jugadoraNombre || '').toString().trim();
+    if (!nombreVoto) {
+      throw new Error('Debes seleccionar una jugadora para votar MVP.');
+    }
+
+    const entrenamientoRef = doc(db, 'entrenamientos', entrenamientoId);
+    const entrenamientoSnap = await getDoc(entrenamientoRef);
+
+    if (!entrenamientoSnap.exists()) {
+      throw new Error('No se encontró el evento para registrar el voto.');
+    }
+
+    const entrenamiento = entrenamientoSnap.data();
+    const tipo = (entrenamiento?.tipo || '').toLowerCase();
+
+    if (!(tipo === 'partido' || tipo === 'amistoso')) {
+      throw new Error('La votación MVP solo aplica para partidos o amistosos.');
+    }
+
+    const mvpRaw = entrenamiento?.mvpHabilitado;
+    const mvpHabilitadoNormalizado = mvpRaw === undefined || mvpRaw === null
+      ? true
+      : (mvpRaw === true || mvpRaw === 'true' || mvpRaw === 1);
+
+    if (!mvpHabilitadoNormalizado) {
+      throw new Error('La votación MVP no está habilitada para este evento.');
+    }
+
+    if (entrenamiento?.mvpCerrada === true) {
+      throw new Error('La votación MVP ya fue finalizada por administración.');
+    }
+
+    const votosActuales = normalizarVotosMvp(entrenamiento?.mvpVotos || []);
+    const mapaVotos = {};
+
+    votosActuales.forEach((item) => {
+      mapaVotos[item.nombre] = item.votos;
+    });
+
+    const nombreAnterior = (votoAnterior || '').toString().trim();
+    if (nombreAnterior && mapaVotos[nombreAnterior]) {
+      mapaVotos[nombreAnterior] = Math.max(0, mapaVotos[nombreAnterior] - 1);
+    }
+
+    mapaVotos[nombreVoto] = (mapaVotos[nombreVoto] || 0) + 1;
+
+    const votosActualizados = Object.entries(mapaVotos)
+      .map(([nombre, votos]) => ({ nombre, votos }))
+      .filter((item) => item.votos > 0)
+      .sort((a, b) => b.votos - a.votos);
+
+    await updateDoc(entrenamientoRef, {
+      mvpVotos: votosActualizados,
+      updatedAt: new Date()
+    });
+
+    return votosActualizados;
+  } catch (err) {
+    errorEntrenamientos.value = err.message;
+    throw err;
+  } finally {
+    isLoadingEntrenamientos.value = false;
+  }
+};
+
+// Finalizar votación MVP (solo admin)
+export const finalizarVotacionMvpEntrenamiento = async (entrenamientoId) => {
+  isLoadingEntrenamientos.value = true;
+  errorEntrenamientos.value = null;
+
+  try {
+    const entrenamientoRef = doc(db, 'entrenamientos', entrenamientoId);
+    const entrenamientoSnap = await getDoc(entrenamientoRef);
+
+    if (!entrenamientoSnap.exists()) {
+      throw new Error('No se encontró el evento para finalizar la votación MVP.');
+    }
+
+    const entrenamiento = entrenamientoSnap.data();
+    const tipo = (entrenamiento?.tipo || '').toLowerCase();
+
+    if (!(tipo === 'partido' || tipo === 'amistoso')) {
+      throw new Error('La votación MVP solo aplica para partidos o amistosos.');
+    }
+
+    const mvpRaw = entrenamiento?.mvpHabilitado;
+    const mvpHabilitadoNormalizado = mvpRaw === undefined || mvpRaw === null
+      ? true
+      : (mvpRaw === true || mvpRaw === 'true' || mvpRaw === 1);
+
+    if (!mvpHabilitadoNormalizado) {
+      throw new Error('Este evento no tiene habilitada la votación MVP.');
+    }
+
+    if (entrenamiento?.mvpCerrada === true) {
+      return true;
+    }
+
+    await updateDoc(entrenamientoRef, {
+      mvpCerrada: true,
+      mvpCerradaAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    return true;
+  } catch (err) {
+    errorEntrenamientos.value = err.message;
+    throw err;
   } finally {
     isLoadingEntrenamientos.value = false;
   }

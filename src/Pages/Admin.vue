@@ -316,8 +316,18 @@
                         <span v-if="ent.tipo" class="text-xs bg-linear-to-r from-green-500 to-green-600 text-white rounded-full px-3 py-1.5 font-bold capitalize shadow-sm">
                           {{ ent.tipo }}
                         </span>
+                        <span v-if="esPartidoOAmistoso(ent) && mvpHabilitadoNormalizado(ent)" class="text-xs bg-linear-to-r from-red-500 to-red-600 text-white rounded-full px-3 py-1.5 font-bold shadow-sm">
+                          MVP habilitado
+                        </span>
+                        <span v-if="ent.mvpCerrada && esPartidoOAmistoso(ent)" class="text-xs bg-linear-to-r from-gray-600 to-gray-700 text-white rounded-full px-3 py-1.5 font-bold shadow-sm">
+                          Votación MVP cerrada
+                        </span>
                         <span v-if="ent.esConvocatoria" class="text-xs bg-linear-to-r from-purple-500 to-purple-600 text-white rounded-full px-3 py-1.5 font-bold shadow-sm">
                           Convocatoria
+                        </span>
+                        <span v-if="mvpGanadora(ent)" class="text-xs bg-linear-to-r from-yellow-500 to-yellow-600 text-white rounded-full px-3 py-1.5 font-bold shadow-sm inline-flex items-center gap-1">
+                          <TrophyIcon class="w-3.5 h-3.5" />
+                          <span>Jugadora del partido: {{ mvpGanadora(ent).nombre }}</span>
                         </span>
                       </div>
 
@@ -333,6 +343,15 @@
                       >
                         <PencilIcon class="w-4 h-4" />
                         Ver Asistencia
+                      </button>
+
+                      <button
+                        v-if="esPartidoOAmistoso(ent) && mvpHabilitadoNormalizado(ent) && !ent.mvpCerrada"
+                        @click="finalizarVotacionMvpDesdeHistorial(ent)"
+                        class="w-full mt-2 px-4 py-3 bg-linear-to-r from-gray-700 to-gray-800 text-white rounded-xl cursor-pointer hover:shadow-lg font-black transition-all duration-300 flex items-center justify-center gap-2 group-hover:scale-[1.02] active:scale-95"
+                      >
+                        <FlagIcon class="w-4 h-4" />
+                        <span>Finalizar votación MVP</span>
                       </button>
                     </div>
                   </div>
@@ -383,7 +402,8 @@ import {
   CheckIcon,
   ClockIcon,
   GiftIcon,
-  PencilIcon
+  PencilIcon,
+  FlagIcon
 } from '@heroicons/vue/24/outline';
 import GestionarGalerias from '../components/GestionarGalerias.vue';
 import GestionarEventosEspeciales from '../components/GestionarEventosEspeciales.vue';
@@ -392,7 +412,7 @@ import GestionarSliderHome from '../components/GestionarSliderHome.vue';
 import GestionarSolicitudesRegistro from '../components/GestionarSolicitudesRegistro.vue';
 import GestionarEntrenamientos from '../components/GestionarEntrenamientos.vue';
 import GestionarPartidos from '../components/GestionarPartidos.vue';
-import { entrenamientos, fetchTodosEntrenamientos } from '../firebase/entrenamientos';
+import { entrenamientos, fetchTodosEntrenamientos, finalizarVotacionMvpEntrenamiento } from '../firebase/entrenamientos';
 import VistaJugadorasAdmin from '../components/VistaJugadorasAdmin.vue';
 import ListadoJugadorasAdmin from '../components/ListadoJugadorasAdmin.vue';
 import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
@@ -477,6 +497,35 @@ const getFechaHoraMs = (ent) => {
 const eventoFinalizado = (ent) => {
   const ms = getFechaHoraMs(ent);
   return ms != null && ms < Date.now();
+};
+
+const esPartidoOAmistoso = (ent) => {
+  const tipo = (ent?.tipo || '').toString().toLowerCase();
+  return tipo === 'partido' || tipo === 'amistoso';
+};
+
+const mvpHabilitadoNormalizado = (ent) => {
+  const mvpRaw = ent?.mvpHabilitado;
+  return mvpRaw === undefined || mvpRaw === null
+    ? true
+    : (mvpRaw === true || mvpRaw === 'true' || mvpRaw === 1);
+};
+
+const mvpGanadora = (ent) => {
+  if (!ent?.mvpCerrada || !Array.isArray(ent?.mvpVotos) || ent.mvpVotos.length === 0) return null;
+  return [...ent.mvpVotos].sort((a, b) => (Number(b?.votos) || 0) - (Number(a?.votos) || 0))[0];
+};
+
+const finalizarVotacionMvpDesdeHistorial = async (ent) => {
+  const confirmar = confirm(`¿Finalizar votación MVP para "${ent?.nombre || 'este evento'}"?`);
+  if (!confirmar) return;
+
+  try {
+    await finalizarVotacionMvpEntrenamiento(ent.id);
+    await fetchTodosEntrenamientos();
+  } catch (err) {
+    alert(err?.message || 'No se pudo finalizar la votación MVP.');
+  }
 };
 
 const historialEntrenamientos = computed(() => {

@@ -16,12 +16,39 @@ export const error = ref(null);
 // Referencia a la colección del campeonato interno
 const CAMPEONATO_INTERNO_2026 = 'campeonato_interno_2026';
 
+const normalizarFichaPartido = (ficha = {}) => ({
+  lugar: (ficha?.lugar || 'Tricolor La Florida').toString().trim(),
+  arbitra: (ficha?.arbitra || '').toString().trim(),
+  figura: (ficha?.figura || '').toString().trim(),
+  resumen: (ficha?.resumen || '').toString().trim(),
+  goleadorasLocal: Array.isArray(ficha?.goleadorasLocal)
+    ? ficha.goleadorasLocal.map((item) => (item || '').toString().trim()).filter(Boolean)
+    : [],
+  goleadorasVisita: Array.isArray(ficha?.goleadorasVisita)
+    ? ficha.goleadorasVisita.map((item) => (item || '').toString().trim()).filter(Boolean)
+    : []
+});
+
+const normalizarMvpVotos = (votos = []) => {
+  if (!Array.isArray(votos)) return [];
+
+  return votos
+    .map((voto) => ({
+      nombre: (voto?.nombre || '').toString().trim(),
+      votos: Number.isFinite(voto?.votos) ? Math.max(0, voto.votos) : Math.max(0, Number(voto?.votos) || 0)
+    }))
+    .filter((voto) => voto.nombre)
+    .sort((a, b) => b.votos - a.votos);
+};
+
 const normalizarPartidoConPenales = (partido) => ({
   ...partido,
   empate: partido?.empate === true,
   penalesLocal: Number.isFinite(partido?.penalesLocal) ? Math.max(0, partido.penalesLocal) : 0,
   penalesVisita: Number.isFinite(partido?.penalesVisita) ? Math.max(0, partido.penalesVisita) : 0,
-  ganadorPenales: partido?.ganadorPenales || null
+  ganadorPenales: partido?.ganadorPenales || null,
+  ficha: normalizarFichaPartido(partido?.ficha),
+  mvpVotos: normalizarMvpVotos(partido?.mvpVotos)
 });
 
 const normalizarNumeroGoles = (valor) => {
@@ -631,6 +658,98 @@ export const actualizarResultadoPartido = async (partidoId, golesLocal, golesVis
     return false;
   } catch (err) {
     console.error('Error actualizando resultado:', err);
+    throw err;
+  }
+};
+
+/**
+ * Guardar/actualizar ficha completa de partido (admin)
+ */
+export const actualizarFichaPartido = async (partidoId, ficha = {}) => {
+  try {
+    const docRef = doc(db, CAMPEONATO_INTERNO_2026, 'partidos');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const datos = docSnap.data();
+      const partidoIndex = datos.partidos.findIndex(p => p.id === partidoId);
+
+      if (partidoIndex !== -1) {
+        const fichaActual = normalizarFichaPartido(datos.partidos[partidoIndex]?.ficha || {});
+        const fichaNueva = normalizarFichaPartido({
+          ...fichaActual,
+          ...ficha
+        });
+
+        datos.partidos[partidoIndex].ficha = fichaNueva;
+        datos.lastUpdated = new Date().toISOString();
+
+        await updateDoc(docRef, datos);
+        return true;
+      }
+    }
+
+    return false;
+  } catch (err) {
+    console.error('Error actualizando ficha del partido:', err);
+    throw err;
+  }
+};
+
+/**
+ * Registrar voto MVP para una jugadora en un partido finalizado
+ */
+export const votarMvpPartido = async (partidoId, jugadoraNombre, votoAnterior = null) => {
+  try {
+    const nombreVoto = (jugadoraNombre || '').toString().trim();
+    if (!nombreVoto) {
+      throw new Error('Debes seleccionar una jugadora para votar MVP.');
+    }
+
+    const docRef = doc(db, CAMPEONATO_INTERNO_2026, 'partidos');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const datos = docSnap.data();
+      const partidoIndex = datos.partidos.findIndex(p => p.id === partidoId);
+
+      if (partidoIndex !== -1) {
+        const partido = normalizarPartidoConPenales(datos.partidos[partidoIndex]);
+
+        if (partido.estado !== 'FINALIZADO') {
+          throw new Error('La votación MVP se habilita cuando el partido está finalizado.');
+        }
+
+        const votosActuales = [...partido.mvpVotos];
+        const mapaVotos = {};
+
+        votosActuales.forEach((item) => {
+          mapaVotos[item.nombre] = item.votos;
+        });
+
+        const nombreAnterior = (votoAnterior || '').toString().trim();
+        if (nombreAnterior && mapaVotos[nombreAnterior]) {
+          mapaVotos[nombreAnterior] = Math.max(0, mapaVotos[nombreAnterior] - 1);
+        }
+
+        mapaVotos[nombreVoto] = (mapaVotos[nombreVoto] || 0) + 1;
+
+        const votosNormalizados = Object.entries(mapaVotos)
+          .map(([nombre, votos]) => ({ nombre, votos }))
+          .filter((item) => item.votos > 0)
+          .sort((a, b) => b.votos - a.votos);
+
+        datos.partidos[partidoIndex].mvpVotos = votosNormalizados;
+        datos.lastUpdated = new Date().toISOString();
+
+        await updateDoc(docRef, datos);
+        return votosNormalizados;
+      }
+    }
+
+    return [];
+  } catch (err) {
+    console.error('Error registrando voto MVP:', err);
     throw err;
   }
 };

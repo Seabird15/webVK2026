@@ -19,7 +19,7 @@
               </span>
               <span class="flex items-center gap-1">
                 <ClockIcon class="w-4 h-4" />
-                {{ entrenamiento?.hora }}
+                {{ entrenamiento?.hora }}<template v-if="entrenamiento?.horaFin"> - {{ entrenamiento?.horaFin }}</template>
               </span>
             </div>
           </div>
@@ -176,6 +176,98 @@
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div v-if="mvpPendienteHabilitacion" class="bg-blue-50 border border-blue-200 rounded-xl p-3">
+            <p class="text-xs text-blue-800 font-bold">
+              Votación MVP disponible desde: {{ mvpDisponibleDesdeTexto }}
+            </p>
+          </div>
+
+          <div v-if="esMvpDisponible" class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="px-4 py-3 border-b border-gray-200">
+              <h2 class="text-black font-black text-xs uppercase">Votación MVP Post-Partido</h2>
+              <p class="text-[11px] text-gray-500 mt-1">Vota por la jugadora destacada del partido</p>
+            </div>
+
+            <div class="p-4 space-y-3">
+              <div v-if="mvpGanadora" class="bg-linear-to-r from-yellow-50 via-amber-50 to-orange-100 border-2 border-yellow-300 rounded-2xl p-3 shadow-lg relative overflow-hidden">
+                <SparklesIcon class="absolute -top-3 -right-3 w-10 h-10 text-yellow-500 opacity-20 animate-pulse" />
+                <TrophyIcon class="absolute -bottom-3 -left-2 w-8 h-8 text-yellow-600 opacity-20 animate-bounce" />
+
+                <div class="flex items-center gap-3 relative z-10">
+                  <div class="relative shrink-0">
+                    <img
+                      v-if="mvpGanadoraFoto"
+                      :src="mvpGanadoraFoto"
+                      :alt="mvpGanadora.nombre"
+                      class="w-14 h-14 rounded-full object-cover border-2 border-yellow-400 shadow"
+                    />
+                    <div
+                      v-else
+                      class="w-14 h-14 rounded-full bg-linear-to-br from-primary-dark to-primary text-white border-2 border-yellow-400 shadow flex items-center justify-center font-black"
+                    >
+                      {{ obtenerIniciales(mvpGanadora.nombre) }}
+                    </div>
+                    <div class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-yellow-400 text-yellow-900 flex items-center justify-center shadow animate-pulse">
+                      <TrophyIcon class="w-4 h-4" />
+                    </div>
+                  </div>
+
+                  <div class="min-w-0 flex-1">
+                    <p class="text-[11px] font-black uppercase tracking-wider text-yellow-700 flex items-center gap-1">
+                      <TrophyIcon class="w-3.5 h-3.5" />
+                      <span>Jugadora del partido</span>
+                    </p>
+                    <p class="text-base font-black text-yellow-900 truncate">{{ mvpGanadora.nombre }}</p>
+                    <div class="flex items-center gap-2 mt-0.5">
+                      <p class="text-xs font-semibold text-yellow-800">{{ mvpGanadora.votos }} {{ mvpGanadora.votos === 1 ? 'voto' : 'votos' }}</p>
+                      <span v-if="mvpGanadoraFotoCargando" class="text-[10px] bg-white/70 text-yellow-900 px-2 py-0.5 rounded-full font-bold">cargando foto...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <p v-if="mvpCerrada" class="text-xs font-bold text-gray-700 bg-gray-200 border border-gray-300 rounded-lg p-2 flex items-center gap-1.5">
+                <LockClosedIcon class="w-3.5 h-3.5" />
+                <span>Votación finalizada por administración.</span>
+              </p>
+
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-gray-600 font-semibold">Total de votos</span>
+                <span class="text-primary-dark font-black">{{ totalVotosMvp }}</span>
+              </div>
+
+              <div v-if="mvpLider" class="bg-primary/10 border border-primary/20 rounded-lg p-3">
+                <p class="text-xs text-gray-600 font-semibold">Lidera actualmente</p>
+                <p class="text-sm font-black text-primary-dark">{{ mvpLider.nombre }} ({{ mvpLider.votos }} {{ mvpLider.votos === 1 ? 'voto' : 'votos' }})</p>
+              </div>
+
+              <div v-if="candidatasMvp.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button
+                  v-for="nombre in candidatasMvp"
+                  :key="`mvp-${entrenamiento.id}-${nombre}`"
+                  @click="votarMvp(nombre)"
+                  :disabled="!puedeVotarMvp || mvpVoteLoading"
+                  :class="[
+                    'px-3 py-2 rounded-lg text-sm font-bold border transition-all disabled:opacity-50 disabled:cursor-not-allowed',
+                    mvpVotoUsuario === nombre
+                      ? 'bg-primary text-white border-primary-dark'
+                      : 'bg-gray-50 text-gray-800 border-gray-200 hover:bg-gray-100'
+                  ]"
+                >
+                  {{ nombre }}
+                </button>
+              </div>
+
+              <p v-if="mvpVotoUsuario" class="text-xs text-gray-600">
+                Tu voto: <span class="font-black text-primary-dark">{{ mvpVotoUsuario }}</span>
+              </p>
+
+              <p v-if="!puedeVotarMvp && !mvpCerrada" class="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-lg p-2">
+                Solo jugadoras pueden votar MVP desde su cuenta.
+              </p>
             </div>
           </div>
         </div>
@@ -438,8 +530,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { doc, onSnapshot, getDoc } from 'firebase/firestore';
+import { db } from '../firebase/config';
 import { 
   ChevronLeftIcon,
   CalendarIcon,
@@ -456,7 +550,10 @@ import {
   XMarkIcon,
   HandThumbUpIcon,
   CheckBadgeIcon,
-  ChatBubbleLeftIcon
+  ChatBubbleLeftIcon,
+  TrophyIcon,
+  SparklesIcon,
+  LockClosedIcon
 } from '@heroicons/vue/24/outline';
 import { jugadoraAuthUser, jugadoraData } from '../firebase/jugadorasAuth';
 import { 
@@ -467,7 +564,7 @@ import {
   errorInscripciones,
   cambiarEstadoInscripcion as cambiarEstadoInscripcionFirebase
 } from '../firebase/inscripciones';
-import { entrenamientos } from '../firebase/entrenamientos';
+import { entrenamientos, votarMvpEntrenamiento } from '../firebase/entrenamientos';
 import { authUser, userRole } from '../firebase/auth';
 
 const router = useRouter();
@@ -488,6 +585,13 @@ const isLoadingAccion = ref(false);
 const toastMensaje = ref(null);
 const toastTipo = ref('success');
 const unsubscribers = ref([]);
+const mvpVoteLoading = ref(false);
+const mvpVotoUsuario = ref(null);
+const mvpGanadoraFoto = ref('');
+const mvpGanadoraFotoCargando = ref(false);
+const cacheFotosJugadoras = ref({});
+const DOS_HORAS_MS = 2 * 60 * 60 * 1000;
+const DURACION_PARTIDO_DEFAULT_MS = 90 * 60 * 1000;
 
 const vieneDeAdmin = computed(() => route.query?.from === 'admin');
 const adminPuedeVer = computed(() => {
@@ -527,6 +631,62 @@ const formatearFecha = (date) => {
   });
 };
 
+const esPartidoOAmistoso = (ent) => {
+  const tipo = (ent?.tipo || '').toString().toLowerCase();
+  return tipo === 'partido' || tipo === 'amistoso';
+};
+
+const parseHora = (horaTexto = '') => {
+  const [horas, minutos] = (horaTexto || '').split(':').map(Number);
+  return {
+    horas: Number.isFinite(horas) ? horas : 0,
+    minutos: Number.isFinite(minutos) ? minutos : 0
+  };
+};
+
+const obtenerInicioFinEvento = (ent) => {
+  if (!ent?.fecha) return { inicioMs: null, finMs: null };
+  const base = new Date(ent.fecha.seconds ? ent.fecha.seconds * 1000 : ent.fecha);
+  if (Number.isNaN(base.getTime())) return { inicioMs: null, finMs: null };
+
+  const horaTexto = (ent?.hora || '').toString().trim();
+  const horaFinTexto = (ent?.horaFin || '').toString().trim();
+  const partes = horaTexto.split('-').map((p) => p.trim()).filter(Boolean);
+  const inicio = new Date(base);
+  const fin = new Date(base);
+
+  const horaInicio = parseHora(partes[0] || '00:00');
+  inicio.setHours(horaInicio.horas, horaInicio.minutos, 0, 0);
+
+  if (horaFinTexto) {
+    const horaFin = parseHora(horaFinTexto);
+    fin.setHours(horaFin.horas, horaFin.minutos, 0, 0);
+  } else if (partes.length > 1) {
+    const horaFin = parseHora(partes[1]);
+    fin.setHours(horaFin.horas, horaFin.minutos, 0, 0);
+  } else if (esPartidoOAmistoso(ent)) {
+    fin.setTime(inicio.getTime() + DURACION_PARTIDO_DEFAULT_MS);
+  } else {
+    fin.setTime(inicio.getTime());
+  }
+
+  return {
+    inicioMs: inicio.getTime(),
+    finMs: fin.getTime()
+  };
+};
+
+const eventoFueraDeVentanaJugadora = (ent) => {
+  const { finMs } = obtenerInicioFinEvento(ent);
+  if (!Number.isFinite(finMs)) return false;
+
+  if (esPartidoOAmistoso(ent)) {
+    return Date.now() > finMs + DOS_HORAS_MS;
+  }
+
+  return Date.now() > finMs + (24 * 60 * 60 * 1000);
+};
+
 const formatFechaHora = (timestamp) => {
   if (!timestamp) return '-';
   const d = new Date(timestamp.seconds ? timestamp.seconds * 1000 : timestamp);
@@ -540,11 +700,8 @@ const formatFechaHora = (timestamp) => {
 };
 
 const fechaPasada = (ent) => {
-  if (!ent?.fecha) return false;
-  const fechaEntrenamiento = new Date(ent.fecha.seconds ? ent.fecha.seconds * 1000 : ent.fecha);
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  return fechaEntrenamiento < hoy;
+  const { finMs } = obtenerInicioFinEvento(ent);
+  return Number.isFinite(finMs) ? Date.now() > finMs : false;
 };
 
 const cargarDatos = async () => {
@@ -561,6 +718,24 @@ const cargarDatos = async () => {
     volver();
     return;
   }
+
+  if (!vieneDeAdmin.value && eventoFueraDeVentanaJugadora(entrenamiento.value)) {
+    router.push('/entrenamientos');
+    return;
+  }
+
+  cargarVotoMvpUsuario(id);
+
+  const entrenamientoRef = doc(db, 'entrenamientos', id);
+  const unsubscribeEntrenamiento = onSnapshot(entrenamientoRef, (docSnap) => {
+    if (docSnap.exists()) {
+      entrenamiento.value = {
+        id: docSnap.id,
+        ...docSnap.data()
+      };
+    }
+  });
+  unsubscribers.value.push(unsubscribeEntrenamiento);
 
   // Obtener estado de inscripción
   if (jugadoraAuthUser.value) {
@@ -627,6 +802,213 @@ const canInteract = computed(() => {
   // Si es convocatoria, solo las convocadas y si el evento no pasó
   return isConvocada.value && !fechaPasada(entrenamiento.value);
 });
+
+const mvpEsPartido = computed(() => {
+  if (!entrenamiento.value) return false;
+  const tipo = (entrenamiento.value.tipo || '').toLowerCase();
+  return tipo === 'partido' || tipo === 'amistoso';
+});
+
+const mvpHabilitadoEvento = computed(() => {
+  if (!entrenamiento.value) return false;
+  const mvpRaw = entrenamiento.value.mvpHabilitado;
+  return mvpRaw === undefined || mvpRaw === null
+    ? true
+    : (mvpRaw === true || mvpRaw === 'true' || mvpRaw === 1);
+});
+
+const mvpCerrada = computed(() => entrenamiento.value?.mvpCerrada === true);
+
+const mvpDisponibleDesdeTexto = computed(() => {
+  if (!entrenamiento.value) return '';
+  const { finMs } = obtenerInicioFinEvento(entrenamiento.value);
+  if (!Number.isFinite(finMs)) return 'Hora por confirmar';
+
+  return new Date(finMs).toLocaleString('es-CL', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+});
+
+const esMvpDisponible = computed(() => {
+  if (!entrenamiento.value) return false;
+  return mvpEsPartido.value && mvpHabilitadoEvento.value && fechaPasada(entrenamiento.value);
+});
+
+const mvpPendienteHabilitacion = computed(() => {
+  if (!entrenamiento.value) return false;
+  return mvpEsPartido.value && mvpHabilitadoEvento.value && !fechaPasada(entrenamiento.value);
+});
+
+const candidatasMvp = computed(() => {
+  if (!entrenamiento.value) return [];
+
+  const desdeConvocatoria = Array.isArray(entrenamiento.value.jugadorasConvocadas)
+    ? entrenamiento.value.jugadorasConvocadas.map((j) => (j?.nombre || '').trim()).filter(Boolean)
+    : [];
+
+  const desdeInscripciones = [
+    ...inscritasOrganizadas.value.confirmadas,
+    ...inscritasOrganizadas.value.bajas
+  ]
+    .map((i) => (i?.jugadoraNombre || '').trim())
+    .filter(Boolean);
+
+  return [...new Set([...desdeConvocatoria, ...desdeInscripciones])];
+});
+
+const totalVotosMvp = computed(() => {
+  if (!Array.isArray(entrenamiento.value?.mvpVotos)) return 0;
+  return entrenamiento.value.mvpVotos.reduce((total, item) => total + (Number(item?.votos) || 0), 0);
+});
+
+const mvpLider = computed(() => {
+  if (!Array.isArray(entrenamiento.value?.mvpVotos) || entrenamiento.value.mvpVotos.length === 0) return null;
+  return [...entrenamiento.value.mvpVotos].sort((a, b) => (Number(b?.votos) || 0) - (Number(a?.votos) || 0))[0];
+});
+
+const mvpGanadora = computed(() => {
+  if (!mvpCerrada.value) return null;
+  return mvpLider.value;
+});
+
+const obtenerFotoCandidata = (nombre) => {
+  if (!entrenamiento.value || !nombre) return '';
+  const convocadas = Array.isArray(entrenamiento.value.jugadorasConvocadas)
+    ? entrenamiento.value.jugadorasConvocadas
+    : [];
+
+  const candidata = convocadas.find((j) => (j?.nombre || '').trim().toLowerCase() === nombre.trim().toLowerCase());
+  if (!candidata) return '';
+
+  return candidata.fotoPerfil || candidata.foto || candidata.imagen || candidata.photoURL || candidata.urlFoto || '';
+};
+
+const normalizarNombre = (nombre) => (nombre || '').toString().trim().toLowerCase();
+
+const obtenerJugadoraIdGanadora = () => {
+  const nombreGanadora = normalizarNombre(mvpGanadora.value?.nombre);
+  if (!nombreGanadora) return null;
+
+  const inscripciones = [
+    ...inscritasOrganizadas.value.confirmadas,
+    ...inscritasOrganizadas.value.bajas,
+    ...inscritasOrganizadas.value.pendientes
+  ];
+
+  const encontradaEnInscripciones = inscripciones.find(
+    (item) => normalizarNombre(item?.jugadoraNombre) === nombreGanadora && item?.jugadoraId
+  );
+
+  if (encontradaEnInscripciones?.jugadoraId) return encontradaEnInscripciones.jugadoraId;
+
+  const convocadas = Array.isArray(entrenamiento.value?.jugadorasConvocadas)
+    ? entrenamiento.value.jugadorasConvocadas
+    : [];
+  const encontradaEnConvocadas = convocadas.find(
+    (item) => normalizarNombre(item?.nombre) === nombreGanadora && item?.id
+  );
+
+  return encontradaEnConvocadas?.id || null;
+};
+
+const obtenerFotoPerfilJugadora = async (jugadoraId) => {
+  if (!jugadoraId) return '';
+  if (cacheFotosJugadoras.value[jugadoraId]) return cacheFotosJugadoras.value[jugadoraId];
+
+  const snap = await getDoc(doc(db, 'jugadoraRegistro', jugadoraId));
+  if (!snap.exists()) return '';
+
+  const data = snap.data() || {};
+  const foto = data.fotoPerfil || data.foto || data.photoURL || data.imagen || data.urlFoto || '';
+  if (foto) {
+    cacheFotosJugadoras.value[jugadoraId] = foto;
+  }
+  return foto;
+};
+
+const resolverFotoMvpGanadora = async () => {
+  mvpGanadoraFoto.value = '';
+
+  if (!mvpGanadora.value?.nombre) return;
+
+  const fotoConvocada = obtenerFotoCandidata(mvpGanadora.value.nombre);
+  if (fotoConvocada) {
+    mvpGanadoraFoto.value = fotoConvocada;
+    return;
+  }
+
+  const jugadoraId = obtenerJugadoraIdGanadora();
+  if (!jugadoraId) return;
+
+  try {
+    mvpGanadoraFotoCargando.value = true;
+    const fotoPerfil = await obtenerFotoPerfilJugadora(jugadoraId);
+    mvpGanadoraFoto.value = fotoPerfil || '';
+  } catch {
+    mvpGanadoraFoto.value = '';
+  } finally {
+    mvpGanadoraFotoCargando.value = false;
+  }
+};
+
+watch(
+  () => [
+    entrenamiento.value?.id,
+    mvpGanadora.value?.nombre,
+    inscritasOrganizadas.value.confirmadas.length,
+    inscritasOrganizadas.value.bajas.length,
+    inscritasOrganizadas.value.pendientes.length
+  ],
+  () => {
+    resolverFotoMvpGanadora();
+  },
+  { immediate: true }
+);
+
+const puedeVotarMvp = computed(() => {
+  return esMvpDisponible.value
+    && !!jugadoraAuthUser.value
+    && !vieneDeAdmin.value
+    && !mvpCerrada.value;
+});
+
+const cargarVotoMvpUsuario = (entrenamientoId) => {
+  if (!entrenamientoId) {
+    mvpVotoUsuario.value = null;
+    return;
+  }
+  mvpVotoUsuario.value = localStorage.getItem(`mvp_voto_entrenamiento_${entrenamientoId}`);
+};
+
+const votarMvp = async (jugadoraNombre) => {
+  if (!entrenamiento.value?.id || !puedeVotarMvp.value || mvpVoteLoading.value) return;
+  if (mvpVotoUsuario.value === jugadoraNombre) return;
+
+  mvpVoteLoading.value = true;
+  try {
+    const votosActualizados = await votarMvpEntrenamiento(
+      entrenamiento.value.id,
+      jugadoraNombre,
+      mvpVotoUsuario.value || null
+    );
+
+    entrenamiento.value = {
+      ...entrenamiento.value,
+      mvpVotos: votosActualizados
+    };
+
+    mvpVotoUsuario.value = jugadoraNombre;
+    localStorage.setItem(`mvp_voto_entrenamiento_${entrenamiento.value.id}`, jugadoraNombre);
+    mostrarToast('¡Tu voto MVP fue registrado!', 'success');
+  } catch (err) {
+    mostrarToast(err?.message || 'No se pudo registrar el voto MVP', 'error');
+  } finally {
+    mvpVoteLoading.value = false;
+  }
+};
 
 const handleInscribirse = async () => {
   if (!jugadoraData.value) return;

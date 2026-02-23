@@ -145,6 +145,20 @@
             </label>
           </div>
 
+          <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'" class="bg-gradient-to-br from-red-50 to-orange-50 p-4 rounded-xl border-2 border-red-200">
+            <label class="flex items-start sm:items-center gap-3 cursor-pointer">
+              <input
+                v-model="formulario.mvpHabilitado"
+                type="checkbox"
+                class="w-5 h-5 mt-0.5 sm:mt-0 text-primary-dark focus:ring-2 focus:ring-primary rounded shrink-0"
+              />
+              <div class="flex-1">
+                <span class="text-sm font-black text-gray-700 uppercase tracking-wide">Habilitar votación MVP post-partido</span>
+                <p class="text-xs text-gray-600 mt-1 font-medium">Las jugadoras podrán votar MVP cuando el evento haya finalizado.</p>
+              </div>
+            </label>
+          </div>
+
           <!-- Opción de convocatoria (solo para partidos/amistosos) -->
           <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'" class="bg-gradient-to-br from-blue-50 to-purple-50 p-4 rounded-xl border-2 border-blue-200">
             <label class="flex items-start sm:items-center gap-3 cursor-pointer">
@@ -230,7 +244,7 @@
           </div>
 
           <!-- Fecha y Hora -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-2">
                 <CalendarIcon class="w-4 h-4" />
@@ -252,6 +266,18 @@
                 v-model="formulario.hora"
                 type="time"
                 required
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-2">
+                <ClockIcon class="w-4 h-4" />
+                Hora finalización <span v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'">*</span>
+              </label>
+              <input
+                v-model="formulario.horaFin"
+                type="time"
+                :required="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'"
                 class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
               />
             </div>
@@ -331,7 +357,7 @@
         <p class="text-gray-200 text-lg">Cargando entrenamientos...</p>
       </div>
 
-      <div v-else-if="entrenamientosFiltrados.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-else-if="entrenamientosFiltrados.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
         <div
           v-for="entrenamiento in entrenamientosFiltrados"
           :key="entrenamiento.id"
@@ -362,6 +388,12 @@
                   </span>
                   <span v-if="entrenamiento.mostrarEnProximoPartido" class="inline-flex items-center gap-1 text-xs bg-yellow-500 text-black px-2.5 py-1 rounded-full font-bold whitespace-nowrap">
                     Próximo partido Home
+                  </span>
+                  <span v-if="mvpHabilitadoNormalizado(entrenamiento) && (entrenamiento.tipo === 'partido' || entrenamiento.tipo === 'amistoso')" class="inline-flex items-center gap-1 text-xs bg-red-500 text-white px-2.5 py-1 rounded-full font-bold whitespace-nowrap">
+                    MVP habilitado
+                  </span>
+                  <span v-if="entrenamiento.mvpCerrada && (entrenamiento.tipo === 'partido' || entrenamiento.tipo === 'amistoso')" class="inline-flex items-center gap-1 text-xs bg-gray-700 text-white px-2.5 py-1 rounded-full font-bold whitespace-nowrap">
+                    Votación MVP cerrada
                   </span>
                   <span v-if="fechaPasada(entrenamiento)" class="inline-flex items-center gap-1 text-xs bg-gray-500 text-white px-2.5 py-1 rounded-full font-bold whitespace-nowrap">
                     <ClockIcon class="w-3 h-3" />
@@ -394,7 +426,10 @@
                 </div>
                 <div class="flex-1">
                   <div class="text-xs text-gray-500 font-semibold uppercase">Hora</div>
-                  <div class="text-sm font-bold text-gray-900">{{ entrenamiento.hora }}</div>
+                  <div class="text-sm font-bold text-gray-900">
+                    {{ entrenamiento.hora }}
+                    <span v-if="entrenamiento.horaFin" class="text-gray-500 font-semibold"> - {{ entrenamiento.horaFin }}</span>
+                  </div>
                 </div>
               </div>
               <div class="flex items-center gap-3 text-sm">
@@ -428,7 +463,7 @@
                   <CheckCircleIcon class="w-5 h-5 text-green-600" />
                 </div>
                 <p class="text-2xl font-black text-green-700">{{ contarPorEstado(entrenamiento.id, 'confirmada') }}</p>
-                <p class="text-[10px] text-green-600 font-bold uppercase tracking-wide">Anotadas</p>
+                <p class="text-[10px] text-green-600 font-bold uppercase truncate tracking-wide">Anotadas</p>
               </div>
               <div class="bg-gradient-to-br from-red-50 to-red-100 p-3 rounded-xl border-2 border-red-200 text-center">
                 <div class="flex items-center justify-center mb-1">
@@ -442,7 +477,7 @@
                   <QuestionMarkCircleIcon class="w-5 h-5 text-yellow-600" />
                 </div>
                 <p class="text-2xl font-black text-yellow-700">{{ contarPorEstado(entrenamiento.id, 'pendiente') }}</p>
-                <p class="text-[10px] text-yellow-600 font-bold uppercase tracking-wide">Pendientes</p>
+                <p class="text-[10px] text-yellow-600 font-bold uppercase truncate tracking-wide">Pendientes</p>
               </div>
             </div>
 
@@ -470,6 +505,14 @@
                   Eliminar
                 </button>
               </div>
+              <button
+                v-if="esPartidoOAmistoso(entrenamiento) && mvpHabilitadoNormalizado(entrenamiento) && !entrenamiento.mvpCerrada"
+                @click="confirmarFinalizarVotacionMvp(entrenamiento)"
+                class="w-full px-3 py-2.5 rounded-xl font-bold transition-all text-sm bg-gradient-to-r from-gray-700 to-gray-800 text-white hover:from-gray-800 hover:to-black hover:scale-[1.02] shadow-sm flex items-center justify-center gap-2"
+              >
+                <FlagIcon class="w-4 h-4" />
+                <span>Finalizar votación MVP</span>
+              </button>
               <button
                 @click="regenerarInscripciones(entrenamiento)"
                 class="w-full px-3 py-2.5 rounded-xl font-bold transition-all text-sm bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:from-yellow-600 hover:to-orange-600 hover:scale-[1.02] shadow-sm flex items-center justify-center gap-2"
@@ -970,6 +1013,7 @@ import {
   fetchEntrenamientosPorEquipo,
   fetchTodosEntrenamientos,
   actualizarEntrenamiento,
+  finalizarVotacionMvpEntrenamiento,
   eliminarEntrenamiento,
   isLoadingEntrenamientos,
   errorEntrenamientos,
@@ -1020,10 +1064,12 @@ const formulario = ref({
   rival: '',
   fecha: '',
   hora: '',
+  horaFin: '',
   lugar: '',
   descripcion: '',
   capacidadMaxima: null,
   mostrarEnProximoPartido: false,
+  mvpHabilitado: false,
   esConvocatoria: false,
   jugadorasConvocadas: []
 });
@@ -1062,6 +1108,18 @@ const getFechaHoraMs = (ent) => {
   return dt.getTime();
 };
 
+const esPartidoOAmistoso = (entrenamiento) => {
+  const tipo = (entrenamiento?.tipo || '').toString().toLowerCase();
+  return tipo === 'partido' || tipo === 'amistoso';
+};
+
+const mvpHabilitadoNormalizado = (entrenamiento) => {
+  const mvpRaw = entrenamiento?.mvpHabilitado;
+  return mvpRaw === undefined || mvpRaw === null
+    ? true
+    : (mvpRaw === true || mvpRaw === 'true' || mvpRaw === 1);
+};
+
 const entrenamientosFiltrados = computed(() => {
   const now = Date.now();
   return entrenamientos.value
@@ -1094,10 +1152,12 @@ const mostrarFormularioNuevo = () => {
     rival: '',
     fecha: '',
     hora: '',
+    horaFin: '',
     lugar: '',
     descripcion: '',
     capacidadMaxima: null,
     mostrarEnProximoPartido: false,
+    mvpHabilitado: false,
     esConvocatoria: false,
     jugadorasConvocadas: []
   };
@@ -1132,10 +1192,12 @@ const editarEntrenamiento = (entrenamiento) => {
     rival: entrenamiento.rival || '',
     fecha: fechaFormato,
     hora: entrenamiento.hora,
+    horaFin: entrenamiento.horaFin || '',
     lugar: entrenamiento.lugar,
     descripcion: entrenamiento.descripcion || '',
     capacidadMaxima: entrenamiento.capacidadMaxima || null,
     mostrarEnProximoPartido: entrenamiento.mostrarEnProximoPartido || false,
+    mvpHabilitado: entrenamiento.mvpHabilitado === true,
     esConvocatoria: entrenamiento.esConvocatoria || false,
     jugadorasConvocadas: entrenamiento.jugadorasConvocadas || []
   };
@@ -1327,6 +1389,7 @@ const onTipoChange = () => {
   if (formulario.value.tipo !== 'partido' && formulario.value.tipo !== 'amistoso') {
     formulario.value.rival = '';
     formulario.value.mostrarEnProximoPartido = false;
+    formulario.value.mvpHabilitado = false;
     formulario.value.esConvocatoria = false;
     formulario.value.jugadorasConvocadas = [];
   }
@@ -1370,7 +1433,8 @@ const agregarJugadoraConvocatoria = (jugadora) => {
     id: jugadora.id,
     nombre: `${jugadora.nombre} ${jugadora.apellido}`,
     posicion: jugadora.posicion,
-    dorsal: jugadora.dorsal
+    dorsal: jugadora.dorsal,
+    fotoPerfil: jugadora.fotoPerfil || jugadora.foto || null
   });
   busquedaConvocatoria.value = '';
   jugadorasParaConvocar.value = [];
@@ -1421,6 +1485,11 @@ const guardarEntrenamiento = async () => {
     return;
   }
 
+  if ((formulario.value.tipo === 'partido' || formulario.value.tipo === 'amistoso') && !formulario.value.horaFin) {
+    error.value = 'Para partidos o amistosos debes ingresar la hora de finalización';
+    return;
+  }
+
   // Validar convocatoria
   if (formulario.value.esConvocatoria && formulario.value.jugadorasConvocadas.length === 0) {
     error.value = 'Debes seleccionar al menos una jugadora para la convocatoria';
@@ -1443,10 +1512,12 @@ const guardarEntrenamiento = async () => {
         rival: formulario.value.rival?.trim() || '',
         fecha: fechaCorrecta,
         hora: formulario.value.hora,
+        horaFin: formulario.value.horaFin || '',
         lugar: formulario.value.lugar,
         descripcion: formulario.value.descripcion,
         capacidadMaxima: formulario.value.capacidadMaxima,
         mostrarEnProximoPartido: formulario.value.mostrarEnProximoPartido,
+        mvpHabilitado: formulario.value.mvpHabilitado,
         esConvocatoria: formulario.value.esConvocatoria,
         jugadorasConvocadas: formulario.value.jugadorasConvocadas
       });
@@ -1468,10 +1539,12 @@ const guardarEntrenamiento = async () => {
         rival: formulario.value.rival?.trim() || '',
         fecha: fechaCorrecta,
         hora: formulario.value.hora,
+        horaFin: formulario.value.horaFin || '',
         lugar: formulario.value.lugar,
         descripcion: formulario.value.descripcion,
         capacidadMaxima: formulario.value.capacidadMaxima,
         mostrarEnProximoPartido: formulario.value.mostrarEnProximoPartido,
+        mvpHabilitado: formulario.value.mvpHabilitado,
         esConvocatoria: formulario.value.esConvocatoria,
         jugadorasConvocadas: formulario.value.jugadorasConvocadas
       });
@@ -1544,6 +1617,43 @@ const regenerarInscripciones = (entrenamiento) => {
         }
       } catch (err) {
         alert('Error: ' + err.message);
+      } finally {
+        modalCargando.value = false;
+      }
+    }
+  };
+  mostrarModal.value = true;
+};
+
+const confirmarFinalizarVotacionMvp = (entrenamiento) => {
+  modalConfig.value = {
+    titulo: '¿Finalizar votación MVP?',
+    mensaje: `Se cerrará la votación MVP para "${entrenamiento.nombre}".`,
+    detalles: 'Una vez finalizada, las jugadoras ya no podrán votar en este evento.',
+    tipo: 'warning',
+    textoConfirmar: 'Finalizar votación',
+    accion: async () => {
+      try {
+        modalCargando.value = true;
+        await finalizarVotacionMvpEntrenamiento(entrenamiento.id);
+
+        if (filtroEquipo.value) {
+          await fetchEntrenamientosPorEquipo(filtroEquipo.value);
+        } else {
+          await fetchTodosEntrenamientos();
+        }
+
+        if (entrenamientoDetallado.value?.id === entrenamiento.id) {
+          entrenamientoDetallado.value = {
+            ...entrenamientoDetallado.value,
+            mvpCerrada: true,
+            mvpCerradaAt: new Date()
+          };
+        }
+
+        mostrarModal.value = false;
+      } catch (err) {
+        alert('Error al finalizar votación MVP: ' + err.message);
       } finally {
         modalCargando.value = false;
       }

@@ -114,7 +114,6 @@
                           </div>
                           <div class="min-w-0">
                             <p class="font-bold text-gray-900 text-xs truncate">{{ cumple.nombre }}</p>
-                            <p class="text-pink-600 text-[10px] font-medium">{{ cumple.edad }} años</p>
                           </div>
                         </div>
                         <div class="flex flex-col items-end gap-0.5 shrink-0">
@@ -302,7 +301,7 @@
               <div class="flex items-center gap-2">
                 <ClockIcon class="w-4 h-4 text-primary-dark" />
                 <span class="font-bold">Hora:</span>
-                <span>{{ entrenamiento.hora }}</span>
+                <span>{{ entrenamiento.hora }}<template v-if="entrenamiento.horaFin"> - {{ entrenamiento.horaFin }}</template></span>
               </div>
               <div class="flex items-center gap-2">
                 <MapPinIcon class="w-4 h-4 text-primary-dark" />
@@ -501,7 +500,7 @@
                     </span>
                     <span class="flex items-center gap-1">
                       <ClockIcon class="w-4 h-4" />
-                      {{ entrenamientoSeleccionado.hora }}
+                      {{ entrenamientoSeleccionado.hora }}<template v-if="entrenamientoSeleccionado.horaFin"> - {{ entrenamientoSeleccionado.horaFin }}</template>
                     </span>
                   </div>
                 </div>
@@ -790,6 +789,91 @@
           <!-- Acciones del evento -->
           <div class="max-w-4xl mx-auto px-4 pb-6">
             <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-lg">
+          <div v-if="mvpPendienteSeleccionado" class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-sm text-blue-800 font-semibold flex items-center gap-2">
+              <TrophyIcon class="w-4 h-4" />
+              <span>Votación MVP disponible desde: {{ mvpDisponibleDesdeTextoSeleccionado }}</span>
+            </p>
+          </div>
+
+          <div v-if="mvpDisponibleSeleccionado" class="mb-4 bg-gray-50 border border-gray-200 rounded-lg p-3">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-bold text-gray-800">Votación MVP Post-Partido</p>
+              <p class="text-xs text-gray-600">Total votos: <span class="font-black text-primary-dark">{{ totalVotosMvpSeleccionado }}</span></p>
+            </div>
+
+            <div v-if="mvpGanadoraSeleccionado" class="mb-3 p-3 rounded-2xl bg-linear-to-r from-yellow-50 via-amber-50 to-orange-100 border-2 border-yellow-300 shadow-lg relative overflow-hidden">
+              <SparklesIcon class="absolute -top-3 -right-3 w-10 h-10 text-yellow-500 opacity-20 animate-pulse" />
+              <TrophyIcon class="absolute -bottom-3 -left-2 w-8 h-8 text-yellow-600 opacity-20 animate-bounce" />
+
+              <div class="flex items-center gap-3 relative z-10">
+                <div class="relative shrink-0">
+                  <img
+                    v-if="mvpGanadoraFotoSeleccionado"
+                    :src="mvpGanadoraFotoSeleccionado"
+                    :alt="mvpGanadoraSeleccionado.nombre"
+                    class="w-14 h-14 rounded-full object-cover border-2 border-yellow-400 shadow"
+                  />
+                  <div
+                    v-else
+                    class="w-14 h-14 rounded-full bg-linear-to-br from-primary-dark to-primary text-white border-2 border-yellow-400 shadow flex items-center justify-center font-black"
+                  >
+                    {{ obtenerIniciales(mvpGanadoraSeleccionado.nombre) }}
+                  </div>
+                  <div class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-yellow-400 text-yellow-900 flex items-center justify-center shadow animate-pulse">
+                    <TrophyIcon class="w-4 h-4" />
+                  </div>
+                </div>
+
+                <div class="min-w-0 flex-1">
+                  <p class="text-[11px] font-black uppercase tracking-wider text-yellow-700 flex items-center gap-1">
+                    <TrophyIcon class="w-3.5 h-3.5" />
+                    <span>Jugadora del partido</span>
+                  </p>
+                  <p class="text-base font-black text-yellow-900 truncate">{{ mvpGanadoraSeleccionado.nombre }}</p>
+                  <div class="flex items-center gap-2 mt-0.5">
+                    <p class="text-xs font-semibold text-yellow-800">{{ mvpGanadoraSeleccionado.votos }} {{ mvpGanadoraSeleccionado.votos === 1 ? 'voto' : 'votos' }}</p>
+                    <span v-if="mvpGanadoraFotoCargando" class="text-[10px] bg-white/70 text-yellow-900 px-2 py-0.5 rounded-full font-bold">cargando foto...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p v-if="mvpCerradaSeleccionado" class="mb-2 text-xs font-bold text-gray-700 bg-gray-200 border border-gray-300 rounded px-2 py-1 flex items-center gap-1.5">
+              <LockClosedIcon class="w-3.5 h-3.5" />
+              <span>Votación finalizada</span>
+            </p>
+
+            <div v-if="liderMvpSeleccionado" class="mb-2 p-2 bg-primary/10 border border-primary/20 rounded text-xs text-primary-dark font-bold">
+              Lidera: {{ liderMvpSeleccionado.nombre }} ({{ liderMvpSeleccionado.votos }} {{ liderMvpSeleccionado.votos === 1 ? 'voto' : 'votos' }})
+            </div>
+
+            <div v-if="candidatasMvpSeleccionado.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button
+                v-for="nombre in candidatasMvpSeleccionado"
+                :key="`mvp-detalle-${entrenamientoSeleccionado.id}-${nombre}`"
+                @click="votarMvpSeleccionado(nombre)"
+                :disabled="!puedeVotarMvpSeleccionado || mvpVoteLoading"
+                :class="[
+                  'px-3 py-2 rounded-lg text-sm font-bold border transition-all disabled:opacity-50 disabled:cursor-not-allowed',
+                  mvpVotoSeleccionado === nombre
+                    ? 'bg-primary text-white border-primary-dark'
+                    : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-100'
+                ]"
+              >
+                {{ nombre }}
+              </button>
+            </div>
+
+            <p v-if="mvpVotoSeleccionado" class="text-xs text-gray-600 mt-2">
+              Tu voto: <span class="font-black text-primary-dark">{{ mvpVotoSeleccionado }}</span>
+            </p>
+
+            <p v-if="!puedeVotarMvpSeleccionado && !mvpCerradaSeleccionado" class="text-xs text-gray-500 mt-2">
+              Solo jugadoras pueden votar MVP.
+            </p>
+          </div>
+
           <!-- Mensaje si la fecha pasó -->
           <div v-if="fechaPasada(entrenamientoSeleccionado)" class="mb-4 p-3 bg-gray-100 border border-gray-300 rounded-lg">
             <p class="text-sm text-gray-700 font-semibold">
@@ -947,7 +1031,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { 
   CakeIcon,
@@ -967,12 +1051,13 @@ import {
   ArrowPathIcon,
   ExclamationTriangleIcon,
   NoSymbolIcon,
+  LockClosedIcon,
   ShoppingBagIcon,
   ArrowTopRightOnSquareIcon
 } from '@heroicons/vue/24/outline';
 import { logoutJugadora, jugadoraAuthUser, jugadoraData } from '../firebase/jugadorasAuth';
 import { userRole } from '../firebase/auth';
-import { fetchEntrenamientosPorEquipo, entrenamientos, isLoadingEntrenamientos, escucharEntrenamientosPorEquipo } from '../firebase/entrenamientos';
+import { fetchEntrenamientosPorEquipo, entrenamientos, isLoadingEntrenamientos, escucharEntrenamientosPorEquipo, votarMvpEntrenamiento } from '../firebase/entrenamientos';
 import { 
   inscribirseEntrenamiento, 
   desuscribirseEntrenamiento, 
@@ -984,7 +1069,7 @@ import {
   isLoadingInscripciones,
   errorInscripciones
 } from '../firebase/inscripciones';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
 
@@ -1011,6 +1096,11 @@ const cumpleaniosHoy = ref([]); // Cumpleaños de hoy
 const proximoCumpleanios = ref([]); // Próximos cumpleaños (mismo día)
 const cargandoInscripciones = ref({}); // Estado de carga por entrenamiento
 const primeraCarga = ref(true); // Para mostrar loader en primera carga
+const mvpVoteLoading = ref(false);
+const mvpVotoSeleccionado = ref(null);
+const mvpGanadoraFotoSeleccionado = ref('');
+const mvpGanadoraFotoCargando = ref(false);
+const cacheFotosJugadoras = ref({});
 let timeoutMensajeDetalle = null;
 
 // Computed para obtener el entrenamiento seleccionado actualizado en tiempo real
@@ -1018,6 +1108,71 @@ const entrenamientoSeleccionado = computed(() => {
   if (!entrenamientoSeleccionadoId.value) return null;
   return entrenamientos.value.find(e => e.id === entrenamientoSeleccionadoId.value) || null;
 });
+
+const DOS_HORAS_MS = 2 * 60 * 60 * 1000;
+const DURACION_PARTIDO_DEFAULT_MS = 90 * 60 * 1000;
+
+const esPartidoOAmistoso = (entrenamiento) => {
+  const tipo = (entrenamiento?.tipo || '').toString().toLowerCase();
+  return tipo === 'partido' || tipo === 'amistoso';
+};
+
+const obtenerFechaBaseEntrenamiento = (entrenamiento) => {
+  if (!entrenamiento?.fecha) return null;
+  const fecha = new Date(entrenamiento.fecha.seconds ? entrenamiento.fecha.seconds * 1000 : entrenamiento.fecha);
+  if (Number.isNaN(fecha.getTime())) return null;
+  return fecha;
+};
+
+const parseHora = (horaTexto = '') => {
+  const [horas, minutos] = (horaTexto || '').split(':').map(Number);
+  return {
+    horas: Number.isFinite(horas) ? horas : 0,
+    minutos: Number.isFinite(minutos) ? minutos : 0
+  };
+};
+
+const obtenerInicioFinEvento = (entrenamiento) => {
+  const base = obtenerFechaBaseEntrenamiento(entrenamiento);
+  if (!base) return { inicioMs: null, finMs: null };
+
+  const horaTexto = (entrenamiento?.hora || '').toString().trim();
+  const horaFinTexto = (entrenamiento?.horaFin || '').toString().trim();
+  const partes = horaTexto.split('-').map((p) => p.trim()).filter(Boolean);
+  const inicio = new Date(base);
+  const fin = new Date(base);
+
+  const inicioHora = parseHora(partes[0] || '00:00');
+  inicio.setHours(inicioHora.horas, inicioHora.minutos, 0, 0);
+
+  if (horaFinTexto) {
+    const finHora = parseHora(horaFinTexto);
+    fin.setHours(finHora.horas, finHora.minutos, 0, 0);
+  } else if (partes.length > 1) {
+    const finHora = parseHora(partes[1]);
+    fin.setHours(finHora.horas, finHora.minutos, 0, 0);
+  } else if (esPartidoOAmistoso(entrenamiento)) {
+    fin.setTime(inicio.getTime() + DURACION_PARTIDO_DEFAULT_MS);
+  } else {
+    fin.setTime(inicio.getTime());
+  }
+
+  return {
+    inicioMs: inicio.getTime(),
+    finMs: fin.getTime()
+  };
+};
+
+const eventoFueraDeVentanaJugadora = (entrenamiento) => {
+  const { finMs } = obtenerInicioFinEvento(entrenamiento);
+  if (!Number.isFinite(finMs)) return false;
+
+  if (esPartidoOAmistoso(entrenamiento)) {
+    return Date.now() > finMs + DOS_HORAS_MS;
+  }
+
+  return Date.now() > finMs + (24 * 60 * 60 * 1000);
+};
 
 // Computed para obtener inscripciones organizadas del entrenamiento seleccionado
 const inscritasOrganizadas = computed(() => {
@@ -1043,24 +1198,13 @@ if (!jugadoraAuthUser.value) {
 }
 
 const entrenamientosFiltered = computed(() => {
-  const now = Date.now();
   return entrenamientos.value
     .filter(e => {
       // Filtrar por equipo
       if (e.equipo !== equipoSeleccionado.value) return false;
 
-      // Si no hay fecha, mostrar por seguridad
-      if (!e.fecha) return true;
-
-      const fechaEvento = new Date(e.fecha.seconds ? e.fecha.seconds * 1000 : e.fecha);
-
-      // Mostrar si el evento es en el futuro
-      if (fechaEvento.getTime() > now) return true;
-
-      // Mostrar si el evento terminó hace menos de 24 horas
-      const diff = now - fechaEvento.getTime();
-      const veinticuatroHoras = 24 * 60 * 60 * 1000;
-      return diff <= veinticuatroHoras;
+      // Mostrar mientras esté dentro de la ventana de visibilidad para jugadoras
+      return !eventoFueraDeVentanaJugadora(e);
     })
     .sort((a, b) => {
       // Ordenar por fecha: más próximo primero
@@ -1069,6 +1213,217 @@ const entrenamientosFiltered = computed(() => {
       return fechaA.getTime() - fechaB.getTime();
     });
 });
+
+const mvpHabilitadoEvento = (entrenamiento) => {
+  const mvpRaw = entrenamiento?.mvpHabilitado;
+  return mvpRaw === undefined || mvpRaw === null
+    ? true
+    : (mvpRaw === true || mvpRaw === 'true' || mvpRaw === 1);
+};
+
+const mvpCerradaEvento = (entrenamiento) => entrenamiento?.mvpCerrada === true;
+
+const mvpCerradaSeleccionado = computed(() => {
+  if (!entrenamientoSeleccionado.value) return false;
+  return mvpCerradaEvento(entrenamientoSeleccionado.value);
+});
+
+const mvpDisponibleSeleccionado = computed(() => {
+  if (!entrenamientoSeleccionado.value) return false;
+  return esPartidoOAmistoso(entrenamientoSeleccionado.value)
+    && mvpHabilitadoEvento(entrenamientoSeleccionado.value)
+    && fechaPasada(entrenamientoSeleccionado.value);
+});
+
+const mvpPendienteSeleccionado = computed(() => {
+  if (!entrenamientoSeleccionado.value) return false;
+  return esPartidoOAmistoso(entrenamientoSeleccionado.value)
+    && mvpHabilitadoEvento(entrenamientoSeleccionado.value)
+    && !fechaPasada(entrenamientoSeleccionado.value);
+});
+
+const mvpDisponibleDesdeTextoSeleccionado = computed(() => {
+  if (!entrenamientoSeleccionado.value) return '';
+  const { finMs } = obtenerInicioFinEvento(entrenamientoSeleccionado.value);
+  if (!Number.isFinite(finMs)) return 'Hora por confirmar';
+  return new Date(finMs).toLocaleString('es-CL', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+});
+
+const candidatasMvpSeleccionado = computed(() => {
+  if (!entrenamientoSeleccionado.value) return [];
+
+  const desdeConvocatoria = Array.isArray(entrenamientoSeleccionado.value.jugadorasConvocadas)
+    ? entrenamientoSeleccionado.value.jugadorasConvocadas.map((j) => (j?.nombre || '').trim()).filter(Boolean)
+    : [];
+
+  const desdeInscripciones = [
+    ...inscritasOrganizadas.value.confirmadas,
+    ...inscritasOrganizadas.value.bajas
+  ]
+    .map((i) => (i?.jugadoraNombre || '').trim())
+    .filter(Boolean);
+
+  return [...new Set([...desdeConvocatoria, ...desdeInscripciones])];
+});
+
+const totalVotosMvpSeleccionado = computed(() => {
+  if (!Array.isArray(entrenamientoSeleccionado.value?.mvpVotos)) return 0;
+  return entrenamientoSeleccionado.value.mvpVotos.reduce((total, item) => total + (Number(item?.votos) || 0), 0);
+});
+
+const liderMvpSeleccionado = computed(() => {
+  if (!Array.isArray(entrenamientoSeleccionado.value?.mvpVotos) || entrenamientoSeleccionado.value.mvpVotos.length === 0) return null;
+  return [...entrenamientoSeleccionado.value.mvpVotos].sort((a, b) => (Number(b?.votos) || 0) - (Number(a?.votos) || 0))[0];
+});
+
+const mvpGanadoraSeleccionado = computed(() => {
+  if (!mvpCerradaSeleccionado.value) return null;
+  return liderMvpSeleccionado.value;
+});
+
+const obtenerFotoCandidataSeleccionada = (nombre) => {
+  if (!entrenamientoSeleccionado.value || !nombre) return '';
+  const convocadas = Array.isArray(entrenamientoSeleccionado.value.jugadorasConvocadas)
+    ? entrenamientoSeleccionado.value.jugadorasConvocadas
+    : [];
+
+  const candidata = convocadas.find((j) => (j?.nombre || '').trim().toLowerCase() === nombre.trim().toLowerCase());
+  if (!candidata) return '';
+
+  return candidata.fotoPerfil || candidata.foto || candidata.imagen || candidata.photoURL || candidata.urlFoto || '';
+};
+
+const normalizarNombre = (nombre) => (nombre || '').toString().trim().toLowerCase();
+
+const obtenerJugadoraIdGanadoraSeleccionada = () => {
+  const nombreGanadora = normalizarNombre(mvpGanadoraSeleccionado.value?.nombre);
+  if (!nombreGanadora) return null;
+
+  const inscripciones = [
+    ...inscritasOrganizadas.value.confirmadas,
+    ...inscritasOrganizadas.value.bajas,
+    ...inscritasOrganizadas.value.pendientes
+  ];
+
+  const encontradaEnInscripciones = inscripciones.find(
+    (item) => normalizarNombre(item?.jugadoraNombre) === nombreGanadora && item?.jugadoraId
+  );
+
+  if (encontradaEnInscripciones?.jugadoraId) return encontradaEnInscripciones.jugadoraId;
+
+  const convocadas = Array.isArray(entrenamientoSeleccionado.value?.jugadorasConvocadas)
+    ? entrenamientoSeleccionado.value.jugadorasConvocadas
+    : [];
+  const encontradaEnConvocadas = convocadas.find(
+    (item) => normalizarNombre(item?.nombre) === nombreGanadora && item?.id
+  );
+
+  return encontradaEnConvocadas?.id || null;
+};
+
+const obtenerFotoPerfilJugadora = async (jugadoraId) => {
+  if (!jugadoraId) return '';
+  if (cacheFotosJugadoras.value[jugadoraId]) return cacheFotosJugadoras.value[jugadoraId];
+
+  const snap = await getDoc(doc(db, 'jugadoraRegistro', jugadoraId));
+  if (!snap.exists()) return '';
+
+  const data = snap.data() || {};
+  const foto = data.fotoPerfil || data.foto || data.photoURL || data.imagen || data.urlFoto || '';
+  if (foto) {
+    cacheFotosJugadoras.value[jugadoraId] = foto;
+  }
+  return foto;
+};
+
+const resolverFotoMvpGanadoraSeleccionada = async () => {
+  mvpGanadoraFotoSeleccionado.value = '';
+
+  if (!mvpGanadoraSeleccionado.value?.nombre) return;
+
+  const fotoConvocada = obtenerFotoCandidataSeleccionada(mvpGanadoraSeleccionado.value.nombre);
+  if (fotoConvocada) {
+    mvpGanadoraFotoSeleccionado.value = fotoConvocada;
+    return;
+  }
+
+  const jugadoraId = obtenerJugadoraIdGanadoraSeleccionada();
+  if (!jugadoraId) return;
+
+  try {
+    mvpGanadoraFotoCargando.value = true;
+    const fotoPerfil = await obtenerFotoPerfilJugadora(jugadoraId);
+    mvpGanadoraFotoSeleccionado.value = fotoPerfil || '';
+  } catch {
+    mvpGanadoraFotoSeleccionado.value = '';
+  } finally {
+    mvpGanadoraFotoCargando.value = false;
+  }
+};
+
+watch(
+  () => [
+    entrenamientoSeleccionado.value?.id,
+    mvpGanadoraSeleccionado.value?.nombre,
+    inscritasOrganizadas.value.confirmadas.length,
+    inscritasOrganizadas.value.bajas.length,
+    inscritasOrganizadas.value.pendientes.length
+  ],
+  () => {
+    resolverFotoMvpGanadoraSeleccionada();
+  },
+  { immediate: true }
+);
+
+const puedeVotarMvpSeleccionado = computed(() => {
+  return !!jugadoraAuthUser.value
+    && !esAdmin.value
+    && mvpDisponibleSeleccionado.value
+    && !mvpCerradaSeleccionado.value;
+});
+
+const cargarVotoMvpSeleccionado = (entrenamientoId) => {
+  if (!entrenamientoId) {
+    mvpVotoSeleccionado.value = null;
+    return;
+  }
+  mvpVotoSeleccionado.value = localStorage.getItem(`mvp_voto_entrenamiento_${entrenamientoId}`);
+};
+
+const votarMvpSeleccionado = async (jugadoraNombre) => {
+  if (!entrenamientoSeleccionado.value?.id || !puedeVotarMvpSeleccionado.value || mvpVoteLoading.value) return;
+  if (mvpVotoSeleccionado.value === jugadoraNombre) return;
+
+  mvpVoteLoading.value = true;
+  try {
+    const votosActualizados = await votarMvpEntrenamiento(
+      entrenamientoSeleccionado.value.id,
+      jugadoraNombre,
+      mvpVotoSeleccionado.value || null
+    );
+
+    const idx = entrenamientos.value.findIndex(e => e.id === entrenamientoSeleccionado.value.id);
+    if (idx !== -1) {
+      entrenamientos.value[idx] = {
+        ...entrenamientos.value[idx],
+        mvpVotos: votosActualizados
+      };
+    }
+
+    mvpVotoSeleccionado.value = jugadoraNombre;
+    localStorage.setItem(`mvp_voto_entrenamiento_${entrenamientoSeleccionado.value.id}`, jugadoraNombre);
+    mostrarToast('¡Tu voto MVP fue registrado!', 'success');
+  } catch (err) {
+    mostrarToast(err?.message || 'No se pudo registrar el voto MVP', 'error');
+  } finally {
+    mvpVoteLoading.value = false;
+  }
+};
 
 const rachaReciente = computed(() => {
   const historialConRespuesta = entrenamientos.value
@@ -1100,19 +1455,11 @@ const rachaReciente = computed(() => {
   };
 });
 
-// Retorna true si el evento terminó hace más de 24 horas
-const eventoVencidoMas24h = (entrenamiento) => {
-  if (!entrenamiento?.fecha) return false;
-  const now = Date.now();
-  const fechaEvento = new Date(entrenamiento.fecha.seconds ? entrenamiento.fecha.seconds * 1000 : entrenamiento.fecha);
-  return (now - fechaEvento.getTime()) > (24 * 60 * 60 * 1000);
-};
-
 const esAdmin = computed(() => userRole.value === 'admin');
 
 const historialEntrenamientos = computed(() => {
   return entrenamientos.value
-    .filter(e => e.equipo === equipoSeleccionado.value && eventoVencidoMas24h(e))
+    .filter(e => e.equipo === equipoSeleccionado.value && eventoFueraDeVentanaJugadora(e))
     .sort((a, b) => {
       // Ordenar por fecha: más reciente primero en el historial
       const fechaA = new Date(a.fecha?.seconds ? a.fecha.seconds * 1000 : a.fecha || 0);
@@ -1136,11 +1483,8 @@ const isLoading = computed(() => isLoadingEntrenamientos.value);
 
 // Verificar si la fecha del entrenamiento ya pasó
 const fechaPasada = (entrenamiento) => {
-  if (!entrenamiento.fecha) return false;
-  const fechaEntrenamiento = new Date(entrenamiento.fecha.seconds ? entrenamiento.fecha.seconds * 1000 : entrenamiento.fecha);
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  return fechaEntrenamiento < hoy;
+  const { finMs } = obtenerInicioFinEvento(entrenamiento);
+  return Number.isFinite(finMs) ? Date.now() > finMs : false;
 };
 
 const cambiarEquipo = (equipo) => {
@@ -1236,6 +1580,7 @@ const estaInscrita = (entrenamientoId) => {
 
 const verDetalles = (entrenamiento) => {
   entrenamientoSeleccionadoId.value = entrenamiento.id;
+  cargarVotoMvpSeleccionado(entrenamiento.id);
   mensajeDetalle.value = '';
 };
 
