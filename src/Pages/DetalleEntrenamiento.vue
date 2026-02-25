@@ -239,25 +239,43 @@
                 <span class="text-primary-dark font-black">{{ totalVotosMvp }}</span>
               </div>
 
-              <div v-if="mvpLider" class="bg-primary/10 border border-primary/20 rounded-lg p-3">
-                <p class="text-xs text-gray-600 font-semibold">Lidera actualmente</p>
-                <p class="text-sm font-black text-primary-dark">{{ mvpLider.nombre }} ({{ mvpLider.votos }} {{ mvpLider.votos === 1 ? 'voto' : 'votos' }})</p>
+              <div v-if="topMvp.length > 0" class="bg-primary/10 border border-primary/20 rounded-lg p-3">
+                <p class="text-xs text-gray-600 font-semibold mb-2">Top 3 MVP</p>
+                <div class="space-y-1.5">
+                  <div v-for="(item, index) in topMvp" :key="`top-mvp-${entrenamiento.id}-${item.nombre}`" class="flex items-center justify-between text-xs text-primary-dark">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <span class="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-black shrink-0">{{ index + 1 }}</span>
+                      <span class="font-bold truncate">{{ item.nombre }}</span>
+                    </div>
+                    <span class="font-black">{{ item.votos }} {{ item.votos === 1 ? 'voto' : 'votos' }}</span>
+                  </div>
+                </div>
               </div>
 
-              <div v-if="candidatasMvp.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div v-if="!mvpYaVotado && candidatasMvp.length > 0" class="space-y-2">
+                <p class="text-[11px] text-gray-500 font-black uppercase tracking-wide">Elige una jugadora inscrita</p>
                 <button
                   v-for="nombre in candidatasMvp"
                   :key="`mvp-${entrenamiento.id}-${nombre}`"
                   @click="votarMvp(nombre)"
                   :disabled="!puedeVotarMvp || mvpVoteLoading"
                   :class="[
-                    'px-3 py-2 rounded-lg text-sm font-bold border transition-all disabled:opacity-50 disabled:cursor-not-allowed',
+                    'w-full px-3 py-2.5 rounded-xl text-sm border transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-between gap-3',
                     mvpVotoUsuario === nombre
-                      ? 'bg-primary text-white border-primary-dark'
+                      ? 'bg-primary text-white border-primary-dark shadow'
                       : 'bg-gray-50 text-gray-800 border-gray-200 hover:bg-gray-100'
                   ]"
                 >
-                  {{ nombre }}
+                  <span class="flex items-center gap-2 min-w-0">
+                    <span :class="[
+                      'w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-black shrink-0',
+                      mvpVotoUsuario === nombre ? 'bg-white/20 text-white' : 'bg-primary/10 text-primary-dark'
+                    ]">
+                      {{ obtenerIniciales(nombre) }}
+                    </span>
+                    <span class="font-bold truncate text-left">{{ nombre }}</span>
+                  </span>
+                  <span v-if="mvpVotoUsuario === nombre" class="text-[11px] font-black uppercase tracking-wide">Tu voto</span>
                 </button>
               </div>
 
@@ -265,8 +283,12 @@
                 Tu voto: <span class="font-black text-primary-dark">{{ mvpVotoUsuario }}</span>
               </p>
 
+              <p v-if="mvpYaVotado" class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2 font-bold">
+                Ya registraste tu voto MVP en este partido. No se puede modificar.
+              </p>
+
               <p v-if="!puedeVotarMvp && !mvpCerrada" class="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-lg p-2">
-                Solo jugadoras pueden votar MVP desde su cuenta.
+                Solo jugadoras inscritas pueden votar MVP desde su cuenta.
               </p>
             </div>
           </div>
@@ -590,7 +612,7 @@ const mvpVotoUsuario = ref(null);
 const mvpGanadoraFoto = ref('');
 const mvpGanadoraFotoCargando = ref(false);
 const cacheFotosJugadoras = ref({});
-const DOS_HORAS_MS = 2 * 60 * 60 * 1000;
+const VENTANA_VISIBILIDAD_JUGADORAS_MS = 24 * 60 * 60 * 1000;
 const DURACION_PARTIDO_DEFAULT_MS = 90 * 60 * 1000;
 
 const vieneDeAdmin = computed(() => route.query?.from === 'admin');
@@ -680,11 +702,7 @@ const eventoFueraDeVentanaJugadora = (ent) => {
   const { finMs } = obtenerInicioFinEvento(ent);
   if (!Number.isFinite(finMs)) return false;
 
-  if (esPartidoOAmistoso(ent)) {
-    return Date.now() > finMs + DOS_HORAS_MS;
-  }
-
-  return Date.now() > finMs + (24 * 60 * 60 * 1000);
+  return Date.now() > finMs + VENTANA_VISIBILIDAD_JUGADORAS_MS;
 };
 
 const formatFechaHora = (timestamp) => {
@@ -843,20 +861,15 @@ const mvpPendienteHabilitacion = computed(() => {
 });
 
 const candidatasMvp = computed(() => {
-  if (!entrenamiento.value) return [];
-
-  const desdeConvocatoria = Array.isArray(entrenamiento.value.jugadorasConvocadas)
-    ? entrenamiento.value.jugadorasConvocadas.map((j) => (j?.nombre || '').trim()).filter(Boolean)
-    : [];
-
   const desdeInscripciones = [
     ...inscritasOrganizadas.value.confirmadas,
-    ...inscritasOrganizadas.value.bajas
+    ...inscritasOrganizadas.value.bajas,
+    ...inscritasOrganizadas.value.pendientes
   ]
     .map((i) => (i?.jugadoraNombre || '').trim())
     .filter(Boolean);
 
-  return [...new Set([...desdeConvocatoria, ...desdeInscripciones])];
+  return [...new Set(desdeInscripciones)].sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
 });
 
 const totalVotosMvp = computed(() => {
@@ -865,12 +878,31 @@ const totalVotosMvp = computed(() => {
 });
 
 const mvpLider = computed(() => {
-  if (!Array.isArray(entrenamiento.value?.mvpVotos) || entrenamiento.value.mvpVotos.length === 0) return null;
-  return [...entrenamiento.value.mvpVotos].sort((a, b) => (Number(b?.votos) || 0) - (Number(a?.votos) || 0))[0];
+  if (topMvp.value.length === 0) return null;
+  return topMvp.value[0];
+});
+
+const topMvp = computed(() => {
+  if (!Array.isArray(entrenamiento.value?.mvpVotos) || entrenamiento.value.mvpVotos.length === 0) return [];
+  return [...entrenamiento.value.mvpVotos]
+    .sort((a, b) => (Number(b?.votos) || 0) - (Number(a?.votos) || 0))
+    .slice(0, 3);
 });
 
 const mvpGanadora = computed(() => {
   if (!mvpCerrada.value) return null;
+
+  const nombreFinal = (entrenamiento.value?.mvpGanadoraFinal || '').toString().trim();
+  if (nombreFinal) {
+    const enVotos = Array.isArray(entrenamiento.value?.mvpVotos)
+      ? entrenamiento.value.mvpVotos.find(
+          (item) => (item?.nombre || '').toString().trim().toLowerCase() === nombreFinal.toLowerCase()
+        )
+      : null;
+
+    return enVotos || { nombre: nombreFinal, votos: 0 };
+  }
+
   return mvpLider.value;
 });
 
@@ -969,10 +1001,34 @@ watch(
 );
 
 const puedeVotarMvp = computed(() => {
+  const uid = jugadoraAuthUser.value?.uid;
+
+  const inscritaEnDetalle = !!uid && (
+    inscritasOrganizadas.value.confirmadas.some((item) => item?.jugadoraId === uid)
+    || inscritasOrganizadas.value.bajas.some((item) => item?.jugadoraId === uid)
+    || inscritasOrganizadas.value.pendientes.some((item) => item?.jugadoraId === uid)
+  );
+
+  const inscritaPorEstado = estadoInscripcion.value === 'confirmada'
+    || estadoInscripcion.value === 'baja'
+    || estadoInscripcion.value === 'pendiente';
+
   return esMvpDisponible.value
     && !!jugadoraAuthUser.value
     && !vieneDeAdmin.value
+    && (inscritaEnDetalle || inscritaPorEstado)
+    && !mvpYaVotado.value
     && !mvpCerrada.value;
+});
+
+const mvpYaVotado = computed(() => {
+  const uid = jugadoraAuthUser.value?.uid;
+  if (!uid || !entrenamiento.value) return false;
+
+  const votosRegistrados = entrenamiento.value.mvpVotantes;
+  if (!votosRegistrados || typeof votosRegistrados !== 'object') return false;
+
+  return !!votosRegistrados[uid];
 });
 
 const cargarVotoMvpUsuario = (entrenamientoId) => {
@@ -980,28 +1036,33 @@ const cargarVotoMvpUsuario = (entrenamientoId) => {
     mvpVotoUsuario.value = null;
     return;
   }
-  mvpVotoUsuario.value = localStorage.getItem(`mvp_voto_entrenamiento_${entrenamientoId}`);
+
+  const uid = jugadoraAuthUser.value?.uid;
+  const votosRegistrados = entrenamiento.value?.mvpVotantes;
+  mvpVotoUsuario.value = (uid && votosRegistrados && typeof votosRegistrados === 'object')
+    ? votosRegistrados[uid]
+    : null;
 };
 
 const votarMvp = async (jugadoraNombre) => {
   if (!entrenamiento.value?.id || !puedeVotarMvp.value || mvpVoteLoading.value) return;
-  if (mvpVotoUsuario.value === jugadoraNombre) return;
+  if (mvpYaVotado.value || mvpVotoUsuario.value === jugadoraNombre) return;
 
   mvpVoteLoading.value = true;
   try {
     const votosActualizados = await votarMvpEntrenamiento(
       entrenamiento.value.id,
-      jugadoraNombre,
-      mvpVotoUsuario.value || null
+      jugadoraAuthUser.value.uid,
+      jugadoraNombre
     );
 
     entrenamiento.value = {
       ...entrenamiento.value,
-      mvpVotos: votosActualizados
+      mvpVotos: votosActualizados.mvpVotos,
+      mvpVotantes: votosActualizados.mvpVotantes
     };
 
     mvpVotoUsuario.value = jugadoraNombre;
-    localStorage.setItem(`mvp_voto_entrenamiento_${entrenamiento.value.id}`, jugadoraNombre);
     mostrarToast('¡Tu voto MVP fue registrado!', 'success');
   } catch (err) {
     mostrarToast(err?.message || 'No se pudo registrar el voto MVP', 'error');

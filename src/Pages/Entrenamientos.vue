@@ -20,7 +20,6 @@
 
 
           </div>
-            <InfoUltimaActualizacion />
 
         </div>
       </div>
@@ -844,24 +843,43 @@
               <span>Votación finalizada</span>
             </p>
 
-            <div v-if="liderMvpSeleccionado" class="mb-2 p-2 bg-primary/10 border border-primary/20 rounded text-xs text-primary-dark font-bold">
-              Lidera: {{ liderMvpSeleccionado.nombre }} ({{ liderMvpSeleccionado.votos }} {{ liderMvpSeleccionado.votos === 1 ? 'voto' : 'votos' }})
+            <div v-if="topMvpSeleccionado.length > 0" class="mb-2 p-2 bg-primary/10 border border-primary/20 rounded">
+              <p class="text-[11px] font-black text-primary-dark uppercase tracking-wide mb-1">Top 3 MVP</p>
+              <div class="space-y-1">
+                <div v-for="(item, index) in topMvpSeleccionado" :key="`mvp-top-${entrenamientoSeleccionado.id}-${item.nombre}`" class="flex items-center justify-between text-xs text-primary-dark">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-black shrink-0">{{ index + 1 }}</span>
+                    <span class="font-bold truncate">{{ item.nombre }}</span>
+                  </div>
+                  <span class="font-black">{{ item.votos }} {{ item.votos === 1 ? 'voto' : 'votos' }}</span>
+                </div>
+              </div>
             </div>
 
-            <div v-if="candidatasMvpSeleccionado.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div v-if="!mvpYaVotadoSeleccionado && candidatasMvpSeleccionado.length > 0" class="space-y-2">
+              <p class="text-[11px] font-black text-gray-500 uppercase tracking-wide">Elige una jugadora inscrita</p>
               <button
                 v-for="nombre in candidatasMvpSeleccionado"
                 :key="`mvp-detalle-${entrenamientoSeleccionado.id}-${nombre}`"
                 @click="votarMvpSeleccionado(nombre)"
                 :disabled="!puedeVotarMvpSeleccionado || mvpVoteLoading"
                 :class="[
-                  'px-3 py-2 rounded-lg text-sm font-bold border transition-all disabled:opacity-50 disabled:cursor-not-allowed',
+                  'w-full px-3 py-2.5 rounded-xl text-sm border transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-between gap-3',
                   mvpVotoSeleccionado === nombre
-                    ? 'bg-primary text-white border-primary-dark'
-                    : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-100'
+                    ? 'bg-primary text-white border-primary-dark shadow'
+                    : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50'
                 ]"
               >
-                {{ nombre }}
+                <span class="flex items-center gap-2 min-w-0">
+                  <span :class="[
+                    'w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-black shrink-0',
+                    mvpVotoSeleccionado === nombre ? 'bg-white/20 text-white' : 'bg-primary/10 text-primary-dark'
+                  ]">
+                    {{ obtenerIniciales(nombre) }}
+                  </span>
+                  <span class="font-bold truncate text-left">{{ nombre }}</span>
+                </span>
+                <span v-if="mvpVotoSeleccionado === nombre" class="text-[11px] font-black uppercase tracking-wide">Tu voto</span>
               </button>
             </div>
 
@@ -869,8 +887,12 @@
               Tu voto: <span class="font-black text-primary-dark">{{ mvpVotoSeleccionado }}</span>
             </p>
 
+            <p v-if="mvpYaVotadoSeleccionado" class="text-xs text-amber-700 mt-2 font-bold">
+              Ya registraste tu voto MVP en este partido. No se puede modificar.
+            </p>
+
             <p v-if="!puedeVotarMvpSeleccionado && !mvpCerradaSeleccionado" class="text-xs text-gray-500 mt-2">
-              Solo jugadoras pueden votar MVP.
+              Solo jugadoras inscritas pueden votar MVP.
             </p>
           </div>
 
@@ -1109,7 +1131,7 @@ const entrenamientoSeleccionado = computed(() => {
   return entrenamientos.value.find(e => e.id === entrenamientoSeleccionadoId.value) || null;
 });
 
-const DOS_HORAS_MS = 2 * 60 * 60 * 1000;
+const VENTANA_VISIBILIDAD_JUGADORAS_MS = 24 * 60 * 60 * 1000;
 const DURACION_PARTIDO_DEFAULT_MS = 90 * 60 * 1000;
 
 const esPartidoOAmistoso = (entrenamiento) => {
@@ -1167,11 +1189,7 @@ const eventoFueraDeVentanaJugadora = (entrenamiento) => {
   const { finMs } = obtenerInicioFinEvento(entrenamiento);
   if (!Number.isFinite(finMs)) return false;
 
-  if (esPartidoOAmistoso(entrenamiento)) {
-    return Date.now() > finMs + DOS_HORAS_MS;
-  }
-
-  return Date.now() > finMs + (24 * 60 * 60 * 1000);
+  return Date.now() > finMs + VENTANA_VISIBILIDAD_JUGADORAS_MS;
 };
 
 // Computed para obtener inscripciones organizadas del entrenamiento seleccionado
@@ -1255,20 +1273,15 @@ const mvpDisponibleDesdeTextoSeleccionado = computed(() => {
 });
 
 const candidatasMvpSeleccionado = computed(() => {
-  if (!entrenamientoSeleccionado.value) return [];
-
-  const desdeConvocatoria = Array.isArray(entrenamientoSeleccionado.value.jugadorasConvocadas)
-    ? entrenamientoSeleccionado.value.jugadorasConvocadas.map((j) => (j?.nombre || '').trim()).filter(Boolean)
-    : [];
-
   const desdeInscripciones = [
     ...inscritasOrganizadas.value.confirmadas,
-    ...inscritasOrganizadas.value.bajas
+    ...inscritasOrganizadas.value.bajas,
+    ...inscritasOrganizadas.value.pendientes
   ]
     .map((i) => (i?.jugadoraNombre || '').trim())
     .filter(Boolean);
 
-  return [...new Set([...desdeConvocatoria, ...desdeInscripciones])];
+  return [...new Set(desdeInscripciones)].sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
 });
 
 const totalVotosMvpSeleccionado = computed(() => {
@@ -1277,12 +1290,31 @@ const totalVotosMvpSeleccionado = computed(() => {
 });
 
 const liderMvpSeleccionado = computed(() => {
-  if (!Array.isArray(entrenamientoSeleccionado.value?.mvpVotos) || entrenamientoSeleccionado.value.mvpVotos.length === 0) return null;
-  return [...entrenamientoSeleccionado.value.mvpVotos].sort((a, b) => (Number(b?.votos) || 0) - (Number(a?.votos) || 0))[0];
+  if (topMvpSeleccionado.value.length === 0) return null;
+  return topMvpSeleccionado.value[0];
+});
+
+const topMvpSeleccionado = computed(() => {
+  if (!Array.isArray(entrenamientoSeleccionado.value?.mvpVotos) || entrenamientoSeleccionado.value.mvpVotos.length === 0) return [];
+  return [...entrenamientoSeleccionado.value.mvpVotos]
+    .sort((a, b) => (Number(b?.votos) || 0) - (Number(a?.votos) || 0))
+    .slice(0, 3);
 });
 
 const mvpGanadoraSeleccionado = computed(() => {
   if (!mvpCerradaSeleccionado.value) return null;
+
+  const nombreFinal = (entrenamientoSeleccionado.value?.mvpGanadoraFinal || '').toString().trim();
+  if (nombreFinal) {
+    const enVotos = Array.isArray(entrenamientoSeleccionado.value?.mvpVotos)
+      ? entrenamientoSeleccionado.value.mvpVotos.find(
+          (item) => (item?.nombre || '').toString().trim().toLowerCase() === nombreFinal.toLowerCase()
+        )
+      : null;
+
+    return enVotos || { nombre: nombreFinal, votos: 0 };
+  }
+
   return liderMvpSeleccionado.value;
 });
 
@@ -1381,10 +1413,34 @@ watch(
 );
 
 const puedeVotarMvpSeleccionado = computed(() => {
+  const uid = jugadoraAuthUser.value?.uid;
+  const entrenamientoId = entrenamientoSeleccionado.value?.id;
+
+  const inscritaEnDetalle = !!uid && (
+    inscritasOrganizadas.value.confirmadas.some((item) => item?.jugadoraId === uid)
+    || inscritasOrganizadas.value.bajas.some((item) => item?.jugadoraId === uid)
+    || inscritasOrganizadas.value.pendientes.some((item) => item?.jugadoraId === uid)
+  );
+
+  const estadoActual = entrenamientoId ? estadoInscripcion.value[entrenamientoId] : null;
+  const inscritaPorEstado = estadoActual === 'confirmada' || estadoActual === 'baja' || estadoActual === 'pendiente';
+
   return !!jugadoraAuthUser.value
     && !esAdmin.value
+    && (inscritaEnDetalle || inscritaPorEstado)
     && mvpDisponibleSeleccionado.value
+    && !mvpYaVotadoSeleccionado.value
     && !mvpCerradaSeleccionado.value;
+});
+
+const mvpYaVotadoSeleccionado = computed(() => {
+  const uid = jugadoraAuthUser.value?.uid;
+  if (!uid || !entrenamientoSeleccionado.value) return false;
+
+  const votosRegistrados = entrenamientoSeleccionado.value.mvpVotantes;
+  if (!votosRegistrados || typeof votosRegistrados !== 'object') return false;
+
+  return !!votosRegistrados[uid];
 });
 
 const cargarVotoMvpSeleccionado = (entrenamientoId) => {
@@ -1392,31 +1448,36 @@ const cargarVotoMvpSeleccionado = (entrenamientoId) => {
     mvpVotoSeleccionado.value = null;
     return;
   }
-  mvpVotoSeleccionado.value = localStorage.getItem(`mvp_voto_entrenamiento_${entrenamientoId}`);
+
+  const uid = jugadoraAuthUser.value?.uid;
+  const votosRegistrados = entrenamientoSeleccionado.value?.mvpVotantes;
+  mvpVotoSeleccionado.value = (uid && votosRegistrados && typeof votosRegistrados === 'object')
+    ? votosRegistrados[uid]
+    : null;
 };
 
 const votarMvpSeleccionado = async (jugadoraNombre) => {
   if (!entrenamientoSeleccionado.value?.id || !puedeVotarMvpSeleccionado.value || mvpVoteLoading.value) return;
-  if (mvpVotoSeleccionado.value === jugadoraNombre) return;
+  if (mvpYaVotadoSeleccionado.value || mvpVotoSeleccionado.value === jugadoraNombre) return;
 
   mvpVoteLoading.value = true;
   try {
     const votosActualizados = await votarMvpEntrenamiento(
       entrenamientoSeleccionado.value.id,
-      jugadoraNombre,
-      mvpVotoSeleccionado.value || null
+      jugadoraAuthUser.value.uid,
+      jugadoraNombre
     );
 
     const idx = entrenamientos.value.findIndex(e => e.id === entrenamientoSeleccionado.value.id);
     if (idx !== -1) {
       entrenamientos.value[idx] = {
         ...entrenamientos.value[idx],
-        mvpVotos: votosActualizados
+        mvpVotos: votosActualizados.mvpVotos,
+        mvpVotantes: votosActualizados.mvpVotantes
       };
     }
 
     mvpVotoSeleccionado.value = jugadoraNombre;
-    localStorage.setItem(`mvp_voto_entrenamiento_${entrenamientoSeleccionado.value.id}`, jugadoraNombre);
     mostrarToast('¡Tu voto MVP fue registrado!', 'success');
   } catch (err) {
     mostrarToast(err?.message || 'No se pudo registrar el voto MVP', 'error');

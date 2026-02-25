@@ -319,6 +319,9 @@
                         <span v-if="esPartidoOAmistoso(ent) && mvpHabilitadoNormalizado(ent)" class="text-xs bg-linear-to-r from-red-500 to-red-600 text-white rounded-full px-3 py-1.5 font-bold shadow-sm">
                           MVP habilitado
                         </span>
+                        <span v-if="mvpEmpatePendiente(ent)" class="text-xs bg-linear-to-r from-amber-500 to-orange-500 text-white rounded-full px-3 py-1.5 font-bold shadow-sm">
+                          Empate MVP pendiente
+                        </span>
                         <span v-if="ent.mvpCerrada && esPartidoOAmistoso(ent)" class="text-xs bg-linear-to-r from-gray-600 to-gray-700 text-white rounded-full px-3 py-1.5 font-bold shadow-sm">
                           Votación MVP cerrada
                         </span>
@@ -511,8 +514,39 @@ const mvpHabilitadoNormalizado = (ent) => {
     : (mvpRaw === true || mvpRaw === 'true' || mvpRaw === 1);
 };
 
+const mvpEmpatePendiente = (ent) => {
+  if (!esPartidoOAmistoso(ent) || !mvpHabilitadoNormalizado(ent) || ent?.mvpCerrada) return false;
+
+  const votosOrdenados = Array.isArray(ent?.mvpVotos)
+    ? [...ent.mvpVotos]
+        .map((item) => ({
+          nombre: (item?.nombre || '').toString().trim(),
+          votos: Math.max(0, Number(item?.votos) || 0)
+        }))
+        .filter((item) => item.nombre)
+        .sort((a, b) => b.votos - a.votos)
+    : [];
+
+  if (votosOrdenados.length < 2) return false;
+
+  const maxVotos = votosOrdenados[0].votos;
+  if (maxVotos <= 0) return false;
+
+  return votosOrdenados.filter((item) => item.votos === maxVotos).length > 1;
+};
+
 const mvpGanadora = (ent) => {
-  if (!ent?.mvpCerrada || !Array.isArray(ent?.mvpVotos) || ent.mvpVotos.length === 0) return null;
+  if (!ent?.mvpCerrada) return null;
+
+  const nombreFinal = (ent?.mvpGanadoraFinal || '').toString().trim();
+  if (nombreFinal) {
+    const enVotos = Array.isArray(ent?.mvpVotos)
+      ? ent.mvpVotos.find((item) => (item?.nombre || '').toString().trim().toLowerCase() === nombreFinal.toLowerCase())
+      : null;
+    return enVotos || { nombre: nombreFinal, votos: 0 };
+  }
+
+  if (!Array.isArray(ent?.mvpVotos) || ent.mvpVotos.length === 0) return null;
   return [...ent.mvpVotos].sort((a, b) => (Number(b?.votos) || 0) - (Number(a?.votos) || 0))[0];
 };
 
@@ -520,8 +554,38 @@ const finalizarVotacionMvpDesdeHistorial = async (ent) => {
   const confirmar = confirm(`¿Finalizar votación MVP para "${ent?.nombre || 'este evento'}"?`);
   if (!confirmar) return;
 
+  const votosOrdenados = Array.isArray(ent?.mvpVotos)
+    ? [...ent.mvpVotos]
+        .map((item) => ({
+          nombre: (item?.nombre || '').toString().trim(),
+          votos: Math.max(0, Number(item?.votos) || 0)
+        }))
+        .filter((item) => item.nombre)
+        .sort((a, b) => b.votos - a.votos)
+    : [];
+
+  const maxVotos = votosOrdenados.length > 0 ? votosOrdenados[0].votos : 0;
+  const empatadas = maxVotos > 0 ? votosOrdenados.filter((item) => item.votos === maxVotos) : [];
+  let ganadoraFinal = '';
+
+  if (empatadas.length > 1) {
+    const opciones = empatadas.map((item, idx) => `${idx + 1}. ${item.nombre} (${item.votos} votos)`).join('\n');
+    const seleccionRaw = prompt(`Hay empate MVP. Elige la ganadora final escribiendo el número:\n\n${opciones}`);
+    if (!seleccionRaw) return;
+
+    const indice = Number(seleccionRaw);
+    if (!Number.isFinite(indice) || indice < 1 || indice > empatadas.length) {
+      alert('Selección inválida. Debes ingresar un número de la lista.');
+      return;
+    }
+
+    ganadoraFinal = empatadas[indice - 1].nombre;
+  } else if (empatadas.length === 1) {
+    ganadoraFinal = empatadas[0].nombre;
+  }
+
   try {
-    await finalizarVotacionMvpEntrenamiento(ent.id);
+    await finalizarVotacionMvpEntrenamiento(ent.id, ganadoraFinal);
     await fetchTodosEntrenamientos();
   } catch (err) {
     alert(err?.message || 'No se pudo finalizar la votación MVP.');

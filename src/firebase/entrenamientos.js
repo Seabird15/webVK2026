@@ -246,11 +246,16 @@ export const actualizarEntrenamiento = async (entrenamientoId, data) => {
 };
 
 // Votar MVP en un partido/amistoso creado por admin
-export const votarMvpEntrenamiento = async (entrenamientoId, jugadoraNombre, votoAnterior = null) => {
+export const votarMvpEntrenamiento = async (entrenamientoId, jugadoraId, jugadoraNombre) => {
   isLoadingEntrenamientos.value = true;
   errorEntrenamientos.value = null;
 
   try {
+    const idVotante = (jugadoraId || '').toString().trim();
+    if (!idVotante) {
+      throw new Error('No se pudo validar la jugadora que vota.');
+    }
+
     const nombreVoto = (jugadoraNombre || '').toString().trim();
     if (!nombreVoto) {
       throw new Error('Debes seleccionar una jugadora para votar MVP.');
@@ -283,17 +288,47 @@ export const votarMvpEntrenamiento = async (entrenamientoId, jugadoraNombre, vot
       throw new Error('La votación MVP ya fue finalizada por administración.');
     }
 
+    const votosRegistradosPorJugadora = (entrenamiento?.mvpVotantes && typeof entrenamiento.mvpVotantes === 'object')
+      ? entrenamiento.mvpVotantes
+      : {};
+
+    if (votosRegistradosPorJugadora[idVotante]) {
+      throw new Error('Tu voto MVP ya fue registrado y no se puede modificar.');
+    }
+
+    const inscripcionesSnap = await getDocs(
+      query(
+        collection(db, 'inscripcionesEntrenamientos'),
+        where('entrenamientoId', '==', entrenamientoId)
+      )
+    );
+
+    const jugadoraInscrita = inscripcionesSnap.docs.some((docSnap) => {
+      const data = docSnap.data() || {};
+      return data.jugadoraId === idVotante;
+    });
+
+    if (!jugadoraInscrita) {
+      throw new Error('Solo las jugadoras inscritas en este evento pueden votar MVP.');
+    }
+
+    const nombreVotoNormalizado = nombreVoto.toLowerCase();
+    const candidataInscrita = inscripcionesSnap.docs.some((docSnap) => {
+      const data = docSnap.data() || {};
+      const nombreInscrita = (data.jugadoraNombre || '').toString().trim().toLowerCase();
+      return nombreInscrita === nombreVotoNormalizado;
+    });
+
+    if (!candidataInscrita) {
+      throw new Error('Solo se puede votar por jugadoras inscritas en este evento.');
+    }
+
     const votosActuales = normalizarVotosMvp(entrenamiento?.mvpVotos || []);
     const mapaVotos = {};
 
     votosActuales.forEach((item) => {
       mapaVotos[item.nombre] = item.votos;
     });
-
-    const nombreAnterior = (votoAnterior || '').toString().trim();
-    if (nombreAnterior && mapaVotos[nombreAnterior]) {
-      mapaVotos[nombreAnterior] = Math.max(0, mapaVotos[nombreAnterior] - 1);
-    }
 
     mapaVotos[nombreVoto] = (mapaVotos[nombreVoto] || 0) + 1;
 
@@ -302,12 +337,21 @@ export const votarMvpEntrenamiento = async (entrenamientoId, jugadoraNombre, vot
       .filter((item) => item.votos > 0)
       .sort((a, b) => b.votos - a.votos);
 
+    const mvpVotantesActualizados = {
+      ...votosRegistradosPorJugadora,
+      [idVotante]: nombreVoto
+    };
+
     await updateDoc(entrenamientoRef, {
       mvpVotos: votosActualizados,
+      mvpVotantes: mvpVotantesActualizados,
       updatedAt: new Date()
     });
 
-    return votosActualizados;
+    return {
+      mvpVotos: votosActualizados,
+      mvpVotantes: mvpVotantesActualizados
+    };
   } catch (err) {
     errorEntrenamientos.value = err.message;
     throw err;
@@ -317,7 +361,7 @@ export const votarMvpEntrenamiento = async (entrenamientoId, jugadoraNombre, vot
 };
 
 // Finalizar votación MVP (solo admin)
-export const finalizarVotacionMvpEntrenamiento = async (entrenamientoId) => {
+export const finalizarVotacionMvpEntrenamiento = async (entrenamientoId, mvpGanadoraFinal = '') => {
   isLoadingEntrenamientos.value = true;
   errorEntrenamientos.value = null;
 
@@ -349,9 +393,37 @@ export const finalizarVotacionMvpEntrenamiento = async (entrenamientoId) => {
       return true;
     }
 
+    const votosNormalizados = normalizarVotosMvp(entrenamiento?.mvpVotos || []);
+    const maxVotos = votosNormalizados.length > 0 ? (Number(votosNormalizados[0]?.votos) || 0) : 0;
+    const lideresEmpatados = maxVotos > 0
+      ? votosNormalizados.filter((item) => (Number(item?.votos) || 0) === maxVotos)
+      : [];
+
+    const ganadoraFinalRaw = (mvpGanadoraFinal || '').toString().trim();
+    let ganadoraFinal = '';
+
+    if (lideresEmpatados.length > 1) {
+      if (!ganadoraFinalRaw) {
+        throw new Error('Hay empate en MVP. Debes seleccionar la MVP final antes de cerrar la votación.');
+      }
+
+      const ganadoraValida = lideresEmpatados.find(
+        (item) => (item?.nombre || '').toString().trim().toLowerCase() === ganadoraFinalRaw.toLowerCase()
+      );
+
+      if (!ganadoraValida) {
+        throw new Error('La jugadora elegida no corresponde al empate de MVP.');
+      }
+
+      ganadoraFinal = ganadoraValida.nombre;
+    } else if (lideresEmpatados.length === 1) {
+      ganadoraFinal = lideresEmpatados[0].nombre;
+    }
+
     await updateDoc(entrenamientoRef, {
       mvpCerrada: true,
       mvpCerradaAt: new Date(),
+      mvpGanadoraFinal: ganadoraFinal,
       updatedAt: new Date()
     });
 

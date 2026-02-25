@@ -392,6 +392,9 @@
                   <span v-if="mvpHabilitadoNormalizado(entrenamiento) && (entrenamiento.tipo === 'partido' || entrenamiento.tipo === 'amistoso')" class="inline-flex items-center gap-1 text-xs bg-red-500 text-white px-2.5 py-1 rounded-full font-bold whitespace-nowrap">
                     MVP habilitado
                   </span>
+                  <span v-if="mvpEmpatePendiente(entrenamiento)" class="inline-flex items-center gap-1 text-xs bg-amber-500 text-white px-2.5 py-1 rounded-full font-bold whitespace-nowrap">
+                    Empate MVP pendiente
+                  </span>
                   <span v-if="entrenamiento.mvpCerrada && (entrenamiento.tipo === 'partido' || entrenamiento.tipo === 'amistoso')" class="inline-flex items-center gap-1 text-xs bg-gray-700 text-white px-2.5 py-1 rounded-full font-bold whitespace-nowrap">
                     Votación MVP cerrada
                   </span>
@@ -976,6 +979,58 @@
     </div>
     
     <!-- Modal de confirmaci\u00f3n -->
+    <Teleport to="body">
+      <div v-if="mostrarModalDesempateMvp" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-10000 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full border-2 border-gray-200 overflow-hidden">
+          <div class="bg-linear-to-r from-primary-dark to-primary text-white p-5">
+            <h3 class="text-lg font-black uppercase tracking-wide">Desempate MVP</h3>
+            <p class="text-xs opacity-90 mt-1">Selecciona la MVP final para cerrar la votación</p>
+          </div>
+
+          <div class="p-5 space-y-4">
+            <p class="text-sm text-gray-700 font-semibold">
+              Hay empate en el primer lugar para
+              <span class="font-black text-gray-900">{{ entrenamientoDesempateMvp?.nombre }}</span>.
+            </p>
+
+            <div class="space-y-2">
+              <button
+                v-for="item in candidatasEmpateMvp"
+                :key="`desempate-${entrenamientoDesempateMvp?.id}-${item.nombre}`"
+                @click="mvpSeleccionDesempate = item.nombre"
+                :class="[
+                  'w-full px-4 py-3 rounded-xl border text-left flex items-center justify-between transition-all',
+                  mvpSeleccionDesempate === item.nombre
+                    ? 'border-primary bg-primary/10 text-primary-dark'
+                    : 'border-gray-200 bg-white text-gray-800 hover:bg-gray-50'
+                ]"
+              >
+                <span class="font-bold">{{ item.nombre }}</span>
+                <span class="text-xs font-black">{{ item.votos }} {{ item.votos === 1 ? 'voto' : 'votos' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-5 bg-gray-50 border-t border-gray-200 flex gap-3">
+            <button
+              @click="cerrarModalDesempateMvp"
+              :disabled="modalCargando"
+              class="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-xl font-bold hover:bg-gray-100 transition-colors disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button
+              @click="confirmarDesempateMvp"
+              :disabled="!mvpSeleccionDesempate || modalCargando"
+              class="flex-1 px-4 py-2.5 bg-linear-to-r from-primary-dark to-primary text-white rounded-xl font-bold hover:opacity-90 transition-all disabled:opacity-50"
+            >
+              {{ modalCargando ? 'Guardando...' : 'Elegir y cerrar' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
     <ModalConfirmacion
       v-model="mostrarModal"
       :titulo="modalConfig.titulo"
@@ -1076,6 +1131,10 @@ const formulario = ref({
 
 const busquedaConvocatoria = ref('');
 const jugadorasParaConvocar = ref([]);
+const mostrarModalDesempateMvp = ref(false);
+const entrenamientoDesempateMvp = ref(null);
+const candidatasEmpateMvp = ref([]);
+const mvpSeleccionDesempate = ref('');
 
 const parseFechaBase = (fecha) => {
   if (!fecha) return null;
@@ -1118,6 +1177,29 @@ const mvpHabilitadoNormalizado = (entrenamiento) => {
   return mvpRaw === undefined || mvpRaw === null
     ? true
     : (mvpRaw === true || mvpRaw === 'true' || mvpRaw === 1);
+};
+
+const mvpEmpatePendiente = (entrenamiento) => {
+  if (!esPartidoOAmistoso(entrenamiento) || !mvpHabilitadoNormalizado(entrenamiento) || entrenamiento?.mvpCerrada) {
+    return false;
+  }
+
+  const votosOrdenados = Array.isArray(entrenamiento?.mvpVotos)
+    ? [...entrenamiento.mvpVotos]
+        .map((item) => ({
+          nombre: (item?.nombre || '').toString().trim(),
+          votos: Math.max(0, Number(item?.votos) || 0)
+        }))
+        .filter((item) => item.nombre)
+        .sort((a, b) => b.votos - a.votos)
+    : [];
+
+  if (votosOrdenados.length < 2) return false;
+
+  const maxVotos = votosOrdenados[0].votos;
+  if (maxVotos <= 0) return false;
+
+  return votosOrdenados.filter((item) => item.votos === maxVotos).length > 1;
 };
 
 const entrenamientosFiltrados = computed(() => {
@@ -1626,6 +1708,31 @@ const regenerarInscripciones = (entrenamiento) => {
 };
 
 const confirmarFinalizarVotacionMvp = (entrenamiento) => {
+  const votosOrdenados = Array.isArray(entrenamiento?.mvpVotos)
+    ? [...entrenamiento.mvpVotos]
+        .map((item) => ({
+          nombre: (item?.nombre || '').toString().trim(),
+          votos: Math.max(0, Number(item?.votos) || 0)
+        }))
+        .filter((item) => item.nombre)
+        .sort((a, b) => b.votos - a.votos)
+    : [];
+
+  const maxVotos = votosOrdenados.length > 0 ? votosOrdenados[0].votos : 0;
+  const empatadas = maxVotos > 0
+    ? votosOrdenados.filter((item) => item.votos === maxVotos)
+    : [];
+
+  if (empatadas.length > 1) {
+    entrenamientoDesempateMvp.value = entrenamiento;
+    candidatasEmpateMvp.value = empatadas;
+    mvpSeleccionDesempate.value = '';
+    mostrarModalDesempateMvp.value = true;
+    return;
+  }
+
+  const ganadoraDirecta = empatadas.length === 1 ? empatadas[0].nombre : '';
+
   modalConfig.value = {
     titulo: '¿Finalizar votación MVP?',
     mensaje: `Se cerrará la votación MVP para "${entrenamiento.nombre}".`,
@@ -1635,7 +1742,7 @@ const confirmarFinalizarVotacionMvp = (entrenamiento) => {
     accion: async () => {
       try {
         modalCargando.value = true;
-        await finalizarVotacionMvpEntrenamiento(entrenamiento.id);
+        await finalizarVotacionMvpEntrenamiento(entrenamiento.id, ganadoraDirecta);
 
         if (filtroEquipo.value) {
           await fetchEntrenamientosPorEquipo(filtroEquipo.value);
@@ -1647,7 +1754,8 @@ const confirmarFinalizarVotacionMvp = (entrenamiento) => {
           entrenamientoDetallado.value = {
             ...entrenamientoDetallado.value,
             mvpCerrada: true,
-            mvpCerradaAt: new Date()
+            mvpCerradaAt: new Date(),
+            mvpGanadoraFinal: ganadoraDirecta
           };
         }
 
@@ -1660,6 +1768,47 @@ const confirmarFinalizarVotacionMvp = (entrenamiento) => {
     }
   };
   mostrarModal.value = true;
+};
+
+const cerrarModalDesempateMvp = () => {
+  if (modalCargando.value) return;
+  mostrarModalDesempateMvp.value = false;
+  entrenamientoDesempateMvp.value = null;
+  candidatasEmpateMvp.value = [];
+  mvpSeleccionDesempate.value = '';
+};
+
+const confirmarDesempateMvp = async () => {
+  if (!entrenamientoDesempateMvp.value?.id || !mvpSeleccionDesempate.value) return;
+
+  try {
+    modalCargando.value = true;
+    await finalizarVotacionMvpEntrenamiento(
+      entrenamientoDesempateMvp.value.id,
+      mvpSeleccionDesempate.value
+    );
+
+    if (filtroEquipo.value) {
+      await fetchEntrenamientosPorEquipo(filtroEquipo.value);
+    } else {
+      await fetchTodosEntrenamientos();
+    }
+
+    if (entrenamientoDetallado.value?.id === entrenamientoDesempateMvp.value.id) {
+      entrenamientoDetallado.value = {
+        ...entrenamientoDetallado.value,
+        mvpCerrada: true,
+        mvpCerradaAt: new Date(),
+        mvpGanadoraFinal: mvpSeleccionDesempate.value
+      };
+    }
+
+    cerrarModalDesempateMvp();
+  } catch (err) {
+    alert('Error al finalizar votación MVP: ' + err.message);
+  } finally {
+    modalCargando.value = false;
+  }
 };
 
 const formatearFecha = (fecha) => {
