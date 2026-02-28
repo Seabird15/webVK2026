@@ -39,6 +39,15 @@
       </div>
     </div>
 
+    <div class="max-w-6xl mx-auto px-6 mt-4">
+      <CuestionarioSaludSemanal
+        v-if="jugadoraAuthUser?.uid && jugadoraData"
+        :jugadora-id="jugadoraAuthUser.uid"
+        :jugadora-nombre="nombreCompletoJugadora"
+        :equipo="equipoSeleccionado"
+      />
+    </div>
+
     <!-- Contenido -->
     <div class="max-w-6xl mx-auto p-6">
       <!-- Información de jugadora -->
@@ -1145,6 +1154,7 @@ import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { obtenerEventosEspeciales } from '../firebase/eventosEspeciales';
 import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
+import CuestionarioSaludSemanal from '../components/CuestionarioSaludSemanal.vue';
 
 const router = useRouter();
 const normalizarEquipo = (equipo) => {
@@ -1197,6 +1207,10 @@ let timeoutMensajeDetalle = null;
 const entrenamientoSeleccionado = computed(() => {
   if (!entrenamientoSeleccionadoId.value) return null;
   return entrenamientos.value.find(e => e.id === entrenamientoSeleccionadoId.value) || null;
+});
+
+const nombreCompletoJugadora = computed(() => {
+  return `${jugadoraData.value?.nombre || ''} ${jugadoraData.value?.apellido || ''}`.trim();
 });
 
 const VENTANA_VISIBILIDAD_JUGADORAS_MS = 24 * 60 * 60 * 1000;

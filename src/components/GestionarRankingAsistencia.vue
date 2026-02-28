@@ -20,7 +20,7 @@
         </div>
         <div class="bg-green-50 border border-green-200 rounded-xl p-4">
           <p class="text-xs text-green-600 font-bold uppercase">Entrenamientos y partidos considerados</p>
-          <p class="text-2xl font-black text-green-700 mt-1">{{ totalEventosFinalizados }}</p>
+          <p class="text-2xl font-black text-green-700 mt-1">{{ totalEventosFinalizadosFiltrados }}</p>
         </div>
         <div class="bg-purple-50 border border-purple-200 rounded-xl p-4">
           <p class="text-xs text-purple-600 font-bold uppercase">Respuestas totales</p>
@@ -70,7 +70,7 @@
           <tbody>
             <tr
               v-for="(item, index) in rankingFiltrado"
-              :key="item.jugadoraId"
+              :key="`${equipoSeleccionado}-${item.jugadoraId}-${item.equipo}`"
               class="border-b border-gray-100 hover:bg-gray-50"
             >
               <td class="py-3 pr-4 font-black text-gray-700">{{ index + 1 }}</td>
@@ -100,8 +100,16 @@ import { ChartBarIcon } from '@heroicons/vue/24/outline';
 import { db } from '../firebase/config';
 
 const isLoading = ref(true);
-const ranking = ref([]);
-const totalEventosFinalizados = ref(0);
+const rankingPorEquipo = ref({
+  todos: [],
+  ascenso: [],
+  escuela: []
+});
+const eventosFinalizadosPorEquipo = ref({
+  todos: 0,
+  ascenso: 0,
+  escuela: 0
+});
 const equipoSeleccionado = ref('todos');
 
 const equiposFiltro = [
@@ -130,29 +138,21 @@ const nombresExcluidos = new Set([
 ]);
 
 const rankingFiltrado = computed(() => {
-  if (equipoSeleccionado.value === 'todos') return ranking.value;
-  if (equipoSeleccionado.value === 'ascenso') {
-    return ranking.value.filter((item) => item.equipo === 'ascenso' || item.equipo === 'ambos');
-  }
-  if (equipoSeleccionado.value === 'escuela') {
-    return ranking.value.filter((item) => item.equipo === 'escuela' || item.equipo === 'ambos');
-  }
-  return ranking.value;
+  return rankingPorEquipo.value[equipoSeleccionado.value] || [];
 });
 
 const totalRespuestasFiltradas = computed(() => rankingFiltrado.value.reduce((acc, item) => acc + item.total, 0));
 
+const totalEventosFinalizadosFiltrados = computed(() => {
+  return eventosFinalizadosPorEquipo.value[equipoSeleccionado.value] || 0;
+});
+
 const conteoPorEquipo = computed(() => {
-  const base = { todos: ranking.value.length, ascenso: 0, escuela: 0 };
-  ranking.value.forEach((item) => {
-    if (item.equipo === 'ascenso') base.ascenso += 1;
-    else if (item.equipo === 'escuela') base.escuela += 1;
-    else if (item.equipo === 'ambos') {
-      base.ascenso += 1;
-      base.escuela += 1;
-    }
-  });
-  return base;
+  return {
+    todos: rankingPorEquipo.value.todos.length,
+    ascenso: rankingPorEquipo.value.ascenso.length,
+    escuela: rankingPorEquipo.value.escuela.length
+  };
 });
 
 const parseFechaBase = (fecha) => {
@@ -213,26 +213,35 @@ const cargarRanking = async () => {
         return ms != null && ms < now;
       });
 
-    const idsFinalizados = new Set(entrenamientosFinalizados.map((ent) => ent.id));
-    totalEventosFinalizados.value = idsFinalizados.size;
+    const idsFinalizadosPorEquipo = {
+      ascenso: new Set(),
+      escuela: new Set()
+    };
 
-    const acumulado = new Map();
+    entrenamientosFinalizados.forEach((ent) => {
+      const equipoEntrenamiento = normalizarEquipo(ent?.equipo);
+      if (equipoEntrenamiento === 'ascenso' || equipoEntrenamiento === 'escuela') {
+        idsFinalizadosPorEquipo[equipoEntrenamiento].add(ent.id);
+      }
+    });
 
-    inscripcionesSnap.forEach((documento) => {
-      const data = documento.data();
-      if (!idsFinalizados.has(data.entrenamientoId)) return;
+    eventosFinalizadosPorEquipo.value = {
+      ascenso: idsFinalizadosPorEquipo.ascenso.size,
+      escuela: idsFinalizadosPorEquipo.escuela.size,
+      todos: idsFinalizadosPorEquipo.ascenso.size + idsFinalizadosPorEquipo.escuela.size
+    };
 
-      const jugadoraId = (data.jugadoraId || '').toString().trim();
-      if (!jugadoraId) return;
+    const acumuladoPorEquipo = {
+      ascenso: new Map(),
+      escuela: new Map()
+    };
 
-      const nombreNormalizado = normalizarNombre(data.jugadoraNombre || '');
-      if (nombresExcluidos.has(nombreNormalizado)) return;
-
+    const registrarInscripcion = (acumulado, jugadoraId, data, equipoJugadora) => {
       if (!acumulado.has(jugadoraId)) {
         acumulado.set(jugadoraId, {
           jugadoraId,
           nombre: (data.jugadoraNombre || 'Sin nombre').toString().trim() || 'Sin nombre',
-          equipo: equipoPorJugadoraId.get(jugadoraId) || 'sin-equipo',
+          equipo: equipoJugadora,
           confirmadas: 0,
           bajas: 0,
           pendientes: 0,
@@ -252,21 +261,81 @@ const cargarRanking = async () => {
       if (data.jugadoraNombre && (!item.nombre || item.nombre === 'Sin nombre')) {
         item.nombre = data.jugadoraNombre;
       }
+    };
+
+    inscripcionesSnap.forEach((documento) => {
+      const data = documento.data();
+
+      const jugadoraId = (data.jugadoraId || '').toString().trim();
+      if (!jugadoraId) return;
+
+      const nombreNormalizado = normalizarNombre(data.jugadoraNombre || '');
+      if (nombresExcluidos.has(nombreNormalizado)) return;
+
+      const equipoJugadora = equipoPorJugadoraId.get(jugadoraId) || 'sin-equipo';
+      if (equipoJugadora !== 'ascenso' && equipoJugadora !== 'escuela' && equipoJugadora !== 'ambos') return;
+
+      const esEventoAscenso = idsFinalizadosPorEquipo.ascenso.has(data.entrenamientoId);
+      const esEventoEscuela = idsFinalizadosPorEquipo.escuela.has(data.entrenamientoId);
+
+      if (esEventoAscenso && (equipoJugadora === 'ascenso' || equipoJugadora === 'ambos')) {
+        registrarInscripcion(acumuladoPorEquipo.ascenso, jugadoraId, data, equipoJugadora);
+      }
+
+      if (esEventoEscuela && (equipoJugadora === 'escuela' || equipoJugadora === 'ambos')) {
+        registrarInscripcion(acumuladoPorEquipo.escuela, jugadoraId, data, equipoJugadora);
+      }
     });
 
-    const lista = Array.from(acumulado.values())
-      .map((item) => ({
-        ...item,
-        porcentaje: item.total > 0 ? Math.round((item.confirmadas / item.total) * 100) : 0
-      }))
-      .sort((a, b) => {
-        if (b.confirmadas !== a.confirmadas) return b.confirmadas - a.confirmadas;
-        if (b.porcentaje !== a.porcentaje) return b.porcentaje - a.porcentaje;
-        if (a.bajas !== b.bajas) return a.bajas - b.bajas;
-        return a.nombre.localeCompare(b.nombre, 'es');
-      });
+    const ordenarLista = (listaBase) => {
+      return listaBase
+        .map((item) => ({
+          ...item,
+          porcentaje: item.total > 0 ? Math.round((item.confirmadas / item.total) * 100) : 0
+        }))
+        .sort((a, b) => {
+          if (b.confirmadas !== a.confirmadas) return b.confirmadas - a.confirmadas;
+          if (b.porcentaje !== a.porcentaje) return b.porcentaje - a.porcentaje;
+          if (a.bajas !== b.bajas) return a.bajas - b.bajas;
+          return a.nombre.localeCompare(b.nombre, 'es');
+        });
+    };
 
-    ranking.value = lista;
+    const rankingAscenso = ordenarLista(Array.from(acumuladoPorEquipo.ascenso.values()));
+    const rankingEscuela = ordenarLista(Array.from(acumuladoPorEquipo.escuela.values()));
+
+    const acumuladoTodos = new Map();
+    [...rankingAscenso, ...rankingEscuela].forEach((item) => {
+      const existente = acumuladoTodos.get(item.jugadoraId);
+      if (!existente) {
+        acumuladoTodos.set(item.jugadoraId, {
+          jugadoraId: item.jugadoraId,
+          nombre: item.nombre,
+          equipo: item.equipo,
+          confirmadas: item.confirmadas,
+          bajas: item.bajas,
+          pendientes: item.pendientes,
+          total: item.total,
+          porcentaje: 0
+        });
+        return;
+      }
+
+      existente.confirmadas += item.confirmadas;
+      existente.bajas += item.bajas;
+      existente.pendientes += item.pendientes;
+      existente.total += item.total;
+
+      if (existente.equipo !== item.equipo) {
+        existente.equipo = 'ambos';
+      }
+    });
+
+    rankingPorEquipo.value = {
+      ascenso: rankingAscenso,
+      escuela: rankingEscuela,
+      todos: ordenarLista(Array.from(acumuladoTodos.values()))
+    };
   } finally {
     isLoading.value = false;
   }

@@ -152,6 +152,25 @@
                 </div>
               </div>
 
+              <div
+                v-if="esAdmin && alertasSalud.nuevas > 0"
+                class="mb-6 rounded-2xl border-2 border-red-200 bg-linear-to-r from-red-50 to-rose-50 p-5 shadow-md"
+              >
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <p class="text-xs font-black uppercase tracking-wide text-red-600">Notificación de salud semanal</p>
+                    <p class="text-lg font-black text-red-700 mt-1">Hay {{ alertasSalud.nuevas }} respuesta{{ alertasSalud.nuevas === 1 ? '' : 's' }} nueva{{ alertasSalud.nuevas === 1 ? '' : 's' }} para revisar</p>
+                    <p class="text-sm text-red-600 mt-1">Pendientes totales de revisión: {{ alertasSalud.pendientesRevision }}</p>
+                  </div>
+                  <button
+                    @click="activeTab = 'salud-semanal'"
+                    class="px-4 py-2.5 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 cursor-pointer"
+                  >
+                    Ver respuestas
+                  </button>
+                </div>
+              </div>
+
               <!-- Próximo Cumpleaños -->
               <div v-if="proximoCumpleanios" class="bg-linear-to-r from-pink-50 via-purple-50 to-pink-50 border-2 border-pink-200 rounded-2xl p-6 mb-6 shadow-md hover:shadow-lg transition-all">
                 <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4">
@@ -382,6 +401,11 @@
             <GestionarRankingAsistencia />
           </div>
 
+          <!-- Salud Semanal (solo admin) -->
+          <div v-if="activeTab === 'salud-semanal' && esAdmin">
+            <GestionarSaludSemanal />
+          </div>
+
           <!-- Estadísticas -->
           <div v-if="activeTab === 'estadisticas'">
             <GestionarEstadisticas />
@@ -398,7 +422,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { logout, authUser, userRole } from '../firebase/auth';
 import { 
@@ -422,6 +446,7 @@ import GestionarGalerias from '../components/GestionarGalerias.vue';
 import GestionarEventosEspeciales from '../components/GestionarEventosEspeciales.vue';
 import GestionarBannerMensualidad from '../components/GestionarBannerMensualidad.vue';
 import GestionarRankingAsistencia from '../components/GestionarRankingAsistencia.vue';
+import GestionarSaludSemanal from '../components/GestionarSaludSemanal.vue';
 import GestionarEstadisticas from '../components/GestionarEstadisticas.vue';
 import GestionarSliderHome from '../components/GestionarSliderHome.vue';
 import GestionarSolicitudesRegistro from '../components/GestionarSolicitudesRegistro.vue';
@@ -433,6 +458,7 @@ import ListadoJugadorasAdmin from '../components/ListadoJugadorasAdmin.vue';
 import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import { escucharAlertasSaludSemanalAdmin } from '../firebase/saludSemanal';
 
 const router = useRouter();
 const route = useRoute();
@@ -440,6 +466,8 @@ const activeTab = ref('home');
 const proximoCumpleanios = ref(null);
 const inscripcionesPorEntrenamiento = ref({});
 const jugadorasPorEquipo = ref({ ascenso: 0, escuela: 0, ambos: 0, total: 0 });
+const alertasSalud = ref({ nuevas: 0, pendientesRevision: 0, ultimas: [] });
+let unsubscribeAlertasSalud = null;
 
 const userGreeting = computed(() => {
   if (authUser.value) {
@@ -471,6 +499,14 @@ const tabs = computed(() => {
       id: 'ranking-asistencia',
       label: 'Ranking Asistencia',
       icon: ChartBarIcon,
+    });
+
+    baseTabs.splice(8, 0, {
+      id: 'salud-semanal',
+      label: alertasSalud.value.nuevas > 0
+        ? `Salud Semanal (${alertasSalud.value.nuevas})`
+        : 'Salud Semanal',
+      icon: BellAlertIcon,
     });
   }
 
@@ -796,6 +832,18 @@ onMounted(async () => {
   await cargarProximoCumpleanios();
   await cargarInscripcionesEntrenamientos();
   await cargarJugadorasPorEquipo();
+
+  if (esAdmin.value) {
+    unsubscribeAlertasSalud = escucharAlertasSaludSemanalAdmin((data) => {
+      alertasSalud.value = data;
+    });
+  }
+});
+
+onUnmounted(() => {
+  if (typeof unsubscribeAlertasSalud === 'function') {
+    unsubscribeAlertasSalud();
+  }
 });
 
 watch(
