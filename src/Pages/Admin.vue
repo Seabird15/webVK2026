@@ -14,7 +14,6 @@
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <InfoUltimaActualizacion />
             <button
               @click="handleLogout"
               class="bg-white/20 hover:bg-white/30 px-5 py-2.5 rounded-xl font-bold transition-all cursor-pointer backdrop-blur-sm border border-white/30 hover:border-white/50 hover:scale-105 active:scale-95"
@@ -31,7 +30,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <!-- Menú Lateral -->
         <div class="lg:col-span-1">
-          <div class="bg-white rounded-2xl shadow-xl p-5 sticky top-6 border border-gray-100">
+          <div class="bg-white rounded-2xl shadow-xl p-5 sticky top-6 border border-gray-100 max-h-[calc(100vh-3rem)] overflow-y-auto">
             <div class="flex items-center gap-2 mb-5 pb-4 border-b border-gray-100">
               <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
                 <HomeIcon class="w-5 h-5 text-primary" />
@@ -373,6 +372,16 @@
             <GestionarEventosEspeciales />
           </div>
 
+          <!-- Banner Mensualidad -->
+          <div v-if="activeTab === 'banner-mensualidad'">
+            <GestionarBannerMensualidad />
+          </div>
+
+          <!-- Ranking Asistencia (solo admin) -->
+          <div v-if="activeTab === 'ranking-asistencia' && esAdmin">
+            <GestionarRankingAsistencia />
+          </div>
+
           <!-- Estadísticas -->
           <div v-if="activeTab === 'estadisticas'">
             <GestionarEstadisticas />
@@ -402,6 +411,7 @@ import {
   TrophyIcon, 
   CameraIcon, 
   ArrowTrendingUpIcon,
+  BellAlertIcon,
   CheckIcon,
   ClockIcon,
   GiftIcon,
@@ -410,6 +420,8 @@ import {
 } from '@heroicons/vue/24/outline';
 import GestionarGalerias from '../components/GestionarGalerias.vue';
 import GestionarEventosEspeciales from '../components/GestionarEventosEspeciales.vue';
+import GestionarBannerMensualidad from '../components/GestionarBannerMensualidad.vue';
+import GestionarRankingAsistencia from '../components/GestionarRankingAsistencia.vue';
 import GestionarEstadisticas from '../components/GestionarEstadisticas.vue';
 import GestionarSliderHome from '../components/GestionarSliderHome.vue';
 import GestionarSolicitudesRegistro from '../components/GestionarSolicitudesRegistro.vue';
@@ -437,18 +449,33 @@ const userGreeting = computed(() => {
   return '';
 });
 
-const tabs = [
-  { id: 'home', label: 'Inicio', icon: HomeIcon },
-  { id: 'solicitudes', label: 'Solicitudes', icon: DocumentTextIcon },
-  { id: 'slider', label: 'Slider Home', icon: PhotoIcon },
-  { id: 'jugadoras', label: 'Jugadoras', icon: UsersIcon },
-  { id: 'entrenamientos', label: 'Entrenamientos', icon: CalendarIcon },
-  { id: 'historial', label: 'Historial', icon: ChartBarIcon },
-  { id: 'eventos-especiales', label: 'Próx/Último Partido', icon: TrophyIcon },
-  { id: 'galeria', label: 'Galería', icon: CameraIcon },
-  { id: 'estadisticas', label: 'Estadísticas', icon: ArrowTrendingUpIcon },
-  { id: 'partidos', label: 'Campeonato', icon: TrophyIcon },
-];
+const esAdmin = computed(() => userRole.value === 'admin');
+
+const tabs = computed(() => {
+  const baseTabs = [
+    { id: 'home', label: 'Inicio', icon: HomeIcon },
+    { id: 'solicitudes', label: 'Solicitudes', icon: DocumentTextIcon },
+    { id: 'slider', label: 'Slider Home', icon: PhotoIcon },
+    { id: 'jugadoras', label: 'Jugadoras', icon: UsersIcon },
+    { id: 'entrenamientos', label: 'Entrenamientos', icon: CalendarIcon },
+    { id: 'banner-mensualidad', label: 'Banner Mensualidad', icon: BellAlertIcon },
+    { id: 'historial', label: 'Historial', icon: ChartBarIcon },
+    { id: 'eventos-especiales', label: 'Actualizar Último Partido', icon: TrophyIcon },
+    { id: 'galeria', label: 'Galería', icon: CameraIcon },
+    { id: 'estadisticas', label: 'Estadísticas', icon: ArrowTrendingUpIcon },
+    { id: 'partidos', label: 'Campeonato', icon: TrophyIcon },
+  ];
+
+  if (esAdmin.value) {
+    baseTabs.splice(7, 0, {
+      id: 'ranking-asistencia',
+      label: 'Ranking Asistencia',
+      icon: ChartBarIcon,
+    });
+  }
+
+  return baseTabs;
+});
 
 const handleLogout = async () => {
   await logout();
@@ -762,7 +789,7 @@ const cargarJugadorasPorEquipo = async () => {
 
 onMounted(async () => {
   const tab = route.query?.tab;
-  if (typeof tab === 'string' && tabs.some(t => t.id === tab)) {
+  if (typeof tab === 'string' && tabs.value.some(t => t.id === tab)) {
     activeTab.value = tab;
   }
   await fetchTodosEntrenamientos();
@@ -774,7 +801,7 @@ onMounted(async () => {
 watch(
   () => route.query?.tab,
   (tab) => {
-    if (typeof tab === 'string' && tabs.some(t => t.id === tab)) {
+    if (typeof tab === 'string' && tabs.value.some(t => t.id === tab)) {
       activeTab.value = tab;
     }
   }

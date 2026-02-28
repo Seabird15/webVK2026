@@ -70,6 +70,25 @@ export const actualizarUltimoPartido = async (datos) => {
 };
 
 /**
+ * Actualizar banner de mensualidad para jugadoras
+ */
+export const actualizarBannerMensualidad = async (datos) => {
+    try {
+        const docRef = doc(db, EVENTOS_ESPECIALES_COLLECTION, EVENTOS_ESPECIALES_DOC);
+        await updateDoc(docRef, {
+            bannerMensualidad: {
+                activo: datos?.activo === true,
+                mensaje: (datos?.mensaje || '').toString().trim()
+            },
+            updatedAt: serverTimestamp()
+        });
+        return true;
+    } catch (error) {
+        throw error;
+    }
+};
+
+/**
  * Subir logo de equipo a Cloud Storage
  */
 export const subirLogoEquipo = async (file, equipoNombre) => {
@@ -100,6 +119,10 @@ export const inicializarEventosEspeciales = async () => {
             await setDoc(docRef, {
                 proximoPartido: null,
                 ultimoPartido: null,
+                bannerMensualidad: {
+                    activo: true,
+                    mensaje: 'Recuerda el pago de la mensualidad. Gracias a esto seguimos existiendo.'
+                },
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             });

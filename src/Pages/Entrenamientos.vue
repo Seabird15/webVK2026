@@ -25,6 +25,20 @@
       </div>
     </div>
 
+    <div v-if="bannerMensualidad.activo" class="max-w-6xl mx-auto px-6 mt-3">
+      <div class="bg-linear-to-r from-red-600 via-rose-500 to-red-600 text-white rounded-2xl p-4 sm:p-5 shadow-2xl border-2 border-red-300/40">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0 my-auto">
+            <ExclamationTriangleIcon class="w-6 h-6 animate-pulse" />
+          </div>
+          <div class="flex-1">
+            <p class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-white/90">Importante</p>
+            <p class="text-sm sm:text-lg font-500 leading-tight mt-1">{{ bannerMensualidad.mensaje }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Contenido -->
     <div class="max-w-6xl mx-auto p-6">
       <!-- Información de jugadora -->
@@ -1129,6 +1143,7 @@ import {
 } from '../firebase/inscripciones';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import { obtenerEventosEspeciales } from '../firebase/eventosEspeciales';
 import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
 
 const router = useRouter();
@@ -1172,6 +1187,10 @@ const mvpVotoSeleccionado = ref(null);
 const mvpGanadoraFotoSeleccionado = ref('');
 const mvpGanadoraFotoCargando = ref(false);
 const cacheFotosJugadoras = ref({});
+const bannerMensualidad = ref({
+  activo: true,
+  mensaje: 'Recuerda el pago de la mensualidad. Gracias a esto seguimos existiendo.'
+});
 let timeoutMensajeDetalle = null;
 
 // Computed para obtener el entrenamiento seleccionado actualizado en tiempo real
@@ -1892,6 +1911,22 @@ const abrirMapa = (entrenamiento) => {
   window.open(url, '_blank', 'noopener,noreferrer');
 };
 
+const cargarBannerMensualidad = async () => {
+  try {
+    const eventos = await obtenerEventosEspeciales();
+    const banner = eventos?.bannerMensualidad || {};
+    bannerMensualidad.value = {
+      activo: typeof banner?.activo === 'boolean' ? banner.activo : true,
+      mensaje: (banner?.mensaje || '').toString().trim() || 'Recuerda el pago de la mensualidad. Gracias a esto seguimos existiendo.'
+    };
+  } catch {
+    bannerMensualidad.value = {
+      activo: true,
+      mensaje: 'Recuerda el pago de la mensualidad. Gracias a esto seguimos existiendo.'
+    };
+  }
+};
+
 // Función para calcular cumpleaños de hoy y próximos
 const cargarProximoCumpleanios = async () => {
   try {
@@ -1990,6 +2025,7 @@ const handleLogout = async () => {
 
 onMounted(() => {
   cargarEntrenamientos();
+  cargarBannerMensualidad();
   cargarProximoCumpleanios(); // Cargar el próximo cumpleaños
 });
 

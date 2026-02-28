@@ -1,7 +1,5 @@
 <template>
     <div class="space-y-8">
-
-
         <!-- Sección Último Partido -->
         <div class="bg-white/10 border border-primary/30 rounded-lg p-6">
             <h3 class="text-black text-xl font-bold mb-6 flex items-center gap-2">
@@ -186,4 +184,5 @@ const guardarUltimoPartido = async () => {
         alert('Error al guardar');
     }
 };
+
 </script>
