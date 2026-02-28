@@ -18,6 +18,35 @@ export const isLoadingJugadora = ref(false);
 export const errorJugadora = ref(null);
 export const authReady = ref(false); // Flag para saber cuando Auth está listo
 
+const normalizarCategoriaEquipo = (valor) => {
+  const normalizado = (valor || '').toString().trim().toLowerCase();
+  return ['ascenso', 'escuela', 'ambos'].includes(normalizado) ? normalizado : '';
+};
+
+const resolverCategoriaSeleccionada = (equipo, categoriaSolicitada, categoriaActual = '') => {
+  const equipoNormalizado = normalizarCategoriaEquipo(equipo);
+  const categoriaSolicitadaNormalizada = normalizarCategoriaEquipo(categoriaSolicitada);
+  const categoriaActualNormalizada = normalizarCategoriaEquipo(categoriaActual);
+
+  if (equipoNormalizado === 'ascenso' || equipoNormalizado === 'escuela') {
+    return equipoNormalizado;
+  }
+
+  if (equipoNormalizado === 'ambos') {
+    if (categoriaSolicitadaNormalizada === 'ascenso' || categoriaSolicitadaNormalizada === 'escuela' || categoriaSolicitadaNormalizada === 'ambos') {
+      return categoriaSolicitadaNormalizada;
+    }
+
+    if (categoriaActualNormalizada === 'ascenso' || categoriaActualNormalizada === 'escuela' || categoriaActualNormalizada === 'ambos') {
+      return categoriaActualNormalizada;
+    }
+
+    return 'ascenso';
+  }
+
+  return categoriaSolicitadaNormalizada || categoriaActualNormalizada || 'ascenso';
+};
+
 // Flag para ignorar el primer onAuthStateChanged después del registro
 let ignorarProximoAuthChange = false;
 
@@ -113,6 +142,44 @@ export const fetchJugadoraData = async (uid, coleccion = 'jugadoraRegistro') => 
     // // console.error('Error obteniendo datos de jugadora:', err);
     jugadoraData.value = null;
     return null;
+  }
+};
+
+export const actualizarCategoriaSeleccionadaJugadora = async (uid, categoria) => {
+  try {
+    if (!uid) return false;
+
+    const jugadoraRef = doc(db, 'jugadoraRegistro', uid);
+    const jugadoraSnap = await getDoc(jugadoraRef);
+
+    if (!jugadoraSnap.exists()) {
+      return false;
+    }
+
+    const jugadoraDoc = jugadoraSnap.data() || {};
+    const categoriaSeleccionada = resolverCategoriaSeleccionada(
+      jugadoraDoc.equipo,
+      categoria,
+      jugadoraDoc.categoriaSeleccionada
+    );
+
+    await updateDoc(jugadoraRef, {
+      categoriaSeleccionada,
+      updatedAt: new Date()
+    });
+
+    if (jugadoraData.value?.id === uid) {
+      jugadoraData.value = {
+        ...jugadoraData.value,
+        categoriaSeleccionada,
+        updatedAt: new Date()
+      };
+    }
+
+    return true;
+  } catch (err) {
+    errorJugadora.value = err.message;
+    return false;
   }
 };
 
@@ -295,6 +362,7 @@ export const completarPerfilJugadora = async (uid, perfilData, fotoFile) => {
     const dataToUpdate = {
       ...perfilData,
       uid: uid,
+      categoriaSeleccionada: resolverCategoriaSeleccionada(perfilData?.equipo, perfilData?.categoriaSeleccionada),
       perfilCompleto: true,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -331,6 +399,11 @@ export const actualizarPerfilJugadora = async (uid, perfilData, fotoFile) => {
   try {
     const dataToUpdate = {
       ...perfilData,
+      categoriaSeleccionada: resolverCategoriaSeleccionada(
+        perfilData?.equipo,
+        perfilData?.categoriaSeleccionada,
+        jugadoraData.value?.categoriaSeleccionada
+      ),
       updatedAt: new Date()
     };
 

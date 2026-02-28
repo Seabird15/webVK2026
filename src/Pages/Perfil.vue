@@ -274,6 +274,7 @@ import {
   jugadoraAuthUser, 
   jugadoraData, 
   actualizarPerfilJugadora,
+  actualizarCategoriaSeleccionadaJugadora,
   isLoadingJugadora,
   errorJugadora
 } from '../firebase/jugadorasAuth';
@@ -285,7 +286,7 @@ const previewFoto = ref(null);
 const fotoFile = ref(null);
 const isLoading = ref(false);
 const error = ref(null);
-const categoriaSeleccionada = ref(localStorage.getItem('categoriaSeleccionada') || 'ascenso');
+const categoriaSeleccionada = ref(jugadoraData.value?.categoriaSeleccionada || jugadoraData.value?.equipo || 'ascenso');
 
 const fotoPerfil = ref(jugadoraData.value?.fotoPerfil || null);
 
@@ -410,9 +411,11 @@ const handleGuardar = async () => {
   }
 };
 
-const cambiarEquipoDesdePerf = (equipo) => {
+const cambiarEquipoDesdePerf = async (equipo) => {
   categoriaSeleccionada.value = equipo;
-  localStorage.setItem('categoriaSeleccionada', equipo);
+  if (jugadoraAuthUser.value?.uid) {
+    await actualizarCategoriaSeleccionadaJugadora(jugadoraAuthUser.value.uid, equipo);
+  }
 };
 
 const handleBack = () => {
@@ -433,6 +436,7 @@ onMounted(() => {
     formData.equipo = jugadoraData.value.equipo || 'ascenso';
     formData.fechaNacimiento = jugadoraData.value.fechaNacimiento || '';
     formData.estadoSalud = jugadoraData.value?.estadoSalud || 'disponible';
+    categoriaSeleccionada.value = jugadoraData.value?.categoriaSeleccionada || jugadoraData.value?.equipo || 'ascenso';
     fotoPerfil.value = jugadoraData.value.fotoPerfil || null;
   }
 });

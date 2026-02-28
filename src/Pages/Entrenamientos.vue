@@ -537,6 +537,15 @@
                   <div>
                     <h3 class="font-bold text-blue-900 text-xs mb-0.5">Lugar</h3>
                     <p class="text-blue-800 text-xs">{{ entrenamientoSeleccionado.lugar }}</p>
+                    <button
+                      v-if="obtenerMapaUrl(entrenamientoSeleccionado)"
+                      type="button"
+                      @click="abrirMapa(entrenamientoSeleccionado)"
+                      class="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 hover:text-blue-900"
+                    >
+                      <MapPinIcon class="w-3.5 h-3.5" />
+                      Ver en Google Maps
+                    </button>
                   </div>
                 </div>
               </div>
@@ -548,6 +557,33 @@
                     <p class="text-green-800 text-xs capitalize">{{ entrenamientoSeleccionado.equipo }}</p>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <div v-if="obtenerMapaEmbedUrl(entrenamientoSeleccionado)" class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div class="px-3 py-2 border-b border-gray-100 bg-gray-50 flex items-center justify-between gap-2">
+                <p class="text-[11px] font-black uppercase tracking-wide text-gray-700">Mapa de la cancha</p>
+                <button
+                  type="button"
+                  @click="abrirMapa(entrenamientoSeleccionado)"
+                  class="text-[11px] font-bold text-primary-dark hover:text-primary"
+                >
+                  Abrir mapa
+                </button>
+              </div>
+              <div class="relative">
+                <div v-if="mapaCargando" class="absolute inset-0 z-10 bg-white/90 flex flex-col items-center justify-center gap-2">
+                  <div class="w-7 h-7 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  <p class="text-[11px] font-bold text-gray-600">Cargando mapa...</p>
+                </div>
+              <iframe
+                :src="obtenerMapaEmbedUrl(entrenamientoSeleccionado)"
+                @load="mapaCargando = false"
+                class="w-full h-56 border-0"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Mapa del evento"
+              ></iframe>
               </div>
             </div>
 
@@ -1077,7 +1113,7 @@ import {
   ShoppingBagIcon,
   ArrowTopRightOnSquareIcon
 } from '@heroicons/vue/24/outline';
-import { logoutJugadora, jugadoraAuthUser, jugadoraData } from '../firebase/jugadorasAuth';
+import { logoutJugadora, jugadoraAuthUser, jugadoraData, actualizarCategoriaSeleccionadaJugadora } from '../firebase/jugadorasAuth';
 import { userRole } from '../firebase/auth';
 import { fetchEntrenamientosPorEquipo, entrenamientos, isLoadingEntrenamientos, escucharEntrenamientosPorEquipo, votarMvpEntrenamiento } from '../firebase/entrenamientos';
 import { 
@@ -1096,7 +1132,19 @@ import { db } from '../firebase/config';
 import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
 
 const router = useRouter();
-const equipoSeleccionado = ref(localStorage.getItem('categoriaSeleccionada') || jugadoraData.value?.equipo || 'ascenso');
+const normalizarEquipo = (equipo) => {
+  const valor = (equipo || '').toString().trim().toLowerCase();
+  return ['ascenso', 'escuela', 'ambos'].includes(valor) ? valor : '';
+};
+
+const equipoJugadoraInicial = normalizarEquipo(jugadoraData.value?.equipo);
+const equipoGuardadoInicial = normalizarEquipo(jugadoraData.value?.categoriaSeleccionada);
+
+const equipoSeleccionado = ref(
+  equipoJugadoraInicial && equipoJugadoraInicial !== 'ambos'
+    ? equipoJugadoraInicial
+    : (equipoGuardadoInicial || equipoJugadoraInicial || 'ascenso')
+);
 const entrenamientoSeleccionadoId = ref(null);
 const inscritasEntrenamiento = ref([]);
 // Guardar inscripciones organizadas de todos los entrenamientos
@@ -1119,6 +1167,7 @@ const proximoCumpleanios = ref([]); // Próximos cumpleaños (mismo día)
 const cargandoInscripciones = ref({}); // Estado de carga por entrenamiento
 const primeraCarga = ref(true); // Para mostrar loader en primera carga
 const mvpVoteLoading = ref(false);
+const mapaCargando = ref(false);
 const mvpVotoSeleccionado = ref(null);
 const mvpGanadoraFotoSeleccionado = ref('');
 const mvpGanadoraFotoCargando = ref(false);
@@ -1548,10 +1597,36 @@ const fechaPasada = (entrenamiento) => {
   return Number.isFinite(finMs) ? Date.now() > finMs : false;
 };
 
+const obtenerEquipoSeleccionadoPermitido = (equipoJugadora) => {
+  const equipoNormalizado = normalizarEquipo(equipoJugadora);
+
+  if (equipoNormalizado === 'ascenso' || equipoNormalizado === 'escuela') {
+    return equipoNormalizado;
+  }
+
+  if (equipoNormalizado === 'ambos') {
+    const equipoGuardado = normalizarEquipo(jugadoraData.value?.categoriaSeleccionada);
+    if (['ascenso', 'escuela', 'ambos'].includes(equipoGuardado)) {
+      return equipoGuardado;
+    }
+
+    const equipoActual = normalizarEquipo(equipoSeleccionado.value);
+    if (['ascenso', 'escuela', 'ambos'].includes(equipoActual)) {
+      return equipoActual;
+    }
+
+    return 'ascenso';
+  }
+
+  return normalizarEquipo(equipoSeleccionado.value) || 'ascenso';
+};
+
 const cambiarEquipo = (equipo) => {
   primeraCarga.value = true; // Mostrar loader al cambiar equipo
   equipoSeleccionado.value = equipo;
-  localStorage.setItem('categoriaSeleccionada', equipo);
+  if (jugadoraAuthUser.value?.uid) {
+    actualizarCategoriaSeleccionadaJugadora(jugadoraAuthUser.value.uid, equipo);
+  }
   cargarEntrenamientos();
   actualizarEstados();
 };
@@ -1641,6 +1716,7 @@ const estaInscrita = (entrenamientoId) => {
 
 const verDetalles = (entrenamiento) => {
   entrenamientoSeleccionadoId.value = entrenamiento.id;
+  mapaCargando.value = Boolean(obtenerMapaEmbedUrl(entrenamiento));
   cargarVotoMvpSeleccionado(entrenamiento.id);
   mensajeDetalle.value = '';
 };
@@ -1792,6 +1868,30 @@ const formatearEstadoSalud = (estado) => {
   return map[estado] || 'Disponible';
 };
 
+const obtenerTextoMapa = (entrenamiento) => {
+  const ubicacionMapa = (entrenamiento?.ubicacionMapa || '').toString().trim();
+  if (ubicacionMapa) return ubicacionMapa;
+  return (entrenamiento?.lugar || '').toString().trim();
+};
+
+const obtenerMapaUrl = (entrenamiento) => {
+  const texto = obtenerTextoMapa(entrenamiento);
+  if (!texto) return '';
+  return `https://www.google.com/maps?q=${encodeURIComponent(texto)}`;
+};
+
+const obtenerMapaEmbedUrl = (entrenamiento) => {
+  const texto = obtenerTextoMapa(entrenamiento);
+  if (!texto) return '';
+  return `https://www.google.com/maps?q=${encodeURIComponent(texto)}&output=embed`;
+};
+
+const abrirMapa = (entrenamiento) => {
+  const url = obtenerMapaUrl(entrenamiento);
+  if (!url) return;
+  window.open(url, '_blank', 'noopener,noreferrer');
+};
+
 // Función para calcular cumpleaños de hoy y próximos
 const cargarProximoCumpleanios = async () => {
   try {
@@ -1892,6 +1992,28 @@ onMounted(() => {
   cargarEntrenamientos();
   cargarProximoCumpleanios(); // Cargar el próximo cumpleaños
 });
+
+watch(
+  () => jugadoraData.value?.equipo,
+  async (nuevoEquipo) => {
+    const equipoPermitido = obtenerEquipoSeleccionadoPermitido(nuevoEquipo);
+    if (!equipoPermitido) return;
+
+    const huboCambio = equipoSeleccionado.value !== equipoPermitido;
+    equipoSeleccionado.value = equipoPermitido;
+
+    if (jugadoraAuthUser.value?.uid && jugadoraData.value?.categoriaSeleccionada !== equipoPermitido) {
+      await actualizarCategoriaSeleccionadaJugadora(jugadoraAuthUser.value.uid, equipoPermitido);
+    }
+
+    if (huboCambio) {
+      primeraCarga.value = true;
+      cargarEntrenamientos();
+      await actualizarEstados();
+    }
+  },
+  { immediate: true }
+);
 
 // Limpiar listeners cuando se desmonta el componente
 onUnmounted(() => {

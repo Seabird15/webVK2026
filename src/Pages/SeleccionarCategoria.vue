@@ -180,7 +180,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { jugadoraAuthUser, jugadoraData } from '../firebase/jugadorasAuth';
+import { jugadoraAuthUser, jugadoraData, actualizarCategoriaSeleccionadaJugadora } from '../firebase/jugadorasAuth';
 
 const router = useRouter();
 const isLoading = ref(false);
@@ -192,8 +192,9 @@ if (!jugadoraAuthUser.value || jugadoraData.value?.equipo !== 'ambos') {
 
 const seleccionarCategoria = async (categoria) => {
   isLoading.value = true;
-  // Guardar categoría seleccionada en localStorage o similar si es necesario
-  localStorage.setItem('categoriaSeleccionada', categoria);
+  if (jugadoraAuthUser.value?.uid) {
+    await actualizarCategoriaSeleccionadaJugadora(jugadoraAuthUser.value.uid, categoria);
+  }
   
   // Pequeño delay para mostrar la animación
   setTimeout(() => {

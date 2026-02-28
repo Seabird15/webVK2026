@@ -99,14 +99,18 @@
           
           <!-- Contenido principal -->
           <div class="text-center md:text-left">
-            <h2 class="text-2xl md:text-4xl font-black text-black mb-1 uppercase" style="font-family: 'Gobold High', sans-serif;">
-              PRÓXIMO SÁBADO, FINAL CAMPEONATO INTERNO
+            <div class="inline-flex items-center gap-2 bg-black/20 text-black px-3 py-1 rounded-full text-[11px] md:text-xs font-black tracking-wider uppercase mb-2">
+              <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
+              HOY • GRAN FINAL
+            </div>
+            <h2 class="text-3xl md:text-4xl font-300 tracking-widest text-black mb-1 uppercase" style="font-family: 'Gobold High', sans-serif;">
+              FINAL CAMPEONATO INTERNO
             </h2>
             <p class="text-black/90 font-bold text-sm md:text-base mb-2">
-             Verserkers vs Internadas, van por la final del campeonato interno de nuestro Club ¡No te lo pierdas!
+              Verserkers vs Inter Nadas, hoy se define a las campeonas del torneo interno Vikingas. 
             </p>
             <p class="text-black/70 text-xs md:text-sm font-semibold">
-              Sábado 28 de Febrero 2026 | Tricolor La Florida 
+              Hoy · 20:00 hrs · Tricolor La Florida
             </p>
           </div>
           
@@ -121,7 +125,7 @@
               <HeartIconSolid v-if="hasLiked" class="w-6 h-6 text-red-500 transition-all" />
               <HeartIcon v-else class="w-6 h-6 text-black transition-all" />
               <span>{{ likesCount }}</span>
-              <span class="text-xs font-bold opacity-80">likes</span>
+              <span class="text-xs font-bold opacity-80 my-auto">likes</span>
             </button>
             
             <!-- CTA Ver Resultados -->
@@ -129,7 +133,7 @@
               to="/competencias"
               class="inline-flex items-center gap-2 bg-black hover:bg-gray-900 text-primary px-6 py-3 rounded-lg font-black text-sm transition-all transform hover:scale-105 shadow-xl"
             >
-              Ver detalles
+              Ver marcador en vivo
               <span aria-hidden="true">→</span>
             </router-link>
 
@@ -146,7 +150,7 @@
           ¿Eres jugadora del club?
         </h2>
         <p class="text-white/90 mb-6 text-md">
-          Accede a tu perfil, revisa entrenamientos y confirma tu asistencia
+          Accede a tu perfil, revisa entrenamientos y confirma tu asistencia 
         </p>
         <router-link
           to="/login-jugadora"
@@ -164,6 +168,8 @@
 import { ref, onMounted } from 'vue';
 import { doc, getDoc, setDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import { authUser } from '../firebase/auth';
+import { jugadoraAuthUser } from '../firebase/jugadorasAuth';
 import { HeartIcon } from '@heroicons/vue/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/vue/24/solid';
 import Eventos from '../components/Eventos.vue';
@@ -185,10 +191,18 @@ const likesCount = ref(0);
 const hasLiked = ref(false);
 const isLikeLoading = ref(false);
 
-// Verificar si el usuario ya dio like (usando localStorage)
-const checkIfLiked = () => {
-  const liked = localStorage.getItem('campeonato_liked');
-  hasLiked.value = liked === 'true';
+const obtenerUidActivo = () => authUser.value?.uid || jugadoraAuthUser.value?.uid || null;
+
+const cargarReaccionUsuario = async () => {
+  const uid = obtenerUidActivo();
+  if (!uid) {
+    hasLiked.value = false;
+    return;
+  }
+
+  const reaccionRef = doc(db, 'configuracion', 'campeonatoLikes', 'reacciones', uid);
+  const reaccionSnap = await getDoc(reaccionRef);
+  hasLiked.value = reaccionSnap.exists() && reaccionSnap.data()?.activo === true;
 };
 
 // Cargar contador de likes desde Firebase
@@ -212,28 +226,38 @@ const cargarLikes = async () => {
 // Toggle like
 const toggleLike = async () => {
   if (isLikeLoading.value) return;
+
+  const uid = obtenerUidActivo();
+  if (!uid) return;
   
   isLikeLoading.value = true;
   
   try {
     const docRef = doc(db, 'configuracion', 'campeonatoLikes');
+    const reaccionRef = doc(db, 'configuracion', 'campeonatoLikes', 'reacciones', uid);
     
     if (hasLiked.value) {
       // Quitar like
       await updateDoc(docRef, {
         count: increment(-1)
       });
+      await setDoc(reaccionRef, {
+        activo: false,
+        updatedAt: new Date()
+      }, { merge: true });
       likesCount.value = Math.max(0, likesCount.value - 1);
       hasLiked.value = false;
-      localStorage.removeItem('campeonato_liked');
     } else {
       // Dar like
       await updateDoc(docRef, {
         count: increment(1)
       });
+      await setDoc(reaccionRef, {
+        activo: true,
+        updatedAt: new Date()
+      }, { merge: true });
       likesCount.value++;
       hasLiked.value = true;
-      localStorage.setItem('campeonato_liked', 'true');
     }
   } catch (error) {
     // // console.error('Error actualizando like:', error);
@@ -254,9 +278,9 @@ onMounted(async () => {
     // // console.error('Error cargando datos del hero:', error);
   }
   
-  // Cargar likes y verificar si el usuario ya dio like
-  checkIfLiked();
+  // Cargar likes y estado de reacción del usuario
   await cargarLikes();
+  await cargarReaccionUsuario();
 });
 
 </script>

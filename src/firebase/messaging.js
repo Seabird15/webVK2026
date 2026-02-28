@@ -104,13 +104,6 @@ export const requestPermissionAndSubscribe = async (topicName) => {
             // // console.error('✗ ERROR al guardar token en Firestore:', saveError);
             // // console.error('Error code:', saveError?.code);
             // // console.error('Error message:', saveError?.message);
-            // Si falla por permisos, intentar guardar en localStorage como respaldo
-            try {
-              localStorage.setItem(`fcm_token_${userUid}`, currentToken);
-              // // console.log('Token guardado en localStorage como respaldo');
-            } catch (e) {
-              // // console.error('Tampoco se pudo guardar en localStorage:', e);
-            }
           }
         } else {
           // // console.warn('No hay usuario autenticado. Token no guardado en Firestore.');

@@ -598,15 +598,46 @@
             </button>
           </div>
 
+          <div v-if="isAdmin" class="mt-4 text-center">
+            <button
+              @click="iniciarFechaFinal"
+              :disabled="inicializandoFechaFinal || tieneFechaFinal"
+              class="bg-primary hover:bg-primary/90 text-black px-6 py-3 rounded-lg font-bold transition-all transform hover:scale-105 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span v-if="inicializandoFechaFinal">Inicializando...</span>
+              <span v-else-if="tieneFechaFinal">✅ Fecha Final ya inicializada</span>
+              <span v-else>🏁 Inicializar Fecha Final (20:00)</span>
+            </button>
+          </div>
+
           <!-- Resultados por Fecha (Dinámico) -->
           <div v-for="numeroFecha in fechasOrdenadas" :key="`fecha-${numeroFecha}`" class="bg-black border-2 border-primary rounded-lg p-4 sm:p-8 mt-8">
-            <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4 sm:mb-6 text-center flex items-center justify-center gap-2 sm:gap-3" style="font-family: 'Collegiate Black', sans-serif;">
-              <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M9 11H7v2h2v-2m4 0h-2v2h2v-2m4 0h-2v2h2v-2m2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m0 16H5V9h14v11z"/>
-              </svg>
-              <span class="hidden sm:inline">{{ obtenerTituloFecha(numeroFecha) }}</span>
-              <span class="sm:hidden">FECHA {{ numeroFecha }}</span>
-            </h2>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
+              <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-white text-center sm:text-left flex items-center justify-center sm:justify-start gap-2 sm:gap-3" style="font-family: 'Collegiate Black', sans-serif;">
+                <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 11H7v2h2v-2m4 0h-2v2h2v-2m4 0h-2v2h2v-2m2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m0 16H5V9h14v11z"/>
+                </svg>
+                <span class="hidden sm:inline">{{ obtenerTituloFecha(numeroFecha) }}</span>
+                <span class="sm:hidden">FECHA {{ numeroFecha }}</span>
+              </h2>
+              <button
+                @click="toggleFecha(numeroFecha)"
+                class="inline-flex items-center justify-center gap-2 bg-primary/20 hover:bg-primary/30 text-primary border border-primary/40 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-colors"
+              >
+                <span>{{ fechaExpandida(numeroFecha) ? 'Ocultar' : 'Ver' }}</span>
+                <svg
+                  class="w-4 h-4 transition-transform duration-200"
+                  :class="fechaExpandida(numeroFecha) ? 'rotate-180' : ''"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+            </div>
+
+            <div v-show="fechaExpandida(numeroFecha)">
             
             <!-- Estado de la fecha -->
             <div class="text-center mb-4">
@@ -737,39 +768,7 @@
                     </p>
                   </div>
 
-                  <div class="bg-black/30 border border-primary/20 rounded-lg p-3">
-                    <div class="flex items-center justify-between mb-2">
-                      <p class="text-primary text-xs font-bold uppercase tracking-wide">Ficha del partido</p>
-                      <span class="text-white/60 text-[11px]">{{ partido.fecha }}</span>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                      <div class="bg-white/5 rounded p-2">
-                        <p class="text-white/60">Sede</p>
-                        <p class="text-white font-semibold">{{ partido.ficha?.lugar || 'Tricolor La Florida' }}</p>
-                      </div>
-                      <div class="bg-white/5 rounded p-2">
-                        <p class="text-white/60">Árbitra</p>
-                        <p class="text-white font-semibold">{{ partido.ficha?.arbitra || 'Por confirmar' }}</p>
-                      </div>
-                    </div>
-
-                    <div v-if="(partido.ficha?.goleadorasLocal?.length || 0) + (partido.ficha?.goleadorasVisita?.length || 0) > 0" class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                      <div class="bg-white/5 rounded p-2">
-                        <p class="text-cyan-300 font-bold mb-1">Goleadoras {{ obtenerDatosEquipo(partido.equipoLocal).nombre }}</p>
-                        <p class="text-white/80">{{ (partido.ficha?.goleadorasLocal || []).join(', ') }}</p>
-                      </div>
-                      <div class="bg-white/5 rounded p-2">
-                        <p class="text-red-300 font-bold mb-1">Goleadoras {{ obtenerDatosEquipo(partido.equipoVisita).nombre }}</p>
-                        <p class="text-white/80">{{ (partido.ficha?.goleadorasVisita || []).join(', ') }}</p>
-                      </div>
-                    </div>
-
-                    <div v-if="partido.ficha?.figura || partido.ficha?.resumen" class="mt-2 bg-white/5 rounded p-2 text-xs">
-                      <p v-if="partido.ficha?.figura" class="text-primary font-bold">MVP del partido: <span class="text-white">{{ partido.ficha.figura }}</span></p>
-                      <p v-if="partido.ficha?.resumen" class="text-white/80 mt-1">{{ partido.ficha.resumen }}</p>
-                    </div>
-                  </div>
+                
 
                 </div>
                 
@@ -1074,6 +1073,7 @@
                 <span class="font-bold text-sm sm:text-lg">Cancha Tricolor La Florida</span>
               </div>
             </div>
+            </div>
           </div>
           </div>
         </div>
@@ -1375,9 +1375,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, onUnmounted } from 'vue';
+import { ref, onMounted, computed, onUnmounted, watch } from 'vue';
+import { doc, getDoc, setDoc, updateDoc, increment } from 'firebase/firestore';
+import { db } from '../firebase/config';
 import ModalConfirmacion from '../components/ModalConfirmacion.vue';
 import { authUser, userRole } from '../firebase/auth';
+import { jugadoraAuthUser } from '../firebase/jugadorasAuth';
 import { 
   obtenerDatosCampeonato,
   escucharCampeonato,
@@ -1397,7 +1400,8 @@ import {
   escucharTabla,
   calcularTabla,
   inicializarFecha2,
-  inicializarFecha3
+  inicializarFecha3,
+  inicializarFechaFinal
 } from '../firebase/campeonatoInterno';
 
 const logoEquipos = {
@@ -1435,6 +1439,7 @@ const modalConfig = ref({
 });
 const inicializandoFecha2 = ref(false);
 const inicializandoFecha3 = ref(false);
+const inicializandoFechaFinal = ref(false);
 
 // Equipos del torneo interno (ahora vinculados a Firebase)
 const equipos = computed(() => equiposCampeonato.value);
@@ -1448,20 +1453,69 @@ const mostrarPanelGoles = ref(false);
 const guardandoGol = ref(false);
 const fuegitosFinal = ref(0);
 const dioFuegoFinal = ref(false);
+const fueguitoLoading = ref(false);
+const invitadaSesionId = ref(`guest_${Math.random().toString(36).slice(2, 12)}`);
 
 let unsubscribe = null;
 
-const reaccionarConFuego = () => {
+const obtenerActorFuego = () => authUser.value?.uid || jugadoraAuthUser.value?.uid || invitadaSesionId.value;
+
+const cargarFueguitosFinal = async () => {
+  try {
+    const docRef = doc(db, 'configuracion', 'finalFueguitos');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      fuegitosFinal.value = Number(docSnap.data()?.count) || 0;
+    } else {
+      await setDoc(docRef, { count: 0, updatedAt: new Date() });
+      fuegitosFinal.value = 0;
+    }
+
+    const actorId = obtenerActorFuego();
+    const reaccionRef = doc(db, 'configuracion', 'finalFueguitos', 'reacciones', actorId);
+    const reaccionSnap = await getDoc(reaccionRef);
+    dioFuegoFinal.value = reaccionSnap.exists() && reaccionSnap.data()?.activo === true;
+  } catch (err) {
+    console.error('Error cargando fueguitos de la final:', err);
+  }
+};
+
+const reaccionarConFuego = async () => {
+  if (fueguitoLoading.value) return;
+
+  fueguitoLoading.value = true;
   if (dioFuegoFinal.value) {
-    fuegitosFinal.value = Math.max(0, fuegitosFinal.value - 1);
-    dioFuegoFinal.value = false;
+    try {
+      const actorId = obtenerActorFuego();
+      const contadorRef = doc(db, 'configuracion', 'finalFueguitos');
+      const reaccionRef = doc(db, 'configuracion', 'finalFueguitos', 'reacciones', actorId);
+
+      await updateDoc(contadorRef, { count: increment(-1), updatedAt: new Date() });
+      await setDoc(reaccionRef, { activo: false, updatedAt: new Date() }, { merge: true });
+
+      fuegitosFinal.value = Math.max(0, fuegitosFinal.value - 1);
+      dioFuegoFinal.value = false;
+    } catch (err) {
+      console.error('Error quitando fueguito:', err);
+    }
   } else {
-    fuegitosFinal.value += 1;
-    dioFuegoFinal.value = true;
+    try {
+      const actorId = obtenerActorFuego();
+      const contadorRef = doc(db, 'configuracion', 'finalFueguitos');
+      const reaccionRef = doc(db, 'configuracion', 'finalFueguitos', 'reacciones', actorId);
+
+      await updateDoc(contadorRef, { count: increment(1), updatedAt: new Date() });
+      await setDoc(reaccionRef, { activo: true, updatedAt: new Date() }, { merge: true });
+
+      fuegitosFinal.value += 1;
+      dioFuegoFinal.value = true;
+    } catch (err) {
+      console.error('Error agregando fueguito:', err);
+    }
   }
 
-  localStorage.setItem('final_fueguitos_count', String(fuegitosFinal.value));
-  localStorage.setItem('final_fueguitos_user_reacted', dioFuegoFinal.value ? '1' : '0');
+  fueguitoLoading.value = false;
 };
 
 const agregarGol = async (equipoKey, jugadoraIndex) => {
@@ -1655,6 +1709,39 @@ const iniciarFecha3 = () => {
   mostrarModal.value = true;
 };
 
+const iniciarFechaFinal = () => {
+  if (inicializandoFechaFinal.value) return;
+
+  modalConfig.value = {
+    titulo: '¿Inicializar Fecha Final?',
+    mensaje: 'Se agregará el partido final de hoy: Verserkers vs Inter Nadas a las 20:00.',
+    detalles: 'Esta acción creará el partido final en el sistema.',
+    tipo: 'warning',
+    textoConfirmar: 'Inicializar final',
+    accion: async () => {
+      try {
+        modalCargando.value = true;
+        inicializandoFechaFinal.value = true;
+        const resultado = await inicializarFechaFinal();
+        if (resultado.success) {
+          alert('Fecha Final inicializada correctamente');
+          await cargarPartidos();
+          mostrarModal.value = false;
+        } else {
+          alert(resultado.message);
+        }
+      } catch (err) {
+        console.error('Error inicializando Fecha Final:', err);
+        alert('Error al inicializar Fecha Final. Por favor intenta nuevamente.');
+      } finally {
+        inicializandoFechaFinal.value = false;
+        modalCargando.value = false;
+      }
+    }
+  };
+  mostrarModal.value = true;
+};
+
 const cambiarEstadoPartido = async (partidoId, nuevoEstado) => {
   try {
     await actualizarEstadoPartido(partidoId, nuevoEstado);
@@ -1687,6 +1774,8 @@ const obtenerTituloFecha = (numeroFecha) => {
     return 'FECHA 2 - SÁBADO 14 DE FEBRERO';
   } else if (numeroFecha == 3) {
     return 'FECHA 3 - SÁBADO 21 DE FEBRERO';
+  } else if (numeroFecha == 4) {
+    return 'FECHA FINAL - HOY 20:00';
   }
   return `FECHA ${numeroFecha}`;
 };
@@ -1706,6 +1795,43 @@ const fechasOrdenadas = computed(() => {
 });
 
 const tieneFecha3 = computed(() => fechasOrdenadas.value.includes(3));
+const tieneFechaFinal = computed(() => fechasOrdenadas.value.includes(4));
+const fechasColapsadas = ref({});
+
+const fechaExpandida = (numeroFecha) => {
+  if (typeof fechasColapsadas.value[numeroFecha] === 'boolean') {
+    return fechasColapsadas.value[numeroFecha];
+  }
+  const ultimaFecha = fechasOrdenadas.value[fechasOrdenadas.value.length - 1];
+  return numeroFecha === ultimaFecha;
+};
+
+const toggleFecha = (numeroFecha) => {
+  fechasColapsadas.value = {
+    ...fechasColapsadas.value,
+    [numeroFecha]: !fechaExpandida(numeroFecha)
+  };
+};
+
+watch(fechasOrdenadas, (nuevasFechas) => {
+  const siguienteEstado = { ...fechasColapsadas.value };
+  const ultimaFecha = nuevasFechas[nuevasFechas.length - 1];
+
+  nuevasFechas.forEach((fecha) => {
+    if (typeof siguienteEstado[fecha] !== 'boolean') {
+      siguienteEstado[fecha] = fecha === ultimaFecha;
+    }
+  });
+
+  Object.keys(siguienteEstado).forEach((key) => {
+    const numero = Number(key);
+    if (!nuevasFechas.includes(numero)) {
+      delete siguienteEstado[key];
+    }
+  });
+
+  fechasColapsadas.value = siguienteEstado;
+}, { immediate: true });
 
 const obtenerDatosEquipo = (equipoKey) => {
   const equiposData = {
@@ -1883,9 +2009,7 @@ const obtenerColorTexto = (equipoData) => {
 };
 
 onMounted(async () => {
-  const fueguitosGuardados = Number(localStorage.getItem('final_fueguitos_count') || '0');
-  fuegitosFinal.value = Number.isFinite(fueguitosGuardados) && fueguitosGuardados >= 0 ? fueguitosGuardados : 0;
-  dioFuegoFinal.value = localStorage.getItem('final_fueguitos_user_reacted') === '1';
+  await cargarFueguitosFinal();
 
   fetchTabla();
   

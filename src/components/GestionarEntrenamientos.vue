@@ -298,6 +298,20 @@
             />
           </div>
 
+          <div>
+            <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-2">
+              <MapPinIcon class="w-4 h-4" />
+              Dirección para mapa (opcional)
+            </label>
+            <input
+              v-model="formulario.ubicacionMapa"
+              type="text"
+              placeholder="Ej: Tricolor La Florida, Puente Alto, Chile"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
+            />
+            <p class="mt-2 text-xs text-gray-500 font-medium">Si queda vacío, el mapa se genera con el campo “Lugar”.</p>
+          </div>
+
           <!-- Descripción -->
           <div>
             <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide">Descripción</label>
@@ -609,6 +623,38 @@
 
           <!-- Contenido mejorado -->
           <div class="max-w-7xl mx-auto p-4 sm:p-6">
+          <div class="bg-white rounded-xl border-2 border-blue-100 p-4 shadow-sm mb-6">
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <div class="flex items-center gap-2">
+                <MapPinIcon class="w-5 h-5 text-blue-600" />
+                <h3 class="text-xs font-black uppercase tracking-wide text-blue-900">Ubicación del evento</h3>
+              </div>
+              <button
+                type="button"
+                @click="abrirMapaNuevaPestana(entrenamientoDetallado)"
+                class="text-[11px] font-bold text-primary-dark hover:text-primary"
+              >
+                Abrir mapa
+              </button>
+            </div>
+            <p class="text-sm font-bold text-gray-900 mb-1">{{ entrenamientoDetallado.lugar }}</p>
+            <p v-if="entrenamientoDetallado.ubicacionMapa" class="text-xs text-gray-600 mb-3">{{ entrenamientoDetallado.ubicacionMapa }}</p>
+            <div v-if="obtenerMapaEmbedUrl(entrenamientoDetallado)" class="relative">
+              <div v-if="mapaCargandoAdmin" class="absolute inset-0 z-10 bg-white/90 rounded-lg border border-gray-200 flex flex-col items-center justify-center gap-2">
+                <div class="w-7 h-7 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                <p class="text-[11px] font-bold text-gray-600">Cargando mapa...</p>
+              </div>
+              <iframe
+                :src="obtenerMapaEmbedUrl(entrenamientoDetallado)"
+                @load="mapaCargandoAdmin = false"
+                class="w-full h-64 rounded-lg border border-gray-200"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Mapa del entrenamiento"
+              ></iframe>
+            </div>
+          </div>
+
           <!-- Lista de Convocadas (solo si es convocatoria) -->
           <div v-if="entrenamientoDetallado.esConvocatoria && entrenamientoDetallado.jugadorasConvocadas && entrenamientoDetallado.jugadorasConvocadas.length > 0" class="bg-white rounded-xl border-2 border-purple-200 p-5 shadow-sm mb-6">
             <div class="flex items-center gap-2 mb-4">
@@ -1096,6 +1142,7 @@ const busquedaJugadora = ref('');
 const jugadorasDisponibles = ref([]);
 const isSendingNotification = ref(false);
 const notificationData = ref({ title: '', body: '' });
+const mapaCargandoAdmin = ref(false);
 
 // Mapeo para contar inscritas por estado
 const conteoInscritas = ref({});
@@ -1121,6 +1168,7 @@ const formulario = ref({
   hora: '',
   horaFin: '',
   lugar: '',
+  ubicacionMapa: '',
   descripcion: '',
   capacidadMaxima: null,
   mostrarEnProximoPartido: false,
@@ -1236,6 +1284,7 @@ const mostrarFormularioNuevo = () => {
     hora: '',
     horaFin: '',
     lugar: '',
+    ubicacionMapa: '',
     descripcion: '',
     capacidadMaxima: null,
     mostrarEnProximoPartido: false,
@@ -1276,6 +1325,7 @@ const editarEntrenamiento = (entrenamiento) => {
     hora: entrenamiento.hora,
     horaFin: entrenamiento.horaFin || '',
     lugar: entrenamiento.lugar,
+    ubicacionMapa: entrenamiento.ubicacionMapa || '',
     descripcion: entrenamiento.descripcion || '',
     capacidadMaxima: entrenamiento.capacidadMaxima || null,
     mostrarEnProximoPartido: entrenamiento.mostrarEnProximoPartido || false,
@@ -1296,6 +1346,7 @@ const cerrarFormulario = () => {
 
 const verDetallesEntrenamiento = (entrenamiento) => {
   entrenamientoDetallado.value = entrenamiento;
+  mapaCargandoAdmin.value = Boolean(obtenerMapaEmbedUrl(entrenamiento));
   tabDetalleAdmin.value = 'confirmadas';
   busquedaJugadora.value = '';
   jugadorasDisponibles.value = [];
@@ -1553,6 +1604,30 @@ const enviarNotificacionEntrenamiento = async () => {
   }
 };
 
+const obtenerTextoMapa = (entrenamiento) => {
+  const ubicacionMapa = (entrenamiento?.ubicacionMapa || '').toString().trim();
+  if (ubicacionMapa) return ubicacionMapa;
+  return (entrenamiento?.lugar || '').toString().trim();
+};
+
+const obtenerMapaUrl = (entrenamiento) => {
+  const texto = obtenerTextoMapa(entrenamiento);
+  if (!texto) return '';
+  return `https://www.google.com/maps?q=${encodeURIComponent(texto)}`;
+};
+
+const obtenerMapaEmbedUrl = (entrenamiento) => {
+  const texto = obtenerTextoMapa(entrenamiento);
+  if (!texto) return '';
+  return `https://www.google.com/maps?q=${encodeURIComponent(texto)}&output=embed`;
+};
+
+const abrirMapaNuevaPestana = (entrenamiento) => {
+  const url = obtenerMapaUrl(entrenamiento);
+  if (!url) return;
+  window.open(url, '_blank', 'noopener,noreferrer');
+};
+
 const guardarEntrenamiento = async () => {
   error.value = null;
 
@@ -1596,6 +1671,7 @@ const guardarEntrenamiento = async () => {
         hora: formulario.value.hora,
         horaFin: formulario.value.horaFin || '',
         lugar: formulario.value.lugar,
+        ubicacionMapa: formulario.value.ubicacionMapa?.trim() || '',
         descripcion: formulario.value.descripcion,
         capacidadMaxima: formulario.value.capacidadMaxima,
         mostrarEnProximoPartido: formulario.value.mostrarEnProximoPartido,
@@ -1623,6 +1699,7 @@ const guardarEntrenamiento = async () => {
         hora: formulario.value.hora,
         horaFin: formulario.value.horaFin || '',
         lugar: formulario.value.lugar,
+        ubicacionMapa: formulario.value.ubicacionMapa?.trim() || '',
         descripcion: formulario.value.descripcion,
         capacidadMaxima: formulario.value.capacidadMaxima,
         mostrarEnProximoPartido: formulario.value.mostrarEnProximoPartido,

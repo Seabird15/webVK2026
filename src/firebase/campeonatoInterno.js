@@ -582,6 +582,54 @@ export const inicializarFecha3 = async () => {
 };
 
 /**
+ * Inicializar partido de la Fecha Final (hoy)
+ */
+export const inicializarFechaFinal = async () => {
+  try {
+    const docRef = doc(db, CAMPEONATO_INTERNO_2026, 'partidos');
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const datos = docSnap.data();
+
+      const tieneFechaFinal = datos.partidos.some(p => p.numeroFecha === 4);
+      if (tieneFechaFinal) {
+        return { success: false, message: 'La Fecha Final ya está inicializada' };
+      }
+
+      const nuevoId = Math.max(...datos.partidos.map(p => p.id)) + 1;
+      const partidoFinal = {
+        id: nuevoId,
+        equipoLocal: 'verserkers',
+        equipoVisita: 'internadas',
+        golesLocal: 0,
+        golesVisita: 0,
+        empate: false,
+        penalesLocal: 0,
+        penalesVisita: 0,
+        ganadorPenales: null,
+        horario: '20:00',
+        fecha: '2026-02-28',
+        numeroFecha: 4,
+        estado: 'PROGRAMADO',
+        goleadoras: []
+      };
+
+      datos.partidos = [...datos.partidos, partidoFinal];
+      datos.lastUpdated = new Date().toISOString();
+
+      await updateDoc(docRef, datos);
+      return { success: true, message: 'Fecha Final inicializada correctamente', partidos: [partidoFinal] };
+    }
+
+    return { success: false, message: 'No se encontró el documento de partidos' };
+  } catch (err) {
+    console.error('Error inicializando Fecha Final:', err);
+    throw err;
+  }
+};
+
+/**
  * Obtener todos los partidos
  */
 export const obtenerPartidos = async () => {
