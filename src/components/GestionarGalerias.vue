@@ -82,7 +82,7 @@
           <!-- Upload de fotos -->
           <div class="mt-4">
             <label class="block text-sm font-bold text-gray-700 mb-2">Agregar Fotos</label>
-            <div class="flex gap-2">
+            <div class="flex gap-2 flex-col lg:flex-row">
               <input 
                 type="file" 
                 multiple

@@ -101,16 +101,16 @@
           <div class="text-center md:text-left">
             <div class="inline-flex items-center gap-2 bg-black/20 text-black px-3 py-1 rounded-full text-[11px] md:text-xs font-black tracking-wider uppercase mb-2">
               <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
-              HOY • GRAN FINAL
+              CAMPEONAS INTERINO 1ERA VERSION
             </div>
-            <h2 class="text-3xl md:text-4xl font-300 tracking-widest text-black mb-1 uppercase" style="font-family: 'Gobold High', sans-serif;">
-              FINAL CAMPEONATO INTERNO
+            <h2 class="text-3xl md:text-4xl font-black tracking-widest text-black mb-1 uppercase" style="font-family: 'Gobold High', sans-serif;">
+              INTER NADAS
             </h2>
             <p class="text-black/90 font-bold text-sm md:text-base mb-2">
-              Verserkers vs Inter Nadas, hoy se define a las campeonas del torneo interno Vikingas. 
+              Campeonas del interino en su 1era versión.
             </p>
-            <p class="text-black/70 text-xs md:text-sm font-semibold">
-              Hoy · 20:00 hrs · Tricolor La Florida
+                 <p class="text-black/90 font-bold text-sm md:text-base mb-2">
+             ¡FELICIDADES!
             </p>
           </div>
           
@@ -133,7 +133,7 @@
               to="/competencias"
               class="inline-flex items-center gap-2 bg-black hover:bg-gray-900 text-primary px-6 py-3 rounded-lg font-black text-sm transition-all transform hover:scale-105 shadow-xl"
             >
-              Ver marcador en vivo
+              Ver detalles
               <span aria-hidden="true">→</span>
             </router-link>
 

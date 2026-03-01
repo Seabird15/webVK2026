@@ -28,11 +28,11 @@
         <div class="mt-6 max-w-3xl mx-auto bg-linear-to-r from-primary/20 via-primary/10 to-primary/20 border-2 border-primary rounded-xl px-4 py-4 sm:px-6 sm:py-5 shadow-xl">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-left">
             <div>
-              <p class="text-primary text-xs sm:text-sm font-black uppercase tracking-[0.2em]">Gran Final</p>
+              <p class="text-primary text-xs sm:text-sm font-black uppercase tracking-[0.2em]">Campeonas Interino 1era versión</p>
               <h2 class="text-white text-lg sm:text-2xl font-400" style="font-family: 'Collegiate Black', sans-serif;">
-                Verserkers vs Inter Nadas
+                Inter Nadas
               </h2>
-              <p class="text-white/80 text-sm sm:text-base font-semibold mt-1">Sábado 28 de febrero</p>
+              <p class="text-white/80 text-sm sm:text-base font-semibold mt-1">Resumen de jornadas y cierre del torneo interno</p>
             </div>
             <div class="flex flex-col items-start sm:items-end gap-2">
               <button
@@ -114,6 +114,8 @@
             </div>
           </div>
 
+
+
           <!-- Equipos participantes -->
           <div v-if="equipos.verserkers && equipos.internadas && equipos.siemprealpalo">
           <h3 class="text-primary font-bold text-xl mb-6 text-center flex items-center justify-center gap-2">
@@ -139,48 +141,8 @@
                   </svg>
                   <span class="text-sm font-bold">Capitana: Barby</span>
                 </div>
-                <div class="w-full bg-cyan-900/30 rounded-lg p-4 text-left">
-                  <p class="text-cyan-200 text-xs font-bold mb-2 uppercase">Plantel ({{ equipos.verserkers?.jugadoras?.length || 0 }} jugadoras)</p>
-                  <div class="space-y-2">
-                    <!-- Jugadoras con goles -->
-                    <div v-if="equipos.verserkers?.jugadoras?.filter(j => j.goles > 0).length > 0" class="mb-3">
-                      <p class="text-cyan-300 text-xs font-bold mb-2 flex items-center gap-1">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                        </svg>
-                        GOLEADORAS
-                      </p>
-                      <div class="grid grid-cols-2 gap-2">
-                        <div v-for="(jugadora, index) in equipos.verserkers?.jugadoras?.filter(j => j.goles > 0) || []" :key="index" 
-                             class="flex items-center justify-between bg-cyan-400/10 px-2 py-1.5 rounded border border-cyan-400/30">
-                          <div class="flex items-center gap-1">
-                            <svg class="w-3 h-3 text-cyan-400" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" v-if="jugadora.capitana"/>
-                              <circle cx="12" cy="12" r="3" v-else/>
-                            </svg>
-                            <span class="text-cyan-100 text-xs" :class="jugadora.capitana ? 'font-bold' : ''">{{ jugadora.nombre }}</span>
-                          </div>
-                          <span class="text-cyan-400 font-black text-sm">{{ jugadora.goles }}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- Resto del plantel -->
-                    <div>
-                      <p class="text-cyan-200/60 text-xs font-bold mb-2">PLANTEL COMPLETO</p>
-                      <div class="grid grid-cols-2 gap-1.5 text-white/70 text-xs">
-                        <div v-for="(jugadora, index) in equipos.verserkers?.jugadoras || []" :key="index" class="flex items-center gap-1">
-                          <svg class="w-2.5 h-2.5 text-cyan-400/50" fill="currentColor" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="3"/>
-                          </svg>
-                          <span>{{ jugadora.nombre }}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="mt-3 text-primary font-bold text-xl">
-                  {{ totalGoles('verserkers') }} Goles
-                </div>
+          
+           
               </div>
             </div>
 
@@ -199,48 +161,7 @@
                   </svg>
                   <span class="text-sm font-bold">Capitana: Pau Motta</span>
                 </div>
-                <div class="w-full bg-gray-900/30 rounded-lg p-4 text-left">
-                  <p class="text-gray-200 text-xs font-bold mb-2 uppercase">Plantel ({{ equipos.internadas?.jugadoras?.length || 0 }} jugadoras)</p>
-                  <div class="space-y-2">
-                    <!-- Jugadoras con goles -->
-                    <div v-if="equipos.internadas?.jugadoras?.filter(j => j.goles > 0).length > 0" class="mb-3">
-                      <p class="text-gray-300 text-xs font-bold mb-2 flex items-center gap-1">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                        </svg>
-                        GOLEADORAS
-                      </p>
-                      <div class="grid grid-cols-2 gap-2">
-                        <div v-for="(jugadora, index) in equipos.internadas?.jugadoras?.filter(j => j.goles > 0) || []" :key="index" 
-                             class="flex items-center justify-between bg-gray-400/10 px-2 py-1.5 rounded border border-gray-400/30">
-                          <div class="flex items-center gap-1">
-                            <svg class="w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" v-if="jugadora.capitana"/>
-                              <circle cx="12" cy="12" r="3" v-else/>
-                            </svg>
-                            <span class="text-gray-100 text-xs" :class="jugadora.capitana ? 'font-bold' : ''">{{ jugadora.nombre }}</span>
-                          </div>
-                          <span class="text-gray-400 font-black text-sm">{{ jugadora.goles }}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- Resto del plantel -->
-                    <div>
-                      <p class="text-gray-200/60 text-xs font-bold mb-2">PLANTEL COMPLETO</p>
-                      <div class="grid grid-cols-2 gap-1.5 text-white/70 text-xs">
-                        <div v-for="(jugadora, index) in equipos.internadas?.jugadoras || []" :key="index" class="flex items-center gap-1">
-                          <svg class="w-2.5 h-2.5 text-gray-400/50" fill="currentColor" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="3"/>
-                          </svg>
-                          <span>{{ jugadora.nombre }}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="mt-3 text-primary font-bold text-xl">
-                  {{ totalGoles('internadas') }} Goles
-                </div>
+           
               </div>
             </div>
 
@@ -259,48 +180,8 @@
                   </svg>
                   <span class="text-sm font-bold">Capitana: Dany Farias</span>
                 </div>
-                <div class="w-full bg-red-900/30 rounded-lg p-4 text-left">
-                  <p class="text-red-200 text-xs font-bold mb-2 uppercase">Plantel ({{ equipos.siemprealpalo?.jugadoras?.length || 0 }} jugadoras)</p>
-                  <div class="space-y-2">
-                    <!-- Jugadoras con goles -->
-                    <div v-if="equipos.siemprealpalo?.jugadoras?.filter(j => j.goles > 0).length > 0" class="mb-3">
-                      <p class="text-red-300 text-xs font-bold mb-2 flex items-center gap-1">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                        </svg>
-                        GOLEADORAS
-                      </p>
-                      <div class="grid grid-cols-2 gap-2">
-                        <div v-for="(jugadora, index) in equipos.siemprealpalo?.jugadoras?.filter(j => j.goles > 0) || []" :key="index" 
-                             class="flex items-center justify-between bg-red-400/10 px-2 py-1.5 rounded border border-red-400/30">
-                          <div class="flex items-center gap-1">
-                            <svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" v-if="jugadora.capitana"/>
-                              <circle cx="12" cy="12" r="3" v-else/>
-                            </svg>
-                            <span class="text-red-100 text-xs" :class="jugadora.capitana ? 'font-bold' : ''">{{ jugadora.nombre }}</span>
-                          </div>
-                          <span class="text-red-400 font-black text-sm">{{ jugadora.goles }}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- Resto del plantel -->
-                    <div>
-                      <p class="text-red-200/60 text-xs font-bold mb-2">PLANTEL COMPLETO</p>
-                      <div class="grid grid-cols-2 gap-1.5 text-white/70 text-xs">
-                        <div v-for="(jugadora, index) in equipos.siemprealpalo?.jugadoras || []" :key="index" class="flex items-center gap-1">
-                          <svg class="w-2.5 h-2.5 text-red-400/50" fill="currentColor" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="3"/>
-                          </svg>
-                          <span>{{ jugadora.nombre }}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="mt-3 text-primary font-bold text-xl">
-                  {{ totalGoles('siemprealpalo') }} Goles
-                </div>
+           
+             
               </div>
             </div>
           </div>
@@ -319,14 +200,13 @@
                   </svg>
                   <div class="text-left">
                     <h2 class="text-xl font-400 tracking-wider text-white" style="font-family: 'Collegiate Black', sans-serif;">
-                      TABLA DE GOLEADORAS
+                 1, 2, Y 3 GOLEADORAS
                     </h2>
-                    <p class="text-black/70 text-xs">Rankings individuales por goles anotados</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-3">
                   <span class="text-black font-bold text-xs bg-black/20 px-3 py-1 rounded-full">
-                    {{ tablaGoleadoras.length }} {{ tablaGoleadoras.length === 1 ? 'goleadora' : 'goleadoras' }}
+                    {{ topGoleadoras.length }} {{ topGoleadoras.length === 1 ? 'goleadora' : 'goleadoras' }}
                   </span>
                   <svg 
                     class="w-5 h-5 text-black transition-transform duration-300"
@@ -357,8 +237,8 @@
                   <p class="text-white/40 text-sm mt-2">Los goles se mostrarán aquí una vez que comience el torneo</p>
                 </div>
 
-                <!-- Tabla completa de goleadoras -->
-                <div v-if="tablaGoleadoras.length > 0" class="bg-black/50 rounded-lg border border-primary/30 overflow-hidden shadow-2xl">
+                <!-- Top 3 de goleadoras -->
+                <div v-if="topGoleadoras.length > 0" class="bg-black/50 rounded-lg border border-primary/30 overflow-hidden shadow-2xl">
                   <div class="overflow-x-auto">
                     <table class="w-full">
                       <thead>
@@ -371,7 +251,7 @@
                       </thead>
                       <tbody>
                         <tr 
-                          v-for="(jugadora, index) in tablaGoleadoras" 
+                          v-for="(jugadora, index) in topGoleadoras" 
                           :key="index"
                           class="border-b border-white/5 transition-all duration-200"
                           :class="{
@@ -610,469 +490,64 @@
             </button>
           </div>
 
-          <!-- Resultados por Fecha (Dinámico) -->
-          <div v-for="numeroFecha in fechasOrdenadas" :key="`fecha-${numeroFecha}`" class="bg-black border-2 border-primary rounded-lg p-4 sm:p-8 mt-8">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
-              <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-white text-center sm:text-left flex items-center justify-center sm:justify-start gap-2 sm:gap-3" style="font-family: 'Collegiate Black', sans-serif;">
-                <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M9 11H7v2h2v-2m4 0h-2v2h2v-2m4 0h-2v2h2v-2m2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m0 16H5V9h14v11z"/>
-                </svg>
-                <span class="hidden sm:inline">{{ obtenerTituloFecha(numeroFecha) }}</span>
-                <span class="sm:hidden">FECHA {{ numeroFecha }}</span>
-              </h2>
-              <button
-                @click="toggleFecha(numeroFecha)"
-                class="inline-flex items-center justify-center gap-2 bg-primary/20 hover:bg-primary/30 text-primary border border-primary/40 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-colors"
-              >
-                <span>{{ fechaExpandida(numeroFecha) ? 'Ocultar' : 'Ver' }}</span>
-                <svg
-                  class="w-4 h-4 transition-transform duration-200"
-                  :class="fechaExpandida(numeroFecha) ? 'rotate-180' : ''"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
-              </button>
-            </div>
-
-            <div v-show="fechaExpandida(numeroFecha)">
-            
-            <!-- Estado de la fecha -->
-            <div class="text-center mb-4">
-              <span 
-                :class="['inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold', obtenerEstadoFecha(partidosPorFecha[numeroFecha]).class]"
-              >
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
-                </svg>
-                {{ obtenerEstadoFecha(partidosPorFecha[numeroFecha]).text }}
-              </span>
-            </div>
-            
-            <!-- Panel de Administración de Resultados (Solo Admin) -->
-            <div v-if="isAdmin" class="mb-6 bg-primary/20 border-2 border-primary rounded-lg p-4">
-              <div class="flex items-center justify-between mb-3">
-                <h3 class="text-primary font-bold text-sm flex items-center gap-2">
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                  </svg>
-                  MODO EDICIÓN (ADMIN)
+          <!-- Resultados simplificados por jornada -->
+          <div class="mt-8 space-y-5">
+            <div v-for="numeroFecha in fechasOrdenadas" :key="`fecha-${numeroFecha}`" class="bg-black border-2 border-primary rounded-lg p-4 sm:p-6">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                <h3 class="text-white font-300 text-lg sm:text-xl" style="font-family: 'Collegiate Black', sans-serif;">
+                  {{ obtenerTituloFecha(numeroFecha) }}
                 </h3>
-                <span v-if="editandoResultado" class="text-xs bg-black/30 text-primary px-2 py-1 rounded flex items-center gap-1">
-                  <svg class="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Guardando...
+                <span
+                  :class="['inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold w-fit', obtenerEstadoFecha(partidosPorFecha[numeroFecha] || []).class]"
+                >
+                  {{ obtenerEstadoFecha(partidosPorFecha[numeroFecha] || []).text }}
                 </span>
               </div>
-              <p class="text-primary/80 text-xs">Haz clic en "Editar" o en los botones de estado para modificar los partidos</p>
-            </div>
 
-            <div class="space-y-3 sm:space-y-4">
-              <!-- Partidos dinámicos desde Firebase -->
-              <div v-for="partido in partidosPorFecha[numeroFecha]" :key="partido.id" class="bg-linear-to-r from-blue-900/30 via-purple-900/30 to-pink-900/30 border-2 border-primary rounded-lg p-3 sm:p-6">
-                <div class="flex items-center justify-between mb-3 sm:mb-4">
-                  <div class="flex items-center gap-1 sm:gap-2 text-primary">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/>
-                    </svg>
-                    <span class="font-bold text-xs sm:text-sm">{{ partido.horario }}</span>
+              <div class="space-y-2">
+                <div
+                  v-for="partido in partidosPorFecha[numeroFecha]"
+                  :key="partido.id"
+                  class="bg-white/5 border border-white/10 rounded-lg px-3 py-2.5"
+                >
+                  <div class="flex items-center justify-between gap-3">
+                    <span class="text-white text-sm font-semibold">{{ obtenerDatosEquipo(partido.equipoLocal).nombre }}</span>
+                    <span class="text-primary font-black text-lg">{{ partido.golesLocal }} - {{ partido.golesVisita }}</span>
+                    <span class="text-white text-sm font-semibold text-right">{{ obtenerDatosEquipo(partido.equipoVisita).nombre }}</span>
                   </div>
-                  <div class="flex items-center gap-2">
-                    <span 
-                      :class="['text-xs font-bold px-2 sm:px-3 py-1 rounded-full', obtenerEstadoBadge(partido).class]"
-                    >
+                  <div class="flex flex-wrap items-center justify-between gap-2 mt-1">
+                    <span class="text-white/60 text-xs">{{ partido.horario }} · Tricolor La Florida</span>
+                    <span :class="['text-[11px] font-bold px-2 py-0.5 rounded-full', obtenerEstadoBadge(partido).class]">
                       {{ obtenerEstadoBadge(partido).text }}
                     </span>
-                    
-                    <!-- Botones de admin -->
-                    <div v-if="isAdmin && !partidoEditando" class="flex gap-1">
-                      <button
-                        v-if="partido.estado !== 'EN_CURSO'"
-                        @click="cambiarEstadoPartido(partido.id, 'EN_CURSO')"
-                        class="bg-yellow-500 hover:bg-yellow-600 text-black px-2 py-1 rounded text-xs font-bold transition"
-                        title="Iniciar partido"
-                      >
-                        ▶
-                      </button>
-                      <button
-                        v-if="partido.estado === 'EN_CURSO'"
-                        @click="cambiarEstadoPartido(partido.id, 'FINALIZADO')"
-                        class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs font-bold transition"
-                        title="Finalizar partido"
-                      >
-                        ✓
-                      </button>
-                      <button
-                        @click="editarResultado(partido)"
-                        class="bg-primary hover:bg-primary/80 text-black px-2 py-1 rounded text-xs font-bold transition"
-                      >
-                        Editar
-                      </button>
-                    </div>
                   </div>
-                </div>
-                
-                <!-- Vista normal del partido -->
-                <div v-if="!partidoEditando || partidoEditando.id !== partido.id" class="space-y-3">
-                  <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
-                    <div class="flex items-center gap-2 sm:gap-3 flex-1">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                        <img :src="resolverLogoEquipo(obtenerDatosEquipo(partido.equipoLocal).logo)" :alt="obtenerDatosEquipo(partido.equipoLocal).nombre" class="w-full h-full object-contain" />
-                      </div>
-                      <span 
-                        class="font-bold text-sm sm:text-lg"
-                        :class="partido.golesLocal > partido.golesVisita ? 'text-primary' : 'text-white/70'"
-                      >
-                        {{ obtenerDatosEquipo(partido.equipoLocal).nombre }}
-                      </span>
-                    </div>
-                    <div class="flex items-center gap-3 sm:gap-4">
-                      <span 
-                        class="font-black text-2xl sm:text-3xl"
-                        :class="partido.golesLocal > partido.golesVisita ? 'text-primary' : 'text-white/70'"
-                      >
-                        {{ partido.golesLocal }}
-                      </span>
-                      <span class="text-primary/50 font-bold text-lg">-</span>
-                      <span 
-                        class="font-black text-2xl sm:text-3xl"
-                        :class="partido.golesVisita > partido.golesLocal ? 'text-primary' : 'text-white/70'"
-                      >
-                        {{ partido.golesVisita }}
-                      </span>
-                    </div>
-                    <div class="flex items-center gap-2 sm:gap-3 flex-1 justify-end">
-                      <span 
-                        class="font-bold text-sm sm:text-lg text-right"
-                        :class="partido.golesVisita > partido.golesLocal ? 'text-primary' : 'text-white/70'"
-                      >
-                        {{ obtenerDatosEquipo(partido.equipoVisita).nombre }}
-                      </span>
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                        <img :src="resolverLogoEquipo(obtenerDatosEquipo(partido.equipoVisita).logo)" :alt="obtenerDatosEquipo(partido.equipoVisita).nombre" class="w-full h-full object-contain" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div v-if="partido.empate" class="bg-yellow-500/10 border border-yellow-400/40 rounded-lg p-3 text-center">
-                    <p class="text-yellow-300 text-xs font-bold uppercase tracking-wide mb-1">Definición por penales</p>
-                    <p class="text-white text-sm font-bold">
-                      {{ obtenerDatosEquipo(partido.equipoLocal).nombre }} {{ partido.penalesLocal || 0 }} - {{ partido.penalesVisita || 0 }} {{ obtenerDatosEquipo(partido.equipoVisita).nombre }}
-                    </p>
-                    <p v-if="partido.ganadorPenales" class="text-primary text-xs font-bold mt-1">
-                      Ganador: {{ obtenerDatosEquipo(partido.ganadorPenales).nombre }}
-                    </p>
-                  </div>
-
-                
-
-                </div>
-                
-                <!-- Modo de edición (solo admin) -->
-                <div v-else class="space-y-4">
-                  <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <div class="flex items-center gap-2 sm:gap-3 flex-1">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                        <img :src="resolverLogoEquipo(obtenerDatosEquipo(partido.equipoLocal).logo)" :alt="obtenerDatosEquipo(partido.equipoLocal).nombre" class="w-full h-full object-contain" />
-                      </div>
-                      <span class="text-white font-bold text-sm sm:text-lg">{{ obtenerDatosEquipo(partido.equipoLocal).nombre }}</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                      <button
-                        @click="decrementarGol('local')"
-                        :disabled="partidoEditando.golesLocalEdit === 0"
-                        class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
-                      >-</button>
-                      <span class="text-primary font-black text-3xl w-12 text-center">{{ partidoEditando.golesLocalEdit }}</span>
-                      <button
-                        @click="incrementarGol('local')"
-                        class="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded font-bold transition"
-                      >+</button>
-                    </div>
-                  </div>
-                  
-                  <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <div class="flex items-center gap-2 sm:gap-3 flex-1">
-                      <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full p-2 shrink-0">
-                        <img :src="resolverLogoEquipo(obtenerDatosEquipo(partido.equipoVisita).logo)" :alt="obtenerDatosEquipo(partido.equipoVisita).nombre" class="w-full h-full object-contain" />
-                      </div>
-                      <span class="text-white font-bold text-sm sm:text-lg">{{ obtenerDatosEquipo(partido.equipoVisita).nombre }}</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                      <button
-                        @click="decrementarGol('visita')"
-                        :disabled="partidoEditando.golesVisitaEdit === 0"
-                        class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
-                      >-</button>
-                      <span class="text-primary font-black text-3xl w-12 text-center">{{ partidoEditando.golesVisitaEdit }}</span>
-                      <button
-                        @click="incrementarGol('visita')"
-                        class="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded font-bold transition"
-                      >+</button>
-                    </div>
-                  </div>
-
-                  <div class="bg-black/30 border border-primary/20 rounded-lg p-3 space-y-3">
-                    <label class="flex items-center gap-2 text-sm font-bold text-primary cursor-pointer">
-                      <input
-                        v-model="partidoEditando.empateEdit"
-                        type="checkbox"
-                        class="w-4 h-4"
-                      />
-                      Definido por penales (empate en tiempo regular)
-                    </label>
-
-                    <div v-if="partidoEditando.empateEdit" class="space-y-3">
-                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div class="bg-white/5 rounded p-2">
-                          <p class="text-white/70 text-xs mb-2">Penales {{ obtenerDatosEquipo(partido.equipoLocal).nombre }}</p>
-                          <div class="flex items-center justify-center gap-2">
-                            <button
-                              @click="decrementarPenal('local')"
-                              :disabled="partidoEditando.penalesLocalEdit === 0"
-                              class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
-                            >-</button>
-                            <span class="text-primary font-black text-2xl w-10 text-center">{{ partidoEditando.penalesLocalEdit }}</span>
-                            <button
-                              @click="incrementarPenal('local')"
-                              class="bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded font-bold transition"
-                            >+</button>
-                          </div>
-                        </div>
-                        <div class="bg-white/5 rounded p-2">
-                          <p class="text-white/70 text-xs mb-2">Penales {{ obtenerDatosEquipo(partido.equipoVisita).nombre }}</p>
-                          <div class="flex items-center justify-center gap-2">
-                            <button
-                              @click="decrementarPenal('visita')"
-                              :disabled="partidoEditando.penalesVisitaEdit === 0"
-                              class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
-                            >-</button>
-                            <span class="text-primary font-black text-2xl w-10 text-center">{{ partidoEditando.penalesVisitaEdit }}</span>
-                            <button
-                              @click="incrementarPenal('visita')"
-                              class="bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded font-bold transition"
-                            >+</button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <p class="text-white/70 text-xs mb-2">Ganador por penales</p>
-                        <div class="flex flex-wrap gap-2">
-                          <button
-                            @click="seleccionarGanadorPenales(partido.equipoLocal)"
-                            :class="[
-                              'px-3 py-1.5 rounded text-xs font-bold transition',
-                              partidoEditando.ganadorPenalesEdit === partido.equipoLocal
-                                ? 'bg-primary text-black'
-                                : 'bg-white/10 text-white hover:bg-white/20'
-                            ]"
-                          >
-                            {{ obtenerDatosEquipo(partido.equipoLocal).nombre }}
-                          </button>
-                          <button
-                            @click="seleccionarGanadorPenales(partido.equipoVisita)"
-                            :class="[
-                              'px-3 py-1.5 rounded text-xs font-bold transition',
-                              partidoEditando.ganadorPenalesEdit === partido.equipoVisita
-                                ? 'bg-primary text-black'
-                                : 'bg-white/10 text-white hover:bg-white/20'
-                            ]"
-                          >
-                            {{ obtenerDatosEquipo(partido.equipoVisita).nombre }}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="bg-black/30 border border-primary/20 rounded-lg p-3 space-y-3">
-                    <p class="text-primary text-sm font-bold uppercase tracking-wide">Ficha completa del partido</p>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label class="block text-white/70 text-xs mb-1">Sede / cancha</label>
-                        <input
-                          v-model="partidoEditando.lugarEdit"
-                          type="text"
-                          class="w-full bg-white/5 border border-white/20 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
-                          placeholder="Ej: Tricolor La Florida"
-                        />
-                      </div>
-                      <div>
-                        <label class="block text-white/70 text-xs mb-1">Árbitra</label>
-                        <input
-                          v-model="partidoEditando.arbitraEdit"
-                          type="text"
-                          class="w-full bg-white/5 border border-white/20 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
-                          placeholder="Ej: Carla"
-                        />
-                      </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label class="block text-white/70 text-xs mb-1">Goleadoras local (separadas por coma)</label>
-                        <input
-                          v-model="partidoEditando.goleadorasLocalEditText"
-                          type="text"
-                          class="w-full bg-white/5 border border-white/20 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
-                          placeholder="Ej: Barby, May"
-                        />
-                      </div>
-                      <div>
-                        <label class="block text-white/70 text-xs mb-1">Goleadoras visita (separadas por coma)</label>
-                        <input
-                          v-model="partidoEditando.goleadorasVisitaEditText"
-                          type="text"
-                          class="w-full bg-white/5 border border-white/20 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
-                          placeholder="Ej: Motta, Eli López"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label class="block text-white/70 text-xs mb-1">Figura del partido</label>
-                      <input
-                        v-model="partidoEditando.figuraEdit"
-                        type="text"
-                        class="w-full bg-white/5 border border-white/20 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
-                        placeholder="Ej: Motta"
-                      />
-                    </div>
-
-                    <div>
-                      <label class="block text-white/70 text-xs mb-1">Resumen del partido</label>
-                      <textarea
-                        v-model="partidoEditando.resumenEdit"
-                        rows="3"
-                        class="w-full bg-white/5 border border-white/20 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
-                        placeholder="Describe lo más importante del partido"
-                      ></textarea>
-                    </div>
-                  </div>
-                  
-                  <div class="flex justify-end gap-2 pt-3 border-t border-white/10">
-                    <button
-                      @click="cancelarEdicion"
-                      class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded font-bold transition text-sm"
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      @click="guardarResultado(partido.id)"
-                      :disabled="editandoResultado"
-                      class="bg-primary hover:bg-primary/80 text-black px-4 py-2 rounded font-bold transition text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Guardar
-                    </button>
-                  </div>
+                  <p v-if="partido.empate && partido.ganadorPenales" class="text-primary text-[11px] font-semibold mt-1">
+                    Ganó por penales: {{ obtenerDatosEquipo(partido.ganadorPenales).nombre }}
+                  </p>
                 </div>
               </div>
             </div>
 
-            <!-- Tabla de Posiciones (solo se muestra una vez al final) -->
-            <div v-if="numeroFecha === fechasOrdenadas[fechasOrdenadas.length - 1]" class="mt-6 bg-black/50 border-2 border-primary/50 rounded-lg overflow-hidden shadow-lg">
-              <div class="bg-primary/20 px-4 py-2 border-b border-primary/50">
-                <h3 class="text-primary font-bold text-sm text-center flex items-center justify-center gap-2 uppercase tracking-wider">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                  </svg>
-                  Tabla de Posiciones
-                </h3>
-              </div>
-              <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                  <thead>
-                    <tr class="bg-primary/10 border-b border-primary/30">
-                      <th class="px-2 py-2 text-center text-primary font-bold text-xs uppercase">#</th>
-                      <th class="px-2 py-2 text-left text-primary font-bold text-xs uppercase">Equipo</th>
-                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">PJ</th>
-                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">G</th>
-                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">E</th>
-                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">P</th>
-                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">GF</th>
-                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">GC</th>
-                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">DG</th>
-                      <th class="px-2 py-2 text-center text-primary font-bold text-xs">PTS</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr 
-                      v-for="(equipo, index) in tablaPosiciones" 
-                      :key="equipo.key"
-                      class="border-b border-white/5 hover:bg-primary/5 transition-all border-l-4"
-                      :class="[
-                        index === 0 ? 'bg-linear-to-r from-yellow-400/10 to-transparent' : '',
-                        index === 1 ? 'bg-linear-to-r from-gray-300/10 to-transparent' : '',
-                        index === 2 ? 'bg-linear-to-r from-orange-400/10 to-transparent' : '',
-                        obtenerColorBorde(equipo)
-                      ]"
-                    >
-                      <td class="px-2 py-2 text-center">
-                        <svg 
-                          v-if="index < 3" 
-                          class="w-6 h-6 mx-auto" 
-                          :class="[
-                            index === 0 ? 'text-yellow-400' : '',
-                            index === 1 ? 'text-gray-300' : '',
-                            index === 2 ? 'text-orange-400' : ''
-                          ]"
-                          fill="currentColor" viewBox="0 0 24 24"
-                        >
-                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                        </svg>
-                        <span v-else class="text-white/70">{{ index + 1 }}</span>
-                      </td>
-                      <td class="px-2 py-2">
-                        <div class="flex items-center gap-2">
-                          <div class="w-5 h-5 bg-white rounded-full p-0.5 shrink-0">
-                            <img :src="resolverLogoEquipo(equipo.logo)" :alt="equipo.nombre" class="w-full h-full object-contain" />
-                          </div>
-                          <span class="text-white font-bold text-xs">{{ equipo.nombre }}</span>
-                        </div>
-                      </td>
-                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">{{ equipo.pj }}</td>
-                      <td class="px-2 py-2 text-center text-primary font-bold text-xs">{{ equipo.pg }}</td>
-                      <td class="px-2 py-2 text-center text-yellow-300 font-bold text-xs">{{ equipo.pe || 0 }}</td>
-                      <td class="px-2 py-2 text-center text-red-400 font-bold text-xs">{{ equipo.pp }}</td>
-                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">{{ equipo.gf }}</td>
-                      <td class="px-2 py-2 text-center text-white/70 font-medium text-xs">{{ equipo.gc }}</td>
-                      <td class="px-2 py-2 text-center font-bold text-xs" :class="equipo.dg >= 0 ? 'text-primary' : 'text-red-400'">
-                        {{ equipo.dg >= 0 ? '+' : '' }}{{ equipo.dg }}
-                      </td>
-                      <td class="px-2 py-2 text-center text-primary font-bold text-base">{{ equipo.pts }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="bg-primary/10 px-3 py-1.5 border-t border-primary/30">
-                <p class="text-white/60 text-xs text-center leading-relaxed">
-                  <span class="font-semibold text-white">PJ:</span> Partidos Jugados • 
-                  <span class="font-semibold text-white">G:</span> Ganados • 
-                  <span class="font-semibold text-white">E:</span> Empatados • 
-                  <span class="font-semibold text-white">P:</span> Perdidos • 
-                  <span class="font-semibold text-white">GF:</span> Goles a Favor • 
-                  <span class="font-semibold text-white">GC:</span> Goles en Contra • 
-                  <span class="font-semibold text-white">DG:</span> Diferencia de Goles • 
-                  <span class="font-semibold text-white">PTS:</span> Puntos
-                </p>
+            <div class="bg-primary/10 border-2 border-primary/50 rounded-lg p-5 animate-campeonas-suave" v-if="campeonasInterno">
+              <p class="text-primary text-xs uppercase font-black tracking-widest mb-1">Flamantes campeonas</p>
+              <div class="flex items-center gap-3">
+                <div class="w-14 h-14 bg-white rounded-full p-2">
+                  <img :src="resolverLogoEquipo(campeonasInterno.logo)" :alt="campeonasInterno.nombre" class="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <p class="text-white text-2xl font-500" style="font-family: 'Collegiate Black', sans-serif;">{{ campeonasInterno.nombre }}</p>
+                  <p class="text-white/70 text-sm">{{ campeonasInterno.pts }} pts · DG {{ campeonasInterno.dg >= 0 ? '+' : '' }}{{ campeonasInterno.dg }}</p>
+                </div>
               </div>
             </div>
 
-            <!-- Información de la sede -->
-            <div class="mt-4 sm:mt-6 bg-primary-dark rounded-lg p-3 sm:p-4 border-2 border-primary">
+            <div class="bg-primary-dark rounded-lg p-3 sm:p-4 border-2 border-primary">
               <div class="flex items-center justify-center gap-2 sm:gap-3 text-black">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6 shrink-0" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                 </svg>
                 <span class="font-bold text-sm sm:text-lg">Cancha Tricolor La Florida</span>
               </div>
-            </div>
             </div>
           </div>
           </div>
@@ -1375,7 +850,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, onUnmounted, watch } from 'vue';
+import { ref, onMounted, computed, onUnmounted } from 'vue';
 import { doc, getDoc, setDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import ModalConfirmacion from '../components/ModalConfirmacion.vue';
@@ -1447,6 +922,7 @@ const equipos = computed(() => equiposCampeonato.value);
 // Tabla de goleadoras general
 const tablaGoleadoras = ref([]);
 const mostrarTablaGoleadoras = ref(false);
+const topGoleadoras = computed(() => tablaGoleadoras.value.slice(0, 3));
 
 const isAdmin = computed(() => userRole.value === 'admin');
 const mostrarPanelGoles = ref(false);
@@ -1775,7 +1251,7 @@ const obtenerTituloFecha = (numeroFecha) => {
   } else if (numeroFecha == 3) {
     return 'FECHA 3 - SÁBADO 21 DE FEBRERO';
   } else if (numeroFecha == 4) {
-    return 'FECHA FINAL - HOY 20:00';
+    return ' FINAL - 28 MARZO 20:00';
   }
   return `FECHA ${numeroFecha}`;
 };
@@ -1794,44 +1270,53 @@ const fechasOrdenadas = computed(() => {
   return Object.keys(partidosPorFecha.value).map(Number).sort((a, b) => a - b);
 });
 
+const resumenJornadas = computed(() => {
+  return fechasOrdenadas.value.map((numeroFecha) => {
+    const partidosFecha = partidosPorFecha.value[numeroFecha] || [];
+    const finalizada = partidosFecha.length > 0 && partidosFecha.every((partido) => partido.estado === 'FINALIZADO');
+    const enCurso = partidosFecha.some((partido) => partido.estado === 'EN_CURSO');
+
+    return {
+      numeroFecha,
+      estado: finalizada ? 'Completada' : enCurso ? 'En curso' : 'Próximamente',
+      finalizada,
+      enCurso
+    };
+  });
+});
+
+const resumenInterno = computed(() => {
+  const totalJornadas = fechasOrdenadas.value.length;
+  const jornadasFinalizadas = resumenJornadas.value.filter((jornada) => jornada.finalizada).length;
+  const totalPartidos = Object.values(partidosPorFecha.value).reduce((acumulado, lista) => acumulado + lista.length, 0);
+  const partidosFinalizados = Object.values(partidosPorFecha.value).reduce(
+    (acumulado, lista) => acumulado + lista.filter((partido) => partido.estado === 'FINALIZADO').length,
+    0
+  );
+
+  return {
+    totalJornadas,
+    jornadasFinalizadas,
+    totalPartidos,
+    partidosFinalizados
+  };
+});
+
+const campeonasInterno = computed(() => {
+  const lider = tablaPosiciones.value?.[0];
+  if (!lider) return null;
+
+  const datosEquipo = obtenerDatosEquipo(lider.key);
+  return {
+    nombre: lider.nombre || datosEquipo.nombre || 'Por definir',
+    logo: lider.logo || datosEquipo.logo || '',
+    pts: lider.pts ?? 0,
+    dg: lider.dg ?? 0
+  };
+});
+
 const tieneFecha3 = computed(() => fechasOrdenadas.value.includes(3));
 const tieneFechaFinal = computed(() => fechasOrdenadas.value.includes(4));
-const fechasColapsadas = ref({});
-
-const fechaExpandida = (numeroFecha) => {
-  if (typeof fechasColapsadas.value[numeroFecha] === 'boolean') {
-    return fechasColapsadas.value[numeroFecha];
-  }
-  const ultimaFecha = fechasOrdenadas.value[fechasOrdenadas.value.length - 1];
-  return numeroFecha === ultimaFecha;
-};
-
-const toggleFecha = (numeroFecha) => {
-  fechasColapsadas.value = {
-    ...fechasColapsadas.value,
-    [numeroFecha]: !fechaExpandida(numeroFecha)
-  };
-};
-
-watch(fechasOrdenadas, (nuevasFechas) => {
-  const siguienteEstado = { ...fechasColapsadas.value };
-  const ultimaFecha = nuevasFechas[nuevasFechas.length - 1];
-
-  nuevasFechas.forEach((fecha) => {
-    if (typeof siguienteEstado[fecha] !== 'boolean') {
-      siguienteEstado[fecha] = fecha === ultimaFecha;
-    }
-  });
-
-  Object.keys(siguienteEstado).forEach((key) => {
-    const numero = Number(key);
-    if (!nuevasFechas.includes(numero)) {
-      delete siguienteEstado[key];
-    }
-  });
-
-  fechasColapsadas.value = siguienteEstado;
-}, { immediate: true });
 
 const obtenerDatosEquipo = (equipoKey) => {
   const equiposData = {
@@ -2076,7 +1561,23 @@ onUnmounted(() => {
   }
 }
 
+@keyframes campeonas-suave {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.92;
+  }
+  50% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
 .animate-spin {
   animation: spin 1s linear infinite;
+}
+
+.animate-campeonas-suave {
+  animation: campeonas-suave 3.2s ease-in-out infinite;
 }
 </style>
