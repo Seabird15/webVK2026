@@ -24,7 +24,6 @@ export const requestPermissionAndSubscribe = async (topicName) => {
   try {
     const permission = await Notification.requestPermission();
     if (permission === "granted") {
-      // // console.log("Permiso de notificación concedido.");
 
       // Obtener el token del dispositivo
       let currentToken = null;
@@ -35,32 +34,26 @@ export const requestPermissionAndSubscribe = async (topicName) => {
 
       // Si el navegador soporta service workers, intenta registrar/usar el registration
       if (navigator?.serviceWorker) {
-        // // console.log('navigator.serviceWorker presente. controller:', navigator.serviceWorker.controller);
         try {
           // Intentar obtener una registration existente para nuestro SW
           let registration = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js');
           if (!registration) {
-            // // console.log('No hay registration para /firebase-messaging-sw.js — registrando ahora...');
             try {
               registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-              // // console.log('Registro del service worker completado:', registration && registration.scope);
             } catch (regErr) {
               // // console.warn('Falló el registro del service worker:', regErr);
             }
           } else {
-            // // console.log('Encontrada registration existente:', registration && registration.scope);
           }
 
           // Esperar a que haya una registration activa
           try {
             const readyReg = await navigator.serviceWorker.ready;
-            // // console.log('navigator.serviceWorker.ready -> scope:', readyReg && readyReg.scope);
             try {
               currentToken = await getToken(messaging, {
                 vapidKey,
                 serviceWorkerRegistration: readyReg,
               });
-              // // console.log('getToken con serviceWorkerRegistration resultó en:', currentToken);
             } catch (getErr) {
               // // console.warn('getToken con serviceWorkerRegistration falló:', getErr);
             }
@@ -76,30 +69,24 @@ export const requestPermissionAndSubscribe = async (topicName) => {
       if (!currentToken) {
         try {
           currentToken = await getToken(messaging, { vapidKey });
-          // // console.log('getToken fallback resultó en:', currentToken);
         } catch (fallbackErr) {
           // // console.error('Error en getToken fallback:', fallbackErr);
         }
       }
 
       if (currentToken) {
-        // // console.log("Token de FCM obtenido:", currentToken);
 
         // Guardar el token en Firestore si hay un usuario autenticado (admin o jugadora)
         let userUid = null;
         if (auth.currentUser) {
           userUid = auth.currentUser.uid;
-          // // console.log('Usuario admin autenticado, UID:', userUid);
         } else if (jugadoraAuthUser.value) {
           userUid = jugadoraAuthUser.value.uid;
-          // // console.log('Jugadora autenticada, UID:', userUid);
         }
         
         if (userUid) {
-          // // console.log('Guardando token en Firestore para UID:', userUid);
           try {
             await guardarTokenNotificacion(userUid, currentToken);
-            // // console.log('✓ Token guardado exitosamente');
           } catch (saveError) {
             // // console.error('✗ ERROR al guardar token en Firestore:', saveError);
             // // console.error('Error code:', saveError?.code);
@@ -110,13 +97,9 @@ export const requestPermissionAndSubscribe = async (topicName) => {
         }
 
         // Llamar a la Cloud Function para suscribir el token
-        // // console.log(`Llamando a la Cloud Function para suscribir al tema: ${topicName}`);
         try {
           const payload = { token: currentToken, topic: topicName };
-          // // console.log('Payload subscribeToTopic:', payload);
           const fnRes = await subscribeToTopicFunction(payload);
-          // // console.log(`Respuesta de subscribeToTopic:`, fnRes.data || fnRes);
-          // // console.log(`Suscripción al tema '${topicName}' solicitada con éxito.`);
         } catch (fnErr) {
           // // console.error('Error al llamar a subscribeToTopic:', fnErr);
           try {
@@ -127,10 +110,8 @@ export const requestPermissionAndSubscribe = async (topicName) => {
         }
 
       } else {
-        // // console.log("No se pudo obtener el token. Pide al usuario que habilite las notificaciones.");
       }
     } else {
-      // // console.log("El usuario no concedió permiso para las notificaciones.");
     }
   } catch (err) {
     // // console.error("Ocurrió un error durante el proceso de suscripción.", err);
@@ -139,7 +120,6 @@ export const requestPermissionAndSubscribe = async (topicName) => {
 
 // Escuchar mensajes mientras la app está en primer plano
 onMessage(messaging, (payload) => {
-  // // console.log("Mensaje recibido en primer plano: ", payload);
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,

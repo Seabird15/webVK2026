@@ -82,7 +82,4 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'Server running', timestamp: new Date().toISOString() });
 });
 
-app.listen(PORT, () => {
-  // console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-  // console.log(`📊 Endpoint tabla AB: http://localhost:${PORT}/api/competencias/tabla-ab`);
-});
+

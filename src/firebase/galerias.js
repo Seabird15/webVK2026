@@ -84,7 +84,6 @@ export const eliminarGaleria = async (id) => {
             const photoRef = storageRef(storage, foto.url);
             await deleteObject(photoRef);
           } catch (e) {
-            // // console.log('Foto ya eliminada:', e);
           }
         }
       }

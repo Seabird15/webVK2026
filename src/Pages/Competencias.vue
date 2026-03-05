@@ -28,26 +28,25 @@
         <div class="mt-6 max-w-3xl mx-auto bg-linear-to-r from-primary/20 via-primary/10 to-primary/20 border-2 border-primary rounded-xl px-4 py-4 sm:px-6 sm:py-5 shadow-xl">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-left">
             <div>
-              <p class="text-primary text-xs sm:text-sm font-black uppercase tracking-[0.2em]">Campeonas Interino 1era versión</p>
               <h2 class="text-white text-lg sm:text-2xl font-400" style="font-family: 'Collegiate Black', sans-serif;">
-                Inter Nadas
+                ¿Vamos por un nuevo Torneo Interno?
               </h2>
-              <p class="text-white/80 text-sm sm:text-base font-semibold mt-1">Resumen de jornadas y cierre del torneo interno</p>
+              <p class="text-white/80 text-sm sm:text-base font-semibold mt-1">Ayúdanos a decidir si realizamos una 2da versión del campeonato interno</p>
             </div>
             <div class="flex flex-col items-start sm:items-end gap-2">
               <button
                 @click="reaccionarConFuego"
                 :class="[
                   'inline-flex items-center gap-2 px-3 py-2 rounded-lg font-400 text-xs sm:text-sm transition-all duration-200 hover:scale-105',
-                  dioFuegoFinal ? 'bg-primary text-black' : 'bg-white/10 text-white border border-primary/50 hover:bg-primary/20'
+                  dioFuegoFinal ? 'bg-green-600 text-white' : 'bg-white/10 text-white border border-primary/50 hover:bg-primary/20'
                 ]"
                 type="button"
               >
-                <span class="text-base" :class="dioFuegoFinal ? 'animate-pulse' : ''">🔥</span>
-                <span>{{ dioFuegoFinal ? 'Le di fueguito' : 'Dale fueguito' }}</span>
+                <span class="text-base" :class="dioFuegoFinal ? 'animate-pulse' : ''">👍</span>
+                <span>{{ dioFuegoFinal ? '¡Me interesa!' : '¡Quiero jugar!' }}</span>
                 <span class="bg-black/20 px-2 py-0.5 rounded-full">{{ fuegitosFinal }}</span>
               </button>
-              <p class="text-white/60 text-[11px] sm:text-xs">Toca el fueguito para apoyar la final</p>
+              <p class="text-white/60 text-[11px] sm:text-xs">Toca el pulgar para votar por una nueva edición</p>
             </div>
           </div>
         </div>
@@ -147,7 +146,10 @@
             </div>
 
             <!-- Inter Nadas - EQUIPO 2 -->
-            <div class="bg-linear-to-br from-gray-900/50 to-gray-700/30 border-2 border-gray-400 rounded-lg p-6 hover:shadow-xl hover:scale-105 transition-all">
+            <div class="bg-linear-to-br from-gray-900/50 to-gray-700/30 border-2 border-gray-400 rounded-lg p-6 hover:shadow-xl hover:scale-105 transition-all relative">
+              <div class="absolute top-4 right-4 bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold">
+                🏆 CAMPEONAS
+              </div>
               <div class="flex flex-col items-center text-center">
                 <div class="w-20 h-20 bg-white rounded-full p-3 mb-4 shadow-lg">
                   <img src="../assets/internadasLogo.jpeg" alt="Inter Nadas" class="w-full h-full object-contain" />
@@ -172,7 +174,7 @@
                   <img src="../assets/siemprealpaloLogo.jpeg" alt="Siempre al Palo" class="w-full h-full object-contain" />
                 </div>
                 <h4 class="text-2xl font-400 text-white mb-2" style="font-family: 'Collegiate Black', sans-serif;">
-                  SIEMPRE AL PALO FC
+                  SIEMPRE AL PALO
                 </h4>
                 <div class="flex items-center gap-2 text-red-300 mb-4">
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -187,370 +189,19 @@
           </div>
           </div>
 
-          <!-- Tabla General de Goleadoras -->
-          <div class="mt-8">
-            <div class="bg-black border-2 border-primary rounded-lg overflow-hidden">
-              <button
-                @click="mostrarTablaGoleadoras = !mostrarTablaGoleadoras"
-                class="w-full px-6 py-3 bg-primary-dark flex items-center justify-between hover:bg-primary transition-colors cursor-pointer"
-              >
-                <div class="flex items-center gap-3">
-                  <svg class="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                  </svg>
-                  <div class="text-left">
-                    <h2 class="text-xl font-400 tracking-wider text-white" style="font-family: 'Collegiate Black', sans-serif;">
-                 1, 2, Y 3 GOLEADORAS
-                    </h2>
-                  </div>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="text-black font-bold text-xs bg-black/20 px-3 py-1 rounded-full">
-                    {{ topGoleadoras.length }} {{ topGoleadoras.length === 1 ? 'goleadora' : 'goleadoras' }}
-                  </span>
-                  <svg 
-                    class="w-5 h-5 text-black transition-transform duration-300"
-                    :class="mostrarTablaGoleadoras ? 'rotate-180' : ''"
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                  </svg>
-                </div>
-              </button>
-
-              <div v-show="mostrarTablaGoleadoras" class="p-6 bg-linear-to-br from-black via-gray-900 to-black">
-                <!-- Última actualización -->
-                <div class="mb-4 text-center">
-                  <p class="text-white/60 text-xs">
-                    Última actualización: <span class="text-primary font-bold">{{ formatLastUpdate() }}</span>
-                  </p>
-                </div>
-
-                <!-- Mensaje si no hay goleadoras -->
-                <div v-if="tablaGoleadoras.length === 0" class="text-center py-12">
-                  <svg class="w-16 h-16 text-white/20 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                  </svg>
-                  <p class="text-white/60 text-lg font-medium">Aún no hay goles registrados</p>
-                  <p class="text-white/40 text-sm mt-2">Los goles se mostrarán aquí una vez que comience el torneo</p>
-                </div>
-
-                <!-- Top 3 de goleadoras -->
-                <div v-if="topGoleadoras.length > 0" class="bg-black/50 rounded-lg border border-primary/30 overflow-hidden shadow-2xl">
-                  <div class="overflow-x-auto">
-                    <table class="w-full">
-                      <thead>
-                        <tr class="bg-primary/10 border-b border-primary/30">
-                          <th class="px-3 py-2 text-center text-primary font-bold text-xs uppercase tracking-wider">#</th>
-                          <th class="px-3 py-2 text-left text-primary font-bold text-xs uppercase tracking-wider">Jugadora</th>
-                          <th class="px-3 py-2 text-left text-primary font-bold text-xs uppercase tracking-wider">Equipo</th>
-                          <th class="px-3 py-2 text-center text-primary font-bold text-xs uppercase tracking-wider">Goles</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr 
-                          v-for="(jugadora, index) in topGoleadoras" 
-                          :key="index"
-                          class="border-b border-white/5 transition-all duration-200"
-                          :class="{
-                            'bg-linear-to-r from-yellow-400/15 via-yellow-500/5 to-transparent hover:from-yellow-400/20 border-l-4 border-l-yellow-400': index === 0,
-                            'bg-linear-to-r from-gray-300/15 via-gray-400/5 to-transparent hover:from-gray-300/20 border-l-4 border-l-gray-300': index === 1,
-                            'bg-linear-to-r from-orange-400/15 via-orange-500/5 to-transparent hover:from-orange-400/20 border-l-4 border-l-orange-400': index === 2,
-                            'hover:bg-primary/5': index > 2
-                          }"
-                        >
-                          <td class="px-3 py-3 text-center">
-                            <!-- 1er Lugar -->
-                            <div v-if="index === 0" class="flex items-center justify-center">
-                              <svg class="w-7 h-7 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                              </svg>
-                            </div>
-                            <!-- 2do Lugar -->
-                            <div v-else-if="index === 1" class="flex items-center justify-center">
-                              <svg class="w-7 h-7 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                              </svg>
-                            </div>
-                            <!-- 3er Lugar -->
-                            <div v-else-if="index === 2" class="flex items-center justify-center">
-                              <svg class="w-7 h-7 text-orange-400" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                              </svg>
-                            </div>
-                            <!-- Resto -->
-                            <span v-else class="text-white/60 text-sm font-semibold">{{ index + 1 }}</span>
-                          </td>
-                          <td class="px-3 py-3">
-                            <div class="flex items-center gap-2">
-                              <span 
-                                class="font-bold text-sm"
-                                :class="{
-                                  'text-yellow-400': index === 0,
-                                  'text-gray-300': index === 1,
-                                  'text-orange-300': index === 2,
-                                  'text-white': index > 2
-                                }"
-                              >
-                                {{ jugadora.nombre }}
-                              </span>
-                              <span v-if="jugadora.capitana" class="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">C</span>
-                            </div>
-                          </td>
-                          <td class="px-3 py-3">
-                            <span 
-                              class="text-xs font-semibold whitespace-nowrap px-2 py-1 rounded-full"
-                              :class="{
-                                'text-cyan-300 bg-cyan-400/15 border border-cyan-400/30': jugadora.color === 'cyan',
-                                'text-gray-300 bg-gray-400/15 border border-gray-400/30': jugadora.color === 'gray',
-                                'text-red-300 bg-red-400/15 border border-red-400/30': jugadora.color === 'red'
-                              }"
-                            >
-                              {{ jugadora.equipo }}
-                            </span>
-                          </td>
-                          <td class="px-3 py-3 text-center">
-                            <div class="inline-flex items-center gap-1">
-                              <svg class="w-4 h-4" 
-                                :class="{
-                                  'text-yellow-400': index === 0,
-                                  'text-gray-300': index === 1,
-                                  'text-orange-300': index === 2,
-                                  'text-primary': index > 2
-                                }"
-                                fill="currentColor" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10"/>
-                              </svg>
-                              <span 
-                                class="font-black text-lg"
-                                :class="{
-                                  'text-yellow-400': index === 0,
-                                  'text-gray-300': index === 1,
-                                  'text-orange-300': index === 2,
-                                  'text-primary': index > 2
-                                }"
-                              >
-                                {{ jugadora.goles }}
-                              </span>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <!-- Próximamente Versión 2 -->
+          <div class="mt-8 bg-linear-to-br from-blue-900/40 to-purple-900/40 border-2 border-blue-400 rounded-lg p-8 text-center">
+            <h3 class="text-white text-2xl font-300 mb-2" style="font-family: 'Collegiate Black', sans-serif;">
+              ¡PRÓXIMAMENTE 2da VERSIÓN!
+            </h3>
+            <p class="text-white/80 text-base mb-4">
+              Estamos preparando la segunda edición del torneo interno con nuevas energías.
+            </p>
+            <p class="text-primary font-bold text-sm">
+              Mantente atenta para más detalles
+            </p>
           </div>
 
-          <!-- Panel de Administración de Goles (Solo Admin) -->
-          <div v-if="isAdmin && equipos.verserkers && equipos.internadas && equipos.siemprealpalo" class="mt-8 bg-primary-dark rounded-lg p-6 border-2 border-primary">
-            <div class="flex items-center justify-between mb-6">
-              <h3 class="text-black font-bold text-xl flex items-center gap-2">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-                PANEL DE GOLES - ADMINISTRADOR
-                <span v-if="guardandoGol" class="ml-2 inline-flex items-center gap-1 text-xs bg-black/30 text-black px-2 py-1 rounded">
-                  <svg class="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Guardando...
-                </span>
-              </h3>
-              <button
-                @click="mostrarPanelGoles = !mostrarPanelGoles"
-                class="bg-black hover:bg-black/80 text-primary px-4 py-2 rounded font-bold transition text-sm"
-              >
-                {{ mostrarPanelGoles ? 'Ocultar' : 'Mostrar' }} Panel
-              </button>
-            </div>
-            
-            <div v-show="mostrarPanelGoles" class="grid md:grid-cols-3 gap-6">
-              <!-- Verserkers -->
-              <div class="bg-black/50 rounded-lg p-4 border-2 border-cyan-400">
-                <h4 class="text-cyan-400 font-bold mb-4 text-center">LAS VERSERKERS</h4>
-                <div class="space-y-2">
-                  <div v-for="(jugadora, index) in equipos.verserkers?.jugadoras || []" :key="index" 
-                       class="flex items-center justify-between bg-white/5 p-2 rounded">
-                    <span class="text-white text-sm">{{ jugadora.nombre }}</span>
-                    <div class="flex items-center gap-2">
-                      <button
-                        @click="restarGol('verserkers', index)"
-                        class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        :disabled="jugadora.goles === 0 || guardandoGol"
-                      >-</button>
-                      <span class="text-primary font-bold w-8 text-center">{{ jugadora.goles }}</span>
-                      <button
-                        @click="agregarGol('verserkers', index)"
-                        class="bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        :disabled="guardandoGol"
-                      >+</button>
-                    </div>
-                  </div>
-                </div>
-                <div class="mt-4 pt-4 border-t-2 border-cyan-400 text-center">
-                  <span class="text-cyan-400 font-bold">Total: {{ totalGoles('verserkers') }} goles</span>
-                </div>
-              </div>
-
-              <!-- Inter Nadas -->
-              <div class="bg-black/50 rounded-lg p-4 border-2 border-gray-400">
-                <h4 class="text-gray-400 font-bold mb-4 text-center">INTER NADAS</h4>
-                <div class="space-y-2">
-                  <div v-for="(jugadora, index) in equipos.internadas?.jugadoras || []" :key="index" 
-                       class="flex items-center justify-between bg-white/5 p-2 rounded">
-                    <span class="text-white text-sm">{{ jugadora.nombre }}</span>
-                    <div class="flex items-center gap-2">
-                      <button
-                        @click="restarGol('internadas', index)"
-                        class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        :disabled="jugadora.goles === 0 || guardandoGol"
-                      >-</button>
-                      <span class="text-primary font-bold w-8 text-center">{{ jugadora.goles }}</span>
-                      <button
-                        @click="agregarGol('internadas', index)"
-                        class="bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        :disabled="guardandoGol"
-                      >+</button>
-                    </div>
-                  </div>
-                </div>
-                <div class="mt-4 pt-4 border-t-2 border-gray-400 text-center">
-                  <span class="text-gray-400 font-bold">Total: {{ totalGoles('internadas') }} goles</span>
-                </div>
-              </div>
-
-              <!-- Siempre al Palo -->
-              <div class="bg-black/50 rounded-lg p-4 border-2 border-red-400">
-                <h4 class="text-red-400 font-bold mb-4 text-center">SIEMPRE AL PALO FC</h4>
-                <div class="space-y-2">
-                  <div v-for="(jugadora, index) in equipos.siemprealpalo?.jugadoras || []" :key="index" 
-                       class="flex items-center justify-between bg-white/5 p-2 rounded">
-                    <span class="text-white text-sm">{{ jugadora.nombre }}</span>
-                    <div class="flex items-center gap-2">
-                      <button
-                        @click="restarGol('siemprealpalo', index)"
-                        class="bg-red-500 hover:bg-red-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        :disabled="jugadora.goles === 0 || guardandoGol"
-                      >-</button>
-                      <span class="text-primary font-bold w-8 text-center">{{ jugadora.goles }}</span>
-                      <button
-                        @click="agregarGol('siemprealpalo', index)"
-                        class="bg-green-500 hover:bg-green-600 text-white w-7 h-7 rounded font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        :disabled="guardandoGol"
-                      >+</button>
-                    </div>
-                  </div>
-                </div>
-                <div class="mt-4 pt-4 border-t-2 border-red-400 text-center">
-                  <span class="text-red-400 font-bold">Total: {{ totalGoles('siemprealpalo') }} goles</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Botón Admin: Inicializar Fecha 2 -->
-          <div v-if="isAdmin && !fechasOrdenadas.includes(2)" class="mt-8 text-center">
-            <button
-              @click="iniciarFecha2"
-              :disabled="inicializandoFecha2"
-              class="bg-primary hover:bg-primary/90 text-black px-6 py-3 rounded-lg font-bold transition-all transform hover:scale-105 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span v-if="inicializandoFecha2">Inicializando...</span>
-              <span v-else>➕ Inicializar Fecha 2</span>
-            </button>
-          </div>
-
-          <!-- Botón Admin: Inicializar Fecha 3 -->
-          <div v-if="isAdmin" class="mt-4 text-center">
-            <button
-              @click="iniciarFecha3"
-              :disabled="inicializandoFecha3 || tieneFecha3"
-              class="bg-primary hover:bg-primary/90 text-black px-6 py-3 rounded-lg font-bold transition-all transform hover:scale-105 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span v-if="inicializandoFecha3">Inicializando...</span>
-              <span v-else-if="tieneFecha3">✅ Fecha 3 ya inicializada</span>
-              <span v-else>➕ Inicializar Fecha 3 (Hoy)</span>
-            </button>
-          </div>
-
-          <div v-if="isAdmin" class="mt-4 text-center">
-            <button
-              @click="iniciarFechaFinal"
-              :disabled="inicializandoFechaFinal || tieneFechaFinal"
-              class="bg-primary hover:bg-primary/90 text-black px-6 py-3 rounded-lg font-bold transition-all transform hover:scale-105 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span v-if="inicializandoFechaFinal">Inicializando...</span>
-              <span v-else-if="tieneFechaFinal">✅ Fecha Final ya inicializada</span>
-              <span v-else>🏁 Inicializar Fecha Final (20:00)</span>
-            </button>
-          </div>
-
-          <!-- Resultados simplificados por jornada -->
-          <div class="mt-8 space-y-5">
-            <div v-for="numeroFecha in fechasOrdenadas" :key="`fecha-${numeroFecha}`" class="bg-black border-2 border-primary rounded-lg p-4 sm:p-6">
-              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-                <h3 class="text-white font-300 text-lg sm:text-xl" style="font-family: 'Collegiate Black', sans-serif;">
-                  {{ obtenerTituloFecha(numeroFecha) }}
-                </h3>
-                <span
-                  :class="['inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold w-fit', obtenerEstadoFecha(partidosPorFecha[numeroFecha] || []).class]"
-                >
-                  {{ obtenerEstadoFecha(partidosPorFecha[numeroFecha] || []).text }}
-                </span>
-              </div>
-
-              <div class="space-y-2">
-                <div
-                  v-for="partido in partidosPorFecha[numeroFecha]"
-                  :key="partido.id"
-                  class="bg-white/5 border border-white/10 rounded-lg px-3 py-2.5"
-                >
-                  <div class="flex items-center justify-between gap-3">
-                    <span class="text-white text-sm font-semibold">{{ obtenerDatosEquipo(partido.equipoLocal).nombre }}</span>
-                    <span class="text-primary font-black text-lg">{{ partido.golesLocal }} - {{ partido.golesVisita }}</span>
-                    <span class="text-white text-sm font-semibold text-right">{{ obtenerDatosEquipo(partido.equipoVisita).nombre }}</span>
-                  </div>
-                  <div class="flex flex-wrap items-center justify-between gap-2 mt-1">
-                    <span class="text-white/60 text-xs">{{ partido.horario }} · Tricolor La Florida</span>
-                    <span :class="['text-[11px] font-bold px-2 py-0.5 rounded-full', obtenerEstadoBadge(partido).class]">
-                      {{ obtenerEstadoBadge(partido).text }}
-                    </span>
-                  </div>
-                  <p v-if="partido.empate && partido.ganadorPenales" class="text-primary text-[11px] font-semibold mt-1">
-                    Ganó por penales: {{ obtenerDatosEquipo(partido.ganadorPenales).nombre }}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-primary/10 border-2 border-primary/50 rounded-lg p-5 animate-campeonas-suave" v-if="campeonasInterno">
-              <p class="text-primary text-xs uppercase font-black tracking-widest mb-1">Flamantes campeonas</p>
-              <div class="flex items-center gap-3">
-                <div class="w-14 h-14 bg-white rounded-full p-2">
-                  <img :src="resolverLogoEquipo(campeonasInterno.logo)" :alt="campeonasInterno.nombre" class="w-full h-full object-contain" />
-                </div>
-                <div>
-                  <p class="text-white text-2xl font-500" style="font-family: 'Collegiate Black', sans-serif;">{{ campeonasInterno.nombre }}</p>
-                  <p class="text-white/70 text-sm">{{ campeonasInterno.pts }} pts · DG {{ campeonasInterno.dg >= 0 ? '+' : '' }}{{ campeonasInterno.dg }}</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-primary-dark rounded-lg p-3 sm:p-4 border-2 border-primary">
-              <div class="flex items-center justify-center gap-2 sm:gap-3 text-black">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                </svg>
-                <span class="font-bold text-sm sm:text-lg">Cancha Tricolor La Florida</span>
-              </div>
-            </div>
-          </div>
-          </div>
         </div>
       </div>
 
@@ -847,6 +498,7 @@
       @confirmar="modalConfig.accion"
     />
   </div>
+  </div>
 </template>
 
 <script setup>
@@ -1051,7 +703,6 @@ const fetchTabla = async () => {
     const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const apiUrl = isDev ? 'http://localhost:3001' : window.location.origin;
     
-    // // console.log('API URL:', apiUrl);
     
     const response = await fetch(`${apiUrl}/api/competencias`);
     const data = await response.json();
@@ -1331,7 +982,7 @@ const obtenerDatosEquipo = (equipoKey) => {
       color: 'gray'
     },
     siemprealpalo: {
-      nombre: 'Siempre al Palo FC',
+      nombre: 'Siempre al Palo',
       logo: 'siemprealpaloLogo.jpeg',
       color: 'red'
     }

@@ -21,15 +21,14 @@ const fetchUserRole = async (uid) => {
     const userDoc = await getDoc(doc(db, 'users', uid));
     if (userDoc.exists()) {
       const role = userDoc.data().rol;
-      // // console.log('Rol obtenido de Firestore:', role, 'UID:', uid);
       userRole.value = role;
       return role;
     } else {
-      // // console.warn('No existe documento de usuario en Firestore para UID:', uid);
+      console.warn('No existe documento de usuario en Firestore para UID:', uid);
     }
     return null;
   } catch (err) {
-    // // console.error('Error obteniendo rol del usuario:', err);
+   console.error('Error obteniendo rol del usuario:', err);
     return null;
   }
 };
@@ -53,11 +52,9 @@ export const login = async (email, password) => {
     await setPersistence(auth, browserLocalPersistence);
     const result = await signInWithEmailAndPassword(auth, email, password);
     const uid = result.user.uid;
-    // // console.log('Usuario autenticado. UID:', uid);
     
     // Obtener rol del usuario
     const role = await fetchUserRole(uid);
-    // // console.log('Rol después de fetchUserRole:', role);
     
     // Verificar si el usuario tiene rol admin o coach
     if (role !== 'admin' && role !== 'coach') {
@@ -69,7 +66,6 @@ export const login = async (email, password) => {
       return false;
     }
     
-    // // console.log('Login exitoso. Rol:', role);
     return true;
   } catch (err) {
     // // console.error('Error en login:', err);

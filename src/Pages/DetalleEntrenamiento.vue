@@ -760,14 +760,6 @@ const cargarDatos = async () => {
     estadoInscripcion.value = await obtenerEstadoInscripcion(id, jugadoraAuthUser.value.uid);
   }
 
-console.log('📋 DEBUG - Entrenamiento cargado:', {
-    id: entrenamiento.value.id,
-    nombre: entrenamiento.value.nombre,
-    esConvocatoria: entrenamiento.value.esConvocatoria,
-    convocadas: entrenamiento.value.convocadas,
-    tieneConvocadas: !!entrenamiento.value.convocadas,
-    cantidadConvocadas: entrenamiento.value.convocadas?.length
-  });
 
   // Escuchar cambios en inscripciones
   const unsubscribe = escucharInscripcionesEntrenamiento(id, (organizadas) => {

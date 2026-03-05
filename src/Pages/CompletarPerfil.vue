@@ -188,7 +188,6 @@ const formData = reactive({
 // Verificar autenticación cuando monta el componente
 onMounted(() => {
   if (!jugadoraAuthUser.value) {
-    // // console.log('No hay usuario autenticado, redirigiendo a login');
     router.push('/login-jugadora');
   }
 });
@@ -221,10 +220,6 @@ const handleSubmit = async () => {
     return;
   }
 
-  // // console.log('Iniciando guardado de perfil...');
-  // // console.log('UID del usuario:', jugadoraAuthUser.value.uid);
-  // // console.log('Datos del formulario:', formData);
-  // // console.log('Foto seleccionada:', fotoFile.value ? 'Sí' : 'No');
 
   isLoading.value = true;
 
@@ -243,10 +238,8 @@ const handleSubmit = async () => {
 
   isLoading.value = false;
 
-  // // console.log('Resultado de guardado:', success);
 
   if (success) {
-    // // console.log('Perfil guardado exitosamente, redirigiendo...');
     // Redirigir según equipo
     if (formData.equipo === 'ambos') {
       router.push('/seleccionar-categoria');

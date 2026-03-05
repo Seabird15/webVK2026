@@ -1413,7 +1413,6 @@ const cambiarEstado = async (inscripcionId, nuevoEstado) => {
   try {
     const success = await cambiarEstadoInscripcion(inscripcionId, nuevoEstado);
     if (success) {
-      // // console.log('Estado actualizado correctamente');
     } else {
       alert('Error al cambiar el estado');
     }
@@ -1466,7 +1465,6 @@ const agregarJugadoraManual = async (jugadora, estado) => {
     );
     
     if (success) {
-      // // console.log('Jugadora agregada correctamente');
       busquedaJugadora.value = '';
       jugadorasDisponibles.value = [];
     } else {
@@ -1687,7 +1685,6 @@ const guardarEntrenamiento = async () => {
           formulario.value.jugadorasConvocadas
         );
       }
-      // // console.log('Entrenamiento actualizado');
     } else {
       // Crear
       await crearEntrenamiento({
@@ -1707,7 +1704,6 @@ const guardarEntrenamiento = async () => {
         esConvocatoria: formulario.value.esConvocatoria,
         jugadorasConvocadas: formulario.value.jugadorasConvocadas
       });
-      // // console.log('Entrenamiento creado');
     }
 
     // Recargar entrenamientos

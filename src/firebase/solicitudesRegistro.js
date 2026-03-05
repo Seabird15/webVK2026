@@ -59,21 +59,18 @@ export const aprobarSolicitud = async (uid, email) => {
   isLoadingSolicitudes.value = true;
   errorSolicitudes.value = null;
   try {
-    // // console.log('Aprobando solicitud para uid:', uid);
     
     // Actualizar estado en jugadoras primero (es el documento principal)
     await updateDoc(doc(db, 'jugadoras', uid), {
       estado: 'aprobada',
       updatedAt: new Date()
     });
-    // // console.log('Documento en jugadoras actualizado a aprobada');
 
     // Actualizar estado en jugadorasLogin
     await updateDoc(doc(db, 'jugadorasLogin', uid), {
       estado: 'aprobada',
       updatedAt: new Date()
     });
-    // // console.log('Documento en jugadorasLogin actualizado a aprobada');
 
     // Actualizar lista local
     await fetchTodasSolicitudes();

@@ -22,7 +22,6 @@ export const inscribirseEntrenamiento = async (entrenamientoId, jugadoraId, juga
   isLoadingInscripciones.value = true;
   errorInscripciones.value = null;
   try {
-    // // console.log('inscribirseEntrenamiento llamado con:', { entrenamientoId, jugadoraId, jugadoraNombre });
     
     // Verificar si ya existe un registro
     const q = query(
@@ -35,16 +34,13 @@ export const inscribirseEntrenamiento = async (entrenamientoId, jugadoraId, juga
     if (snapshot.size > 0) {
       // Si ya existe, actualizar estado a confirmada
       const docId = snapshot.docs[0].id;
-      // // console.log('Actualizando inscripción existente:', docId, 'con nombre:', jugadoraNombre);
       await updateDoc(doc(db, 'inscripcionesEntrenamientos', docId), {
         estado: 'confirmada',
         jugadoraNombre: jugadoraNombre,
         updatedAt: new Date()
       });
-      // // console.log('Inscripción actualizada correctamente');
     } else {
       // Si no existe, crear nueva inscripción confirmada
-      // // console.log('Creando nueva inscripción con nombre:', jugadoraNombre);
       await addDoc(collection(db, 'inscripcionesEntrenamientos'), {
         entrenamientoId: entrenamientoId,
         jugadoraId: jugadoraId,
@@ -53,7 +49,6 @@ export const inscribirseEntrenamiento = async (entrenamientoId, jugadoraId, juga
         createdAt: new Date(),
         updatedAt: new Date()
       });
-      // // console.log('Nueva inscripción creada');
     }
 
     return true;
@@ -229,7 +224,6 @@ export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
     
     // Obtener todas las jugadoras del equipo
     const jugadoras = await fetchJugadorasRegistradasPorEquipo(equipo);
-    // // console.log(`Creando inscripciones para ${jugadoras.length} jugadoras del equipo ${equipo}`);
     
     if (jugadoras.length === 0) {
       // // console.warn('No se encontraron jugadoras para el equipo:', equipo);
@@ -262,7 +256,6 @@ export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
     }
     
     await Promise.all(batch);
-    // // console.log(`Creadas ${batch.length} inscripciones pendientes para entrenamiento ${entrenamientoId}`);
     return true;
   } catch (err) {
     // // console.error('Error creando inscripciones pendientes:', err);
@@ -273,7 +266,6 @@ export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
 // Crear inscripciones solo para jugadoras convocadas (convocatoria/nómina)
 export const crearInscripcionesConvocadas = async (entrenamientoId, jugadorasConvocadas) => {
   try {
-    // // console.log(`Creando inscripciones de convocatoria para ${jugadorasConvocadas.length} jugadoras`);
     
     if (jugadorasConvocadas.length === 0) {
       // // console.warn('No hay jugadoras convocadas');
@@ -307,7 +299,6 @@ export const crearInscripcionesConvocadas = async (entrenamientoId, jugadorasCon
     }
     
     await Promise.all(batch);
-    // // console.log(`Creadas ${batch.length} inscripciones de convocatoria para entrenamiento ${entrenamientoId}`);
     return true;
   } catch (err) {
     // // console.error('Error creando inscripciones de convocatoria:', err);

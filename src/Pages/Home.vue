@@ -84,7 +84,7 @@
       </div>
     </div>
     
-    <!-- Banner de Campeonato -->
+    <!-- Banner de noticias -->
     <div class="bg-gradient-to-r from-primary via-yellow-400 to-primary py-3 px-4 relative overflow-hidden">
       <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMi01LjM3MyAxMi0xMiAxMi0xMi01LjM3My0xMi0xMnptMC0zNGMwLTYuNjI3IDUuMzczLTEyIDEyLTEyczEyIDUuMzczIDEyIDEyLTUuMzczIDEyLTEyIDEyLTEyLTUuMzczLTEyLTEyem0wIDY4YzAtNi42MjcgNS4zNzMtMTIgMTItMTJzMTIgNS4zNzMgMTIgMTItNS4zNzMgMTItMTIgMTItMTItNS4zNzMtMTItMTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
       
@@ -101,16 +101,13 @@
           <div class="text-center md:text-left">
             <div class="inline-flex items-center gap-2 bg-black/20 text-black px-3 py-1 rounded-full text-[11px] md:text-xs font-black tracking-wider uppercase mb-2">
               <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
-              CAMPEONAS INTERINO 1ERA VERSION
+              NUEVA CATEGORIA SERIE C
             </div>
             <h2 class="text-3xl md:text-4xl font-black tracking-widest text-black mb-1 uppercase" style="font-family: 'Gobold High', sans-serif;">
-              INTER NADAS
+              LIGA DOBLEVE DOMINGOS
             </h2>
             <p class="text-black/90 font-bold text-sm md:text-base mb-2">
-              Campeonas del interino en su 1era versión.
-            </p>
-                 <p class="text-black/90 font-bold text-sm md:text-base mb-2">
-             ¡FELICIDADES!
+              Apoyemos a nuestra nueva categoria
             </p>
           </div>
           
@@ -127,17 +124,6 @@
               <span>{{ likesCount }}</span>
               <span class="text-xs font-bold opacity-80 my-auto">likes</span>
             </button>
-            
-            <!-- CTA Ver Resultados -->
-            <router-link
-              to="/competencias"
-              class="inline-flex items-center gap-2 bg-black hover:bg-gray-900 text-primary px-6 py-3 rounded-lg font-black text-sm transition-all transform hover:scale-105 shadow-xl"
-            >
-              Ver detalles
-              <span aria-hidden="true">→</span>
-            </router-link>
-
-        
           </div>
         </div>
       </div>

@@ -435,24 +435,13 @@ const seleccionarEvento = (evento) => {
 
 // Editar evento (redirigir al admin)
 const editarEvento = (evento) => {
-  // // console.log('Editar evento:', evento);
-  // TODO: Implementar formulario de edición o redirigir a la sección de admin
   alert('Para editar este evento, ve a la sección de Administración');
 };
 
 // Confirmar y eliminar evento
 const confirmarEliminar = async (id) => {
   alert('Para eliminar este evento, ve a la sección de Administración');
-  // TODO: Implementar eliminación desde el calendario si es necesario
-  // if (confirm('¿Estás seguro de que deseas eliminar este evento?')) {
-  //   try {
-  //     await eliminarEntrenamiento(id);
-  //     eventoSeleccionado.value = null;
-  //     cargarEventos();
-  //   } catch (err) {
-  //     // // console.error('Error eliminando evento:', err);
-  //   }
-  // }
+
 };
 
 // Cargar eventos al montar

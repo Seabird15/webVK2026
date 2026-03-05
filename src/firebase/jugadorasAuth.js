@@ -52,11 +52,9 @@ let ignorarProximoAuthChange = false;
 
 // Observar cambios de autenticación para jugadoras
 onAuthStateChanged(auth, async (user) => {
-  // // console.log('onAuthStateChanged disparado, usuario:', user?.uid, 'ignorar:', ignorarProximoAuthChange);
   
   // Si debemos ignorar este cambio, solo marcamos el flag como falso
   if (ignorarProximoAuthChange) {
-    // // console.log('Ignorando onAuthStateChanged temporalmente');
     ignorarProximoAuthChange = false;
     authReady.value = true; // Marcar que Auth está listo
     return;
@@ -73,18 +71,15 @@ onAuthStateChanged(auth, async (user) => {
         id: user.uid,
         ...jugadoraRegistroDoc.data()
       };
-      // // console.log('Datos de jugadora cargados:', jugadoraData.value);
     } else {
       // Si no existe, crear estado vacío (perfil no completado aún)
       jugadoraData.value = {
         id: user.uid,
         perfilCompleto: false
       };
-      // // console.log('Documento de jugadora no existe aún, perfil incompleto');
     }
   } else {
     jugadoraData.value = null;
-    // // console.log('Usuario desconectado');
   }
   
   // Marcar que Auth está listo
@@ -99,7 +94,6 @@ export const loginJugadora = async (email, password) => {
     await setPersistence(auth, browserLocalPersistence);
     const result = await signInWithEmailAndPassword(auth, email, password);
     const uid = result.user.uid;
-    // // console.log('Jugadora autenticada. UID:', uid);
     
     // Cargar datos de la jugadora
     await fetchJugadoraData(uid);
@@ -131,7 +125,6 @@ export const fetchJugadoraData = async (uid, coleccion = 'jugadoraRegistro') => 
         id: uid,
         ...jugadoraDoc.data()
       };
-      // // console.log('Datos de jugadora cargados desde', coleccion, ':', jugadoraData.value);
       return jugadoraData.value;
     } else {
       // // console.warn('Documento de jugadora no existe en', coleccion, 'para uid:', uid);
@@ -204,7 +197,6 @@ export const fetchJugadorasRegistradasPorEquipo = async (equipo) => {
       ...docSnap.data()
     }));
     
-    // // console.log(`Jugadoras registradas del equipo ${equipo}:`, jugadoras.length, jugadoras);
     return jugadoras;
   } catch (err) {
     // // console.error('Error obteniendo jugadoras registradas:', err);
@@ -285,16 +277,13 @@ export const solicitarAcceso = async (email, password) => {
   isLoadingJugadora.value = true;
   errorJugadora.value = null;
   try {
-    // // console.log('Creando solicitud de acceso para:', email);
     
     // Marcar que ignoremos el próximo onAuthStateChanged
     ignorarProximoAuthChange = true;
-    // // console.log('Flag ignorarProximoAuthChange activado');
     
     // Crear usuario en Auth
     const result = await createUserWithEmailAndPassword(auth, email, password);
     const uid = result.user.uid;
-    // // console.log('Usuario creado en Auth con uid:', uid);
 
     // Crear documento en jugadorasLogin
     await setDoc(doc(db, 'jugadorasLogin', uid), {
@@ -304,7 +293,6 @@ export const solicitarAcceso = async (email, password) => {
       createdAt: new Date(),
       updatedAt: new Date()
     });
-    // // console.log('Documento en jugadorasLogin creado');
 
     // Crear documento inicial en jugadoras con estado pendiente
     await setDoc(doc(db, 'jugadoras', uid), {
@@ -314,11 +302,9 @@ export const solicitarAcceso = async (email, password) => {
       createdAt: new Date(),
       updatedAt: new Date()
     });
-    // // console.log('Documento en jugadoras creado');
 
     // Hacer logout automático hasta que sea aprobada
     await signOut(auth);
-    // // console.log('Usuario desconectado. Esperando aprobación.');
     
     return true;
   } catch (err) {
@@ -343,19 +329,15 @@ export const completarPerfilJugadora = async (uid, perfilData, fotoFile) => {
   isLoadingJugadora.value = true;
   errorJugadora.value = null;
   try {
-    // // console.log('Completando perfil para uid:', uid);
-    // // console.log('Datos del perfil a guardar:', perfilData);
     
     let fotoUrl = null;
 
     // Subir foto a Storage si existe
     if (fotoFile) {
-      // // console.log('Subiendo foto de perfil...');
       const filename = `jugadoras/${uid}/perfil_${Date.now()}`;
       const fileRef = storageRef(storage, filename);
       await uploadBytes(fileRef, fotoFile);
       fotoUrl = await getDownloadURL(fileRef);
-      // // console.log('Foto guardada en Storage:', fotoUrl);
     }
 
     // Preparar datos a actualizar
@@ -372,15 +354,11 @@ export const completarPerfilJugadora = async (uid, perfilData, fotoFile) => {
       dataToUpdate.fotoPerfil = fotoUrl;
     }
 
-    // // console.log('Datos finales a guardar en jugadoraRegistro:', dataToUpdate);
-
     // Guardar en jugadoraRegistro (colección principal para el perfil)
     await setDoc(doc(db, 'jugadoraRegistro', uid), dataToUpdate);
-    // // console.log('Documento en jugadoraRegistro creado correctamente');
 
     // Actualizar datos locales
     const datosActualizados = await fetchJugadoraData(uid, 'jugadoraRegistro');
-    // // console.log('Datos locales actualizados:', datosActualizados);
     
     return true;
   } catch (err) {

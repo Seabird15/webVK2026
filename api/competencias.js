@@ -34,7 +34,6 @@ export default async function handler(req, res) {
     // Buscamos la tabla y extraemos datos
     const tabla = parseTabla(html);
     
-    console.log('Tabla parseada:', tabla.length, 'filas');
 
     if (tabla.length === 0) {
       return res.status(200).json({

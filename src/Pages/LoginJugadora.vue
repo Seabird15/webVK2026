@@ -196,15 +196,12 @@ const handleLogin = async () => {
   isLoading.value = false;
 
   if (success) {
-    // // console.log('Login exitoso');
     // Verificar si tiene perfil completo
     const perfilCompleto = await tienePerfılCompleto();
     if (!perfilCompleto) {
-      // // console.log('Perfil incompleto, redirigiendo a completar-perfil');
       // Ir a completar perfil
       router.push('/completar-perfil');
     } else {
-      // // console.log('Perfil completo, redirigiendo según equipo');
       // Verificar equipo y redirigir
       const equipo = obtenerEquipoJugadora();
       if (equipo === 'ambos') {
@@ -215,7 +212,6 @@ const handleLogin = async () => {
     }
   } else {
     error.value = errorJugadora.value || 'Error al iniciar sesión';
-    // // console.log('Login fallido:', error.value);
   }
 };
 </script>

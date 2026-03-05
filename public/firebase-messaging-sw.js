@@ -14,11 +14,9 @@ firebase.initializeApp(firebaseConfig);
 // Obtener la instancia de Messaging
 const messaging = firebase.messaging();
 
-console.log("Firebase Messaging Service Worker inicializado correctamente.");
 
 // Manejar mensajes en segundo plano (cuando la página no está en primer plano)
 messaging.onBackgroundMessage(function(payload) {
-  console.log('Received background message ', payload);
   const notificationTitle = payload?.notification?.title || 'Notificación';
 
   // Intentar obtener una URL de destino desde diferentes campos posibles del payload

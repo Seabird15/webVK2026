@@ -415,6 +415,11 @@
           <div v-if="activeTab === 'partidos'">
             <GestionarPartidos />
           </div>
+
+          <!-- Editar Resultados de Partidos -->
+          <div v-if="activeTab === 'resultados-partidos'">
+            <EditorResultadosPartidosAdmin />
+          </div>
         </div>
       </div>
     </div>
@@ -452,6 +457,7 @@ import GestionarSliderHome from '../components/GestionarSliderHome.vue';
 import GestionarSolicitudesRegistro from '../components/GestionarSolicitudesRegistro.vue';
 import GestionarEntrenamientos from '../components/GestionarEntrenamientos.vue';
 import GestionarPartidos from '../components/GestionarPartidos.vue';
+import EditorResultadosPartidosAdmin from '../components/EditorResultadosPartidosAdmin.vue';
 import { entrenamientos, fetchTodosEntrenamientos, finalizarVotacionMvpEntrenamiento } from '../firebase/entrenamientos';
 import VistaJugadorasAdmin from '../components/VistaJugadorasAdmin.vue';
 import ListadoJugadorasAdmin from '../components/ListadoJugadorasAdmin.vue';
@@ -483,15 +489,13 @@ const tabs = computed(() => {
   const baseTabs = [
     { id: 'home', label: 'Inicio', icon: HomeIcon },
     { id: 'solicitudes', label: 'Solicitudes', icon: DocumentTextIcon },
-    { id: 'slider', label: 'Slider Home', icon: PhotoIcon },
     { id: 'jugadoras', label: 'Jugadoras', icon: UsersIcon },
     { id: 'entrenamientos', label: 'Entrenamientos', icon: CalendarIcon },
-    { id: 'banner-mensualidad', label: 'Banner Mensualidad', icon: BellAlertIcon },
+    { id: 'banner-mensualidad', label: 'Banner Noticia/Mensualidad/Otros', icon: BellAlertIcon },
     { id: 'historial', label: 'Historial', icon: ChartBarIcon },
-    { id: 'eventos-especiales', label: 'Actualizar Último Partido', icon: TrophyIcon },
     { id: 'galeria', label: 'Galería', icon: CameraIcon },
     { id: 'estadisticas', label: 'Estadísticas', icon: ArrowTrendingUpIcon },
-    { id: 'partidos', label: 'Campeonato', icon: TrophyIcon },
+    { id: 'resultados-partidos', label: 'Editar Resultados', icon: TrophyIcon },
   ];
 
   if (esAdmin.value) {

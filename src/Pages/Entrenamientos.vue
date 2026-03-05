@@ -1780,7 +1780,6 @@ const handleInscribirse = async (entrenamiento) => {
     return;
   }
   
-  // // console.log('Inscribiendo con nombre:', nombreCompleto);
   
   isLoadingAccion.value = true;
   const success = await inscribirseEntrenamiento(
