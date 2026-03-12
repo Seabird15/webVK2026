@@ -8,7 +8,8 @@ import {
   query,
   serverTimestamp,
   setDoc,
-  updateDoc
+  updateDoc,
+  deleteDoc
 } from 'firebase/firestore';
 import { db } from './config';
 
@@ -138,4 +139,31 @@ export const marcarTodasNotificacionesSaludVistas = async () => {
     )
   );
   return pendientes.length;
+};
+
+// Eliminar respuestas de salud más antiguas que X semanas
+export const limpiarSaludSemanalAntiguaS = async (semanasMaximas = 1) => {
+  try {
+    const snapshot = await getDocs(collection(db, SALUD_COLLECTION));
+    const ahora = Date.now();
+    const semanasMs = semanasMaximas * 7 * 24 * 60 * 60 * 1000;
+    
+    let eliminados = 0;
+    for (const doc of snapshot.docs) {
+      const data = doc.data();
+      const fechaActualizacion = data.updatedAt?.seconds ? data.updatedAt.seconds * 1000 : data.createdAt?.seconds ? data.createdAt.seconds * 1000 : 0;
+      const diferencia = ahora - fechaActualizacion;
+      
+      if (diferencia > semanasMs) {
+        await deleteDoc(doc.ref);
+        eliminados++;
+      }
+    }
+    
+    console.log(`🗑️ Limpiados ${eliminados} registros de salud antiguos (>${semanasMaximas} semana${semanasMaximas > 1 ? 's' : ''})`);
+    return eliminados;
+  } catch (err) {
+    console.error('Error limpiando registros de salud antiguos:', err);
+    return 0;
+  }
 };

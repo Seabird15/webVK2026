@@ -38,6 +38,7 @@
               <option value="">Todos los equipos</option>
               <option value="ascenso">Ascenso</option>
               <option value="escuela">Escuela</option>
+              <option value="serieC">Serie C</option>
             </select>
           </div>
           <div>
@@ -99,6 +100,7 @@
               <option value="">Selecciona equipo</option>
               <option value="ascenso">Ascenso</option>
               <option value="escuela">Escuela</option>
+              <option value="serieC">Serie C</option>
               <option value="ambos">Ambos Equipos</option>
             </select>
           </div>

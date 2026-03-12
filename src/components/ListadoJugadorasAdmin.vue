@@ -66,12 +66,14 @@
             </div>
             <div class="flex flex-col items-end gap-1 shrink-0">
               <span class="text-[11px] bg-blue-100 text-blue-800 rounded-full px-2 py-0.5 font-semibold">Ascenso</span>
-              <span v-if="j.equipo === 'ambos'" class="text-[11px] bg-purple-100 text-purple-800 rounded-full px-2 py-0.5 font-semibold">Ambos</span>
+              <span v-if="Array.isArray(j.equipos) ? j.equipos.includes('escuela') : j.equipo === 'ambos'" class="text-[11px] bg-green-100 text-green-800 rounded-full px-2 py-0.5 font-semibold">Escuela</span>
+              <span v-if="Array.isArray(j.equipos) ? j.equipos.includes('serieC') : false" class="text-[11px] bg-purple-100 text-purple-800 rounded-full px-2 py-0.5 font-semibold">Serie C</span>
               <button
-                @click="abrirDetalle(j)"
-                class="mt-1 text-[11px] px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold"
+                @click="abrirEdicion(j)"
+                class="mt-1 text-[11px] px-2.5 py-2 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold transition-colors flex items-center gap-1"
               >
-                Ver detalle
+                <span>✏️</span>
+                <span>Editar</span>
               </button>
             </div>
           </div>
@@ -112,12 +114,60 @@
             </div>
             <div class="flex flex-col items-end gap-1 shrink-0">
               <span class="text-[11px] bg-green-100 text-green-800 rounded-full px-2 py-0.5 font-semibold">Escuela</span>
-              <span v-if="j.equipo === 'ambos'" class="text-[11px] bg-purple-100 text-purple-800 rounded-full px-2 py-0.5 font-semibold">Ambos</span>
+              <span v-if="Array.isArray(j.equipos) ? j.equipos.includes('ascenso') : j.equipo === 'ambos'" class="text-[11px] bg-blue-100 text-blue-800 rounded-full px-2 py-0.5 font-semibold">Ascenso</span>
+              <span v-if="Array.isArray(j.equipos) ? j.equipos.includes('serieC') : false" class="text-[11px] bg-purple-100 text-purple-800 rounded-full px-2 py-0.5 font-semibold">Serie C</span>
               <button
-                @click="abrirDetalle(j)"
-                class="mt-1 text-[11px] px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold"
+                @click="abrirEdicion(j)"
+                class="mt-1 text-[11px] px-2.5 py-2 rounded-lg bg-green-100 hover:bg-green-200 text-green-700 font-semibold transition-colors flex items-center gap-1"
               >
-                Ver detalle
+                <span>✏️</span>
+                <span>Editar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Serie C -->
+      <section class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div class="p-4 border-b bg-gray-50 flex items-center justify-between">
+          <h3 class="font-bold text-gray-900">Serie C</h3>
+          <span class="text-xs bg-gray-200 text-gray-700 rounded-full px-2 py-1">{{ serieCFiltradas.length }}</span>
+        </div>
+
+        <div v-if="serieCFiltradas.length === 0" class="p-6 text-sm text-gray-500">
+          No hay jugadoras para mostrar.
+        </div>
+
+        <div v-else class="divide-y">
+          <div v-for="j in serieCFiltradas" :key="'serieC-' + j.id" class="p-4 flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <div class="font-semibold text-gray-900 truncate">
+                {{ j.apellido || '' }} {{ j.nombre || '' }}
+              </div>
+              <div class="text-xs text-gray-600 mt-0.5 truncate">
+                {{ j.email || '-' }}
+              </div>
+              <div class="text-xs text-gray-600 mt-1">
+                <span class="font-semibold">Posición:</span> {{ j.posicion || '-' }} · <span class="font-semibold">Dorsal:</span> {{ j.dorsal ?? '-' }}
+              </div>
+              <div class="mt-2">
+                <span :class="[
+                  'inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border',
+                  estadoClase(j.estadoSalud)
+                ]">
+                  {{ formatearEstadoSalud(j.estadoSalud) }}
+                </span>
+              </div>
+            </div>
+            <div class="flex flex-col items-end gap-1 shrink-0">
+              <span class="text-[11px] bg-purple-100 text-purple-800 rounded-full px-2 py-0.5 font-semibold">Serie C</span>
+              <button
+                @click="abrirEdicion(j)"
+                class="mt-1 text-[11px] px-2.5 py-2 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-700 font-semibold transition-colors flex items-center gap-1"
+              >
+                <span>✏️</span>
+                <span>Editar</span>
               </button>
             </div>
           </div>
@@ -125,41 +175,28 @@
       </section>
     </div>
 
-    <div v-if="jugadoraSeleccionada" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-xl shadow-xl w-full max-w-md">
-        <div class="p-4 border-b border-gray-200 flex items-center justify-between">
-          <h3 class="font-black text-gray-900">Detalle de jugadora</h3>
-          <button @click="jugadoraSeleccionada = null" class="text-gray-500 hover:text-gray-700 text-xl">✕</button>
-        </div>
-        <div class="p-4 space-y-2 text-sm text-gray-700">
-          <p><span class="font-semibold">Nombre:</span> {{ jugadoraSeleccionada.nombre }} {{ jugadoraSeleccionada.apellido }}</p>
-          <p><span class="font-semibold">Email:</span> {{ jugadoraSeleccionada.email || '-' }}</p>
-          <p><span class="font-semibold">Equipo:</span> {{ jugadoraSeleccionada.equipo || '-' }}</p>
-          <p><span class="font-semibold">Posición:</span> {{ jugadoraSeleccionada.posicion || '-' }}</p>
-          <p><span class="font-semibold">Dorsal:</span> {{ jugadoraSeleccionada.dorsal ?? '-' }}</p>
-          <div class="pt-1">
-            <span :class="[
-              'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border',
-              estadoClase(jugadoraSeleccionada.estadoSalud)
-            ]">
-              Estado: {{ formatearEstadoSalud(jugadoraSeleccionada.estadoSalud) }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Modal de edición -->
+    <EditarJugadoraAdmin
+      :jugadora="jugadoraAEditar"
+      :visible="mostrarEdicion"
+      @close="cerrarEdicion"
+      @actualizado="onJugadoraActualizada"
+      @eliminado="onJugadoraEliminada"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { fetchJugadorasRegistradasPorEquipo } from '../firebase/jugadorasAuth';
+import EditarJugadoraAdmin from './EditarJugadoraAdmin.vue';
 
 const isLoading = ref(false);
 const error = ref(null);
 const busqueda = ref('');
 const jugadoras = ref([]);
-const jugadoraSeleccionada = ref(null);
+const jugadoraAEditar = ref(null);
+const mostrarEdicion = ref(false);
 
 const normalizar = (v) => (v || '').toString().trim().toLowerCase();
 
@@ -203,8 +240,27 @@ const estadoClase = (estado) => {
   return 'bg-green-100 text-green-700 border-green-200';
 };
 
-const abrirDetalle = (jugadora) => {
-  jugadoraSeleccionada.value = jugadora;
+const abrirEdicion = (jugadora) => {
+  jugadoraAEditar.value = jugadora;
+  mostrarEdicion.value = true;
+};
+
+const cerrarEdicion = () => {
+  mostrarEdicion.value = false;
+  jugadoraAEditar.value = null;
+};
+
+const onJugadoraActualizada = (jugadoraActualizada) => {
+  // Actualizar en la lista local
+  const index = jugadoras.value.findIndex(j => j.id === jugadoraActualizada.id);
+  if (index !== -1) {
+    jugadoras.value[index] = jugadoraActualizada;
+  }
+};
+
+const onJugadoraEliminada = (jugadoraId) => {
+  // Eliminar de la lista local
+  jugadoras.value = jugadoras.value.filter(j => j.id !== jugadoraId);
 };
 
 const ordenar = (lista) => {
@@ -216,11 +272,30 @@ const ordenar = (lista) => {
   });
 };
 
-const ascenso = computed(() => ordenar(jugadoras.value.filter(j => j.equipo === 'ascenso' || j.equipo === 'ambos')));
-const escuela = computed(() => ordenar(jugadoras.value.filter(j => j.equipo === 'escuela' || j.equipo === 'ambos')));
+// Función helper para verificar si una jugadora pertenece a un equipo
+const pertenecePorEquipo = (jugadora, equipo) => {
+  // Soportar formato nuevo: equipos como array
+  if (Array.isArray(jugadora.equipos)) {
+    return jugadora.equipos.includes(equipo);
+  }
+  // Soportar formato antiguo: equipo como string
+  if (equipo === 'ascenso') {
+    return jugadora.equipo === 'ascenso' || jugadora.equipo === 'ambos';
+  } else if (equipo === 'escuela') {
+    return jugadora.equipo === 'escuela' || jugadora.equipo === 'ambos';
+  } else if (equipo === 'serieC') {
+    return jugadora.equipo === 'serieC';
+  }
+  return false;
+};
+
+const ascenso = computed(() => ordenar(jugadoras.value.filter(j => pertenecePorEquipo(j, 'ascenso'))));
+const escuela = computed(() => ordenar(jugadoras.value.filter(j => pertenecePorEquipo(j, 'escuela'))));
+const serieC = computed(() => ordenar(jugadoras.value.filter(j => pertenecePorEquipo(j, 'serieC'))));
 
 const ascensoFiltradas = computed(() => filtrar(ascenso.value));
 const escuelaFiltradas = computed(() => filtrar(escuela.value));
+const serieCFiltradas = computed(() => filtrar(serieC.value));
 
 onMounted(cargar);
 </script>

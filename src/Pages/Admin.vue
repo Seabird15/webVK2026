@@ -381,6 +381,250 @@
             </div>
           </div>
 
+          <!-- Feedback a Jugadoras -->
+          <div v-if="activeTab === 'feedback'">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+              <!-- Header -->
+              <div class="bg-linear-to-r from-primary-dark via-primary to-primary-dark p-6 sm:p-8 text-white">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                    <BellAlertIcon class="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 class="text-2xl sm:text-3xl font-black">Feedback a Jugadoras</h2>
+                    <p class="text-xs sm:text-sm text-white/80 mt-1">Envía mensajes personalizados de feedback a tus jugadoras</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Contenido -->
+              <div class="p-6 sm:p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  <!-- Formulario -->
+                  <div class="lg:col-span-2">
+                    <div class="space-y-6">
+                      <!-- Selector de Jugadora -->
+                      <div>
+                        <label class="block text-sm font-black text-gray-800 mb-3">
+                          Selecciona una jugadora
+                        </label>
+                        <select
+                          v-model="jugadoraSeleccionadaFeedback"
+                          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary focus:outline-none transition-colors bg-white text-gray-900 font-medium"
+                        >
+                          <option value="">-- Selecciona una jugadora --</option>
+                          <option v-for="jugadora in todasJugadoras" :key="jugadora.id" :value="jugadora">
+                            {{ jugadora.nombre }} {{ jugadora.apellido }}
+                          </option>
+                        </select>
+                      </div>
+
+                      <!-- Tipo de Feedback -->
+                      <div>
+                        <label class="block text-sm font-black text-gray-800 mb-3">
+                          Tipo de feedback
+                        </label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                          <button
+                            v-for="tipo in ['general', 'recomendacion', 'salud', 'rendimiento']"
+                            :key="tipo"
+                            @click="tipoFeedback = tipo"
+                            :class="{
+                              'bg-primary text-white border-primary': tipoFeedback === tipo,
+                              'bg-gray-100 text-gray-700 border-gray-200 hover:border-gray-300': tipoFeedback !== tipo
+                            }"
+                            class="px-4 py-3 truncate border-2 rounded-xl font-bold transition-all capitalize"
+                          >
+                            {{ tipo }}
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Mensaje -->
+                      <div>
+                        <label class="block text-sm font-black text-gray-800 mb-3">
+                          Mensaje
+                        </label>
+                        <textarea
+                          v-model="mensajeFeedback"
+                          placeholder="Escribe tu mensaje de feedback aquí..."
+                          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary focus:outline-none transition-colors bg-white text-gray-900 font-medium resize-none"
+                          rows="6"
+                        ></textarea>
+                        <div class="mt-2 text-xs text-gray-500 font-medium">
+                          {{ mensajeFeedback.length }} / 500 caracteres
+                        </div>
+                      </div>
+
+                      <!-- Botón Enviar -->
+                      <button
+                        @click="enviarFeedback"
+                        :disabled="!jugadoraSeleccionadaFeedback || !mensajeFeedback.trim() || isEnviandoFeedback"
+                        :class="{
+                          'opacity-50 cursor-not-allowed': !jugadoraSeleccionadaFeedback || !mensajeFeedback.trim() || isEnviandoFeedback,
+                          'hover:shadow-lg active:scale-95': jugadoraSeleccionadaFeedback && mensajeFeedback.trim() && !isEnviandoFeedback
+                        }"
+                        class="w-full px-6 py-4 bg-linear-to-r from-primary to-primary-dark text-white rounded-xl font-black transition-all duration-300"
+                      >
+                        <span v-if="isEnviandoFeedback" class="flex items-center justify-center gap-2">
+                          <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          Enviando...
+                        </span>
+                        <span v-else>Enviar Feedback</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Información y Tipos de Feedback -->
+                  <div class="lg:col-span-1">
+                    <div class="bg-linear-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-2 border-blue-200">
+                      <h3 class="font-black text-base text-blue-900 mb-4">Tipos de Feedback</h3>
+                      <div class="space-y-4">
+                        <div>
+                          <div class="font-bold text-blue-900 text-sm mb-1">General</div>
+                          <p class="text-xs text-blue-800">Mensaje general o información importante</p>
+                        </div>
+                        <div>
+                          <div class="font-bold text-blue-900 text-sm mb-1">Recomendación</div>
+                          <p class="text-xs text-blue-800">Suggestions para mejorar el rendimiento</p>
+                        </div>
+                        <div>
+                          <div class="font-bold text-blue-900 text-sm mb-1">Salud</div>
+                          <p class="text-xs text-blue-800">Información sobre salud y bienestar</p>
+                        </div>
+                        <div>
+                          <div class="font-bold text-blue-900 text-sm mb-1">Rendimiento</div>
+                          <p class="text-xs text-blue-800">Evaluación del rendimiento en entrenamientos</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Instrucciones -->
+                    <div class="mt-6 bg-linear-to-br from-green-50 to-green-100 rounded-2xl p-6 border-2 border-green-200">
+                      <h3 class="font-black text-base text-green-900 mb-4">💡 Consejos</h3>
+                      <ul class="space-y-2 text-xs text-green-800">
+                        <li class="flex gap-2">
+                          <span class="shrink-0 font-bold">✓</span>
+                          <span>Sé específico y constructivo</span>
+                        </li>
+                        <li class="flex gap-2">
+                          <span class="shrink-0 font-bold">✓</span>
+                          <span>Destaca logros y áreas de mejora</span>
+                        </li>
+                        <li class="flex gap-2">
+                          <span class="shrink-0 font-bold">✓</span>
+                          <span>La jugadora puede reaccionar al mensaje</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- SECCIÓN: Ver Respuestas -->
+                <div class="mt-8 border-t-2 border-gray-200 pt-8">
+                  <div class="mb-6">
+                    <div class="flex items-center gap-3 mb-6">
+                      <div class="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center shadow-lg">
+                        <CheckCircleIcon class="w-6 h-6 text-white" />
+                      </div>
+                      <h3 class="text-2xl font-black text-gray-900">Ver Respuestas</h3>
+                    </div>
+
+                    <!-- Estadísticas -->
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-8">
+                      <div class="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-200">
+                        <p class="text-xs text-blue-600 font-bold mb-1">Total Enviados</p>
+                        <p class="text-3xl font-black text-blue-700">{{ estadisticasFeedback.total }}</p>
+                      </div>
+                      <div class="bg-linear-to-br from-green-50 to-green-100 rounded-xl p-4 border-2 border-green-200">
+                        <p class="text-xs text-green-600 font-bold mb-1">Respondidos</p>
+                        <p class="text-3xl font-black text-green-700">{{ estadisticasFeedback.respondidos }}</p>
+                      </div>
+                      <div class="bg-linear-to-br from-red-50 to-red-100 rounded-xl p-4 border-2 border-red-200">
+                        <p class="text-xs text-red-600 font-bold mb-1">Pendientes</p>
+                        <p class="text-3xl font-black text-red-700">{{ estadisticasFeedback.pendientes }}</p>
+                      </div>
+                      <div class="bg-linear-to-br from-purple-50 to-purple-100 rounded-xl p-4 border-2 border-purple-200">
+                        <p class="text-xs text-purple-600 font-bold mb-1">Tasa Respuesta</p>
+                        <p class="text-3xl font-black text-purple-700">{{ estadisticasFeedback.tasaRespuesta }}%</p>
+                      </div>
+                      <div class="bg-linear-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 border-2 border-yellow-200">
+                        <p class="text-xs text-yellow-600 font-bold mb-1">Cargando...</p>
+                        <p v-if="!isLoadingFeedbacks" class="text-xl font-black text-yellow-700">✓</p>
+                        <div v-else class="w-6 h-6 border-2 border-yellow-600/30 border-t-yellow-600 rounded-full animate-spin"></div>
+                      </div>
+                    </div>
+
+                    <!-- Lista de Feedbacks -->
+                    <div v-if="isLoadingFeedbacks" class="flex justify-center py-12">
+                      <div class="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                    </div>
+                    <div v-else-if="feedbacksFiltrados.length === 0" class="bg-linear-to-br from-gray-50 to-gray-100 rounded-2xl p-12 text-center">
+                      <div class="w-16 h-16 bg-gray-300 rounded-2xl flex items-center justify-center mx-auto mb-4 opacity-50">
+                        <BellAlertIcon class="w-8 h-8 text-gray-500" />
+                      </div>
+                      <p class="text-gray-600 font-bold text-lg">Sin feedbacks para mostrar</p>
+                      <p class="text-gray-500 text-sm mt-2">Los feedbacks enviados aparecerán aquí</p>
+                    </div>
+                    <div v-else class="space-y-3 max-h-96 overflow-y-auto">
+                      <div 
+                        v-for="feedback in feedbacksFiltrados" 
+                        :key="feedback.id"
+                        :class="[
+                          'p-4 rounded-xl border-2 transition-all hover:shadow-lg',
+                          feedback.reaccion 
+                            ? 'bg-green-50 border-green-200'
+                            : 'bg-yellow-50 border-yellow-200'
+                        ]"
+                      >
+                        <div class="flex items-start justify-between mb-2">
+                          <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                              <p class="font-black text-gray-900">{{ feedback.jugadoraNombre }}</p>
+                              <span class="text-xs font-bold px-2 py-1 rounded-lg bg-gray-200 text-gray-700 capitalize">
+                                {{ feedback.tipo }}
+                              </span>
+                            </div>
+                            <p class="text-sm text-gray-600 line-clamp-2">{{ feedback.mensaje }}</p>
+                          </div>
+                          <div class="shrink-0">
+                            <div v-if="feedback.reaccion" class="flex items-center gap-2">
+                              <component 
+                                v-if="feedback.reaccion === 'confirmado'"
+                                :is="CheckCircleIcon"
+                                class="w-6 h-6 text-green-500"
+                              />
+                              <component 
+                                v-else-if="feedback.reaccion === 'revisar'"
+                                :is="ExclamationCircleIcon"
+                                class="w-6 h-6 text-yellow-500"
+                              />
+                              <component 
+                                v-else-if="feedback.reaccion === 'pregunta'"
+                                :is="QuestionMarkCircleIcon"
+                                class="w-6 h-6 text-blue-500"
+                              />
+                              <span class="text-xs font-bold text-gray-600 whitespace-nowrap">
+                                {{ formatearTiempoRelativo(feedback.reaccionadoAt) }}
+                              </span>
+                            </div>
+                            <div v-else class="text-xs font-bold text-yellow-600">Sin respuesta</div>
+                          </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-gray-500 mt-2">
+                          <span>📅 {{ formatearTiempoRelativo(feedback.createdAt) }}</span>
+                          <span v-if="feedback.reaccion" class="text-green-600 font-bold capitalize">
+                            → {{ feedback.reaccion }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Galería -->
           <div v-if="activeTab === 'galeria'">
             <GestionarGalerias />
@@ -445,7 +689,10 @@ import {
   ClockIcon,
   GiftIcon,
   PencilIcon,
-  FlagIcon
+  FlagIcon,
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  QuestionMarkCircleIcon
 } from '@heroicons/vue/24/outline';
 import GestionarGalerias from '../components/GestionarGalerias.vue';
 import GestionarEventosEspeciales from '../components/GestionarEventosEspeciales.vue';
@@ -464,7 +711,8 @@ import ListadoJugadorasAdmin from '../components/ListadoJugadorasAdmin.vue';
 import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
-import { escucharAlertasSaludSemanalAdmin } from '../firebase/saludSemanal';
+import { escucharAlertasSaludSemanalAdmin, limpiarSaludSemanalAntiguaS } from '../firebase/saludSemanal';
+import { crearFeedback, obtenerTodosFeedbacks, limpiarFeedbacksAntiguos, escucharTodosFeedbacks } from '../firebase/feedback';
 
 const router = useRouter();
 const route = useRoute();
@@ -473,7 +721,15 @@ const proximoCumpleanios = ref(null);
 const inscripcionesPorEntrenamiento = ref({});
 const jugadorasPorEquipo = ref({ ascenso: 0, escuela: 0, ambos: 0, total: 0 });
 const alertasSalud = ref({ nuevas: 0, pendientesRevision: 0, ultimas: [] });
+const todasJugadoras = ref([]);
+const jugadoraSeleccionadaFeedback = ref(null);
+const mensajeFeedback = ref('');
+const tipoFeedback = ref('general');
+const isEnviandoFeedback = ref(false);
+const todosFeedbacks = ref([]);
+const isLoadingFeedbacks = ref(false);
 let unsubscribeAlertasSalud = null;
+let unsubscribeFeedbacks = null;
 
 const userGreeting = computed(() => {
   if (authUser.value) {
@@ -492,6 +748,7 @@ const tabs = computed(() => {
     { id: 'jugadoras', label: 'Jugadoras', icon: UsersIcon },
     { id: 'entrenamientos', label: 'Entrenamientos', icon: CalendarIcon },
     { id: 'banner-mensualidad', label: 'Banner Noticia/Mensualidad/Otros', icon: BellAlertIcon },
+    { id: 'feedback', label: 'Feedback a Jugadoras', icon: BellAlertIcon },
     { id: 'historial', label: 'Historial', icon: ChartBarIcon },
     { id: 'galeria', label: 'Galería', icon: CameraIcon },
     { id: 'estadisticas', label: 'Estadísticas', icon: ArrowTrendingUpIcon },
@@ -499,13 +756,13 @@ const tabs = computed(() => {
   ];
 
   if (esAdmin.value) {
-    baseTabs.splice(7, 0, {
+    baseTabs.splice(8, 0, {
       id: 'ranking-asistencia',
       label: 'Ranking Asistencia',
       icon: ChartBarIcon,
     });
 
-    baseTabs.splice(8, 0, {
+    baseTabs.splice(9, 0, {
       id: 'salud-semanal',
       label: alertasSalud.value.nuevas > 0
         ? `Salud Semanal (${alertasSalud.value.nuevas})`
@@ -515,6 +772,27 @@ const tabs = computed(() => {
   }
 
   return baseTabs;
+});
+
+const feedbacksFiltrados = computed(() => todosFeedbacks.value);
+
+const estadisticasFeedback = computed(() => {
+  const total = todosFeedbacks.value.length;
+  const respondidos = todosFeedbacks.value.filter(f => f.reaccion).length;
+  const pendientes = total - respondidos;
+  const confirmados = todosFeedbacks.value.filter(f => f.reaccion === 'confirmado').length;
+  const revisar = todosFeedbacks.value.filter(f => f.reaccion === 'revisar').length;
+  const preguntas = todosFeedbacks.value.filter(f => f.reaccion === 'pregunta').length;
+  
+  return {
+    total,
+    respondidos,
+    pendientes,
+    confirmados,
+    revisar,
+    preguntas,
+    tasaRespuesta: total > 0 ? Math.round((respondidos / total) * 100) : 0
+  };
 });
 
 const handleLogout = async () => {
@@ -531,6 +809,20 @@ const formatearFecha = (date) => {
     month: 'long',
     day: 'numeric'
   });
+};
+
+const formatearTiempoRelativo = (date) => {
+  if (!date) return '-';
+  const d = new Date(date.seconds ? date.seconds * 1000 : date);
+  const ahora = new Date();
+  const diferencia = Math.floor((ahora.getTime() - d.getTime()) / 1000);
+  
+  if (diferencia < 60) return 'hace unos segundos';
+  if (diferencia < 3600) return `hace ${Math.floor(diferencia / 60)}m`;
+  if (diferencia < 86400) return `hace ${Math.floor(diferencia / 3600)}h`;
+  if (diferencia < 604800) return `hace ${Math.floor(diferencia / 86400)}d`;
+  
+  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 };
 
 const parseFechaBase = (fecha) => {
@@ -827,6 +1119,66 @@ const cargarJugadorasPorEquipo = async () => {
   }
 };
 
+// Función para cargar todas las jugadoras
+const cargarTodasJugadoras = async () => {
+  try {
+    const snapshot = await getDocs(collection(db, 'jugadoraRegistro'));
+    todasJugadoras.value = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })).sort((a, b) => {
+      const nombreA = `${a.nombre} ${a.apellido}`.toLowerCase();
+      const nombreB = `${b.nombre} ${b.apellido}`.toLowerCase();
+      return nombreA.localeCompare(nombreB);
+    });
+  } catch (err) {
+    console.error('Error cargando jugadoras:', err);
+  }
+};
+
+// Función para iniciar el listener de feedbacks en tiempo real
+const iniciarListenerFeedbacks = async () => {
+  try {
+    console.log('🎧 Iniciando listener de feedbacks para admin');
+    // Limpiar feedbacks más antiguos de 2 días (una sola vez al inicio)
+    await limpiarFeedbacksAntiguos(2);
+    
+    // Configurar listener en tiempo real
+    unsubscribeFeedbacks = escucharTodosFeedbacks((feedbacks) => {
+      console.log('✅ Feedbacks actualizados en tiempo real:', feedbacks.length);
+      todosFeedbacks.value = feedbacks;
+    });
+  } catch (err) {
+    console.error('Error iniciando listener de feedbacks:', err);
+  }
+};
+
+// Función para enviar feedback
+const enviarFeedback = async () => {
+  if (!jugadoraSeleccionadaFeedback.value || !mensajeFeedback.value.trim()) {
+    alert('Por favor selecciona una jugadora y escribe un mensaje');
+    return;
+  }
+
+  isEnviandoFeedback.value = true;
+  try {
+    await crearFeedback(
+      jugadoraSeleccionadaFeedback.value.id,
+      `${jugadoraSeleccionadaFeedback.value.nombre} ${jugadoraSeleccionadaFeedback.value.apellido}`,
+      mensajeFeedback.value,
+      tipoFeedback.value
+    );
+    alert('Feedback enviado correctamente');
+    mensajeFeedback.value = '';
+    tipoFeedback.value = 'general';
+    jugadoraSeleccionadaFeedback.value = null;
+  } catch (err) {
+    alert('Error al enviar feedback: ' + err.message);
+  } finally {
+    isEnviandoFeedback.value = false;
+  }
+};
+
 onMounted(async () => {
   const tab = route.query?.tab;
   if (typeof tab === 'string' && tabs.value.some(t => t.id === tab)) {
@@ -836,8 +1188,12 @@ onMounted(async () => {
   await cargarProximoCumpleanios();
   await cargarInscripcionesEntrenamientos();
   await cargarJugadorasPorEquipo();
+  await cargarTodasJugadoras();
+  await iniciarListenerFeedbacks();
 
   if (esAdmin.value) {
+    // Limpiar salud semanal más antigua de 1 semana
+    await limpiarSaludSemanalAntiguaS(1);
     unsubscribeAlertasSalud = escucharAlertasSaludSemanalAdmin((data) => {
       alertasSalud.value = data;
     });
@@ -847,6 +1203,9 @@ onMounted(async () => {
 onUnmounted(() => {
   if (typeof unsubscribeAlertasSalud === 'function') {
     unsubscribeAlertasSalud();
+  }
+  if (typeof unsubscribeFeedbacks === 'function') {
+    unsubscribeFeedbacks();
   }
 });
 

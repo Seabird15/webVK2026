@@ -321,6 +321,7 @@ const activeTab = ref('ascenso');
 
 const tabs = [
   { id: 'ascenso', label: 'Ascenso' },
+  { id: 'serie-c', label: 'Serie C' },
   { id: 'escuela', label: 'Escuela' },
   { id: 'futsal', label: 'Futsal' },
 ];
@@ -330,6 +331,10 @@ const equiposBase = {
   ascenso: {
     titulo: 'Equipo Ascenso',
     descripcion: 'El Equipo Ascenso es nuestra rama más competitiva. Un equipo comprometido con la excelencia, el rendimiento y la pasión por el fútbol. Cada entrenamiento y partido se vive con intensidad, disciplina y espíritu de lucha. Aquí es donde se representa con fuerza el carácter vikinga: garra, juego y mentalidad ganadora.',
+  },
+  'serie-c': {
+    titulo: 'Equipo Serie C',
+    descripcion: 'El Equipo Serie C es nuestra rama de desarrollo competitivo. Aquí jugadoras con experiencia y habilidades técnicas compiten en una categoría que desafía sus límites. Un equipo dedicado a la excelencia, donde cada jugadora aporta su máximo rendimiento y pasión.',
   },
   escuela: {
     titulo: 'Equipo Escuela',
@@ -344,6 +349,7 @@ const equiposBase = {
 // Datos reactivos de los equipos desde Firestore
 const equipos = ref({
   ascenso: { ...equiposBase.ascenso, directoraTecnica: null, preparadorPorteras: null, porteras: [], defensas: [], alas: [], medio: [], delanteras: [] },
+  'serie-c': { ...equiposBase['serie-c'], directoraTecnica: null, preparadorPorteras: null, porteras: [], defensas: [], alas: [], medio: [], delanteras: [] },
   escuela: { ...equiposBase.escuela, directoraTecnica: null, preparadorPorteras: null, porteras: [], defensas: [], alas: [], medio: [], delanteras: [] },
   futsal: { ...equiposBase.futsal, directoraTecnica: null, preparadorPorteras: null, porteras: [], defensas: [], alas: [], medio: [], delanteras: [] },
 });
@@ -359,7 +365,9 @@ const cargarEquipo = async (equipoId) => {
   
   try {
     show('Cargando equipo...');
-    const datosEquipo = await obtenerEquipoCompletoRegistro(equipoId);
+    // Convertir "serie-c" a "serieC" para la consulta de Firestore
+    const equipoFirebase = equipoId === 'serie-c' ? 'serieC' : equipoId;
+    const datosEquipo = await obtenerEquipoCompletoRegistro(equipoFirebase);
     
     equipos.value[equipoId] = {
       ...equiposBase[equipoId],
@@ -381,6 +389,23 @@ const cargarEquipo = async (equipoId) => {
 // Función para obtener foto o logo por defecto
 const obtenerFoto = (foto) => {
   return foto ? foto : logoBlanco;
+};
+
+// Función para verificar si una jugadora pertenece a un equipo
+const pertenecePorEquipo = (jugadora, equipo) => {
+  // Soportar formato nuevo: equipos como array
+  if (Array.isArray(jugadora.equipos)) {
+    return jugadora.equipos.includes(equipo);
+  }
+  // Soportar formato antiguo: equipo como string
+  if (equipo === 'ascenso') {
+    return jugadora.equipo === 'ascenso' || jugadora.equipo === 'ambos';
+  } else if (equipo === 'escuela') {
+    return jugadora.equipo === 'escuela' || jugadora.equipo === 'ambos';
+  } else if (equipo === 'serieC') {
+    return jugadora.equipo === 'serieC';
+  }
+  return false;
 };
 
 // Cargar datos cuando cambia la pestaña

@@ -34,7 +34,16 @@
       <div class="flex items-center gap-4">
         <!-- Links de redes sociales -->
         <div class="flex gap-3">
-              <!-- Admin link -->
+              <!-- Acceso Jugadora Mobile -->
+        <router-link
+          to="/login-jugadora"
+          class="lg:hidden text-black font-bold text-xs tracking-wider hover:text-black/70 transition-colors"
+          title="Acceso Jugadora"
+        >
+          <UserIcon class="w-6 h-6 md:w-7 md:h-7" />
+        </router-link>
+        
+        <!-- Admin link -->
         <router-link
           to="/login"
           class="text-black font-bold text-xs tracking-wider hover:text-black/70 transition-colors"

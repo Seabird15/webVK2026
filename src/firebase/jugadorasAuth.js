@@ -9,7 +9,7 @@ import {
   browserLocalPersistence
 } from 'firebase/auth';
 import { auth, db, storage } from './config';
-import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, deleteDoc } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export const jugadoraAuthUser = ref(null);
@@ -19,25 +19,47 @@ export const errorJugadora = ref(null);
 export const authReady = ref(false); // Flag para saber cuando Auth está listo
 
 const normalizarCategoriaEquipo = (valor) => {
-  const normalizado = (valor || '').toString().trim().toLowerCase();
-  return ['ascenso', 'escuela', 'ambos'].includes(normalizado) ? normalizado : '';
+  if (!valor) return '';
+  const normalizado = valor.toString().trim().toLowerCase();
+  // Retornar 'serieC' consistente con el resto del código
+  if (normalizado === 'seriec' || normalizado === 'serieC') return 'serieC';
+  if (normalizado === 'ascenso' || normalizado === 'escuela' || normalizado === 'ambos') return normalizado;
+  return '';
+};
+
+// Convertir array de equipos a string para resolverCategoriaSeleccionada
+const convertirEquiposAString = (equipos) => {
+  if (typeof equipos === 'string') {
+    return equipos;
+  }
+  
+  if (Array.isArray(equipos)) {
+    if (equipos.length === 0) return '';
+    if (equipos.includes('ascenso') && equipos.includes('escuela')) {
+      return 'ambos';
+    }
+    return equipos[0]; // Retornar el primer equipo
+  }
+  
+  return '';
 };
 
 const resolverCategoriaSeleccionada = (equipo, categoriaSolicitada, categoriaActual = '') => {
-  const equipoNormalizado = normalizarCategoriaEquipo(equipo);
+  const equipoString = convertirEquiposAString(equipo);
+  const equipoNormalizado = normalizarCategoriaEquipo(equipoString);
   const categoriaSolicitadaNormalizada = normalizarCategoriaEquipo(categoriaSolicitada);
   const categoriaActualNormalizada = normalizarCategoriaEquipo(categoriaActual);
 
-  if (equipoNormalizado === 'ascenso' || equipoNormalizado === 'escuela') {
+  if (equipoNormalizado === 'ascenso' || equipoNormalizado === 'escuela' || equipoNormalizado === 'serieC') {
     return equipoNormalizado;
   }
 
   if (equipoNormalizado === 'ambos') {
-    if (categoriaSolicitadaNormalizada === 'ascenso' || categoriaSolicitadaNormalizada === 'escuela' || categoriaSolicitadaNormalizada === 'ambos') {
+    if (categoriaSolicitadaNormalizada === 'ascenso' || categoriaSolicitadaNormalizada === 'escuela' || categoriaSolicitadaNormalizada === 'serieC' || categoriaSolicitadaNormalizada === 'ambos') {
       return categoriaSolicitadaNormalizada;
     }
 
-    if (categoriaActualNormalizada === 'ascenso' || categoriaActualNormalizada === 'escuela' || categoriaActualNormalizada === 'ambos') {
+    if (categoriaActualNormalizada === 'ascenso' || categoriaActualNormalizada === 'escuela' || categoriaActualNormalizada === 'serieC' || categoriaActualNormalizada === 'ambos') {
       return categoriaActualNormalizada;
     }
 
@@ -52,15 +74,19 @@ let ignorarProximoAuthChange = false;
 
 // Observar cambios de autenticación para jugadoras
 onAuthStateChanged(auth, async (user) => {
+  console.log('🔐 onAuthStateChanged ejecutado - user:', user?.uid);
   
   // Si debemos ignorar este cambio, solo marcamos el flag como falso
   if (ignorarProximoAuthChange) {
     ignorarProximoAuthChange = false;
     authReady.value = true; // Marcar que Auth está listo
+    console.log('✅ Ignorando onAuthStateChanged después del registro');
     return;
   }
   
   jugadoraAuthUser.value = user;
+  console.log('✅ jugadoraAuthUser actualizado a:', user?.uid);
+  
   if (user) {
     // Intentar cargar datos de Firestore
     // Si el documento no existe, es normal (aún no completó perfil)
@@ -71,19 +97,23 @@ onAuthStateChanged(auth, async (user) => {
         id: user.uid,
         ...jugadoraRegistroDoc.data()
       };
+      console.log('✅ Documento de jugadora cargado desde Firestore');
     } else {
       // Si no existe, crear estado vacío (perfil no completado aún)
       jugadoraData.value = {
         id: user.uid,
         perfilCompleto: false
       };
+      console.log('⚠️ Documento de jugadora no existe en Firestore para UID:', user.uid);
     }
   } else {
     jugadoraData.value = null;
+    console.log('❌ Usuario desautenticado');
   }
   
   // Marcar que Auth está listo
   authReady.value = true;
+  console.log('✅ authReady.value = true');
 });
 
 // Login de jugadora
@@ -204,32 +234,47 @@ export const fetchJugadorasRegistradasPorEquipo = async (equipo) => {
   }
 };
 
+// Verificar si una jugadora pertenece a un equipo
+const pertenecePorEquipo = (jugadora, equipo) => {
+  // Soportar formato nuevo: equipos como array
+  if (Array.isArray(jugadora.equipos)) {
+    return jugadora.equipos.includes(equipo);
+  }
+  // Soportar formato antiguo: equipo como string
+  if (equipo === 'ascenso') {
+    return jugadora.equipo === 'ascenso' || jugadora.equipo === 'ambos';
+  } else if (equipo === 'escuela') {
+    return jugadora.equipo === 'escuela' || jugadora.equipo === 'ambos';
+  } else if (equipo === 'serieC') {
+    return jugadora.equipo === 'serieC';
+  }
+  return false;
+};
+
 // Obtener jugadoras por equipo y posición desde jugadoraRegistro
 export const obtenerJugadorasPorPosicionRegistro = async (equipo, posicion) => {
   try {
-    let q;
-    if (equipo === 'ambos') {
-      // Solo filtrar por posición
-      q = query(
-        collection(db, 'jugadoraRegistro'),
-        where('posicion', '==', posicion)
-      );
-    } else {
-      // Filtrar por equipo (específico o ambos) y posición
-      q = query(
-        collection(db, 'jugadoraRegistro'),
-        where('equipo', 'in', [equipo, 'ambos']),
-        where('posicion', '==', posicion)
-      );
-    }
+    // Obtener todas las jugadoras de esta posición
+    const q = query(
+      collection(db, 'jugadoraRegistro'),
+      where('posicion', '==', posicion)
+    );
     
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
+    const todasLasJugadoras = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-      foto: doc.data().fotoPerfil || null, // Mapear fotoPerfil a foto
-      numero: doc.data().dorsal || null // Mapear dorsal a numero
+      foto: doc.data().fotoPerfil || null,
+      numero: doc.data().dorsal || null
     }));
+
+    // Filtrar por equipo en JavaScript para soportar tanto formato antiguo como nuevo
+    if (equipo === 'ambos') {
+      // Si se solicita 'ambos', devolver todas (para compatibilidad histórica)
+      return todasLasJugadoras;
+    } else {
+      return todasLasJugadoras.filter(j => pertenecePorEquipo(j, equipo));
+    }
   } catch (err) {
     // // console.error(`Error obteniendo ${posicion}:`, err);
     return [];
@@ -424,4 +469,21 @@ export const tienePerfılCompleto = () => {
 // Obtener equipo de jugadora
 export const obtenerEquipoJugadora = () => {
   return jugadoraData.value?.equipo || null;
+};
+
+// Eliminar perfil de jugadora
+export const eliminarJugadora = async (uid) => {
+  isLoadingJugadora.value = true;
+  errorJugadora.value = null;
+  try {
+    // Eliminar documento de jugadoraRegistro
+    await deleteDoc(doc(db, 'jugadoraRegistro', uid));
+    return true;
+  } catch (err) {
+    // // console.error('Error eliminando jugadora:', err);
+    errorJugadora.value = err.message;
+    return false;
+  } finally {
+    isLoadingJugadora.value = false;
+  }
 };

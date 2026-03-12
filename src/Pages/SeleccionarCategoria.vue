@@ -17,153 +17,89 @@
             </svg>
           </div>
         </div>
-        <h1 class="text-3xl md:text-5xl font-bold text-white mb-3 md:mb-4">
-          ¡Bienvenida de vuelta! 
+        <h1 class="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-3">
+          ¡Bienvenida{{ jugadoraData?.nombre ? ', ' + jugadoraData.nombre.split(' ')[0] : '' }}! 
         </h1>
-        <p class="text-base md:text-xl text-gray-300 max-w-2xl mx-auto px-4">
-          Perteneces a <span class="text-primary font-bold">ambos equipos</span>. 
-          Selecciona el equipo para ver los entrenamientos
+       
+      </div>
+
+      <!-- Tarjetas informativas (solo lectura) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+        <!-- Ascenso - Competencia máxima -->
+        <div class="relative overflow-hidden rounded-xl md:rounded-2xl bg-white border-l-4 border-teal-500 text-left shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div class="p-6 md:p-8 flex flex-col min-h-[280px]">
+            <h2 class="text-2xl md:text-3xl font-bold text-teal-700 mb-1">
+              ASCENSO
+            </h2>
+            
+            <p class="text-xs font-semibold text-teal-600 mb-4 uppercase tracking-wide">Objetivo: Competir</p>
+            
+            <p class="text-sm text-gray-700 mb-6 leading-relaxed flex-grow">
+              Equipo competitivo Serie B donde la exigencia es máxima. Entrenamientos de alto rendimiento, tácticas avanzadas y partidos oficiales de máxima competencia. 
+            </p>
+
+            <div class="w-full px-4 py-2.5 bg-teal-100 text-teal-700 font-semibold rounded-lg text-sm text-center">
+              Equipo competitivo
+            </div>
+          </div>
+        </div>
+
+        <!-- Serie C - Crecimiento competitivo -->
+        <div class="relative overflow-hidden rounded-xl md:rounded-2xl bg-white border-l-4 border-purple-500 text-left shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div class="p-6 md:p-8 flex flex-col min-h-[280px]">
+            <h2 class="text-2xl md:text-3xl font-bold text-purple-700 mb-1">
+              SERIE C
+            </h2>
+            
+            <p class="text-xs font-semibold text-purple-600 mb-4 uppercase tracking-wide">Objetivo: Ganar Experiencia</p>
+            
+            <p class="text-sm text-gray-700 mb-6 leading-relaxed flex-grow">
+              Equipo competitivo que está adquiriendo experiencia en ambiente de apoyo mutuo. Competencia real en partidos oficiales con entrenamientos progresivos. 
+            </p>
+
+            <div class="w-full px-4 py-2.5 bg-purple-100 text-purple-700 font-semibold rounded-lg text-sm text-center">
+              Equipo en crecimiento
+            </div>
+          </div>
+        </div>
+
+        <!-- Escuela - Formación y diversión -->
+        <div class="relative overflow-hidden rounded-xl md:rounded-2xl bg-white border-l-4 border-yellow-500 text-left shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div class="p-6 md:p-8 flex flex-col min-h-[280px]">
+            <h2 class="text-2xl md:text-3xl font-bold text-yellow-700 mb-1">
+              ESCUELA
+            </h2>
+            
+            <p class="text-xs font-semibold text-yellow-600 mb-4 uppercase tracking-wide">Objetivo: Aprender y Divertirse</p>
+            
+            <p class="text-sm text-gray-700 mb-6 leading-relaxed flex-grow">
+              Equipo recreativo con enfoque en formación integral. Aprende fundamentos, mejora tus habilidades en ambiente inclusivo y positivo. Donde divertirse y crecer van de la mano.
+            </p>
+
+            <div class="w-full px-4 py-2.5 bg-yellow-100 text-yellow-700 font-semibold rounded-lg text-sm text-center">
+              Equipo recreativo
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón único para ir a entrenamientos -->
+      <div class="flex justify-center mt-12 md:mt-16">
+        <button
+          @click="irAEntrenamientos"
+          :disabled="isLoading"
+          class="px-8 md:px-12 py-3 md:py-4 bg-gradient-to-r from-primary to-primary-dark text-white font-bold text-lg rounded-xl hover:shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+        >
+          Ir a entrenamientos
+        </button>
+      </div>
+
+      <!-- Leyenda inspiradora -->
+      <div class="text-center mt-12 md:mt-16">
+        <p class="text-white text-lg md:text-xl font-semibold italic">
+          "Lo que nos une nos hace eternas"
         </p>
       </div>
-
-      <!-- Opciones de categoría mejoradas -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
-        <!-- Ascenso -->
-        <button
-          @click="seleccionarCategoria('ascenso')"
-          :disabled="isLoading"
-          class="group relative bg-white/95 backdrop-blur rounded-2xl md:rounded-3xl shadow-2xl p-6 md:p-10 hover:shadow-primary/50 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden cursor-pointer"
-        >
-          <!-- Efecto de brillo al hover -->
-          <div class="absolute inset-0 bg-gradient-to-br from-red-500/0 via-red-500/0 to-red-500/0 group-hover:from-red-500/10 group-hover:via-transparent group-hover:to-transparent transition-all duration-500"></div>
-          
-          <!-- Ícono decorativo -->
-          <div class="absolute -top-8 -right-8 w-32 h-32 bg-red-500/5 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-          
-          <div class="relative">
-            <!-- Badge del equipo -->
-            <div class="inline-flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-full text-sm font-bold mb-4 md:mb-6">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-              </svg>
-              <span>Equipo Competitivo</span>
-            </div>
-
-            <h2 class="text-2xl md:text-4xl font-bold text-gray-900 mb-3 md:mb-4 group-hover:text-red-600 transition-colors">
-              Ascenso
-            </h2>
-            
-            <p class="text-sm md:text-base text-gray-600 mb-6 md:mb-8 leading-relaxed">
-              Liga de ascenso, entrenamientos intensivos y partidos oficiales
-            </p>
-
-            <!-- Características -->
-            <div class="space-y-3 mb-6 md:mb-8">
-              <div class="flex items-center gap-3 text-sm md:text-base text-gray-700">
-                <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <span>Ver entrenamientos y partidos</span>
-              </div>
-              <div class="flex items-center gap-3 text-sm md:text-base text-gray-700">
-                <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <span>Confirmar asistencia</span>
-              </div>
-              <div class="flex items-center gap-3 text-sm md:text-base text-gray-700">
-                <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <span>Gestionar convocatorias</span>
-              </div>
-            </div>
-
-            <!-- Botón de acción -->
-            <div class="flex items-center justify-center gap-2 text-red-600 font-bold group-hover:gap-4 transition-all">
-              <span class="text-sm md:text-base">Seleccionar</span>
-              <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </div>
-          </div>
-        </button>
-
-        <!-- Escuela -->
-        <button
-          @click="seleccionarCategoria('escuela')"
-          :disabled="isLoading"
-          class="group relative bg-white/95 backdrop-blur rounded-2xl md:rounded-3xl shadow-2xl p-6 md:p-10 hover:shadow-primary-dark/50 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden cursor-pointer"
-        >
-          <!-- Efecto de brillo al hover -->
-          <div class="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-blue-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:via-transparent group-hover:to-transparent transition-all duration-500"></div>
-          
-          <!-- Ícono decorativo -->
-          <div class="absolute -top-8 -right-8 w-32 h-32 bg-blue-500/5 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-          
-          <div class="relative">
-            <!-- Badge del equipo -->
-            <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-full text-sm font-bold mb-4 md:mb-6">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 3L1 9L12 15L21 10.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" />
-              </svg>
-              <span>Equipo Formación</span>
-            </div>
-
-            <h2 class="text-2xl md:text-4xl font-bold text-gray-900 mb-3 md:mb-4 group-hover:text-blue-600 transition-colors">
-              Escuela
-            </h2>
-            
-            <p class="text-sm md:text-base text-gray-600 mb-6 md:mb-8 leading-relaxed">
-              Desarrollo de habilidades, aprendizaje y crecimiento deportivo
-            </p>
-
-            <!-- Características -->
-            <div class="space-y-3 mb-6 md:mb-8">
-              <div class="flex items-center gap-3 text-sm md:text-base text-gray-700">
-                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <span>Ver entrenamientos y eventos</span>
-              </div>
-              <div class="flex items-center gap-3 text-sm md:text-base text-gray-700">
-                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <span>Confirmar asistencia</span>
-              </div>
-              <div class="flex items-center gap-3 text-sm md:text-base text-gray-700">
-                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
-                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <span>Participar en actividades</span>
-              </div>
-            </div>
-
-            <!-- Botón de acción -->
-            <div class="flex items-center justify-center gap-2 text-blue-600 font-bold group-hover:gap-4 transition-all">
-              <span class="text-sm md:text-base">Seleccionar</span>
-              <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </div>
-          </div>
-        </button>
-      </div>
-
-   
 
       <!-- Loader mejorado -->
       <div v-if="isLoading" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
@@ -192,12 +128,19 @@ if (!jugadoraAuthUser.value || jugadoraData.value?.equipo !== 'ambos') {
 
 const seleccionarCategoria = async (categoria) => {
   isLoading.value = true;
+  
   if (jugadoraAuthUser.value?.uid) {
     await actualizarCategoriaSeleccionadaJugadora(jugadoraAuthUser.value.uid, categoria);
   }
+};
+
+const irAEntrenamientos = async () => {
+  isLoading.value = true;
   
   // Pequeño delay para mostrar la animación
   setTimeout(() => {
+    // Navegar a entrenamientos sin query params
+    // Entrenamientos.vue mostrará el equipo principal de la jugadora
     router.push('/entrenamientos');
   }, 800);
 };
