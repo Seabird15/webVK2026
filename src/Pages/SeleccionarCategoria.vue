@@ -26,7 +26,7 @@
       <!-- Tarjetas informativas (solo lectura) -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
         <!-- Ascenso - Competencia máxima -->
-        <div class="relative overflow-hidden rounded-xl md:rounded-2xl bg-white border-l-4 border-teal-500 text-left shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <div v-if="equiposJugadora.includes('ascenso')" class="relative overflow-hidden rounded-xl md:rounded-2xl bg-white border-l-4 border-teal-500 text-left shadow-lg hover:shadow-xl transition-shadow duration-300">
           <div class="p-6 md:p-8 flex flex-col min-h-[280px]">
             <h2 class="text-2xl md:text-3xl font-bold text-teal-700 mb-1">
               ASCENSO
@@ -45,7 +45,7 @@
         </div>
 
         <!-- Serie C - Crecimiento competitivo -->
-        <div class="relative overflow-hidden rounded-xl md:rounded-2xl bg-white border-l-4 border-purple-500 text-left shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <div v-if="equiposJugadora.includes('serieC')" class="relative overflow-hidden rounded-xl md:rounded-2xl bg-white border-l-4 border-purple-500 text-left shadow-lg hover:shadow-xl transition-shadow duration-300">
           <div class="p-6 md:p-8 flex flex-col min-h-[280px]">
             <h2 class="text-2xl md:text-3xl font-bold text-purple-700 mb-1">
               SERIE C
@@ -64,7 +64,7 @@
         </div>
 
         <!-- Escuela - Formación y diversión -->
-        <div class="relative overflow-hidden rounded-xl md:rounded-2xl bg-white border-l-4 border-yellow-500 text-left shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <div v-if="equiposJugadora.includes('escuela')" class="relative overflow-hidden rounded-xl md:rounded-2xl bg-white border-l-4 border-yellow-500 text-left shadow-lg hover:shadow-xl transition-shadow duration-300">
           <div class="p-6 md:p-8 flex flex-col min-h-[280px]">
             <h2 class="text-2xl md:text-3xl font-bold text-yellow-700 mb-1">
               ESCUELA
@@ -116,23 +116,16 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { jugadoraAuthUser, jugadoraData, actualizarCategoriaSeleccionadaJugadora } from '../firebase/jugadorasAuth';
+import { jugadoraAuthUser, obtenerEquiposJugadora } from '../firebase/jugadorasAuth';
 
 const router = useRouter();
 const isLoading = ref(false);
+const equiposJugadora = obtenerEquiposJugadora();
 
-// Verificar que el usuario esté autenticado y tenga equipo "ambos"
-if (!jugadoraAuthUser.value || jugadoraData.value?.equipo !== 'ambos') {
+// Verificar que el usuario esté autenticado y tenga múltiples equipos
+if (!jugadoraAuthUser.value || equiposJugadora.length <= 1) {
   router.push('/login-jugadora');
 }
-
-const seleccionarCategoria = async (categoria) => {
-  isLoading.value = true;
-  
-  if (jugadoraAuthUser.value?.uid) {
-    await actualizarCategoriaSeleccionadaJugadora(jugadoraAuthUser.value.uid, categoria);
-  }
-};
 
 const irAEntrenamientos = async () => {
   isLoading.value = true;

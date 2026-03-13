@@ -254,7 +254,7 @@
       </div>
 
       <!-- Selector de equipo (si tiene ambos) -->
-      <div v-if="jugadoraData?.equipo === 'ambos'" class="mb-8">
+      <div v-if="mostrarSelectorEquipos" class="mb-8">
         <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-gray-100">
           <div class="mb-6">
             <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-2">Selecciona tu equipo</h3>
@@ -262,6 +262,7 @@
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <button
+              v-if="equiposDisponibles.includes('ascenso')"
               @click="cambiarEquipo('ascenso')"
               :class="[
                 'px-4 py-3 rounded-xl font-bold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 border-2',
@@ -274,6 +275,7 @@
               Ascenso
             </button>
             <button
+              v-if="equiposDisponibles.includes('serieC')"
               @click="cambiarEquipo('serieC')"
               :class="[
                 'px-4 py-3 rounded-xl font-bold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 border-2',
@@ -286,6 +288,7 @@
               Serie C
             </button>
             <button
+              v-if="equiposDisponibles.includes('escuela')"
               @click="cambiarEquipo('escuela')"
               :class="[
                 'px-4 py-3 rounded-xl font-bold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 border-2',
@@ -298,6 +301,7 @@
               Escuela
             </button>
             <button
+              v-if="mostrarSelectorEquipos"
               @click="cambiarEquipo('ambos')"
               :class="[
                 'px-4 py-3 rounded-xl font-bold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 border-2',
@@ -1254,7 +1258,7 @@ import {
   QuestionMarkCircleIcon,
   XMarkIcon as CloseIcon
 } from '@heroicons/vue/24/outline';
-import { logoutJugadora, jugadoraAuthUser, jugadoraData, actualizarCategoriaSeleccionadaJugadora } from '../firebase/jugadorasAuth';
+import { logoutJugadora, jugadoraAuthUser, jugadoraData, actualizarCategoriaSeleccionadaJugadora, obtenerEquiposJugadoraDesdeDatos } from '../firebase/jugadorasAuth';
 import { userRole } from '../firebase/auth';
 import { fetchEntrenamientosPorEquipo, entrenamientos, isLoadingEntrenamientos, escucharEntrenamientosPorEquipo, votarMvpEntrenamiento } from '../firebase/entrenamientos';
 import { 
@@ -1286,15 +1290,38 @@ const normalizarEquipo = (equipo) => {
   return '';
 };
 
-const equipoJugadoraInicial = normalizarEquipo(jugadoraData.value?.equipo);
-const equipoGuardadoInicial = normalizarEquipo(jugadoraData.value?.categoriaSeleccionada);
+const obtenerEquiposDisponibles = (jugadora = jugadoraData.value) => {
+  return obtenerEquiposJugadoraDesdeDatos(jugadora);
+};
 
-// Usar el equipo principal de la jugadora
-const equipoSeleccionado = ref(
-  equipoJugadoraInicial && equipoJugadoraInicial !== 'ambos'
-    ? equipoJugadoraInicial
-    : (equipoGuardadoInicial || 'ascenso')
-);
+const obtenerEquipoSeleccionadoPermitido = (jugadora = jugadoraData.value, equipoActual = '') => {
+  const equiposPermitidos = obtenerEquiposDisponibles(jugadora);
+  if (equiposPermitidos.length === 0) {
+    return normalizarEquipo(equipoActual) || 'ascenso';
+  }
+
+  const categoriaGuardada = normalizarEquipo(jugadora?.categoriaSeleccionada);
+  if (equiposPermitidos.includes(categoriaGuardada)) {
+    return categoriaGuardada;
+  }
+
+  if (categoriaGuardada === 'ambos' && equiposPermitidos.length > 1) {
+    return 'ambos';
+  }
+
+  const equipoActualNormalizado = normalizarEquipo(equipoActual);
+  if (equiposPermitidos.includes(equipoActualNormalizado)) {
+    return equipoActualNormalizado;
+  }
+
+  if (equipoActualNormalizado === 'ambos' && equiposPermitidos.length > 1) {
+    return 'ambos';
+  }
+
+  return equiposPermitidos[0];
+};
+
+const equipoSeleccionado = ref(obtenerEquipoSeleccionadoPermitido());
 const entrenamientoSeleccionadoId = ref(null);
 const inscritasEntrenamiento = ref([]);
 // Guardar inscripciones organizadas de todos los entrenamientos
@@ -1323,6 +1350,8 @@ const mvpVotoSeleccionado = ref(null);
 const mvpGanadoraFotoSeleccionado = ref('');
 const mvpGanadoraFotoCargando = ref(false);
 const cacheFotosJugadoras = ref({});
+const equiposDisponibles = computed(() => obtenerEquiposDisponibles());
+const mostrarSelectorEquipos = computed(() => equiposDisponibles.value.length > 1);
 const bannerMensualidad = ref({
   activo: true,
   mensaje: 'Recuerda el pago de la mensualidad. Gracias a esto seguimos existiendo.'
@@ -1786,30 +1815,6 @@ const isLoading = computed(() => isLoadingEntrenamientos.value);
 const fechaPasada = (entrenamiento) => {
   const { finMs } = obtenerInicioFinEvento(entrenamiento);
   return Number.isFinite(finMs) ? Date.now() > finMs : false;
-};
-
-const obtenerEquipoSeleccionadoPermitido = (equipoJugadora) => {
-  const equipoNormalizado = normalizarEquipo(equipoJugadora);
-
-  if (equipoNormalizado === 'ascenso' || equipoNormalizado === 'escuela') {
-    return equipoNormalizado;
-  }
-
-  if (equipoNormalizado === 'ambos') {
-    const equipoGuardado = normalizarEquipo(jugadoraData.value?.categoriaSeleccionada);
-    if (['ascenso', 'escuela', 'ambos'].includes(equipoGuardado)) {
-      return equipoGuardado;
-    }
-
-    const equipoActual = normalizarEquipo(equipoSeleccionado.value);
-    if (['ascenso', 'escuela', 'ambos'].includes(equipoActual)) {
-      return equipoActual;
-    }
-
-    return 'ascenso';
-  }
-
-  return normalizarEquipo(equipoSeleccionado.value) || 'ascenso';
 };
 
 const cambiarEquipo = (equipo) => {
@@ -2410,9 +2415,13 @@ watch(
 );
 
 watch(
-  () => jugadoraData.value?.equipo,
-  async (nuevoEquipo) => {
-    const equipoPermitido = obtenerEquipoSeleccionadoPermitido(nuevoEquipo);
+  [
+    () => jugadoraData.value?.equipo,
+    () => JSON.stringify(jugadoraData.value?.equipos || []),
+    () => jugadoraData.value?.categoriaSeleccionada
+  ],
+  async () => {
+    const equipoPermitido = obtenerEquipoSeleccionadoPermitido(jugadoraData.value, equipoSeleccionado.value);
     if (!equipoPermitido) return;
 
     const huboCambio = equipoSeleccionado.value !== equipoPermitido;
@@ -2429,20 +2438,6 @@ watch(
     }
   },
   { immediate: true }
-);
-
-// Observar cambios en el equipo de la jugadora
-watch(
-  () => jugadoraData.value?.equipo,
-  async (nuevoEquipo) => {
-    const equipoNormalizado = normalizarEquipo(nuevoEquipo);
-    if (equipoNormalizado && equipoNormalizado !== 'ambos' && equipoSeleccionado.value !== equipoNormalizado) {
-      equipoSeleccionado.value = equipoNormalizado;
-      primeraCarga.value = true;
-      cargarEntrenamientos();
-      actualizarEstados();
-    }
-  }
 );
 
 // Limpiar listeners cuando se desmonta el componente

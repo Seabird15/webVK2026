@@ -18,6 +18,8 @@ export const isLoadingJugadora = ref(false);
 export const errorJugadora = ref(null);
 export const authReady = ref(false); // Flag para saber cuando Auth está listo
 
+const EQUIPOS_VALIDOS = ['ascenso', 'escuela', 'serieC'];
+
 const normalizarCategoriaEquipo = (valor) => {
   if (!valor) return '';
   const normalizado = valor.toString().trim().toLowerCase();
@@ -27,28 +29,101 @@ const normalizarCategoriaEquipo = (valor) => {
   return '';
 };
 
-// Convertir array de equipos a string para resolverCategoriaSeleccionada
-const convertirEquiposAString = (equipos) => {
-  if (typeof equipos === 'string') {
-    return equipos;
-  }
-  
-  if (Array.isArray(equipos)) {
-    if (equipos.length === 0) return '';
-    if (equipos.includes('ascenso') && equipos.includes('escuela')) {
-      return 'ambos';
-    }
-    return equipos[0]; // Retornar el primer equipo
-  }
-  
-  return '';
+const normalizarListaEquipos = (equipos = []) => {
+  if (!Array.isArray(equipos)) return [];
+
+  const vistos = new Set();
+
+  return equipos
+    .map(equipo => normalizarCategoriaEquipo(equipo))
+    .filter((equipo) => {
+      if (!EQUIPOS_VALIDOS.includes(equipo) || vistos.has(equipo)) {
+        return false;
+      }
+
+      vistos.add(equipo);
+      return true;
+    });
 };
 
-const resolverCategoriaSeleccionada = (equipo, categoriaSolicitada, categoriaActual = '') => {
-  const equipoString = convertirEquiposAString(equipo);
-  const equipoNormalizado = normalizarCategoriaEquipo(equipoString);
+const resolverEquiposDesdeCampos = (equipo, equipos) => {
+  const equiposNormalizados = normalizarListaEquipos(equipos);
+  if (equiposNormalizados.length > 0) {
+    return equiposNormalizados;
+  }
+
+  const equipoNormalizado = normalizarCategoriaEquipo(equipo);
+  if (equipoNormalizado === 'ambos') {
+    return ['ascenso', 'escuela'];
+  }
+
+  if (EQUIPOS_VALIDOS.includes(equipoNormalizado)) {
+    return [equipoNormalizado];
+  }
+
+  return [];
+};
+
+export const obtenerEquiposJugadoraDesdeDatos = (jugadora = null) => {
+  return resolverEquiposDesdeCampos(jugadora?.equipo, jugadora?.equipos);
+};
+
+export const obtenerEquiposJugadora = () => {
+  return obtenerEquiposJugadoraDesdeDatos(jugadoraData.value);
+};
+
+// Convertir array de equipos a string para resolverCategoriaSeleccionada
+const convertirEquiposAString = (equipos) => {
+  const equiposNormalizados = Array.isArray(equipos)
+    ? normalizarListaEquipos(equipos)
+    : resolverEquiposDesdeCampos(equipos);
+
+  if (equiposNormalizados.length === 0) return '';
+  if (equiposNormalizados.length === 2 && equiposNormalizados.includes('ascenso') && equiposNormalizados.includes('escuela')) {
+    return 'ambos';
+  }
+
+  return equiposNormalizados[0];
+};
+
+const normalizarDatosJugadora = (uid, data = {}) => {
+  const equipos = obtenerEquiposJugadoraDesdeDatos(data);
+  const equipo = convertirEquiposAString(equipos);
+
+  return {
+    id: uid,
+    ...data,
+    ...(equipos.length > 0 ? { equipos, equipo } : {})
+  };
+};
+
+const resolverCategoriaSeleccionada = (equipo, categoriaSolicitada, categoriaActual = '', equipos = []) => {
+  const equiposPermitidos = resolverEquiposDesdeCampos(equipo, equipos);
   const categoriaSolicitadaNormalizada = normalizarCategoriaEquipo(categoriaSolicitada);
   const categoriaActualNormalizada = normalizarCategoriaEquipo(categoriaActual);
+
+  if (equiposPermitidos.length === 1) {
+    return equiposPermitidos[0];
+  }
+
+  if (equiposPermitidos.length > 1) {
+    if (equiposPermitidos.includes(categoriaSolicitadaNormalizada)) {
+      return categoriaSolicitadaNormalizada;
+    }
+
+    if (equiposPermitidos.includes(categoriaActualNormalizada)) {
+      return categoriaActualNormalizada;
+    }
+
+    if (categoriaSolicitadaNormalizada === 'ambos' || categoriaActualNormalizada === 'ambos') {
+      return 'ambos';
+    }
+
+    return equiposPermitidos[0];
+  }
+
+  const equipoString = convertirEquiposAString(equipo);
+  const equipoNormalizado = normalizarCategoriaEquipo(equipoString);
 
   if (equipoNormalizado === 'ascenso' || equipoNormalizado === 'escuela' || equipoNormalizado === 'serieC') {
     return equipoNormalizado;
@@ -93,10 +168,7 @@ onAuthStateChanged(auth, async (user) => {
     const jugadoraRegistroDoc = await getDoc(doc(db, 'jugadoraRegistro', user.uid));
     
     if (jugadoraRegistroDoc.exists()) {
-      jugadoraData.value = {
-        id: user.uid,
-        ...jugadoraRegistroDoc.data()
-      };
+      jugadoraData.value = normalizarDatosJugadora(user.uid, jugadoraRegistroDoc.data());
       console.log('✅ Documento de jugadora cargado desde Firestore');
     } else {
       // Si no existe, crear estado vacío (perfil no completado aún)
@@ -151,10 +223,7 @@ export const fetchJugadoraData = async (uid, coleccion = 'jugadoraRegistro') => 
   try {
     const jugadoraDoc = await getDoc(doc(db, coleccion, uid));
     if (jugadoraDoc.exists()) {
-      jugadoraData.value = {
-        id: uid,
-        ...jugadoraDoc.data()
-      };
+      jugadoraData.value = normalizarDatosJugadora(uid, jugadoraDoc.data());
       return jugadoraData.value;
     } else {
       // // console.warn('Documento de jugadora no existe en', coleccion, 'para uid:', uid);
@@ -183,7 +252,8 @@ export const actualizarCategoriaSeleccionadaJugadora = async (uid, categoria) =>
     const categoriaSeleccionada = resolverCategoriaSeleccionada(
       jugadoraDoc.equipo,
       categoria,
-      jugadoraDoc.categoriaSeleccionada
+      jugadoraDoc.categoriaSeleccionada,
+      jugadoraDoc.equipos
     );
 
     await updateDoc(jugadoraRef, {
@@ -389,7 +459,14 @@ export const completarPerfilJugadora = async (uid, perfilData, fotoFile) => {
     const dataToUpdate = {
       ...perfilData,
       uid: uid,
-      categoriaSeleccionada: resolverCategoriaSeleccionada(perfilData?.equipo, perfilData?.categoriaSeleccionada),
+      equipos: obtenerEquiposJugadoraDesdeDatos(perfilData),
+      equipo: convertirEquiposAString(obtenerEquiposJugadoraDesdeDatos(perfilData)),
+      categoriaSeleccionada: resolverCategoriaSeleccionada(
+        perfilData?.equipo,
+        perfilData?.categoriaSeleccionada,
+        '',
+        obtenerEquiposJugadoraDesdeDatos(perfilData)
+      ),
       perfilCompleto: true,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -420,12 +497,17 @@ export const actualizarPerfilJugadora = async (uid, perfilData, fotoFile) => {
   isLoadingJugadora.value = true;
   errorJugadora.value = null;
   try {
+    const equiposNormalizados = obtenerEquiposJugadoraDesdeDatos(perfilData);
+    const equipoLegacy = convertirEquiposAString(equiposNormalizados);
     const dataToUpdate = {
       ...perfilData,
+      equipos: equiposNormalizados,
+      equipo: equipoLegacy,
       categoriaSeleccionada: resolverCategoriaSeleccionada(
-        perfilData?.equipo,
+        equipoLegacy,
         perfilData?.categoriaSeleccionada,
-        jugadoraData.value?.categoriaSeleccionada
+        jugadoraData.value?.categoriaSeleccionada,
+        equiposNormalizados
       ),
       updatedAt: new Date()
     };
@@ -468,7 +550,7 @@ export const tienePerfılCompleto = () => {
 
 // Obtener equipo de jugadora
 export const obtenerEquipoJugadora = () => {
-  return jugadoraData.value?.equipo || null;
+  return convertirEquiposAString(obtenerEquiposJugadora());
 };
 
 // Eliminar perfil de jugadora

@@ -4,20 +4,31 @@
     import Footer from './components/Footer.vue';
 
     import { watch, onMounted } from 'vue';
-import { jugadoraData, authReady } from './firebase/jugadorasAuth'; // Importar authReady
+import { jugadoraData, authReady, obtenerEquiposJugadoraDesdeDatos, obtenerEquipoJugadora } from './firebase/jugadorasAuth'; // Importar authReady
 import { requestPermissionAndSubscribe } from './firebase/messaging'; // La función que creamos
+
+const suscribirTemasJugadora = (data) => {
+  const equipos = obtenerEquiposJugadoraDesdeDatos(data);
+  if (!equipos.length) {
+    return;
+  }
+
+  const temas = new Set(equipos);
+  if (obtenerEquipoJugadora() === 'ambos') {
+    temas.add('ambos');
+  }
+
+  temas.forEach((tema) => {
+    requestPermissionAndSubscribe(tema);
+  });
+};
 
 // Ejecutar al montar el componente si ya hay datos de jugadora
 onMounted(() => {
   // Esperar a que la autenticación esté lista
   const checkAndSubscribe = () => {
-    if (authReady.value && jugadoraData.value && jugadoraData.value.equipo) {
-      requestPermissionAndSubscribe(jugadoraData.value.equipo);
-      
-      if (jugadoraData.value.equipo === 'ambos') {
-        requestPermissionAndSubscribe('ascenso');
-        requestPermissionAndSubscribe('escuela');
-      }
+    if (authReady.value && jugadoraData.value) {
+      suscribirTemasJugadora(jugadoraData.value);
     } else {
     }
   };
@@ -34,23 +45,12 @@ onMounted(() => {
 });
 
 watch(jugadoraData, (newData, oldData) => {
-  // Solo proceder si tenemos nuevos datos y esos datos tienen un 'equipo'
-  // y además, nos aseguramos de que no sea una ejecución inicial con datos vacíos.
-  if (newData && newData.equipo) {
+  if (newData) {
+    const equiposNuevos = obtenerEquiposJugadoraDesdeDatos(newData).join(',');
+    const equiposAnteriores = obtenerEquiposJugadoraDesdeDatos(oldData).join(',');
     
-    // Para evitar ejecuciones múltiples, solo suscribimos si el equipo ha cambiado
-    // o si antes no había datos y ahora sí.
-    if (!oldData || newData.equipo !== oldData.equipo) {
-      
-      
-      // Llama a la función para suscribirla al tema de su equipo
-      requestPermissionAndSubscribe(newData.equipo);
-
-      // Si una jugadora puede pertenecer a "ambos" equipos
-      if (newData.equipo === 'ambos') {
-          requestPermissionAndSubscribe('ascenso');
-          requestPermissionAndSubscribe('escuela');
-      }
+    if (!oldData || equiposNuevos !== equiposAnteriores || newData.categoriaSeleccionada !== oldData?.categoriaSeleccionada) {
+      suscribirTemasJugadora(newData);
     }
   }
 }, { 

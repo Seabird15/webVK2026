@@ -173,7 +173,7 @@ import {
   UserPlusIcon,
   ArrowRightIcon
 } from '@heroicons/vue/24/outline';
-import { loginJugadora, isLoadingJugadora, errorJugadora, tienePerfılCompleto, obtenerEquipoJugadora } from '../firebase/jugadorasAuth';
+import { loginJugadora, isLoadingJugadora, errorJugadora, tienePerfılCompleto, obtenerEquiposJugadora } from '../firebase/jugadorasAuth';
 
 const router = useRouter();
 const email = ref('');
@@ -203,8 +203,8 @@ const handleLogin = async () => {
       router.push('/completar-perfil');
     } else {
       // Verificar equipo y redirigir
-      const equipo = obtenerEquipoJugadora();
-      if (equipo === 'ambos') {
+      const equipos = obtenerEquiposJugadora();
+      if (equipos.length > 1) {
         router.push('/seleccionar-categoria');
       } else {
         router.push('/entrenamientos');
