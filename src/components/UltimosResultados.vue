@@ -7,7 +7,7 @@
           <h2 class="text-3xl md:text-5xl font-black text-white" style="font-family: 'Gobold High', sans-serif;">ULTIMOS RESULTADOS</h2>
         </div>
         <p class="text-white/65 text-sm md:max-w-sm">
-          Revisa los partidos y cierres mas recientes del club en un solo vistazo.
+         
         </p>
       </div>
 
@@ -42,7 +42,6 @@
                 <span class="font-bold">{{ resultado.rival }}</span>
               </div>
               <p class="text-3xl font-black flex justify-around text-primary"><span>{{ resultado.marcadorVikingas }} </span>- <span>{{ resultado.marcadorRival }}</span></p>
-              <p class="text-xs text-white/45 uppercase tracking-[0.2em] mt-2">Primer marcador: Vikingas</p>
             </div>
           </div>
         </article>
