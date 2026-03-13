@@ -148,6 +148,7 @@
     </div>
     
     <Eventos />
+    <UltimosResultados />
 </template>
 
 <script setup>
@@ -159,6 +160,7 @@ import { jugadoraAuthUser } from '../firebase/jugadorasAuth';
 import { HeartIcon } from '@heroicons/vue/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/vue/24/solid';
 import Eventos from '../components/Eventos.vue';
+import UltimosResultados from '../components/UltimosResultados.vue';
 
 const heroData = ref({
   imagenFondo: 'https://firebasestorage.googleapis.com/v0/b/loginvk-955b2.firebasestorage.app/o/slide2.webp?alt=media&token=88083cd1-4f14-4e7f-9aef-0bb1421f92e0',

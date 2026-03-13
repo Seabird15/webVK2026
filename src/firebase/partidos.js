@@ -18,6 +18,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './config';
 import { ref } from 'vue';
+import { actualizarContadorEstadistica } from './estadisticas';
 
 export const partidos = ref([]);
 export const isLoading = ref(false);
@@ -251,412 +252,61 @@ export const registrarAsistencia = async (
   }
 };
 
-// helper to compute Levenshtein distance between two strings
-const levenshtein = (a = '', b = '') => {
-  const m = a.length;
-  const n = b.length;
-  const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
-  for (let i = 0; i <= m; i++) dp[i][0] = i;
-  for (let j = 0; j <= n; j++) dp[0][j] = j;
-  for (let i = 1; i <= m; i++) {
-    for (let j = 1; j <= n; j++) {
-      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      dp[i][j] = Math.min(
-        dp[i - 1][j] + 1,
-        dp[i][j - 1] + 1,
-        dp[i - 1][j - 1] + cost
-      );
-    }
-  }
-  return dp[m][n];
-};
-
-// Función auxiliar: actualizar estadísticas con gol (ahora con búsqueda difusa)
-export const actualizarEstadisticaGol = async (jugadoraNombre, equipoPartido, tipoPartido) => {
+export const actualizarEstadisticaGol = async (jugadoraNombre, equipoPartido, tipoPartido, jugadoraId = null) => {
   try {
-    // LÓGICA: Solo ASCENSO AMISTOSOS va a estadisticasAscAmistosos
-    // Todo lo demás (ASCENSO COMPETICIÓN, ESCUELA COMPETICIÓN, ESCUELA AMISTOSOS) va a estadisticas
-const coleccionEstadisticas = (equipoPartido === 'ascenso' && tipoPartido === 'amistoso')
-  ? 'estadisticasAscAmistosos'
-  : 'estadisticas';
-
-
-    // Intenta primero con filtro de equipo
-    let q = query(
-      collection(db, coleccionEstadisticas),
-      where('equipo', '==', equipoPartido)
-    );
-    let snapshot = await getDocs(q);
-
-    
-    // Si no encuentra nada, busca SIN filtro de equipo en la misma colección
-    if (snapshot.size === 0) {
-      q = query(collection(db, coleccionEstadisticas));
-      snapshot = await getDocs(q);
-    }
-
-    snapshot.docs.forEach((d, idx) => {
-      const datos = d.data();
+    await actualizarContadorEstadistica({
+      equipo: equipoPartido,
+      jugadoraId,
+      jugadoraNombre,
+      tipo: tipoPartido,
+      campo: 'goles',
+      delta: 1
     });
-
-    const nombreLower = jugadoraNombre.trim().toLowerCase().replace(/\s+/g, ' ');
-    const nombreWords = nombreLower.split(/\s+/).filter(w => w);
-
-    // Coleccionar todas las coincidencias con prioridad
-    const coincidencias = {
-      exacto: null,
-      nombreExacto: null,
-      parcial: null,
-      levenshtein: null
-    };
-
-    snapshot.docs.forEach(d => {
-      const data = d.data();
-      const nombre = (data.nombre || '').trim().toLowerCase().replace(/\s+/g, ' ');
-      const apellido = (data.apellido || '').trim().toLowerCase().replace(/\s+/g, ' ');
-      const full = (nombre + ' ' + apellido).trim().replace(/\s+/g, ' ');
-
-
-      // Nivel 1: Coincidencia exacta completa (incluyendo espacios normalizados)
-      if (full === nombreLower && !coincidencias.exacto) {
-        coincidencias.exacto = { id: d.id, data };
-        return;
-      }
-
-      // Nivel 2: Primer nombre exacto (PRIORITARIO)
-      if (!coincidencias.nombreExacto && (nombre === nombreLower || nombreWords[0] === nombre)) {
-        coincidencias.nombreExacto = { id: d.id, data };
-        return;
-      }
-
-      // Nivel 3: Búsqueda parcial
-      if (!coincidencias.parcial) {
-        if (full.includes(nombreLower) || nombreLower.includes(nombre)) {
-          coincidencias.parcial = { id: d.id, data };
-          return;
-        }
-      }
-
-      // Nivel 4: Levenshtein como último recurso
-      if (!coincidencias.levenshtein && nombreLower.length > 2) {
-        const scoreNombre = levenshtein(nombre, nombreLower);
-        const scoreFull = levenshtein(full, nombreLower);
-        const score = Math.min(scoreNombre, scoreFull);
-        const maxLen = Math.max(full.length, nombreLower.length);
-        const threshold = Math.ceil(maxLen * 0.4);
-        
-        if (score <= threshold) {
-          coincidencias.levenshtein = { id: d.id, data };
-          return;
-        }
-      }
-    });
-
-    // Elegir la mejor coincidencia en orden de prioridad
-    const mejorDoc = coincidencias.exacto || 
-                     coincidencias.nombreExacto || 
-                     coincidencias.parcial || 
-                     coincidencias.levenshtein;
-
-    if (mejorDoc) {
-      const docRef = doc(db, coleccionEstadisticas, mejorDoc.id);
-      const tipoMatch = coincidencias.exacto ? 'exacto' : 
-                       coincidencias.nombreExacto ? 'nombreExacto' :
-                       coincidencias.parcial ? 'parcial' : 'levenshtein';
-      
-      
-      await updateDoc(docRef, {
-        goles: increment(1),
-        updatedAt: serverTimestamp()
-      });
-    } else {
-      snapshot.docs.forEach((d, idx) => {
-        const data = d.data();
-      });
-      const docRef = doc(collection(db, coleccionEstadisticas));
-      const parts = jugadoraNombre.split(' ');
-      await setDoc(docRef, {
-        nombre: parts[0] || jugadoraNombre,
-        apellido: parts[1] || '',
-        equipo: equipoPartido,
-        goles: 1,
-        asistencias: 0,
-        partidos: 1,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
-    }
   } catch (err) {
     console.error('❌ Error actualizando estadística de gol:', err);
   }
 };
 
-// Función auxiliar: decrementar gol de estadísticas (uso difuso)
-export const decrementarEstadisticaGol = async (jugadoraNombre, equipoPartido, tipoPartido) => {
+export const decrementarEstadisticaGol = async (jugadoraNombre, equipoPartido, tipoPartido, jugadoraId = null) => {
   try {
-    // LÓGICA: Solo ASCENSO AMISTOSOS va a estadisticasAscAmistosos
-    const coleccionEstadisticas = (equipoPartido === 'ascenso' && tipoPartido === 'amistoso')
-      ? 'estadisticasAscAmistosos'
-      : 'estadisticas';
-
-    // Intenta primero con filtro de equipo
-    let q = query(
-      collection(db, coleccionEstadisticas),
-      where('equipo', '==', equipoPartido)
-    );
-
-    let snapshot = await getDocs(q);
-    
-    // Si no encuentra nada, busca SIN filtro de equipo
-    if (snapshot.size === 0) {
-      q = query(collection(db, coleccionEstadisticas));
-      snapshot = await getDocs(q);
-    }
-
-    const nombreLower = jugadoraNombre.trim().toLowerCase().replace(/\s+/g, ' ');
-    const nombreWords = nombreLower.split(/\s+/).filter(w => w);
-
-    // Coleccionar coincidencias con prioridad
-    const coincidencias = {
-      exacto: null,
-      nombreExacto: null,
-      parcial: null,
-      levenshtein: null
-    };
-
-    snapshot.docs.forEach(d => {
-      const data = d.data();
-      const nombre = (data.nombre || '').trim().toLowerCase().replace(/\s+/g, ' ');
-      const apellido = (data.apellido || '').trim().toLowerCase().replace(/\s+/g, ' ');
-      const full = (nombre + ' ' + apellido).trim().replace(/\s+/g, ' ');
-
-      if (full === nombreLower && !coincidencias.exacto) {
-        coincidencias.exacto = { id: d.id, data };
-        return;
-      }
-
-      if (!coincidencias.nombreExacto && (nombre === nombreLower || nombreWords[0] === nombre)) {
-        coincidencias.nombreExacto = { id: d.id, data };
-        return;
-      }
-
-      if (!coincidencias.parcial) {
-        if (full.includes(nombreLower) || nombreLower.includes(nombre)) {
-          coincidencias.parcial = { id: d.id, data };
-          return;
-        }
-      }
-
-      if (!coincidencias.levenshtein && nombreLower.length > 2) {
-        const scoreNombre = levenshtein(nombre, nombreLower);
-        const scoreFull = levenshtein(full, nombreLower);
-        const score = Math.min(scoreNombre, scoreFull);
-        const maxLen = Math.max(full.length, nombreLower.length);
-        const threshold = Math.ceil(maxLen * 0.4);
-        
-        if (score <= threshold) {
-          coincidencias.levenshtein = { id: d.id, data };
-          return;
-        }
-      }
+    await actualizarContadorEstadistica({
+      equipo: equipoPartido,
+      jugadoraId,
+      jugadoraNombre,
+      tipo: tipoPartido,
+      campo: 'goles',
+      delta: -1
     });
-
-    const mejorDoc = coincidencias.exacto || 
-                     coincidencias.nombreExacto || 
-                     coincidencias.parcial || 
-                     coincidencias.levenshtein;
-
-    if (mejorDoc) {
-      const docRef = doc(db, coleccionEstadisticas, mejorDoc.id);
-      const actuales = mejorDoc.data.goles || 0;
-      await updateDoc(docRef, {
-        goles: Math.max(0, actuales - 1),
-        updatedAt: serverTimestamp()
-      });
-    }
   } catch (err) {
     console.error('Error decrementando gol de estadísticas:', err);
   }
 };
 
-// Función auxiliar: decrementar asistencias de estadísticas
-export const decrementarEstadisticaAsistencia = async (jugadoraNombre, equipoPartido, tipoPartido) => {
+export const decrementarEstadisticaAsistencia = async (jugadoraNombre, equipoPartido, tipoPartido, jugadoraId = null) => {
   try {
-    const coleccionEstadisticas = (equipoPartido === 'ascenso' && tipoPartido === 'amistoso')
-      ? 'estadisticasAscAmistosos'
-      : 'estadisticas';
-
-    // Intenta primero con filtro de equipo
-    let q = query(
-      collection(db, coleccionEstadisticas),
-      where('equipo', '==', equipoPartido)
-    );
-    let snapshot = await getDocs(q);
-
-    // Si no encuentra nada, busca SIN filtro de equipo
-    if (snapshot.size === 0) {
-      q = query(collection(db, coleccionEstadisticas));
-      snapshot = await getDocs(q);
-    }
-
-    const nombreLower = jugadoraNombre.trim().toLowerCase().replace(/\s+/g, ' ');
-    const nombreWords = nombreLower.split(/\s+/).filter(w => w);
-
-    const coincidencias = {
-      exacto: null,
-      nombreExacto: null,
-      parcial: null,
-      levenshtein: null
-    };
-
-    snapshot.docs.forEach(d => {
-      const data = d.data();
-      const nombre = (data.nombre || '').trim().toLowerCase().replace(/\s+/g, ' ');
-      const apellido = (data.apellido || '').trim().toLowerCase().replace(/\s+/g, ' ');
-      const full = (nombre + ' ' + apellido).trim().replace(/\s+/g, ' ');
-
-      if (full === nombreLower && !coincidencias.exacto) {
-        coincidencias.exacto = { id: d.id, data };
-        return;
-      }
-
-      if (!coincidencias.nombreExacto && (nombre === nombreLower || nombreWords[0] === nombre)) {
-        coincidencias.nombreExacto = { id: d.id, data };
-        return;
-      }
-
-      if (!coincidencias.parcial) {
-        if (full.includes(nombreLower) || nombreLower.includes(nombre)) {
-          coincidencias.parcial = { id: d.id, data };
-          return;
-        }
-      }
-
-      if (!coincidencias.levenshtein && nombreLower.length > 2) {
-        const scoreNombre = levenshtein(nombre, nombreLower);
-        const scoreFull = levenshtein(full, nombreLower);
-        const score = Math.min(scoreNombre, scoreFull);
-        const maxLen = Math.max(full.length, nombreLower.length);
-        const threshold = Math.ceil(maxLen * 0.4);
-        
-        if (score <= threshold) {
-          coincidencias.levenshtein = { id: d.id, data };
-          return;
-        }
-      }
+    await actualizarContadorEstadistica({
+      equipo: equipoPartido,
+      jugadoraId,
+      jugadoraNombre,
+      tipo: tipoPartido,
+      campo: 'asistencias',
+      delta: -1
     });
-
-    const mejorDoc = coincidencias.exacto || 
-                     coincidencias.nombreExacto || 
-                     coincidencias.parcial || 
-                     coincidencias.levenshtein;
-
-    if (mejorDoc) {
-      const docRef = doc(db, coleccionEstadisticas, mejorDoc.id);
-      const actuales = mejorDoc.data.asistencias || 0;
-      await updateDoc(docRef, {
-        asistencias: Math.max(0, actuales - 1),
-        updatedAt: serverTimestamp()
-      });
-    }
   } catch (err) {
     console.error('Error decrementando asistencia de estadísticas:', err);
   }
 };
 
-// Función auxiliar: actualizar estadísticas con asistencia
-export const actualizarEstadisticaAsistencia = async (jugadoraNombre, equipoPartido, tipoPartido) => {
+export const actualizarEstadisticaAsistencia = async (jugadoraNombre, equipoPartido, tipoPartido, jugadoraId = null) => {
   try {
-    const coleccionEstadisticas = (equipoPartido === 'ascenso' && tipoPartido === 'amistoso')
-      ? 'estadisticasAscAmistosos'
-      : 'estadisticas';
-
-
-    // Intenta primero con filtro de equipo
-    let q = query(
-      collection(db, coleccionEstadisticas),
-      where('equipo', '==', equipoPartido)
-    );
-    let snapshot = await getDocs(q);
-
-    // Si no encuentra nada, busca SIN filtro de equipo
-    if (snapshot.size === 0) {
-      q = query(collection(db, coleccionEstadisticas));
-      snapshot = await getDocs(q);
-    }
-
-    const nombreLower = jugadoraNombre.trim().toLowerCase().replace(/\s+/g, ' ');
-    const nombreWords = nombreLower.split(/\s+/).filter(w => w);
-
-    const coincidencias = {
-      exacto: null,
-      nombreExacto: null,
-      parcial: null,
-      levenshtein: null
-    };
-
-    snapshot.docs.forEach(d => {
-      const data = d.data();
-      const nombre = (data.nombre || '').trim().toLowerCase().replace(/\s+/g, ' ');
-      const apellido = (data.apellido || '').trim().toLowerCase().replace(/\s+/g, ' ');
-      const full = (nombre + ' ' + apellido).trim().replace(/\s+/g, ' ');
-
-      if (full === nombreLower && !coincidencias.exacto) {
-        coincidencias.exacto = { id: d.id, data };
-        return;
-      }
-
-      if (!coincidencias.nombreExacto && (nombre === nombreLower || nombreWords[0] === nombre)) {
-        coincidencias.nombreExacto = { id: d.id, data };
-        return;
-      }
-
-      if (!coincidencias.parcial) {
-        if (full.includes(nombreLower) || nombreLower.includes(nombre)) {
-          coincidencias.parcial = { id: d.id, data };
-          return;
-        }
-      }
-
-      if (!coincidencias.levenshtein && nombreLower.length > 2) {
-        const scoreNombre = levenshtein(nombre, nombreLower);
-        const scoreFull = levenshtein(full, nombreLower);
-        const score = Math.min(scoreNombre, scoreFull);
-        const maxLen = Math.max(full.length, nombreLower.length);
-        const threshold = Math.ceil(maxLen * 0.4);
-        
-        if (score <= threshold) {
-          coincidencias.levenshtein = { id: d.id, data };
-          return;
-        }
-      }
+    await actualizarContadorEstadistica({
+      equipo: equipoPartido,
+      jugadoraId,
+      jugadoraNombre,
+      tipo: tipoPartido,
+      campo: 'asistencias',
+      delta: 1
     });
-
-    const mejorDoc = coincidencias.exacto || 
-                     coincidencias.nombreExacto || 
-                     coincidencias.parcial || 
-                     coincidencias.levenshtein;
-
-    if (mejorDoc) {
-      const docRef = doc(db, coleccionEstadisticas, mejorDoc.id);
-      await updateDoc(docRef, {
-        asistencias: increment(1),
-        updatedAt: serverTimestamp()
-      });
-    } else {
-      const docRef = doc(collection(db, coleccionEstadisticas));
-      const parts = jugadoraNombre.split(' ');
-      await setDoc(docRef, {
-        nombre: parts[0] || jugadoraNombre,
-        apellido: parts[1] || '',
-        equipo: equipoPartido,
-        goles: 0,
-        asistencias: 1,
-        partidos: 1,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
-    }
   } catch (err) {
     console.error('❌ Error actualizando estadística de asistencia:', err);
   }

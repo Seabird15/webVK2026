@@ -13,7 +13,7 @@
         </div>
         
         <!-- Indicador de tipo de estadística -->
-        <div v-if="equipoActivo === 'ascenso'" class="mt-2">
+        <div class="mt-2">
           <span class="inline-block bg-white/10 text-white px-4 py-2 rounded-lg text-sm font-semibold">
             {{ tipoEstadistica === 'competicion' ? '📊 Competición' : '🤝 Amistosos' }}
           </span>
@@ -46,8 +46,8 @@
         </button>
       </div>
 
-      <!-- Sub-pestañas para Ascenso (Competición/Amistosos) -->
-      <div v-if="equipoActivo === 'ascenso'" class="flex justify-center gap-3 mb-8">
+      <!-- Sub-pestañas por tipo -->
+      <div class="flex justify-center gap-3 mb-8">
         <button
           @click="tipoEstadistica = 'competicion'"
           class="px-5 py-2 font-bold text-xs uppercase transition-all rounded-lg cursor-pointer"
@@ -219,37 +219,48 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { getDocs, collection, query, where } from 'firebase/firestore';
-import { db } from '../firebase/config';
-import { TrophyIcon, FireIcon, SparklesIcon, ChartBarIcon } from '@heroicons/vue/24/solid';
+import { TrophyIcon, FireIcon, SparklesIcon } from '@heroicons/vue/24/solid';
+import { obtenerEstadisticasEquipo, obtenerResumenPorTipo } from '../firebase/estadisticas';
 
 const isLoading = ref(false);
 const equipoActivo = ref('ascenso');
-const tipoEstadistica = ref('competicion'); // Para filtrar en ascenso
+const tipoEstadistica = ref('competicion');
 const jugadoras = ref([]);
 
 const equipos = [
   { id: 'ascenso', label: 'Ascenso' },
-  { id: 'escuela', label: 'Escuela' }
+  { id: 'serieC', label: 'Serie C' }
 ];
+
+const jugadorasFiltradasPorTipo = computed(() => {
+  return jugadoras.value.map((jugadora) => {
+    const resumen = obtenerResumenPorTipo(jugadora, tipoEstadistica.value);
+    return {
+      ...jugadora,
+      goles: resumen.goles || 0,
+      asistencias: resumen.asistencias || 0,
+      partidos: resumen.partidos || 0
+    };
+  });
+});
 
 // Obtener goleadoras ordenadas por mayor a menor
 const goleadorasOrdenadas = computed(() => {
-  return [...jugadoras.value]
+  return [...jugadorasFiltradasPorTipo.value]
     .sort((a, b) => (b.goles || 0) - (a.goles || 0))
     .filter(j => (j.goles || 0) > 0);
 });
 
 // Obtener asistidoras ordenadas por mayor a menor
 const asistidorasOrdenadas = computed(() => {
-  return [...jugadoras.value]
+  return [...jugadorasFiltradasPorTipo.value]
     .sort((a, b) => (b.asistencias || 0) - (a.asistencias || 0))
     .filter(j => (j.asistencias || 0) > 0);
 });
 
 // Estadísticas completas ordenadas por mayor participación
 const estadisticasCompletas = computed(() => {
-  return [...jugadoras.value]
+  return [...jugadorasFiltradasPorTipo.value]
     .sort((a, b) => {
       const participacionA = (a.goles || 0) + (a.asistencias || 0);
       const participacionB = (b.goles || 0) + (b.asistencias || 0);
@@ -261,32 +272,7 @@ const estadisticasCompletas = computed(() => {
 const cargarJugadoras = async () => {
   isLoading.value = true;
   try {
-    let q;
-    
-    // Para escuela: cargar todas las estadísticas del equipo
-    if (equipoActivo.value === 'escuela') {
-      q = query(
-        collection(db, 'estadisticas'),
-        where('equipo', '==', equipoActivo.value)
-      );
-    } 
-    // Para ascenso competición: usar colección estadisticas
-    else if (tipoEstadistica.value === 'competicion') {
-      q = query(
-        collection(db, 'estadisticas'),
-        where('equipo', '==', equipoActivo.value)
-      );
-    }
-    // Para ascenso amistosos: usar colección estadisticasAscAmistosos
-    else {
-      q = collection(db, 'estadisticasAscAmistosos');
-    }
-    
-    const snapshot = await getDocs(q);
-    jugadoras.value = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    jugadoras.value = await obtenerEstadisticasEquipo(equipoActivo.value);
   } catch (err) {
     console.error('Error cargando estadísticas:', err);
     jugadoras.value = [];
@@ -301,13 +287,7 @@ onMounted(() => {
 
 // Watcher para cambios de equipo
 watch(() => equipoActivo.value, () => {
-  // Reiniciar tipo de estadística al cambiar de equipo
-  tipoEstadistica.value = 'competicion';
   cargarJugadoras();
 });
 
-// Watcher para cambios de tipo de estadística
-watch(() => tipoEstadistica.value, () => {
-  cargarJugadoras();
-});
 </script>

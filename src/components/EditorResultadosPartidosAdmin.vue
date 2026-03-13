@@ -39,15 +39,15 @@
           Ascenso
         </button>
         <button
-          @click="filtroEquipo = 'escuela'"
+          @click="filtroEquipo = 'serieC'"
           :class="[
             'px-4 py-2 rounded-lg font-bold text-sm transition-all',
-            filtroEquipo === 'escuela'
+            filtroEquipo === 'serieC'
               ? 'bg-primary text-white'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           ]"
         >
-          Escuela
+          Serie C
         </button>
       </div>
 
@@ -216,7 +216,7 @@
                   class="flex items-center justify-between bg-linear-to-r from-blue-50 to-transparent p-2.5 rounded-lg text-sm border-l-3 border-blue-400"
                 >
                   <span class="font-semibold text-blue-900">
-                    {{ gol.jugadora }}
+                    {{ gol.jugadoraNombre || gol.jugadora }}
                     <span class="text-xs text-blue-600 font-normal ml-1">{{ gol.minuto }}'</span>
                   </span>
                   <button
@@ -232,16 +232,22 @@
                 </p>
               </div>
               <div class="space-y-2">
-                <input
-                  v-model="nuevoGoleadorLocal"
-                  @keyup.enter="agregarGoleador(partido, 'local')"
-                  type="text"
-                  placeholder="Nombre de la goleadora..."
+                <select
+                  v-model="seleccionGoleadora[partido.id]"
                   :disabled="guardando"
                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+                >
+                  <option value="">Selecciona una goleadora...</option>
+                  <option
+                    v-for="jugadora in obtenerJugadorasEquipo(partido)"
+                    :key="`gol-${partido.id}-${jugadora.id}`"
+                    :value="jugadora.id"
+                  >
+                    {{ jugadora.nombre }} {{ jugadora.apellido }}
+                  </option>
+                </select>
                 <input
-                  v-model.number="minutoLocal"
+                  v-model.number="minutoGoleadora[partido.id]"
                   type="number"
                   min="0"
                   max="90"
@@ -251,7 +257,7 @@
                 />
                 <button
                   @click="agregarGoleador(partido, 'local')"
-                  :disabled="!nuevoGoleadorLocal || guardando"
+                  :disabled="!seleccionGoleadora[partido.id] || guardando"
                   class="w-full bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 active:scale-95 text-white px-3 py-2.5 rounded-lg font-bold text-sm transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <span>⚽</span> Registrar Gol
@@ -269,7 +275,7 @@
                   class="flex items-center justify-between bg-linear-to-r from-green-50 to-transparent p-2.5 rounded-lg text-sm border-l-3 border-green-400"
                 >
                   <span class="font-semibold text-green-900">
-                    {{ asistencia.asistente }}
+                    {{ asistencia.asistenteNombre || asistencia.asistente }}
                     <span class="text-xs text-green-600 font-normal ml-1">{{ asistencia.minuto }}'</span>
                   </span>
                   <button
@@ -285,16 +291,22 @@
                 </p>
               </div>
               <div class="space-y-2">
-                <input
-                  v-model="nuevoAsistenteLocal"
-                  @keyup.enter="agregarAsistencia(partido)"
-                  type="text"
-                  placeholder="Nombre de la asistente..."
+                <select
+                  v-model="seleccionAsistente[partido.id]"
                   :disabled="guardando"
                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
+                >
+                  <option value="">Selecciona una asistente...</option>
+                  <option
+                    v-for="jugadora in obtenerJugadorasEquipo(partido)"
+                    :key="`asist-${partido.id}-${jugadora.id}`"
+                    :value="jugadora.id"
+                  >
+                    {{ jugadora.nombre }} {{ jugadora.apellido }}
+                  </option>
+                </select>
                 <input
-                  v-model.number="minutoAsistenteLocal"
+                  v-model.number="minutoAsistente[partido.id]"
                   type="number"
                   min="0"
                   max="90"
@@ -304,7 +316,7 @@
                 />
                 <button
                   @click="agregarAsistencia(partido)"
-                  :disabled="!nuevoAsistenteLocal || guardando"
+                  :disabled="!seleccionAsistente[partido.id] || guardando"
                   class="w-full bg-linear-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 active:scale-95 text-white px-3 py-2.5 rounded-lg font-bold text-sm transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <span>🤝</span> Registrar Asistencia
@@ -374,26 +386,20 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { TrophyIcon } from '@heroicons/vue/24/solid';
 import {
-  obtenerPartidosPorEquipoTipo,
   escucharPartidos,
-  registrarGol,
-  deshacerGol,
-  actualizarResultado,
-  registrarAsistencia,
-  actualizarEstadisticaGol,
-  decrementarEstadisticaGol,
-  actualizarEstadisticaAsistencia,
-  decrementarEstadisticaAsistencia
+  actualizarResultado
 } from '../firebase/partidos';
 import { updateDoc, doc, collection, query, where, onSnapshot, arrayUnion, increment } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import { fetchJugadorasRegistradasPorEquipo } from '../firebase/jugadorasAuth';
+import { actualizarContadorEstadistica } from '../firebase/estadisticas';
 
 // Reactive state
 const partidosAscenso = ref([]);
-const partidosEscuela = ref([]);
+const partidosSerieC = ref([]);
 
 
 const isLoading = ref(true);
@@ -401,25 +407,20 @@ const guardando = ref(false);
 const filtroEquipo = ref('ambos');
 const filtroTipo = ref('todos');
 const mensajeExito = ref('');
-
-// Inputs temporales para goleadores
-const nuevoGoleadorLocal = ref('');
-const nuevoGoleadorVisita = ref('');
-const minutoLocal = ref(0);
-const minutoVisita = ref(0);
-// La goleadora SOLO se edita en Vikingas (equipo local)
-// Los datos visitantes se muestran pero no se pueden editar
-
-// Inputs temporales para asistencias
-const nuevoAsistenteLocal = ref('');
-const minutoAsistenteLocal = ref(0);
-// Las asistencias SOLO se editan en Vikingas (equipo local)
+const plantelPorEquipo = ref({
+  ascenso: [],
+  serieC: []
+});
+const seleccionGoleadora = ref({});
+const minutoGoleadora = ref({});
+const seleccionAsistente = ref({});
+const minutoAsistente = ref({});
 
 // Control de expansión de edición en partidos finalizados
 const expandidosEdicion = ref(new Set());
 
 let unsubscribeAscenso = null;
-let unsubscribeEscuela = null;
+let unsubscribeSerieC = null;
 let unsubscribeEntrenamientos = null;
 
 // Array para guardar todos los unsubscribers
@@ -432,9 +433,9 @@ const partidosFiltrados = computed(() => {
   if (filtroEquipo.value === 'ascenso' || filtroEquipo.value === 'ambos') {
     todos = [...todos, ...partidosAscenso.value];
   }
-  
-  if (filtroEquipo.value === 'escuela' || filtroEquipo.value === 'ambos') {
-    todos = [...todos, ...partidosEscuela.value];
+
+  if (filtroEquipo.value === 'serieC' || filtroEquipo.value === 'ambos') {
+    todos = [...todos, ...partidosSerieC.value];
   }
 
   if (filtroTipo.value !== 'todos') {
@@ -457,6 +458,36 @@ const formatearFecha = (fecha) => {
   }).toUpperCase();
 };
 
+const obtenerJugadorasEquipo = (partido) => {
+  return plantelPorEquipo.value[partido.equipo] || [];
+};
+
+const buscarJugadoraEquipo = (partido, jugadoraId) => {
+  return obtenerJugadorasEquipo(partido).find((jugadora) => jugadora.id === jugadoraId) || null;
+};
+
+const limpiarFormularioGol = (partidoId) => {
+  seleccionGoleadora.value[partidoId] = '';
+  minutoGoleadora.value[partidoId] = 0;
+};
+
+const limpiarFormularioAsistencia = (partidoId) => {
+  seleccionAsistente.value[partidoId] = '';
+  minutoAsistente.value[partidoId] = 0;
+};
+
+const obtenerColeccionPartido = (partido) => {
+  return partido.fuente === 'entrenamientos' ? 'entrenamientos' : 'partidos';
+};
+
+const obtenerCampoMarcador = (partido, lado) => {
+  if (partido.fuente === 'entrenamientos') {
+    return lado === 'local' ? 'resultadoLocal' : 'resultadoVisita';
+  }
+
+  return lado === 'local' ? 'golesLocal' : 'golesVisita';
+};
+
 // Incrementar gol
 const incrementarGol = async (partido, lado) => {
   guardando.value = true;
@@ -473,10 +504,6 @@ const incrementarGol = async (partido, lado) => {
         lado === 'local' ? nuevoGol : partido.golesLocal,
         lado === 'visita' ? nuevoGol : partido.golesVisita
       );
-    }
-    // actualizar estadísticas solo si es el equipo local
-    if (lado === 'local') {
-      await actualizarEstadisticaGol(nuevoGoleadorLocal.value || '', partido.equipo, partido.tipo);
     }
     mostrarMensaje('Gol registrado ✓');
   } catch (err) {
@@ -546,44 +573,44 @@ const agregarGoleador = async (partido, lado) => {
     return;
   }
 
-  const nombre = lado === 'local' ? nuevoGoleadorLocal.value : nuevoGoleadorVisita.value;
-  const minuto = lado === 'local' ? minutoLocal.value : minutoVisita.value;
+  const jugadora = buscarJugadoraEquipo(partido, seleccionGoleadora.value[partido.id]);
+  const minuto = Number(minutoGoleadora.value[partido.id] || 0);
 
-  if (!nombre.trim()) return;
+  if (!jugadora) return;
+
+  const nombre = `${jugadora.nombre} ${jugadora.apellido}`.trim();
 
   guardando.value = true;
   try {
     const nuevoGol = {
       jugadora: nombre,
+      jugadoraId: jugadora.id,
+      jugadoraNombre: nombre,
       minuto,
       timestamp: new Date()
     };
 
-    if (partido.fuente === 'entrenamientos') {
-      const campoGoleadores = lado === 'local' ? 'goleadoresLocal' : 'goleadoresVisita';
-      const campoResultado = lado === 'local' ? 'resultadoLocal' : 'resultadoVisita';
-      const docRef = doc(db, 'entrenamientos', partido.id);
-      
-      await updateDoc(docRef, {
-        [campoGoleadores]: arrayUnion(nuevoGol),
-        [campoResultado]: increment(1)
+    const campoGoleadores = lado === 'local' ? 'goleadoresLocal' : 'goleadoresVisita';
+    const campoResultado = obtenerCampoMarcador(partido, lado);
+    const docRef = doc(db, obtenerColeccionPartido(partido), partido.id);
+
+    await updateDoc(docRef, {
+      [campoGoleadores]: arrayUnion(nuevoGol),
+      [campoResultado]: increment(1)
+    });
+
+    if (lado === 'local') {
+      await actualizarContadorEstadistica({
+        equipo: partido.equipo,
+        jugadoraId: jugadora.id,
+        jugadoraNombre: nombre,
+        tipo: partido.tipo,
+        campo: 'goles',
+        delta: 1
       });
-    } else {
-      await registrarGol(partido.id, lado, nombre, minuto);
     }
-    // si es local, actualizar estadisticas usando la lógica difusa
-    if (lado === 'local') {
-      await actualizarEstadisticaGol(nombre, partido.equipo, partido.tipo);
-    }
-    
-    // Limpiar inputs
-    if (lado === 'local') {
-      nuevoGoleadorLocal.value = '';
-      minutoLocal.value = 0;
-    } else {
-      nuevoGoleadorVisita.value = '';
-      minutoVisita.value = 0;
-    }
+
+    limpiarFormularioGol(partido.id);
     
     mostrarMensaje(`Gol registrado para ${nombre} ✓`);
   } catch (err) {
@@ -605,23 +632,25 @@ const removerGoleador = async (partido, lado, indice) => {
   try {
     const goleadores = lado === 'local' ? partido.goleadoresLocal : partido.goleadoresVisita;
     const goleador = goleadores[indice];
+    const campoGoleadores = lado === 'local' ? 'goleadoresLocal' : 'goleadoresVisita';
+    const campoResultado = obtenerCampoMarcador(partido, lado);
+    const docRef = doc(db, obtenerColeccionPartido(partido), partido.id);
+    const nuevoArray = goleadores.filter((_, i) => i !== indice);
     
-    if (partido.fuente === 'entrenamientos') {
-      const campoGoleadores = lado === 'local' ? 'goleadoresLocal' : 'goleadoresVisita';
-      const campoResultado = lado === 'local' ? 'resultadoLocal' : 'resultadoVisita';
-      const docRef = doc(db, 'entrenamientos', partido.id);
-      const nuevoArray = goleadores.filter((_, i) => i !== indice);
-      
-      await updateDoc(docRef, {
-        [campoGoleadores]: nuevoArray,
-        [campoResultado]: increment(-1)
-      });
-    } else {
-      await deshacerGol(partido.id, lado, goleador.jugadora);
-    }
-    // ajustar estadisticas si era local
+    await updateDoc(docRef, {
+      [campoGoleadores]: nuevoArray,
+      [campoResultado]: increment(-1)
+    });
+
     if (lado === 'local') {
-      await decrementarEstadisticaGol(goleador.jugadora, partido.equipo, partido.tipo);
+      await actualizarContadorEstadistica({
+        equipo: partido.equipo,
+        jugadoraId: goleador.jugadoraId,
+        jugadoraNombre: goleador.jugadoraNombre || goleador.jugadora,
+        tipo: partido.tipo,
+        campo: 'goles',
+        delta: -1
+      });
     }
     mostrarMensaje('Gol eliminado ✓');
   } catch (err) {
@@ -634,39 +663,39 @@ const removerGoleador = async (partido, lado, indice) => {
 // Agregar asistencia
 const agregarAsistencia = async (partido) => {
   // SOLO permitimos registrar asistencias locales (CD Vikingas)
-  const nombre = nuevoAsistenteLocal.value;
-  const minuto = minutoAsistenteLocal.value;
+  const jugadora = buscarJugadoraEquipo(partido, seleccionAsistente.value[partido.id]);
+  const minuto = Number(minutoAsistente.value[partido.id] || 0);
 
-  if (!nombre.trim()) return;
+  if (!jugadora) return;
+
+  const nombre = `${jugadora.nombre} ${jugadora.apellido}`.trim();
 
   guardando.value = true;
   try {
     const nuevoAsistencia = {
       asistente: nombre,
+      asistenteId: jugadora.id,
+      asistenteNombre: nombre,
       minuto,
       timestamp: new Date()
     };
 
-    // Registrar en el partido (entrenamientos u otros)
-    if (partido.fuente === 'entrenamientos') {
-      const docRef = doc(db, 'entrenamientos', partido.id);
-      await updateDoc(docRef, {
-        'asistenciasLocal': arrayUnion(nuevoAsistencia)
-      });
-    } else {
-      // Para partidos regulares, si existe campo similar
-      const docRef = doc(db, 'partidos', partido.id);
-      await updateDoc(docRef, {
-        'asistenciasLocal': arrayUnion(nuevoAsistencia)
-      });
-    }
-    
-    // Actualizar estadísticas con lógica difusa
-    await actualizarEstadisticaAsistencia(nombre, partido.equipo, partido.tipo);
-    
-    // Limpiar inputs
-    nuevoAsistenteLocal.value = '';
-    minutoAsistenteLocal.value = 0;
+    const docRef = doc(db, obtenerColeccionPartido(partido), partido.id);
+
+    await updateDoc(docRef, {
+      asistenciasLocal: arrayUnion(nuevoAsistencia)
+    });
+
+    await actualizarContadorEstadistica({
+      equipo: partido.equipo,
+      jugadoraId: jugadora.id,
+      jugadoraNombre: nombre,
+      tipo: partido.tipo,
+      campo: 'asistencias',
+      delta: 1
+    });
+
+    limpiarFormularioAsistencia(partido.id);
     
     mostrarMensaje(`Asistencia registrada para ${nombre} ✓`);
   } catch (err) {
@@ -682,25 +711,21 @@ const removerAsistencia = async (partido, indice) => {
   try {
     const asistencias = partido.asistenciasLocal || [];
     const asistencia = asistencias[indice];
+    const docRef = doc(db, obtenerColeccionPartido(partido), partido.id);
+    const nuevoArray = asistencias.filter((_, i) => i !== indice);
     
-    if (partido.fuente === 'entrenamientos') {
-      const docRef = doc(db, 'entrenamientos', partido.id);
-      const nuevoArray = asistencias.filter((_, i) => i !== indice);
-      
-      await updateDoc(docRef, {
-        'asistenciasLocal': nuevoArray
-      });
-    } else {
-      const docRef = doc(db, 'partidos', partido.id);
-      const nuevoArray = asistencias.filter((_, i) => i !== indice);
-      
-      await updateDoc(docRef, {
-        'asistenciasLocal': nuevoArray
-      });
-    }
-    
-    // Ajustar estadísticas
-    await decrementarEstadisticaAsistencia(asistencia.asistente, partido.equipo, partido.tipo);
+    await updateDoc(docRef, {
+      asistenciasLocal: nuevoArray
+    });
+
+    await actualizarContadorEstadistica({
+      equipo: partido.equipo,
+      jugadoraId: asistencia.asistenteId,
+      jugadoraNombre: asistencia.asistenteNombre || asistencia.asistente,
+      tipo: partido.tipo,
+      campo: 'asistencias',
+      delta: -1
+    });
     
     mostrarMensaje('Asistencia eliminada ✓');
   } catch (err) {
@@ -747,11 +772,17 @@ const mostrarMensaje = (msg) => {
 // Cargar partidos
 onMounted(async () => {
   try {
+    const [ascenso, serieC] = await Promise.all([
+      fetchJugadorasRegistradasPorEquipo('ascenso'),
+      fetchJugadorasRegistradasPorEquipo('serieC')
+    ]);
+
+    plantelPorEquipo.value = { ascenso, serieC };
     
     // flags para controlar primera respuesta de cada escucha
-    const cargado = { ascenso: false, escuela: false, entrenamientos: false };
+    const cargado = { ascenso: false, serieC: false, entrenamientos: false };
     const chequearCarga = () => {
-      if (cargado.ascenso && cargado.escuela && cargado.entrenamientos) {
+      if (cargado.ascenso && cargado.serieC && cargado.entrenamientos) {
         isLoading.value = false;
       }
     };
@@ -770,17 +801,17 @@ onMounted(async () => {
     });
     unsubscribers.push(unsubscribeAscenso);
 
-    unsubscribeEscuela = escucharPartidos('escuela', null, (datos) => {
-      cargado.escuela = true;
+    unsubscribeSerieC = escucharPartidos('serieC', null, (datos) => {
+      cargado.serieC = true;
       chequearCarga();
       const partidosNuevos = datos.map(p => ({
         ...p,
         fuente: 'partidos'
       }));
-      const entrenamientosPrevios = partidosEscuela.value.filter(p => p.fuente === 'entrenamientos');
-      partidosEscuela.value = [...entrenamientosPrevios, ...partidosNuevos];
+      const entrenamientosPrevios = partidosSerieC.value.filter(p => p.fuente === 'entrenamientos');
+      partidosSerieC.value = [...entrenamientosPrevios, ...partidosNuevos];
     });
-    unsubscribers.push(unsubscribeEscuela);
+    unsubscribers.push(unsubscribeSerieC);
 
     // IMPORTANTE: También buscar entrenamientos con tipo 'partido' o 'amistoso'
     const entrenamientosQuery = query(
@@ -804,7 +835,7 @@ onMounted(async () => {
           golesLocal: data.golesLocal || data.resultadoLocal || 0,
           golesVisita: data.golesVisita || data.resultadoVisita || 0,
           goleadoresLocal: data.goleadoresLocal || [],
-          goleadorasLocal: data.goleadorasLocal || [],
+          asistenciasLocal: data.asistenciasLocal || [],
           goleadoresVisita: data.goleadoresVisita || [],
           estado: data.estado || 'PROGRAMADO',
           fuente: 'entrenamientos' // Para identificar que viene de entrenamientos
@@ -815,7 +846,7 @@ onMounted(async () => {
 
       // Separar por equipo
       const ascenso = entrenamientos.filter(e => e.equipo === 'ascenso' || e.equipo === 'ambos');
-      const escuela = entrenamientos.filter(e => e.equipo === 'escuela' || e.equipo === 'ambos');
+      const serieC = entrenamientos.filter(e => e.equipo === 'serieC');
 
       // Combinar con partidos existentes
       partidosAscenso.value = [
@@ -823,9 +854,9 @@ onMounted(async () => {
         ...(partidosAscenso.value.filter(p => p.fuente === 'partidos') || [])
       ];
 
-      partidosEscuela.value = [
-        ...escuela,
-        ...(partidosEscuela.value.filter(p => p.fuente === 'partidos') || [])
+      partidosSerieC.value = [
+        ...serieC,
+        ...(partidosSerieC.value.filter(p => p.fuente === 'partidos') || [])
       ];
 
 

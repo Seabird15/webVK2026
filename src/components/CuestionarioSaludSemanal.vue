@@ -1,16 +1,40 @@
 <template>
   <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 sm:p-6 mb-6">
-    <div class="flex items-start justify-between gap-3 mb-4">
+    <button
+      type="button"
+      @click="expandido = !expandido"
+      class="w-full flex items-start justify-between gap-3 text-left cursor-pointer"
+    >
       <div>
-        <h3 class="text-lg sm:text-xl font-black text-gray-900">Estado de salud semanal</h3>
-        <p class="text-sm text-gray-500">Mini chequeo pre-entreno para prevenir lesiones</p>
+        <div class="flex flex-wrap items-center gap-2">
+          <h3 class="text-lg sm:text-xl font-black text-gray-900">Estado de salud semanal</h3>
+          <span class="text-xs font-bold bg-primary/10 text-primary px-2.5 py-1 rounded-full">{{ semanaClave }}</span>
+          <span
+            class="text-xs font-bold px-2.5 py-1 rounded-full"
+            :class="yaRespondido ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'"
+          >
+            {{ yaRespondido ? 'Respondido' : 'Pendiente' }}
+          </span>
+        </div>
+        <p class="text-sm text-gray-500 mt-1">Mini chequeo pre-entreno para prevenir lesiones</p>
       </div>
-      <span class="text-xs font-bold bg-primary/10 text-primary px-2.5 py-1 rounded-full">{{ semanaClave }}</span>
-    </div>
 
-    <div v-if="isLoading" class="py-6 text-center text-gray-500 text-sm">Cargando cuestionario...</div>
+      <div class="flex items-center gap-3 shrink-0">
+        <div v-if="yaRespondido && !isLoading" class="hidden sm:block text-right text-xs text-gray-500">
+          <p>Dolor {{ form.dolor }}/5</p>
+          <p>Fatiga {{ form.fatiga }}/5</p>
+        </div>
+        <span class="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 transition-transform" :class="expandido ? 'rotate-180' : ''">
+          <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.512a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+          </svg>
+        </span>
+      </div>
+    </button>
 
-    <div v-else class="space-y-5">
+    <div v-if="isLoading && expandido" class="py-6 text-center text-gray-500 text-sm">Cargando cuestionario...</div>
+
+    <div v-else-if="expandido" class="space-y-5 mt-4">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
           <p class="text-sm font-bold text-gray-700 mb-2">Dolor (1-5)</p>
@@ -79,6 +103,13 @@
         </button>
       </div>
     </div>
+
+    <div v-else-if="!isLoading" class="mt-4 flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-600">
+      <span v-if="yaRespondido" class="rounded-full bg-gray-100 px-3 py-1 font-semibold">Dolor {{ form.dolor }}/5</span>
+      <span v-if="yaRespondido" class="rounded-full bg-gray-100 px-3 py-1 font-semibold">Fatiga {{ form.fatiga }}/5</span>
+      <span v-if="yaRespondido" class="rounded-full bg-gray-100 px-3 py-1 font-semibold">Sueño {{ form.sueno }}/5</span>
+      <span v-if="!yaRespondido" class="rounded-full bg-amber-50 text-amber-700 px-3 py-1 font-semibold">Tienes tu chequeo semanal pendiente</span>
+    </div>
   </div>
 </template>
 
@@ -102,6 +133,7 @@ const guardando = ref(false);
 const yaRespondido = ref(false);
 const mensaje = ref('');
 const tipoMensaje = ref('ok');
+const expandido = ref(false);
 
 const form = reactive({
   dolor: 1,
@@ -143,6 +175,7 @@ const guardar = async () => {
     yaRespondido.value = true;
     tipoMensaje.value = 'ok';
     mensaje.value = 'Respuesta semanal registrada correctamente.';
+    expandido.value = false;
   } catch {
     tipoMensaje.value = 'error';
     mensaje.value = 'No se pudo guardar la respuesta. Inténtalo nuevamente.';
@@ -151,5 +184,8 @@ const guardar = async () => {
   }
 };
 
-onMounted(cargarRespuesta);
+onMounted(async () => {
+  await cargarRespuesta();
+  expandido.value = !yaRespondido.value;
+});
 </script>

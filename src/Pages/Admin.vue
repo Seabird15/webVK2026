@@ -664,6 +664,10 @@
           <div v-if="activeTab === 'resultados-partidos'">
             <EditorResultadosPartidosAdmin />
           </div>
+
+          <div v-if="activeTab === 'ultimos-resultados'">
+            <GestionarUltimosResultados />
+          </div>
         </div>
       </div>
     </div>
@@ -705,6 +709,7 @@ import GestionarSolicitudesRegistro from '../components/GestionarSolicitudesRegi
 import GestionarEntrenamientos from '../components/GestionarEntrenamientos.vue';
 import GestionarPartidos from '../components/GestionarPartidos.vue';
 import EditorResultadosPartidosAdmin from '../components/EditorResultadosPartidosAdmin.vue';
+import GestionarUltimosResultados from '../components/GestionarUltimosResultados.vue';
 import { entrenamientos, fetchTodosEntrenamientos, finalizarVotacionMvpEntrenamiento } from '../firebase/entrenamientos';
 import VistaJugadorasAdmin from '../components/VistaJugadorasAdmin.vue';
 import ListadoJugadorasAdmin from '../components/ListadoJugadorasAdmin.vue';
@@ -753,6 +758,7 @@ const tabs = computed(() => {
     { id: 'galeria', label: 'Galería', icon: CameraIcon },
     { id: 'estadisticas', label: 'Estadísticas', icon: ArrowTrendingUpIcon },
     { id: 'resultados-partidos', label: 'Editar Resultados', icon: TrophyIcon },
+    { id: 'ultimos-resultados', label: 'Ultimos Resultados Home', icon: FlagIcon },
   ];
 
   if (esAdmin.value) {

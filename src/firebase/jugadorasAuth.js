@@ -279,25 +279,17 @@ export const actualizarCategoriaSeleccionadaJugadora = async (uid, categoria) =>
 // Obtener todas las jugadoras registradas por equipo
 export const fetchJugadorasRegistradasPorEquipo = async (equipo) => {
   try {
-    let q;
-    if (equipo === 'ambos') {
-      // Si el equipo es "ambos", traer todas las jugadoras
-      q = collection(db, 'jugadoraRegistro');
-    } else {
-      // Filtrar por equipo específico O jugadoras que juegan en ambos equipos
-      q = query(
-        collection(db, 'jugadoraRegistro'),
-        where('equipo', 'in', [equipo, 'ambos'])
-      );
-    }
-    
-    const snapshot = await getDocs(q);
+    const snapshot = await getDocs(collection(db, 'jugadoraRegistro'));
     const jugadoras = snapshot.docs.map(docSnap => ({
       id: docSnap.id,
       ...docSnap.data()
     }));
-    
-    return jugadoras;
+
+    if (equipo === 'ambos') {
+      return jugadoras;
+    }
+
+    return jugadoras.filter(jugadora => pertenecePorEquipo(jugadora, equipo));
   } catch (err) {
     // // console.error('Error obteniendo jugadoras registradas:', err);
     return [];
@@ -308,15 +300,16 @@ export const fetchJugadorasRegistradasPorEquipo = async (equipo) => {
 const pertenecePorEquipo = (jugadora, equipo) => {
   // Soportar formato nuevo: equipos como array
   if (Array.isArray(jugadora.equipos)) {
-    return jugadora.equipos.includes(equipo);
+    return jugadora.equipos.map(normalizarCategoriaEquipo).includes(equipo);
   }
+  const equipoNormalizado = normalizarCategoriaEquipo(jugadora.equipo);
   // Soportar formato antiguo: equipo como string
   if (equipo === 'ascenso') {
-    return jugadora.equipo === 'ascenso' || jugadora.equipo === 'ambos';
+    return equipoNormalizado === 'ascenso' || equipoNormalizado === 'ambos';
   } else if (equipo === 'escuela') {
-    return jugadora.equipo === 'escuela' || jugadora.equipo === 'ambos';
+    return equipoNormalizado === 'escuela' || equipoNormalizado === 'ambos';
   } else if (equipo === 'serieC') {
-    return jugadora.equipo === 'serieC';
+    return equipoNormalizado === 'serieC';
   }
   return false;
 };

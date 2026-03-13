@@ -39,6 +39,31 @@
       </div>
     </div>
 
+    <div class="max-w-6xl mx-auto px-6 mt-3">
+      <div class="rounded-[28px] border border-white/10 bg-white/6 backdrop-blur-md p-4 sm:p-6 shadow-[0_18px_50px_rgba(0,0,0,0.28)] overflow-hidden relative">
+        <div class="absolute inset-y-0 right-0 w-40 bg-linear-to-l from-cyan-300/10 to-transparent"></div>
+        <div class="relative flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
+          <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-white/95 p-1 shadow-lg shrink-0 flex items-center justify-center overflow-hidden">
+            <img :src="kinesioLogo" alt="Kinesiosport" class="w-full h-full object-contain scale-175" />
+          </div>
+          <div class="flex-1 text-center sm:text-left">
+            <p class="inline-flex items-center rounded-full border border-cyan-200/20 bg-cyan-300/8 px-3 py-1 text-[11px] sm:text-xs font-bold uppercase tracking-[0.22em] text-cyan-100/85">Convenio Kinesiologia</p>
+            <p class="text-white text-xl sm:text-2xl leading-none mt-3 tracking-widest" style="font-family: 'Gobold High', sans-serif;">Kinesiosport</p>
+            <p class="text-white/88 text-sm sm:text-base font-semibold leading-snug mt-2">Recuerda que tenemos convenio con su centro especializado en recuperacion deportiva.</p>
+            <p class="text-cyan-100/70 text-sm sm:text-[15px] mt-1.5">Precio especial por las 10 sesiones para jugadoras Vks</p >
+          </div>
+          <a
+            href="https://www.instagram.com/kinesiosportchile/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="shrink-0 inline-flex items-center justify-center rounded-full border border-cyan-200/20 bg-white text-slate-900 px-5 py-3 font-bold text-sm hover:bg-cyan-50 transition-colors shadow-lg"
+          >
+            Ir a Instagram
+          </a>
+        </div>
+      </div>
+    </div>
+
     <div class="max-w-6xl mx-auto px-6 mt-4">
       <CuestionarioSaludSemanal
         v-if="jugadoraAuthUser?.uid && jugadoraData"
@@ -1276,8 +1301,10 @@ import { escucharFeedbackJugadora, marcarFeedbackComoLeido, agregarReaccionFeedb
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { obtenerEventosEspeciales } from '../firebase/eventosEspeciales';
+import { obtenerTotalesEstadisticasJugadora } from '../firebase/estadisticas';
 import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
 import CuestionarioSaludSemanal from '../components/CuestionarioSaludSemanal.vue';
+import kinesioLogo from '../assets/sponsors/kinesio.png';
 
 const router = useRouter();
 const route = useRoute();
@@ -2146,98 +2173,15 @@ const calcularSimilitudNombre = (nombre1, nombre2) => {
   return 1 - (dp[n][m] / max);
 };
 
-// Función para buscar estadísticas por similitud de nombre
-const cargarEstadisticasPorSimilitud = async () => {
-  if (!jugadoraAuthUser.value?.uid || !jugadoraData.value?.nombre || !jugadoraData.value?.apellido) return;
-  
-  const miNombre = jugadoraData.value.nombre.toString().trim();
-  const miApellido = jugadoraData.value.apellido.toString().trim();
-  const nombreCompleto = `${miNombre} ${miApellido}`;
-  
+const cargarEstadisticasJugadora = async () => {
+  if (!jugadoraAuthUser.value?.uid || !jugadoraData.value) return;
+
   try {
-    let totalGoles = 0;
-    let totalAsistencias = 0;
-    
-    // Buscar en estadisticasAscAmistosos
-    const snapshotAscAmistosos = await getDocs(collection(db, 'estadisticasAscAmistosos'));
-    let mejorCoincidenciaAscAmistosos = null;
-    let mejorSimilitudAscAmistosos = 0;
-    
-    snapshotAscAmistosos.docs.forEach(doc => {
-      const data = doc.data();
-      const docNombre = (data.nombre || '').toString().trim();
-      const docApellido = (data.apellido || '').toString().trim();
-      const docNombreCompleto = `${docNombre} ${docApellido}`;
-      
-      // Buscar por similitud de nombre completo
-      let similitud = calcularSimilitudNombre(nombreCompleto, docNombreCompleto);
-      
-      // Si el apellido coincide exactamente, aumentar similitud del nombre
-      if (calcularSimilitudNombre(miApellido, docApellido) > 0.95) {
-        const similitudNombre = calcularSimilitudNombre(miNombre, docNombre);
-        similitud = Math.max(similitud, similitudNombre);
-      }
-      
-      if (similitud > mejorSimilitudAscAmistosos) {
-        mejorSimilitudAscAmistosos = similitud;
-        mejorCoincidenciaAscAmistosos = data;
-      }
-    });
-    
-    // Buscar en estadísticas
-    const snapshotEstadisticas = await getDocs(collection(db, 'estadisticas'));
-    let mejorCoincidenciaEstadisticas = null;
-    let mejorSimilitudEstadisticas = 0;
-    
-    snapshotEstadisticas.docs.forEach(doc => {
-      const data = doc.data();
-      const docNombre = (data.nombre || '').toString().trim();
-      const docApellido = (data.apellido || '').toString().trim();
-      const docNombreCompleto = `${docNombre} ${docApellido}`;
-      
-      // Buscar por similitud de nombre completo
-      let similitud = calcularSimilitudNombre(nombreCompleto, docNombreCompleto);
-      
-      // Si el apellido coincide exactamente, aumentar similitud del nombre
-      if (calcularSimilitudNombre(miApellido, docApellido) > 0.95) {
-        const similitudNombre = calcularSimilitudNombre(miNombre, docNombre);
-        similitud = Math.max(similitud, similitudNombre);
-      }
-      
-      if (similitud > mejorSimilitudEstadisticas) {
-        mejorSimilitudEstadisticas = similitud;
-        mejorCoincidenciaEstadisticas = data;
-      }
-    });
-    
-    // Sumar goles y asistencias de ambas colecciones si tienen similitud > 0.5
-    if (mejorCoincidenciaAscAmistosos && mejorSimilitudAscAmistosos > 0.5) {
-      if (mejorCoincidenciaAscAmistosos.goles !== undefined) {
-        totalGoles += Number(mejorCoincidenciaAscAmistosos.goles) || 0;
-      }
-      if (mejorCoincidenciaAscAmistosos.asistencias !== undefined) {
-        totalAsistencias += Number(mejorCoincidenciaAscAmistosos.asistencias) || 0;
-      }
-    }
-    
-    if (mejorCoincidenciaEstadisticas && mejorSimilitudEstadisticas > 0.5) {
-      if (mejorCoincidenciaEstadisticas.goles !== undefined) {
-        totalGoles += Number(mejorCoincidenciaEstadisticas.goles) || 0;
-      }
-      if (mejorCoincidenciaEstadisticas.asistencias !== undefined) {
-        totalAsistencias += Number(mejorCoincidenciaEstadisticas.asistencias) || 0;
-      }
-    }
-    
-    // Asignar los totales a los datos de la jugadora
-    if (totalGoles > 0) {
-      jugadoraData.value.goles = totalGoles;
-    }
-    if (totalAsistencias > 0) {
-      jugadoraData.value.asistencias = totalAsistencias;
-    }
+    const totales = await obtenerTotalesEstadisticasJugadora(jugadoraAuthUser.value.uid);
+    jugadoraData.value.goles = Number(totales.goles || 0);
+    jugadoraData.value.asistencias = Number(totales.asistencias || 0);
   } catch (err) {
-    console.error('Error cargando estadísticas por similitud:', err);
+    console.error('Error cargando estadísticas de la jugadora:', err);
   }
 };
 
@@ -2380,7 +2324,7 @@ onMounted(() => {
   cargarEntrenamientos();
   cargarBannerMensualidad();
   cargarProximoCumpleanios(); // Cargar el próximo cumpleaños
-  cargarEstadisticasPorSimilitud(); // Buscar goles y asistencias por similitud de nombre
+  cargarEstadisticasJugadora();
 });
 
 // Watch para el listener de feedback (se suscribe cuando el UID esté disponible)
