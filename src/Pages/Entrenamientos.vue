@@ -234,15 +234,16 @@
             </router-link>
 
             <!-- Camiseta 2026 -->
-            <a
-              href="https://docs.google.com/spreadsheets/d/1u-22axEvNqGepC_yLpddVSYeWt2ZAUaQUZihyZlBRns/edit?usp=drivesdk"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="bg-linear-to-r from-blue-500 to-indigo-600 text-white rounded-xl p-4 font-bold hover:shadow-lg transition-all text-center cursor-pointer hover:scale-105 transform duration-200 flex items-center justify-center gap-2"
+            <div
+              aria-disabled="true"
+              class="bg-linear-to-r from-blue-500 to-indigo-600 text-white rounded-xl p-4 font-bold text-center cursor-not-allowed opacity-60 flex flex-col items-center justify-center gap-1 select-none"
             >
-              <ShoppingBagIcon class="w-5 h-5" />
-              Camiseta 2026
-            </a>
+              <div class="flex items-center justify-center gap-2">
+                <ShoppingBagIcon class="w-5 h-5" />
+                <span>Camiseta 2026</span>
+              </div>
+              <span class="text-[11px] font-semibold uppercase tracking-wide text-white/90">No disponible</span>
+            </div>
           </div>
         </div>
 
@@ -1291,7 +1292,7 @@ import {
   desuscribirseEntrenamiento, 
   fetchInscripcionesEntrenamiento,
   estaInscrita as checkInscrita,
-  obtenerEstadoInscripcion,
+  escucharEstadosInscripcionJugadora,
   escucharInscripcionesEntrenamiento,
   cambiarEstadoInscripcion,
   isLoadingInscripciones,
@@ -1360,8 +1361,9 @@ const toastTipo = ref('success');
 const mensajeDetalle = ref('');
 const tipoMensajeDetalle = ref('success');
 const isLoadingAccion = ref(false);
-const unsubscribers = ref([]);
 const unsubEntrenamientos = ref(null);
+const unsubEstadosInscripcion = ref(null);
+const unsubInscripcionesDetalle = ref(null);
 const unsubFeedback = ref(null);
 const mostrarModalBaja = ref(false);
 const motivoBaja = ref('');
@@ -1399,7 +1401,7 @@ const nombreCompletoJugadora = computed(() => {
   return `${jugadoraData.value?.nombre || ''} ${jugadoraData.value?.apellido || ''}`.trim();
 });
 
-const VENTANA_VISIBILIDAD_JUGADORAS_MS = 24 * 60 * 60 * 1000;
+const VENTANA_HISTORIAL_MS = 24 * 60 * 60 * 1000;
 const DURACION_PARTIDO_DEFAULT_MS = 90 * 60 * 1000;
 
 const esPartidoOAmistoso = (entrenamiento) => {
@@ -1453,11 +1455,39 @@ const obtenerInicioFinEvento = (entrenamiento) => {
   };
 };
 
-const eventoFueraDeVentanaJugadora = (entrenamiento) => {
+const eventoFinalizado = (entrenamiento) => {
   const { finMs } = obtenerInicioFinEvento(entrenamiento);
   if (!Number.isFinite(finMs)) return false;
 
-  return Date.now() > finMs + VENTANA_VISIBILIDAD_JUGADORAS_MS;
+  return Date.now() > finMs;
+};
+
+const mantenerEvento24HorasEnListado = (entrenamiento) => {
+  if (esAdmin.value) return true;
+  return esPartidoOAmistoso(entrenamiento);
+};
+
+const obtenerLimiteListadoMs = (entrenamiento) => {
+  const { finMs } = obtenerInicioFinEvento(entrenamiento);
+  if (!Number.isFinite(finMs)) return null;
+
+  return finMs + (mantenerEvento24HorasEnListado(entrenamiento) ? VENTANA_HISTORIAL_MS : 0);
+};
+
+const eventoVisibleEnListado = (entrenamiento) => {
+  const limiteMs = obtenerLimiteListadoMs(entrenamiento);
+  if (!Number.isFinite(limiteMs)) return true;
+
+  return Date.now() <= limiteMs;
+};
+
+const eventoVisibleEnHistorialAdmin = (entrenamiento) => {
+  if (!esAdmin.value) return false;
+
+  const limiteMs = obtenerLimiteListadoMs(entrenamiento);
+  if (!Number.isFinite(limiteMs)) return false;
+
+  return Date.now() > limiteMs;
 };
 
 // Computed para obtener inscripciones organizadas del entrenamiento seleccionado
@@ -1491,8 +1521,8 @@ const entrenamientosFiltered = computed(() => {
       // Filtrar por equipo
       if (e.equipo !== equipoSeleccionado.value) return false;
 
-      // Mostrar mientras esté dentro de la ventana de visibilidad para jugadoras
-      return !eventoFueraDeVentanaJugadora(e);
+      // Mantener en listado según rol y tipo de evento
+      return eventoVisibleEnListado(e);
     })
     .sort((a, b) => {
       // Ordenar por fecha: más próximo primero
@@ -1816,7 +1846,7 @@ const esAdmin = computed(() => userRole.value === 'admin');
 
 const historialEntrenamientos = computed(() => {
   return entrenamientos.value
-    .filter(e => e.equipo === equipoSeleccionado.value && eventoFueraDeVentanaJugadora(e))
+    .filter(e => e.equipo === equipoSeleccionado.value && eventoVisibleEnHistorialAdmin(e))
     .sort((a, b) => {
       // Ordenar por fecha: más reciente primero en el historial
       const fechaA = new Date(a.fecha?.seconds ? a.fecha.seconds * 1000 : a.fecha || 0);
@@ -1851,7 +1881,6 @@ const cambiarEquipo = (equipo) => {
     actualizarCategoriaSeleccionadaJugadora(jugadoraAuthUser.value.uid, equipo);
   }
   cargarEntrenamientos();
-  actualizarEstados();
 };
 
 const cargarEntrenamientos = () => {
@@ -1861,74 +1890,29 @@ const cargarEntrenamientos = () => {
     unsubEntrenamientos.value = null;
   }
   
-  // Limpiar listeners de inscripciones
-  unsubscribers.value.forEach(unsub => unsub());
-  unsubscribers.value = [];
-  
-  // Limpiar inscripciones organizadas
+  // Limpiar estado de detalle previo
   todasInscritasOrganizadas.value = {};
   cargandoInscripciones.value = {};
   
   // Iniciar listener en tiempo real de entrenamientos
   unsubEntrenamientos.value = escucharEntrenamientosPorEquipo(equipoSeleccionado.value, async () => {
-    await actualizarEstados();
-    
-    // Reiniciar listeners de inscripciones con los entrenamientos actualizados
-    unsubscribers.value.forEach(unsub => unsub());
-    unsubscribers.value = [];
-    
     // Si no hay entrenamientos, ocultar loader inmediatamente
     if (entrenamientos.value.length === 0) {
       primeraCarga.value = false;
+      entrenamientoSeleccionadoId.value = null;
       return;
     }
-    
-    for (const ent of entrenamientos.value) {
-      // Marcar como cargando antes de iniciar listener
-      cargandoInscripciones.value[ent.id] = true;
-      
-      const unsub = escucharInscripcionesEntrenamiento(ent.id, (organizadas) => {
-        conteoInscritas.value[ent.id] = {
-          confirmadas: organizadas.confirmadas.length,
-          bajas: organizadas.bajas.length,
-          pendientes: organizadas.pendientes.length
-        };
-        
-        // Guardar inscripciones organizadas para este entrenamiento
-        todasInscritasOrganizadas.value[ent.id] = organizadas;
-        
-        // Marcar como cargado
-        cargandoInscripciones.value[ent.id] = false;
-        
-        // Verificar si todas las inscripciones terminaron de cargar
-        const todasCargadas = Object.values(cargandoInscripciones.value).every(val => val === false);
-        if (todasCargadas && primeraCarga.value) {
-          // Pequeño delay para suavizar la transición
-          setTimeout(() => {
-            primeraCarga.value = false;
-          }, 300);
-        }
-      }, () => {
-        // Pasar función que retorna el entrenamiento actualizado
-        return entrenamientos.value.find(e => e.id === ent.id);
-      });
-      
-      unsubscribers.value.push(unsub);
+
+    if (entrenamientoSeleccionadoId.value && !entrenamientos.value.some(e => e.id === entrenamientoSeleccionadoId.value)) {
+      entrenamientoSeleccionadoId.value = null;
+    }
+
+    if (primeraCarga.value) {
+      setTimeout(() => {
+        primeraCarga.value = false;
+      }, 150);
     }
   });
-};
-
-const actualizarEstados = async () => {
-  // Validar que el usuario esté autenticado
-  if (!jugadoraAuthUser.value?.uid) {
-    console.warn('⚠️ actualizarEstados: Usuario no autenticado');
-    return;
-  }
-  
-  for (const entrenamiento of entrenamientos.value) {
-    const estado = await obtenerEstadoInscripcion(entrenamiento.id, jugadoraAuthUser.value.uid);
-    estadoInscripcion.value[entrenamiento.id] = estado;
-  }
 };
 
 const contarInscritas = (entrenamientoId) => {
@@ -1948,6 +1932,35 @@ const verDetalles = (entrenamiento) => {
   mapaCargando.value = Boolean(obtenerMapaEmbedUrl(entrenamiento));
   cargarVotoMvpSeleccionado(entrenamiento.id);
   mensajeDetalle.value = '';
+};
+
+const limpiarListenerInscripcionesDetalle = () => {
+  if (unsubInscripcionesDetalle.value) {
+    unsubInscripcionesDetalle.value();
+    unsubInscripcionesDetalle.value = null;
+  }
+};
+
+const suscribirInscripcionesDetalle = (entrenamientoId) => {
+  limpiarListenerInscripcionesDetalle();
+
+  if (!entrenamientoId) return;
+
+  cargandoInscripciones.value = {
+    ...cargandoInscripciones.value,
+    [entrenamientoId]: true
+  };
+
+  unsubInscripcionesDetalle.value = escucharInscripcionesEntrenamiento(entrenamientoId, (organizadas) => {
+    conteoInscritas.value[entrenamientoId] = {
+      confirmadas: organizadas.confirmadas.length,
+      bajas: organizadas.bajas.length,
+      pendientes: organizadas.pendientes.length
+    };
+
+    todasInscritasOrganizadas.value[entrenamientoId] = organizadas;
+    cargandoInscripciones.value[entrenamientoId] = false;
+  }, () => entrenamientos.value.find(e => e.id === entrenamientoId));
 };
 
 const mostrarMensajeDetalle = (mensaje, tipo = 'success') => {
@@ -1985,11 +1998,14 @@ const handleInscribirse = async (entrenamiento) => {
   );
 
   if (success) {
+    estadoInscripcion.value = {
+      ...estadoInscripcion.value,
+      [entrenamiento.id]: 'confirmada'
+    };
     mostrarToast('¡Asistencia confirmada!', 'success');
     if (entrenamientoSeleccionadoId.value === entrenamiento.id) {
       mostrarMensajeDetalle('✅ Asistencia confirmada correctamente', 'success');
     }
-    await actualizarEstados();
   } else {
     mostrarToast(errorInscripciones.value || 'Error al inscribirse', 'error');
   }
@@ -2024,11 +2040,14 @@ const confirmarBaja = async () => {
   );
 
   if (success) {
+    estadoInscripcion.value = {
+      ...estadoInscripcion.value,
+      [entrenamientoParaBaja.value.id]: 'baja'
+    };
     mostrarToast('Te diste de baja correctamente', 'success');
     if (entrenamientoSeleccionadoId.value === entrenamientoParaBaja.value.id) {
       mostrarMensajeDetalle('✕ Te diste de baja correctamente', 'error');
     }
-    await actualizarEstados();
     cerrarModalBaja();
   } else {
     mostrarToast(errorInscripciones.value || 'Error al darse de baja', 'error');
@@ -2331,6 +2350,38 @@ onMounted(() => {
 watch(
   () => jugadoraAuthUser.value?.uid,
   (uid) => {
+    if (unsubEstadosInscripcion.value) {
+      unsubEstadosInscripcion.value();
+      unsubEstadosInscripcion.value = null;
+    }
+
+    estadoInscripcion.value = {};
+
+    if (!uid) return;
+
+    unsubEstadosInscripcion.value = escucharEstadosInscripcionJugadora(uid, (estados) => {
+      estadoInscripcion.value = estados;
+    });
+  },
+  { immediate: true }
+);
+
+watch(
+  () => entrenamientoSeleccionadoId.value,
+  (entrenamientoId) => {
+    if (!entrenamientoId) {
+      limpiarListenerInscripcionesDetalle();
+      return;
+    }
+
+    suscribirInscripcionesDetalle(entrenamientoId);
+  },
+  { immediate: true }
+);
+
+watch(
+  () => jugadoraAuthUser.value?.uid,
+  (uid) => {
     console.log('🔍 Watch detectado UID cambio:', uid);
     console.log('🔐 jugadoraAuthUser.value completo:', jugadoraAuthUser.value);
     
@@ -2378,7 +2429,6 @@ watch(
     if (huboCambio) {
       primeraCarga.value = true;
       cargarEntrenamientos();
-      await actualizarEstados();
     }
   },
   { immediate: true }
@@ -2395,10 +2445,12 @@ onUnmounted(() => {
   if (unsubEntrenamientos.value) {
     unsubEntrenamientos.value();
   }
-  
-  // Limpiar listeners de inscripciones
-  unsubscribers.value.forEach(unsub => unsub());
-  unsubscribers.value = [];
+
+  if (unsubEstadosInscripcion.value) {
+    unsubEstadosInscripcion.value();
+  }
+
+  limpiarListenerInscripcionesDetalle();
 });
 </script>
 

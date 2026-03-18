@@ -179,6 +179,30 @@ export const obtenerEstadoInscripcion = async (entrenamientoId, jugadoraId) => {
     return null;
   }
 };
+
+// Escuchar todos los estados de inscripción de una jugadora en tiempo real
+export const escucharEstadosInscripcionJugadora = (jugadoraId, callback) => {
+  const q = query(
+    collection(db, 'inscripcionesEntrenamientos'),
+    where('jugadoraId', '==', jugadoraId)
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const estados = {};
+
+    snapshot.docs.forEach((docSnap) => {
+      const data = docSnap.data() || {};
+      if (data.entrenamientoId) {
+        estados[data.entrenamientoId] = data.estado || 'confirmada';
+      }
+    });
+
+    callback(estados);
+  }, (error) => {
+    console.error('Error escuchando estados de inscripción de la jugadora:', error);
+  });
+};
+
 // Escuchar cambios en tiempo real de inscripciones de un entrenamiento
 export const escucharInscripcionesEntrenamiento = (entrenamientoId, callback, getEntrenamiento = null) => {
   const q = query(
