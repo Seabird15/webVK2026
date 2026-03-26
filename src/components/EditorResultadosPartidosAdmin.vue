@@ -195,6 +195,51 @@
             </div>
           </div>
 
+          <div class="rounded-xl border border-amber-200 bg-linear-to-r from-amber-50 to-white p-3 sm:p-4 space-y-3">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p class="text-xs font-bold uppercase tracking-wide text-amber-700">Reloj del partido</p>
+                <p class="mt-1 text-lg font-black text-gray-900">{{ obtenerEtiquetaTiempoPartido(partido) }}</p>
+                <p class="text-xs text-gray-500 mt-1">Los goles toman automaticamente el minuto visible de este reloj.</p>
+              </div>
+
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-if="puedeIniciarPrimerTiempo(partido)"
+                  @click="actualizarFasePartido(partido, 'PRIMER_TIEMPO')"
+                  :disabled="guardando"
+                  class="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+                >
+                  Iniciar 1er tiempo
+                </button>
+                <button
+                  v-if="puedeIrAEntretiempo(partido)"
+                  @click="actualizarFasePartido(partido, 'ENTRETIEMPO')"
+                  :disabled="guardando"
+                  class="rounded-lg bg-amber-500 px-3 py-2 text-xs font-bold text-white transition hover:bg-amber-600 disabled:opacity-50"
+                >
+                  Finalizar 1er tiempo
+                </button>
+                <button
+                  v-if="puedeIniciarSegundoTiempo(partido)"
+                  @click="actualizarFasePartido(partido, 'SEGUNDO_TIEMPO')"
+                  :disabled="guardando"
+                  class="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-blue-700 disabled:opacity-50"
+                >
+                  Iniciar 2do tiempo
+                </button>
+                <button
+                  v-if="puedeFinalizarPartido(partido)"
+                  @click="actualizarFasePartido(partido, 'FINALIZADO')"
+                  :disabled="guardando"
+                  class="rounded-lg bg-gray-800 px-3 py-2 text-xs font-bold text-white transition hover:bg-gray-900 disabled:opacity-50"
+                >
+                  Finalizar partido
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Goleadores y Asistencias -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <!-- 
@@ -217,7 +262,7 @@
                 >
                   <span class="font-semibold text-blue-900">
                     {{ gol.jugadoraNombre || gol.jugadora }}
-                    <span class="text-xs text-blue-600 font-normal ml-1">{{ gol.minuto }}'</span>
+                    <span v-if="mostrarMinuto(gol.minuto)" class="text-xs text-blue-600 font-normal ml-1">{{ mostrarMinuto(gol.minuto) }}</span>
                   </span>
                   <button
                     @click="removerGoleador(partido, 'local', idx)"
@@ -246,15 +291,9 @@
                     {{ jugadora.nombre }} {{ jugadora.apellido }}
                   </option>
                 </select>
-                <input
-                  v-model.number="minutoGoleadora[partido.id]"
-                  type="number"
-                  min="0"
-                  max="90"
-                  placeholder="Minuto (0-90)"
-                  :disabled="guardando"
-                  class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+                <div class="w-full px-3 py-2 text-xs border border-blue-200 rounded-lg bg-blue-50 text-blue-800 font-semibold">
+                  El gol se guarda con el minuto que marque el reloj del partido.
+                </div>
                 <button
                   @click="agregarGoleador(partido, 'local')"
                   :disabled="!seleccionGoleadora[partido.id] || guardando"
@@ -276,7 +315,7 @@
                 >
                   <span class="font-semibold text-green-900">
                     {{ asistencia.asistenteNombre || asistencia.asistente }}
-                    <span class="text-xs text-green-600 font-normal ml-1">{{ asistencia.minuto }}'</span>
+                    <span v-if="mostrarMinuto(asistencia.minuto)" class="text-xs text-green-600 font-normal ml-1">{{ mostrarMinuto(asistencia.minuto) }}</span>
                   </span>
                   <button
                     @click="removerAsistencia(partido, idx)"
@@ -310,7 +349,7 @@
                   type="number"
                   min="0"
                   max="90"
-                  placeholder="Minuto (0-90)"
+                  placeholder="Minuto (opcional)"
                   :disabled="guardando"
                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
@@ -412,9 +451,10 @@ const plantelPorEquipo = ref({
   serieC: []
 });
 const seleccionGoleadora = ref({});
-const minutoGoleadora = ref({});
 const seleccionAsistente = ref({});
 const minutoAsistente = ref({});
+const ahora = ref(Date.now());
+let intervaloReloj = null;
 
 // Control de expansión de edición en partidos finalizados
 const expandidosEdicion = ref(new Set());
@@ -466,18 +506,169 @@ const buscarJugadoraEquipo = (partido, jugadoraId) => {
   return obtenerJugadorasEquipo(partido).find((jugadora) => jugadora.id === jugadoraId) || null;
 };
 
+const obtenerFechaDesdeValor = (valor) => {
+  if (!valor) return null;
+  if (valor instanceof Date) return new Date(valor);
+  if (typeof valor?.toDate === 'function') return valor.toDate();
+
+  const fecha = new Date(valor);
+  return Number.isNaN(fecha.getTime()) ? null : fecha;
+};
+
+const obtenerInicioProgramadoPartido = (partido) => {
+  const fechaBase = obtenerFechaDesdeValor(partido?.fecha);
+  if (!fechaBase) return null;
+
+  const horaTexto = (partido?.hora || '').toString().split('-')[0].trim();
+  const [horas, minutos] = horaTexto.split(':').map((valor) => Number(valor || 0));
+  fechaBase.setHours(
+    Number.isFinite(horas) ? horas : 0,
+    Number.isFinite(minutos) ? minutos : 0,
+    0,
+    0
+  );
+
+  return fechaBase;
+};
+
+const obtenerFasePartido = (partido) => {
+  const fase = (partido?.fasePartido || '').toString().trim();
+
+  if (fase) return fase;
+  if (partido?.estado === 'FINALIZADO') return 'FINALIZADO';
+  if (partido?.estado === 'EN_CURSO') return 'PRIMER_TIEMPO';
+
+  return 'PROGRAMADO';
+};
+
+const calcularMinutoDesdeInicio = (inicio, base, minimo, maximo) => {
+  const fechaInicio = obtenerFechaDesdeValor(inicio);
+  if (!fechaInicio) return base;
+
+  const diferenciaMs = ahora.value - fechaInicio.getTime();
+  if (diferenciaMs <= 0) return base;
+
+  return Math.min(maximo, Math.max(minimo, Math.floor(diferenciaMs / 60000) + base));
+};
+
+const calcularRelojDesdeInicio = (inicio, minutoBase, minutoMinimo, minutoMaximo) => {
+  const fechaInicio = obtenerFechaDesdeValor(inicio);
+  if (!fechaInicio) {
+    return {
+      minuto: minutoBase,
+      segundo: 0
+    };
+  }
+
+  const diferenciaMs = Math.max(0, ahora.value - fechaInicio.getTime());
+  const totalSegundos = Math.floor(diferenciaMs / 1000);
+  const minuto = Math.min(minutoMaximo, Math.max(minutoMinimo, Math.floor(totalSegundos / 60) + minutoBase));
+  const segundo = minuto >= minutoMaximo ? Math.min(59, totalSegundos % 60) : totalSegundos % 60;
+
+  return { minuto, segundo };
+};
+
+const formatearRelojPartido = ({ minuto, segundo }) => {
+  const minutoTexto = String(minuto).padStart(2, '0');
+  const segundoTexto = String(segundo).padStart(2, '0');
+  return `${minutoTexto}:${segundoTexto}`;
+};
+
+const obtenerMinutoActualPartido = (partido) => {
+  const fase = obtenerFasePartido(partido);
+
+  if (fase === 'PRIMER_TIEMPO') {
+    return calcularMinutoDesdeInicio(
+      partido?.inicioPrimerTiempoAt || partido?.inicioEnVivoAt || obtenerInicioProgramadoPartido(partido),
+      1,
+      1,
+      25
+    );
+  }
+
+  if (fase === 'ENTRETIEMPO') return 25;
+
+  if (fase === 'SEGUNDO_TIEMPO') {
+    return calcularMinutoDesdeInicio(partido?.inicioSegundoTiempoAt, 26, 26, 50);
+  }
+
+  if (fase === 'FINALIZADO') {
+    return partido?.inicioSegundoTiempoAt ? 50 : 25;
+  }
+
+  return null;
+};
+
+const obtenerEtiquetaTiempoPartido = (partido) => {
+  const fase = obtenerFasePartido(partido);
+  if (fase === 'PRIMER_TIEMPO') {
+    const reloj = calcularRelojDesdeInicio(
+      partido?.inicioPrimerTiempoAt || partido?.inicioEnVivoAt || obtenerInicioProgramadoPartido(partido),
+      1,
+      1,
+      25
+    );
+    return `1er tiempo · ${formatearRelojPartido(reloj)}`;
+  }
+  if (fase === 'ENTRETIEMPO') return 'Entretiempo';
+  if (fase === 'SEGUNDO_TIEMPO') {
+    const reloj = calcularRelojDesdeInicio(partido?.inicioSegundoTiempoAt, 26, 26, 50);
+    return `2do tiempo · ${formatearRelojPartido(reloj)}`;
+  }
+  if (fase === 'FINALIZADO') return 'Finalizado';
+
+  return 'Programado';
+};
+
+const calcularMinutoAutomaticoGol = (partido) => {
+  const fase = obtenerFasePartido(partido);
+
+  if (fase !== 'PRIMER_TIEMPO' && fase !== 'SEGUNDO_TIEMPO') {
+    return null;
+  }
+
+  return obtenerMinutoActualPartido(partido);
+};
+
+const normalizarMinutoOpcional = (valor) => {
+  const minuto = Number(valor);
+  return Number.isFinite(minuto) && minuto > 0 ? minuto : null;
+};
+
+const mostrarMinuto = (valor) => {
+  const minuto = normalizarMinutoOpcional(valor);
+  return minuto !== null ? `${minuto}'` : '';
+};
+
 const limpiarFormularioGol = (partidoId) => {
   seleccionGoleadora.value[partidoId] = '';
-  minutoGoleadora.value[partidoId] = 0;
 };
 
 const limpiarFormularioAsistencia = (partidoId) => {
   seleccionAsistente.value[partidoId] = '';
-  minutoAsistente.value[partidoId] = 0;
+  minutoAsistente.value[partidoId] = '';
 };
 
 const obtenerColeccionPartido = (partido) => {
   return partido.fuente === 'entrenamientos' ? 'entrenamientos' : 'partidos';
+};
+
+const puedeIniciarPrimerTiempo = (partido) => {
+  const fase = obtenerFasePartido(partido);
+  return partido.estado === 'PROGRAMADO' || fase === 'PROGRAMADO';
+};
+
+const puedeIrAEntretiempo = (partido) => {
+  return obtenerFasePartido(partido) === 'PRIMER_TIEMPO';
+};
+
+const puedeIniciarSegundoTiempo = (partido) => {
+  return obtenerFasePartido(partido) === 'ENTRETIEMPO';
+};
+
+const puedeFinalizarPartido = (partido) => {
+  const fase = obtenerFasePartido(partido);
+  return fase === 'PRIMER_TIEMPO' || fase === 'ENTRETIEMPO' || fase === 'SEGUNDO_TIEMPO';
 };
 
 const obtenerCampoMarcador = (partido, lado) => {
@@ -574,9 +765,21 @@ const agregarGoleador = async (partido, lado) => {
   }
 
   const jugadora = buscarJugadoraEquipo(partido, seleccionGoleadora.value[partido.id]);
-  const minuto = Number(minutoGoleadora.value[partido.id] || 0);
+  const minuto = calcularMinutoAutomaticoGol(partido);
 
   if (!jugadora) return;
+  if (partido.estado !== 'EN_CURSO') {
+    mostrarMensaje('Inicia el partido para registrar el gol con minuto automatico');
+    return;
+  }
+  if (obtenerFasePartido(partido) === 'ENTRETIEMPO') {
+    mostrarMensaje('No puedes registrar goles durante el entretiempo');
+    return;
+  }
+  if (minuto === null) {
+    mostrarMensaje('No se pudo calcular el minuto del gol');
+    return;
+  }
 
   const nombre = `${jugadora.nombre} ${jugadora.apellido}`.trim();
 
@@ -664,7 +867,7 @@ const removerGoleador = async (partido, lado, indice) => {
 const agregarAsistencia = async (partido) => {
   // SOLO permitimos registrar asistencias locales (CD Vikingas)
   const jugadora = buscarJugadoraEquipo(partido, seleccionAsistente.value[partido.id]);
-  const minuto = Number(minutoAsistente.value[partido.id] || 0);
+  const minuto = normalizarMinutoOpcional(minutoAsistente.value[partido.id]);
 
   if (!jugadora) return;
 
@@ -676,7 +879,7 @@ const agregarAsistencia = async (partido) => {
       asistente: nombre,
       asistenteId: jugadora.id,
       asistenteNombre: nombre,
-      minuto,
+      ...(minuto !== null ? { minuto } : {}),
       timestamp: new Date()
     };
 
@@ -735,14 +938,89 @@ const removerAsistencia = async (partido, indice) => {
   }
 };
 
+const actualizarFasePartido = async (partido, nuevaFase) => {
+  guardando.value = true;
+  try {
+    const docRef = doc(db, obtenerColeccionPartido(partido), partido.id);
+    const ahoraPartido = new Date();
+    const payload = {};
+
+    if (nuevaFase === 'PRIMER_TIEMPO') {
+      payload.estado = 'EN_CURSO';
+      payload.fasePartido = 'PRIMER_TIEMPO';
+      payload.inicioPrimerTiempoAt = ahoraPartido;
+      payload.inicioEnVivoAt = ahoraPartido;
+      payload.inicioSegundoTiempoAt = null;
+      partido.estado = 'EN_CURSO';
+      partido.fasePartido = 'PRIMER_TIEMPO';
+      partido.inicioPrimerTiempoAt = ahoraPartido;
+      partido.inicioEnVivoAt = ahoraPartido;
+      partido.inicioSegundoTiempoAt = null;
+    }
+
+    if (nuevaFase === 'ENTRETIEMPO') {
+      payload.estado = 'EN_CURSO';
+      payload.fasePartido = 'ENTRETIEMPO';
+      partido.estado = 'EN_CURSO';
+      partido.fasePartido = 'ENTRETIEMPO';
+    }
+
+    if (nuevaFase === 'SEGUNDO_TIEMPO') {
+      payload.estado = 'EN_CURSO';
+      payload.fasePartido = 'SEGUNDO_TIEMPO';
+      payload.inicioSegundoTiempoAt = ahoraPartido;
+      partido.estado = 'EN_CURSO';
+      partido.fasePartido = 'SEGUNDO_TIEMPO';
+      partido.inicioSegundoTiempoAt = ahoraPartido;
+    }
+
+    if (nuevaFase === 'FINALIZADO') {
+      payload.estado = 'FINALIZADO';
+      payload.fasePartido = 'FINALIZADO';
+      partido.estado = 'FINALIZADO';
+      partido.fasePartido = 'FINALIZADO';
+    }
+
+    await updateDoc(docRef, payload);
+    mostrarMensaje('Reloj del partido actualizado ✓');
+  } catch (err) {
+    console.error('Error:', err);
+  } finally {
+    guardando.value = false;
+  }
+};
+
 // Actualizar estado del partido
 const actualizarEstado = async (partido, nuevoEstado) => {
   guardando.value = true;
   try {
-    // Determinar si es de la nueva colección 'partidos' o de 'entrenamientos'
-    const coleccion = partido.fuente === 'entrenamientos' ? 'entrenamientos' : 'partidos';
-    const docRef = doc(db, coleccion, partido.id);
-    await updateDoc(docRef, { estado: nuevoEstado });
+    if (nuevoEstado === 'EN_CURSO') {
+      await actualizarFasePartido(partido, 'PRIMER_TIEMPO');
+      return;
+    }
+
+    const docRef = doc(db, obtenerColeccionPartido(partido), partido.id);
+    const payload = { estado: nuevoEstado };
+
+    if (nuevoEstado === 'PROGRAMADO') {
+      payload.fasePartido = null;
+      payload.inicioEnVivoAt = null;
+      payload.inicioPrimerTiempoAt = null;
+      payload.inicioSegundoTiempoAt = null;
+      partido.fasePartido = null;
+      partido.inicioEnVivoAt = null;
+      partido.inicioPrimerTiempoAt = null;
+      partido.inicioSegundoTiempoAt = null;
+    }
+
+    if (nuevoEstado === 'FINALIZADO') {
+      payload.fasePartido = 'FINALIZADO';
+      partido.fasePartido = 'FINALIZADO';
+    }
+
+    partido.estado = nuevoEstado;
+
+    await updateDoc(docRef, payload);
     mostrarMensaje('Estado actualizado ✓');
   } catch (err) {
     console.error('Error:', err);
@@ -772,6 +1050,10 @@ const mostrarMensaje = (msg) => {
 // Cargar partidos
 onMounted(async () => {
   try {
+    intervaloReloj = window.setInterval(() => {
+      ahora.value = Date.now();
+    }, 1000);
+
     const [ascenso, serieC] = await Promise.all([
       fetchJugadorasRegistradasPorEquipo('ascenso'),
       fetchJugadorasRegistradasPorEquipo('serieC')
@@ -838,6 +1120,10 @@ onMounted(async () => {
           asistenciasLocal: data.asistenciasLocal || [],
           goleadoresVisita: data.goleadoresVisita || [],
           estado: data.estado || 'PROGRAMADO',
+          inicioEnVivoAt: data.inicioEnVivoAt || null,
+          inicioPrimerTiempoAt: data.inicioPrimerTiempoAt || null,
+          inicioSegundoTiempoAt: data.inicioSegundoTiempoAt || null,
+          fasePartido: data.fasePartido || null,
           fuente: 'entrenamientos' // Para identificar que viene de entrenamientos
         };
     
@@ -872,6 +1158,10 @@ onMounted(async () => {
 
 // Limpiar listeners
 onUnmounted(() => {
+  if (intervaloReloj) {
+    window.clearInterval(intervaloReloj);
+  }
+
   unsubscribers.forEach(unsub => {
     if (unsub && typeof unsub === 'function') {
       unsub();

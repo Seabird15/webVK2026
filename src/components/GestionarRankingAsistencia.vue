@@ -7,7 +7,7 @@
         </div>
         <div>
           <h2 class="text-2xl sm:text-3xl font-black">Ranking de asistencia</h2>
-          <p class="text-xs sm:text-sm text-white/80 mt-1">Solo entrenamientos/eventos finalizados</p>
+          <p class="text-xs sm:text-sm text-white/80 mt-1">Todos los eventos cargados, con filtro por entrenamientos o partidos</p>
         </div>
       </div>
     </div>
@@ -19,13 +19,29 @@
           <p class="text-2xl font-black text-blue-700 mt-1">{{ rankingFiltrado.length }}</p>
         </div>
         <div class="bg-green-50 border border-green-200 rounded-xl p-4">
-          <p class="text-xs text-green-600 font-bold uppercase">Entrenamientos y partidos considerados</p>
+          <p class="text-xs text-green-600 font-bold uppercase">Eventos considerados</p>
           <p class="text-2xl font-black text-green-700 mt-1">{{ totalEventosFinalizadosFiltrados }}</p>
         </div>
         <div class="bg-purple-50 border border-purple-200 rounded-xl p-4">
           <p class="text-xs text-purple-600 font-bold uppercase">Respuestas totales</p>
           <p class="text-2xl font-black text-purple-700 mt-1">{{ totalRespuestasFiltradas }}</p>
         </div>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <button
+          v-for="tipo in tiposEventoFiltro"
+          :key="tipo.id"
+          @click="tipoEventoSeleccionado = tipo.id"
+          :class="[
+            'px-3 py-2 rounded-lg text-sm font-bold border transition-colors cursor-pointer',
+            tipoEventoSeleccionado === tipo.id
+              ? 'bg-primary text-white border-primary'
+              : 'bg-white text-gray-700 border-gray-200 hover:border-primary/40 hover:text-primary'
+          ]"
+        >
+          {{ tipo.label }}
+        </button>
       </div>
 
       <div class="flex flex-wrap gap-2">
@@ -100,17 +116,42 @@ import { ChartBarIcon } from '@heroicons/vue/24/outline';
 import { db } from '../firebase/config';
 
 const isLoading = ref(true);
-const rankingPorEquipo = ref({
-  todos: [],
-  ascenso: [],
-  escuela: []
+const rankingPorTipo = ref({
+  todos: {
+    todos: [],
+    ascenso: [],
+    escuela: []
+  },
+  entrenamientos: {
+    todos: [],
+    ascenso: [],
+    escuela: []
+  },
+  partidos: {
+    todos: [],
+    ascenso: [],
+    escuela: []
+  }
 });
-const eventosFinalizadosPorEquipo = ref({
-  todos: 0,
-  ascenso: 0,
-  escuela: 0
+const eventosConsideradosPorTipo = ref({
+  todos: {
+    todos: 0,
+    ascenso: 0,
+    escuela: 0
+  },
+  entrenamientos: {
+    todos: 0,
+    ascenso: 0,
+    escuela: 0
+  },
+  partidos: {
+    todos: 0,
+    ascenso: 0,
+    escuela: 0
+  }
 });
 const equipoSeleccionado = ref('todos');
+const tipoEventoSeleccionado = ref('todos');
 
 const equiposFiltro = [
   { id: 'todos', label: 'Todos' },
@@ -118,11 +159,51 @@ const equiposFiltro = [
   { id: 'escuela', label: 'Escuela' }
 ];
 
+const tiposEventoFiltro = [
+  { id: 'todos', label: 'Todos los eventos' },
+  { id: 'entrenamientos', label: 'Solo entrenamientos' },
+  { id: 'partidos', label: 'Solo partidos' }
+];
+
 const normalizarEquipo = (equipo) => {
   const valor = (equipo || '').toString().trim().toLowerCase();
   if (valor === 'ascenso' || valor === 'escuela' || valor === 'ambos') return valor;
   return 'sin-equipo';
 };
+
+const obtenerEquiposJugadora = (jugadora = {}) => {
+  if (Array.isArray(jugadora.equipos) && jugadora.equipos.length > 0) {
+    const equipos = [...new Set(jugadora.equipos.map(normalizarEquipo))]
+      .filter((equipo) => equipo === 'ascenso' || equipo === 'escuela');
+
+    if (equipos.length > 0) {
+      return equipos;
+    }
+  }
+
+  const equipoLegacy = normalizarEquipo(jugadora.equipo);
+  if (equipoLegacy === 'ambos') return ['ascenso', 'escuela'];
+  if (equipoLegacy === 'ascenso' || equipoLegacy === 'escuela') return [equipoLegacy];
+  return [];
+};
+
+const obtenerNombreJugadora = (jugadora = {}) => {
+  const nombreCompleto = `${jugadora.nombre || ''} ${jugadora.apellido || ''}`.trim();
+  if (nombreCompleto) return nombreCompleto;
+
+  return (jugadora.jugadoraNombre || 'Sin nombre').toString().trim() || 'Sin nombre';
+};
+
+const crearItemRanking = ({ jugadoraId, nombre, equipo }) => ({
+  jugadoraId,
+  nombre,
+  equipo,
+  confirmadas: 0,
+  bajas: 0,
+  pendientes: 0,
+  total: 0,
+  porcentaje: 0
+});
 
 const normalizarNombre = (nombre) =>
   (nombre || '')
@@ -137,21 +218,29 @@ const nombresExcluidos = new Set([
   'yesi gallardo'
 ]);
 
+const TIPOS_PARTIDO = new Set(['partido', 'amistoso']);
+
+const obtenerTipoFiltroEvento = (evento = {}) => {
+  const tipo = (evento?.tipo || '').toString().trim().toLowerCase();
+  return TIPOS_PARTIDO.has(tipo) ? 'partidos' : 'entrenamientos';
+};
+
 const rankingFiltrado = computed(() => {
-  return rankingPorEquipo.value[equipoSeleccionado.value] || [];
+  return rankingPorTipo.value[tipoEventoSeleccionado.value]?.[equipoSeleccionado.value] || [];
 });
 
 const totalRespuestasFiltradas = computed(() => rankingFiltrado.value.reduce((acc, item) => acc + item.total, 0));
 
 const totalEventosFinalizadosFiltrados = computed(() => {
-  return eventosFinalizadosPorEquipo.value[equipoSeleccionado.value] || 0;
+  return eventosConsideradosPorTipo.value[tipoEventoSeleccionado.value]?.[equipoSeleccionado.value] || 0;
 });
 
 const conteoPorEquipo = computed(() => {
+  const rankingActual = rankingPorTipo.value[tipoEventoSeleccionado.value] || {};
   return {
-    todos: rankingPorEquipo.value.todos.length,
-    ascenso: rankingPorEquipo.value.ascenso.length,
-    escuela: rankingPorEquipo.value.escuela.length
+    todos: rankingActual.todos?.length || 0,
+    ascenso: rankingActual.ascenso?.length || 0,
+    escuela: rankingActual.escuela?.length || 0
   };
 });
 
@@ -186,6 +275,102 @@ const getFechaHoraMs = (ent) => {
   return dt.getTime();
 };
 
+const crearAcumuladoBase = (jugadorasBase) => {
+  const acumuladoPorEquipo = {
+    ascenso: new Map(),
+    escuela: new Map()
+  };
+
+  jugadorasBase.forEach((jugadora) => {
+    jugadora.equipos.forEach((equipo) => {
+      const acumulado = acumuladoPorEquipo[equipo];
+      if (!acumulado?.has(jugadora.id)) {
+        acumulado.set(jugadora.id, crearItemRanking({
+          jugadoraId: jugadora.id,
+          nombre: jugadora.nombre,
+          equipo
+        }));
+      }
+    });
+  });
+
+  return acumuladoPorEquipo;
+};
+
+const registrarInscripcion = (acumulado, jugadoraId, data, equipoJugadora) => {
+  if (!acumulado.has(jugadoraId)) {
+    acumulado.set(jugadoraId, crearItemRanking({
+      jugadoraId,
+      nombre: (data.jugadoraNombre || 'Sin nombre').toString().trim() || 'Sin nombre',
+      equipo: equipoJugadora
+    }));
+  }
+
+  const item = acumulado.get(jugadoraId);
+  const estado = (data.estado || 'pendiente').toString().toLowerCase();
+
+  if (estado === 'confirmada') item.confirmadas += 1;
+  else if (estado === 'baja') item.bajas += 1;
+  else item.pendientes += 1;
+
+  item.total += 1;
+  if (data.jugadoraNombre && (!item.nombre || item.nombre === 'Sin nombre')) {
+    item.nombre = data.jugadoraNombre;
+  }
+};
+
+const ordenarLista = (listaBase) => {
+  return listaBase
+    .map((item) => ({
+      ...item,
+      porcentaje: item.total > 0 ? Math.round((item.confirmadas / item.total) * 100) : 0
+    }))
+    .sort((a, b) => {
+      if (b.confirmadas !== a.confirmadas) return b.confirmadas - a.confirmadas;
+      if (b.porcentaje !== a.porcentaje) return b.porcentaje - a.porcentaje;
+      if (a.bajas !== b.bajas) return a.bajas - b.bajas;
+      return a.nombre.localeCompare(b.nombre, 'es');
+    });
+};
+
+const construirRankingPorEquipo = (acumuladoPorEquipo) => {
+  const rankingAscenso = ordenarLista(Array.from(acumuladoPorEquipo.ascenso.values()));
+  const rankingEscuela = ordenarLista(Array.from(acumuladoPorEquipo.escuela.values()));
+
+  const acumuladoTodos = new Map();
+  [...rankingAscenso, ...rankingEscuela].forEach((item) => {
+    const existente = acumuladoTodos.get(item.jugadoraId);
+    if (!existente) {
+      acumuladoTodos.set(item.jugadoraId, {
+        jugadoraId: item.jugadoraId,
+        nombre: item.nombre,
+        equipo: item.equipo,
+        confirmadas: item.confirmadas,
+        bajas: item.bajas,
+        pendientes: item.pendientes,
+        total: item.total,
+        porcentaje: 0
+      });
+      return;
+    }
+
+    existente.confirmadas += item.confirmadas;
+    existente.bajas += item.bajas;
+    existente.pendientes += item.pendientes;
+    existente.total += item.total;
+
+    if (existente.equipo !== item.equipo) {
+      existente.equipo = 'ambos';
+    }
+  });
+
+  return {
+    ascenso: rankingAscenso,
+    escuela: rankingEscuela,
+    todos: ordenarLista(Array.from(acumuladoTodos.values()))
+  };
+};
+
 const cargarRanking = async () => {
   isLoading.value = true;
   try {
@@ -195,72 +380,52 @@ const cargarRanking = async () => {
       getDocs(collection(db, 'jugadoraRegistro'))
     ]);
 
-    const equipoPorJugadoraId = new Map();
+    const jugadorasBase = new Map();
+    const jugadorasPorId = new Map();
     jugadorasSnap.forEach((documento) => {
       const data = documento.data() || {};
-      const equipo = normalizarEquipo(data.equipo);
-      equipoPorJugadoraId.set(documento.id, equipo);
+      const equipos = obtenerEquiposJugadora(data);
+      const nombre = obtenerNombreJugadora(data);
+      const nombreNormalizado = normalizarNombre(nombre);
+
+      if (nombresExcluidos.has(nombreNormalizado) || equipos.length === 0) {
+        return;
+      }
 
       const uid = (data.uid || '').toString().trim();
-      if (uid) equipoPorJugadoraId.set(uid, equipo);
+      const registroJugadora = {
+        id: uid || documento.id,
+        nombre,
+        equipos
+      };
+
+      jugadorasBase.set(registroJugadora.id, registroJugadora);
+      jugadorasPorId.set(documento.id, registroJugadora);
+      if (uid) jugadorasPorId.set(uid, registroJugadora);
     });
 
-    const now = Date.now();
-    const entrenamientosFinalizados = entrenamientosSnap.docs
-      .map((documento) => ({ id: documento.id, ...documento.data() }))
-      .filter((ent) => {
-        const ms = getFechaHoraMs(ent);
-        return ms != null && ms < now;
-      });
+    const entrenamientosConsiderados = entrenamientosSnap.docs
+      .map((documento) => ({ id: documento.id, ...documento.data() }));
 
-    const idsFinalizadosPorEquipo = {
-      ascenso: new Set(),
-      escuela: new Set()
+    const idsFinalizadosPorTipo = {
+      todos: { ascenso: new Set(), escuela: new Set() },
+      entrenamientos: { ascenso: new Set(), escuela: new Set() },
+      partidos: { ascenso: new Set(), escuela: new Set() }
     };
 
-    entrenamientosFinalizados.forEach((ent) => {
+    entrenamientosConsiderados.forEach((ent) => {
       const equipoEntrenamiento = normalizarEquipo(ent?.equipo);
+      const tipoEvento = obtenerTipoFiltroEvento(ent);
       if (equipoEntrenamiento === 'ascenso' || equipoEntrenamiento === 'escuela') {
-        idsFinalizadosPorEquipo[equipoEntrenamiento].add(ent.id);
+        idsFinalizadosPorTipo.todos[equipoEntrenamiento].add(ent.id);
+        idsFinalizadosPorTipo[tipoEvento][equipoEntrenamiento].add(ent.id);
       }
     });
 
-    eventosFinalizadosPorEquipo.value = {
-      ascenso: idsFinalizadosPorEquipo.ascenso.size,
-      escuela: idsFinalizadosPorEquipo.escuela.size,
-      todos: idsFinalizadosPorEquipo.ascenso.size + idsFinalizadosPorEquipo.escuela.size
-    };
-
-    const acumuladoPorEquipo = {
-      ascenso: new Map(),
-      escuela: new Map()
-    };
-
-    const registrarInscripcion = (acumulado, jugadoraId, data, equipoJugadora) => {
-      if (!acumulado.has(jugadoraId)) {
-        acumulado.set(jugadoraId, {
-          jugadoraId,
-          nombre: (data.jugadoraNombre || 'Sin nombre').toString().trim() || 'Sin nombre',
-          equipo: equipoJugadora,
-          confirmadas: 0,
-          bajas: 0,
-          pendientes: 0,
-          total: 0,
-          porcentaje: 0
-        });
-      }
-
-      const item = acumulado.get(jugadoraId);
-      const estado = (data.estado || 'pendiente').toString().toLowerCase();
-
-      if (estado === 'confirmada') item.confirmadas += 1;
-      else if (estado === 'baja') item.bajas += 1;
-      else item.pendientes += 1;
-
-      item.total += 1;
-      if (data.jugadoraNombre && (!item.nombre || item.nombre === 'Sin nombre')) {
-        item.nombre = data.jugadoraNombre;
-      }
+    const acumuladosPorTipo = {
+      todos: crearAcumuladoBase(jugadorasBase),
+      entrenamientos: crearAcumuladoBase(jugadorasBase),
+      partidos: crearAcumuladoBase(jugadorasBase)
     };
 
     inscripcionesSnap.forEach((documento) => {
@@ -269,72 +434,66 @@ const cargarRanking = async () => {
       const jugadoraId = (data.jugadoraId || '').toString().trim();
       if (!jugadoraId) return;
 
-      const nombreNormalizado = normalizarNombre(data.jugadoraNombre || '');
+      const jugadora = jugadorasPorId.get(jugadoraId);
+      const nombreNormalizado = normalizarNombre(jugadora?.nombre || data.jugadoraNombre || '');
       if (nombresExcluidos.has(nombreNormalizado)) return;
 
-      const equipoJugadora = equipoPorJugadoraId.get(jugadoraId) || 'sin-equipo';
-      if (equipoJugadora !== 'ascenso' && equipoJugadora !== 'escuela' && equipoJugadora !== 'ambos') return;
+      const equiposJugadora = jugadora?.equipos || [];
+      if (equiposJugadora.length === 0) return;
 
-      const esEventoAscenso = idsFinalizadosPorEquipo.ascenso.has(data.entrenamientoId);
-      const esEventoEscuela = idsFinalizadosPorEquipo.escuela.has(data.entrenamientoId);
+      const esEventoAscensoEntrenamiento = idsFinalizadosPorTipo.entrenamientos.ascenso.has(data.entrenamientoId);
+      const esEventoEscuelaEntrenamiento = idsFinalizadosPorTipo.entrenamientos.escuela.has(data.entrenamientoId);
+      const esEventoAscensoPartido = idsFinalizadosPorTipo.partidos.ascenso.has(data.entrenamientoId);
+      const esEventoEscuelaPartido = idsFinalizadosPorTipo.partidos.escuela.has(data.entrenamientoId);
+      const rankingJugadoraId = jugadora.id;
 
-      if (esEventoAscenso && (equipoJugadora === 'ascenso' || equipoJugadora === 'ambos')) {
-        registrarInscripcion(acumuladoPorEquipo.ascenso, jugadoraId, data, equipoJugadora);
+      if (equiposJugadora.includes('ascenso')) {
+        if (esEventoAscensoEntrenamiento) {
+          registrarInscripcion(acumuladosPorTipo.entrenamientos.ascenso, rankingJugadoraId, data, 'ascenso');
+          registrarInscripcion(acumuladosPorTipo.todos.ascenso, rankingJugadoraId, data, 'ascenso');
+        }
+
+        if (esEventoAscensoPartido) {
+          registrarInscripcion(acumuladosPorTipo.partidos.ascenso, rankingJugadoraId, data, 'ascenso');
+          registrarInscripcion(acumuladosPorTipo.todos.ascenso, rankingJugadoraId, data, 'ascenso');
+        }
       }
 
-      if (esEventoEscuela && (equipoJugadora === 'escuela' || equipoJugadora === 'ambos')) {
-        registrarInscripcion(acumuladoPorEquipo.escuela, jugadoraId, data, equipoJugadora);
+      if (equiposJugadora.includes('escuela')) {
+        if (esEventoEscuelaEntrenamiento) {
+          registrarInscripcion(acumuladosPorTipo.entrenamientos.escuela, rankingJugadoraId, data, 'escuela');
+          registrarInscripcion(acumuladosPorTipo.todos.escuela, rankingJugadoraId, data, 'escuela');
+        }
+
+        if (esEventoEscuelaPartido) {
+          registrarInscripcion(acumuladosPorTipo.partidos.escuela, rankingJugadoraId, data, 'escuela');
+          registrarInscripcion(acumuladosPorTipo.todos.escuela, rankingJugadoraId, data, 'escuela');
+        }
       }
     });
 
-    const ordenarLista = (listaBase) => {
-      return listaBase
-        .map((item) => ({
-          ...item,
-          porcentaje: item.total > 0 ? Math.round((item.confirmadas / item.total) * 100) : 0
-        }))
-        .sort((a, b) => {
-          if (b.confirmadas !== a.confirmadas) return b.confirmadas - a.confirmadas;
-          if (b.porcentaje !== a.porcentaje) return b.porcentaje - a.porcentaje;
-          if (a.bajas !== b.bajas) return a.bajas - b.bajas;
-          return a.nombre.localeCompare(b.nombre, 'es');
-        });
+    eventosConsideradosPorTipo.value = {
+      todos: {
+        ascenso: idsFinalizadosPorTipo.todos.ascenso.size,
+        escuela: idsFinalizadosPorTipo.todos.escuela.size,
+        todos: idsFinalizadosPorTipo.todos.ascenso.size + idsFinalizadosPorTipo.todos.escuela.size
+      },
+      entrenamientos: {
+        ascenso: idsFinalizadosPorTipo.entrenamientos.ascenso.size,
+        escuela: idsFinalizadosPorTipo.entrenamientos.escuela.size,
+        todos: idsFinalizadosPorTipo.entrenamientos.ascenso.size + idsFinalizadosPorTipo.entrenamientos.escuela.size
+      },
+      partidos: {
+        ascenso: idsFinalizadosPorTipo.partidos.ascenso.size,
+        escuela: idsFinalizadosPorTipo.partidos.escuela.size,
+        todos: idsFinalizadosPorTipo.partidos.ascenso.size + idsFinalizadosPorTipo.partidos.escuela.size
+      }
     };
 
-    const rankingAscenso = ordenarLista(Array.from(acumuladoPorEquipo.ascenso.values()));
-    const rankingEscuela = ordenarLista(Array.from(acumuladoPorEquipo.escuela.values()));
-
-    const acumuladoTodos = new Map();
-    [...rankingAscenso, ...rankingEscuela].forEach((item) => {
-      const existente = acumuladoTodos.get(item.jugadoraId);
-      if (!existente) {
-        acumuladoTodos.set(item.jugadoraId, {
-          jugadoraId: item.jugadoraId,
-          nombre: item.nombre,
-          equipo: item.equipo,
-          confirmadas: item.confirmadas,
-          bajas: item.bajas,
-          pendientes: item.pendientes,
-          total: item.total,
-          porcentaje: 0
-        });
-        return;
-      }
-
-      existente.confirmadas += item.confirmadas;
-      existente.bajas += item.bajas;
-      existente.pendientes += item.pendientes;
-      existente.total += item.total;
-
-      if (existente.equipo !== item.equipo) {
-        existente.equipo = 'ambos';
-      }
-    });
-
-    rankingPorEquipo.value = {
-      ascenso: rankingAscenso,
-      escuela: rankingEscuela,
-      todos: ordenarLista(Array.from(acumuladoTodos.values()))
+    rankingPorTipo.value = {
+      todos: construirRankingPorEquipo(acumuladosPorTipo.todos),
+      entrenamientos: construirRankingPorEquipo(acumuladosPorTipo.entrenamientos),
+      partidos: construirRankingPorEquipo(acumuladosPorTipo.partidos)
     };
   } finally {
     isLoading.value = false;

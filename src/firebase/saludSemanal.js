@@ -21,6 +21,12 @@ const normalizarNumero = (valor, min, max, fallback) => {
   return Math.max(min, Math.min(max, Math.round(numero)));
 };
 
+const normalizarPeriodo = (valor) => {
+  if (valor === true) return true;
+  if (valor === false) return false;
+  return null;
+};
+
 export const obtenerSemanaClave = (fecha = new Date()) => {
   const d = new Date(Date.UTC(fecha.getFullYear(), fecha.getMonth(), fecha.getDate()));
   const dia = d.getUTCDay() || 7;
@@ -30,9 +36,13 @@ export const obtenerSemanaClave = (fecha = new Date()) => {
   return `${d.getUTCFullYear()}-W${String(semana).padStart(2, '0')}`;
 };
 
-export const calcularRiesgoSalud = ({ dolor, fatiga, sueno }) => {
+export const calcularRiesgoSalud = ({ dolor, fatiga, sueno, enPeriodo = null }) => {
+  const enPeriodoNormalizado = normalizarPeriodo(enPeriodo);
+
   if (dolor >= 4 || fatiga >= 4 || sueno <= 2) return 'alto';
+  if (enPeriodoNormalizado === true && (dolor >= 3 || fatiga >= 3 || sueno <= 3)) return 'alto';
   if (dolor >= 3 || fatiga >= 3 || sueno <= 3) return 'medio';
+  if (enPeriodoNormalizado === true && (dolor >= 2 || fatiga >= 2)) return 'medio';
   return 'bajo';
 };
 
@@ -52,6 +62,7 @@ export const guardarRespuestaSaludSemanal = async ({
   dolor,
   fatiga,
   sueno,
+  enPeriodo,
   comentarios = ''
 }) => {
   if (!jugadoraId) throw new Error('jugadoraId requerido');
@@ -61,29 +72,36 @@ export const guardarRespuestaSaludSemanal = async ({
   const refDoc = doc(db, SALUD_COLLECTION, docId);
   const existente = await getDoc(refDoc);
 
+  if (existente.exists()) {
+    throw new Error('La respuesta de salud de esta semana ya fue registrada');
+  }
+
+  const dolorNormalizado = normalizarNumero(dolor, 1, 5, 1);
+  const fatigaNormalizada = normalizarNumero(fatiga, 1, 5, 1);
+  const suenoNormalizado = normalizarNumero(sueno, 1, 5, 5);
+  const enPeriodoNormalizado = normalizarPeriodo(enPeriodo);
+
   const payload = {
     jugadoraId,
     jugadoraNombre: (jugadoraNombre || '').toString().trim() || 'Sin nombre',
     equipo: (equipo || '').toString().trim().toLowerCase(),
     semanaClave,
-    dolor: normalizarNumero(dolor, 1, 5, 1),
-    fatiga: normalizarNumero(fatiga, 1, 5, 1),
-    sueno: normalizarNumero(sueno, 1, 5, 5),
+    dolor: dolorNormalizado,
+    fatiga: fatigaNormalizada,
+    sueno: suenoNormalizado,
+    enPeriodo: enPeriodoNormalizado,
     comentarios: (comentarios || '').toString().trim(),
     riesgo: calcularRiesgoSalud({
-      dolor: normalizarNumero(dolor, 1, 5, 1),
-      fatiga: normalizarNumero(fatiga, 1, 5, 1),
-      sueno: normalizarNumero(sueno, 1, 5, 5)
+      dolor: dolorNormalizado,
+      fatiga: fatigaNormalizada,
+      sueno: suenoNormalizado,
+      enPeriodo: enPeriodoNormalizado
     }),
-    revisada: existente.exists() ? (existente.data().revisada === true) : false,
-    notificadaAdmin: existente.exists() ? (existente.data().notificadaAdmin === true) : false,
+    revisada: false,
+    notificadaAdmin: false,
+    createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
   };
-
-  if (!existente.exists()) {
-    payload.createdAt = serverTimestamp();
-    payload.notificadaAdmin = false;
-  }
 
   await setDoc(refDoc, payload, { merge: true });
   return { id: docId, ...payload };

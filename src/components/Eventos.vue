@@ -1,6 +1,37 @@
 <template>
     <div class="w-full py-12 px-4">
         <div class="max-w-6xl mx-auto">
+            <div
+                v-if="proximoPartido && proximoPartido.estado === 'EN_CURSO'"
+                class="mb-6 rounded-3xl border border-red-500/40 bg-linear-to-r from-red-600/20 via-red-500/15 to-black/40 p-4 sm:p-5 shadow-[0_16px_40px_rgba(0,0,0,0.24)]"
+            >
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div class="text-center sm:text-left">
+                        <div class="inline-flex items-center gap-2 rounded-full bg-red-500 px-3 py-1 text-[11px] font-black uppercase tracking-[0.2em] text-white">
+                            <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                            En vivo
+                        </div>
+                        <p class="text-white text-xl sm:text-2xl font-black mt-3">Se esta jugando ahora</p>
+                        <p class="text-white/80 text-sm sm:text-base mt-1.5">
+                            {{ proximoPartido.equipo1.nombre }} vs {{ proximoPartido.equipo2.nombre }}
+                            <span class="text-red-300 font-bold">• {{ proximoPartido.liga }}</span>
+                        </p>
+                        <p class="text-red-200 text-xs sm:text-sm font-bold uppercase tracking-[0.18em] mt-2">
+                            {{ obtenerEtiquetaTiempoPartido(proximoPartido) }}
+                        </p>
+                    </div>
+
+                    <div class="self-center rounded-2xl bg-black/55 px-4 py-3 text-center min-w-36 border border-white/10">
+                        <div class="flex items-center justify-center gap-2 text-white font-black text-2xl">
+                            <span>{{ proximoPartido.golesLocal }}</span>
+                            <span class="text-white/40">-</span>
+                            <span>{{ proximoPartido.golesVisita }}</span>
+                        </div>
+                        <p class="text-[11px] uppercase tracking-[0.16em] font-bold text-red-300 mt-1">Marcador actual</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid lg:grid-cols-5 grid-cols-1 gap-8">
                 <!-- Próximo Partido -->
                 <div class="col-span-2 border-5 border-primary-dark bg-black/50 p-8 rounded-lg">
@@ -35,11 +66,13 @@
                                         <span class="text-white/70 font-bold">-</span>
                                         <span class="bg-black text-white font-black px-2 py-1 rounded text-sm">{{ proximoPartido.golesVisita }}</span>
                                     </div>
-                                    <p class="text-xs font-bold text-black animate-pulse">EN CURSO ⚽</p>
+                                    <p class="text-xs font-bold text-black animate-pulse">{{ obtenerEtiquetaTiempoPartido(proximoPartido) }}</p>
                                     <div v-if="proximoPartido.goleadoresLocal && proximoPartido.goleadoresLocal.length" class="mt-2">
                                         <p class="text-xs text-white/70">Goleadoras:</p>
                                         <ul class="text-white text-sm list-disc list-inside">
-                                            <li v-for="(gol, idx) in proximoPartido.goleadoresLocal" :key="idx">{{ gol.jugadora }} (min {{ gol.minuto }})</li>
+                                            <li v-for="(gol, idx) in proximoPartido.goleadoresLocal" :key="idx">
+                                                {{ gol.jugadora }}<span v-if="tieneMinutoValido(gol.minuto)"> (min {{ gol.minuto }})</span>
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>
@@ -99,7 +132,7 @@
                         <!-- Equipos y Resultado -->
                         <div class="flex items-center justify-between">
                             <div class="flex flex-col items-center gap-2">
-                                <img src="@/assets/logoVk.png" :alt="ultimoPartido.equipo1.nombre"
+                                <img :src="ultimoPartido.equipo1.logo || logoUrlVikingas" :alt="ultimoPartido.equipo1.nombre"
                                     class="w-16 h-16">
                                 <p class="text-white text-sm font-bold">{{ ultimoPartido.equipo1.nombre }}</p>
                             </div>
@@ -115,9 +148,59 @@
                             </div>
 
                             <div class="flex flex-col items-center gap-2">
+                                <img v-if="ultimoPartido.equipo2.logo" :src="ultimoPartido.equipo2.logo" :alt="ultimoPartido.equipo2.nombre"
+                                    class="w-16 h-16 object-contain">
                                 <p class="text-white text-sm font-bold">{{ ultimoPartido.equipo2.nombre }}</p>
                             </div>
                         </div>
+
+                        <div v-if="ultimoPartido.goleadoresLocal && ultimoPartido.goleadoresLocal.length" class="rounded-2xl border border-white/10 bg-black/30 p-4">
+                            <button
+                                @click="mostrarGoleadorasUltimoPartido = true"
+                                class="w-full flex items-center justify-between gap-3 text-left"
+                            >
+                                <div>
+                                    <p class="text-primary text-[11px] font-black uppercase tracking-[0.18em]">Resumen del partido</p>
+                                    <p class="text-white font-bold text-sm mt-1">Ver goleadoras de Vikingas</p>
+                                </div>
+                                <span class="text-primary text-xs font-black uppercase">Abrir</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            v-if="mostrarGoleadorasUltimoPartido && ultimoPartido && ultimoPartido.goleadoresLocal && ultimoPartido.goleadoresLocal.length"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
+            @click.self="mostrarGoleadorasUltimoPartido = false"
+        >
+            <div class="w-full max-w-lg rounded-3xl border border-primary/25 bg-[#071311] p-5 sm:p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+                <div class="flex items-start justify-between gap-4 mb-5">
+                    <div>
+                        <p class="text-primary text-[11px] font-black uppercase tracking-[0.2em]">Último partido</p>
+                        <h3 class="text-white text-xl sm:text-2xl font-black mt-2">Goleadoras de Vikingas</h3>
+                        <p class="text-white/60 text-sm mt-1">{{ ultimoPartido.equipo1.nombre }} vs {{ ultimoPartido.equipo2.nombre }}</p>
+                    </div>
+
+                    <button
+                        @click="mostrarGoleadorasUltimoPartido = false"
+                        class="shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-white hover:bg-white/10"
+                    >
+                        Cerrar
+                    </button>
+                </div>
+
+                <div class="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
+                    <div
+                        v-for="(gol, idx) in ultimoPartido.goleadoresLocal"
+                        :key="`modal-ultimo-gol-${idx}`"
+                        class="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-white/5 px-4 py-3 text-sm text-white"
+                    >
+                        <span class="font-semibold">{{ gol.jugadoraNombre || gol.jugadora }}</span>
+                        <span v-if="tieneMinutoValido(gol.minuto)" class="text-primary font-black">{{ gol.minuto }}'</span>
+                        <span v-else class="text-white/40 text-xs font-bold uppercase">Gol</span>
                     </div>
                 </div>
             </div>
@@ -133,6 +216,7 @@ import { db } from '../firebase/config';
 const proximoPartido = ref(null);
 const ultimoPartido = ref(null);
 const cargando = ref(true);
+const mostrarGoleadorasUltimoPartido = ref(false);
 let unsubscribeProximoPartido = null;
 let unsubscribeConvocatorias = null;
 let unsubscribeProximoPartidoHomeConfig = null;
@@ -143,6 +227,8 @@ const partidosAdmin = ref([]);  // Convocatorias (esConvocatoria === true, pero 
 const entrenamientosPartidos = ref([]); // Entrenamientos con tipo='partido' o 'amistoso'
 const partidosNuevos = ref([]);
 const partidoDestacadoHome = ref(null);
+const ahora = ref(Date.now());
+let intervaloReloj = null;
 
 const logoUrlVikingas = new URL('../assets/logoVk.png', import.meta.url).href;
 const logoUrlVerserkers = new URL('../assets/versekersLogo.jpeg', import.meta.url).href;
@@ -245,6 +331,96 @@ const normalizarEstado = (estado) => {
     return 'PROGRAMADO';
 };
 
+const tieneMinutoValido = (valor) => {
+    const minuto = Number(valor);
+    return Number.isFinite(minuto) && minuto > 0;
+};
+
+const obtenerFechaDesdeValor = (valor) => {
+    if (!valor) return null;
+    if (valor instanceof Date) return new Date(valor);
+    if (typeof valor?.toDate === 'function') return valor.toDate();
+    if (typeof valor?.seconds === 'number') return new Date(valor.seconds * 1000);
+
+    const fecha = new Date(valor);
+    return Number.isNaN(fecha.getTime()) ? null : fecha;
+};
+
+const obtenerFasePartido = (partido) => {
+    const fase = (partido?.fasePartido || '').toString().trim();
+
+    if (fase) return fase;
+    if (partido?.estado === 'FINALIZADO') return 'FINALIZADO';
+    if (partido?.estado === 'EN_CURSO') return 'PRIMER_TIEMPO';
+
+    return 'PROGRAMADO';
+};
+
+const calcularMinutoDesdeInicio = (inicio, base, minimo, maximo) => {
+    const fechaInicio = obtenerFechaDesdeValor(inicio);
+    if (!fechaInicio) return base;
+
+    const diferenciaMs = ahora.value - fechaInicio.getTime();
+    if (diferenciaMs <= 0) return base;
+
+    return Math.min(maximo, Math.max(minimo, Math.floor(diferenciaMs / 60000) + base));
+};
+
+const calcularRelojDesdeInicio = (inicio, minutoBase, minutoMinimo, minutoMaximo) => {
+    const fechaInicio = obtenerFechaDesdeValor(inicio);
+    if (!fechaInicio) {
+        return {
+            minuto: minutoBase,
+            segundo: 0
+        };
+    }
+
+    const diferenciaMs = Math.max(0, ahora.value - fechaInicio.getTime());
+    const totalSegundos = Math.floor(diferenciaMs / 1000);
+    const minuto = Math.min(minutoMaximo, Math.max(minutoMinimo, Math.floor(totalSegundos / 60) + minutoBase));
+    const segundo = minuto >= minutoMaximo ? Math.min(59, totalSegundos % 60) : totalSegundos % 60;
+
+    return { minuto, segundo };
+};
+
+const formatearRelojPartido = ({ minuto, segundo }) => {
+    const minutoTexto = String(minuto).padStart(2, '0');
+    const segundoTexto = String(segundo).padStart(2, '0');
+    return `${minutoTexto}:${segundoTexto}`;
+};
+
+const obtenerMinutoActualPartido = (partido) => {
+    const fase = obtenerFasePartido(partido);
+
+    if (fase === 'PRIMER_TIEMPO') {
+        return calcularMinutoDesdeInicio(partido?.inicioPrimerTiempoAt || partido?.inicioEnVivoAt || partido?.fechaDate, 1, 1, 25);
+    }
+
+    if (fase === 'ENTRETIEMPO') return 25;
+
+    if (fase === 'SEGUNDO_TIEMPO') {
+        return calcularMinutoDesdeInicio(partido?.inicioSegundoTiempoAt, 26, 26, 50);
+    }
+
+    return null;
+};
+
+const obtenerEtiquetaTiempoPartido = (partido) => {
+    const fase = obtenerFasePartido(partido);
+    if (fase === 'PRIMER_TIEMPO') {
+        const reloj = calcularRelojDesdeInicio(partido?.inicioPrimerTiempoAt || partido?.inicioEnVivoAt || partido?.fechaDate, 1, 1, 25);
+        return `1ER TIEMPO · ${formatearRelojPartido(reloj)}`;
+    }
+    if (fase === 'ENTRETIEMPO') return 'ENTRETIEMPO';
+    if (fase === 'SEGUNDO_TIEMPO') {
+        const reloj = calcularRelojDesdeInicio(partido?.inicioSegundoTiempoAt, 26, 26, 50);
+        return `2DO TIEMPO · ${formatearRelojPartido(reloj)}`;
+    }
+    if (fase === 'FINALIZADO') return 'FINALIZADO';
+
+    return 'PROGRAMADO';
+};
+
 const normalizarEquipoCategoria = (equipo) => {
     const valor = (equipo || '').toString().toLowerCase().trim();
     if (valor === 'ascenso') return 'Ascenso';
@@ -296,7 +472,8 @@ const recalcularProximoPartido = () => {
             resultado: {
                 equipo1: elegido.golesLocal || 0,
                 equipo2: elegido.golesVisita || 0
-            }
+            },
+            goleadoresLocal: elegido.goleadoresLocal || elegido.goleadorasLocal || []
         };
     } else {
         ultimoPartido.value = null;
@@ -305,7 +482,7 @@ const recalcularProximoPartido = () => {
     // Si hay algún partido en curso lo mostramos directamente
     if (enCurso.length > 0) {
         const primero = enCurso.sort((a, b) => a.fechaDate.getTime() - b.fechaDate.getTime())[0];
-        proximoPartido.value = JSON.parse(JSON.stringify(primero));
+        proximoPartido.value = { ...primero };
         return;
     }
 
@@ -328,7 +505,7 @@ const recalcularProximoPartido = () => {
         .sort((a, b) => a.fechaDate.getTime() - b.fechaDate.getTime());
 
     if (candidatos.length > 0) {
-        proximoPartido.value = JSON.parse(JSON.stringify(candidatos[0]));
+        proximoPartido.value = { ...candidatos[0] };
   
     } else {
         proximoPartido.value = null;
@@ -369,6 +546,10 @@ const mapearPartidoDestacadoDesdeConfig = (configData) => {
         fechaDate: fechaHora,
         golesLocal: configData.golesLocal || 0,
         golesVisita: configData.golesVisita || 0,
+        fasePartido: configData.fasePartido || null,
+        inicioEnVivoAt: configData.inicioEnVivoAt || null,
+        inicioPrimerTiempoAt: configData.inicioPrimerTiempoAt || null,
+        inicioSegundoTiempoAt: configData.inicioSegundoTiempoAt || null,
         fuente: 'admin_destacado'
     };
 };
@@ -403,13 +584,18 @@ const mapearPartidoNuevo = (doc) => {
         golesLocal: data.golesLocal || 0,
         golesVisita: data.golesVisita || 0,
         goleadoresLocal: data.goleadoresLocal || [],
-        goleadoresVisita: data.goleadoresVisita || [],        // Firestore timestamp when the documento fue modificado,
+        goleadoresVisita: data.goleadoresVisita || [],
+        fasePartido: data.fasePartido || null,
+        inicioEnVivoAt: data.inicioEnVivoAt || null,
+        inicioPrimerTiempoAt: data.inicioPrimerTiempoAt || null,
+        inicioSegundoTiempoAt: data.inicioSegundoTiempoAt || null,
         // nos ayuda a saber cuál fue el último partido editado
         updatedAt: data.updatedAt
             ? (data.updatedAt.seconds
                 ? new Date(data.updatedAt.seconds * 1000)
                 : new Date(data.updatedAt))
-            : new Date(),        fuente: 'partidos_new'
+            : new Date(),
+        fuente: 'partidos_new'
     };
 };
 
@@ -505,6 +691,10 @@ const cargarProximoPartido = () => {
                         golesVisita: entrenamiento.golesVisita || entrenamiento.resultadoVisita || 0,
                         goleadoresLocal: entrenamiento.goleadoresLocal || [],
                         goleadoresVisita: entrenamiento.goleadoresVisita || [],
+                        fasePartido: entrenamiento.fasePartido || null,
+                        inicioEnVivoAt: entrenamiento.inicioEnVivoAt || null,
+                        inicioPrimerTiempoAt: entrenamiento.inicioPrimerTiempoAt || null,
+                        inicioSegundoTiempoAt: entrenamiento.inicioSegundoTiempoAt || null,
                         fuente: 'admin'
                     };
                 });
@@ -552,6 +742,10 @@ const cargarProximoPartido = () => {
                         goleadoresLocal: entrenamiento.goleadoresLocal || [],
                         goleadorasLocal: entrenamiento.goleadorasLocal || [],
                         goleadoresVisita: entrenamiento.goleadorasVisita || [],
+                        fasePartido: entrenamiento.fasePartido || null,
+                        inicioEnVivoAt: entrenamiento.inicioEnVivoAt || null,
+                        inicioPrimerTiempoAt: entrenamiento.inicioPrimerTiempoAt || null,
+                        inicioSegundoTiempoAt: entrenamiento.inicioSegundoTiempoAt || null,
                         updatedAt: entrenamiento.updatedAt
                             ? (entrenamiento.updatedAt.seconds
                                 ? new Date(entrenamiento.updatedAt.seconds * 1000)
@@ -591,6 +785,10 @@ const cargarProximoPartido = () => {
 
 onMounted(async () => {
     try {
+        intervaloReloj = window.setInterval(() => {
+            ahora.value = Date.now();
+        }, 1000);
+
         // Cargar próximo partido automáticamente desde entrenamientos
         cargarProximoPartido();
     } catch (error) {
@@ -601,6 +799,10 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+    if (intervaloReloj) {
+        window.clearInterval(intervaloReloj);
+    }
+
     if (unsubscribeProximoPartidoHomeConfig) {
         unsubscribeProximoPartidoHomeConfig();
     }

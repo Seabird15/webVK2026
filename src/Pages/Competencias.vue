@@ -1,90 +1,501 @@
 <template>
-  <div class="min-h-screen bg-black py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-6xl mx-auto">
+  <div class="min-h-screen bg-[#020807] py-8 sm:py-10 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div class="absolute inset-0" style="background: radial-gradient(circle at top, rgba(20,184,166,0.18), transparent 38%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.06), transparent 22%), linear-gradient(180deg, rgba(4,18,16,0.94), rgba(2,8,7,1));"></div>
+    <div class="absolute top-24 left-1/2 -translate-x-1/2 h-56 w-56 rounded-full bg-primary/12 blur-3xl"></div>
+    <div class="max-w-6xl mx-auto relative z-10">
       <!-- Header -->
-      <div class="text-center mb-12">
-        <h1 class="text-5xl md:text-6xl font-bold text-white mb-2" style="font-family: 'Gobold High', sans-serif;">COMPETENCIAS</h1>
-        <div class="flex items-center justify-center gap-2 mb-4">
-          <div class="h-1 w-12 bg-primary rounded-full"></div>
-          <p class="text-primary uppercase font-bold text-lg tracking-widest">
-          temporada 2026
-          </p>
-          <div class="h-1 w-12 bg-primary rounded-full"></div>
-        </div>
-        
-        <!-- Botón a Estadísticas -->
-        <div class="mt-6">
-          <router-link
-            to="/estadisticas"
-            class="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-black px-6 py-3 rounded-lg font-bold text-sm transition-all transform hover:scale-105 shadow-xl"
-          >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
-            </svg>
-            Ver Estadísticas por Equipo
-          </router-link>
-        </div>
+      <div class="mb-10 space-y-6">
+        <div class="rounded-4xl border border-primary/20 bg-white/4 backdrop-blur-md shadow-[0_30px_90px_rgba(0,0,0,0.35)] overflow-hidden">
+          <div class="grid lg:grid-cols-[1.4fr_0.9fr] gap-0">
+            <div class="p-6 sm:p-8 lg:p-10">
+              <div class="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-[11px] sm:text-xs font-black uppercase tracking-[0.22em] text-primary">
+                Temporada 2026
+              </div>
+              <h1 class="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold text-white mt-5 leading-none" style="font-family: 'Gobold High', sans-serif;">COMPETENCIAS</h1>
+              <p class="max-w-2xl text-white/72 text-sm sm:text-base lg:text-lg font-semibold mt-4 leading-relaxed">
+                Nuevo semestre competitivo para Vikingas. Desde aquí puedes seguir las ligas activas, cargar resultados y mantener al día cada fecha.
+              </p>
 
-        <div class="mt-6 max-w-3xl mx-auto bg-linear-to-r from-primary/20 via-primary/10 to-primary/20 border-2 border-primary rounded-xl px-4 py-4 sm:px-6 sm:py-5 shadow-xl">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-left">
-            <div>
-              <h2 class="text-white text-lg sm:text-2xl font-400" style="font-family: 'Collegiate Black', sans-serif;">
-                ¿Vamos por un nuevo Torneo Interno?
-              </h2>
-              <p class="text-white/80 text-sm sm:text-base font-semibold mt-1">Ayúdanos a decidir si realizamos una 2da versión del campeonato interno</p>
+              <div class="mt-6 flex flex-col sm:flex-row sm:flex-wrap gap-3">
+                <button
+                  type="button"
+                  @click="abrirCompetencia('semestre')"
+                  class="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-xl bg-primary text-black px-5 py-3 font-black text-sm shadow-lg hover:bg-primary/90 transition cursor-pointer"
+                >
+                  <span class="w-2.5 h-2.5 rounded-full bg-black"></span>
+                  Ver semestre activo
+                </button>
+
+                <router-link
+                  to="/estadisticas"
+                  class="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-xl border border-white/12 bg-white/4 text-white px-5 py-3 font-black text-sm hover:bg-white/8 transition"
+                >
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                  </svg>
+                  Ver estadísticas por equipo
+                </router-link>
+              </div>
+
+              <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-[11px] uppercase tracking-[0.2em] font-black text-white/45">Ligas activas</p>
+                  <p class="text-3xl font-black text-white mt-2">2</p>
+                  <p class="text-sm text-white/60 mt-1">Jueves Serie B Ascenso y Domingos Serie C</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-[11px] uppercase tracking-[0.2em] font-black text-white/45">Fechas cargadas</p>
+                  <p class="text-3xl font-black text-white mt-2">{{ resumenSemestreGlobal.totalFechas }}</p>
+                  <p class="text-sm text-white/60 mt-1">{{ resumenSemestreGlobal.fechasConResultado }} con resultado ingresado</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p class="text-[11px] uppercase tracking-[0.2em] font-black text-white/45">En foco</p>
+                  <p class="text-xl font-black text-white mt-2">{{ ligaActiva?.descripcion || 'Semestre activo' }}</p>
+                  <p class="text-sm text-white/60 mt-1">Edita rival, marcador y goleadoras desde el bloque principal</p>
+                </div>
+              </div>
             </div>
-            <div class="flex flex-col items-start sm:items-end gap-2">
-              <button
-                @click="reaccionarConFuego"
-                :class="[
-                  'inline-flex items-center gap-2 px-3 py-2 rounded-lg font-400 text-xs sm:text-sm transition-all duration-200 hover:scale-105',
-                  dioFuegoFinal ? 'bg-green-600 text-white' : 'bg-white/10 text-white border border-primary/50 hover:bg-primary/20'
-                ]"
-                type="button"
-              >
-                <span class="text-base" :class="dioFuegoFinal ? 'animate-pulse' : ''">👍</span>
-                <span>{{ dioFuegoFinal ? '¡Me interesa!' : '¡Quiero jugar!' }}</span>
-                <span class="bg-black/20 px-2 py-0.5 rounded-full">{{ fuegitosFinal }}</span>
-              </button>
-              <p class="text-white/60 text-[11px] sm:text-xs">Toca el pulgar para votar por una nueva edición</p>
+
+            <div class="border-t lg:border-t-0 lg:border-l border-white/10 bg-black/25 p-6 sm:p-8 lg:p-10 flex flex-col justify-between gap-6">
+              <div>
+                <p class="text-[11px] uppercase tracking-[0.2em] font-black text-primary">Semestre activo</p>
+                <div class="mt-4 grid gap-3 sm:space-y-0">
+                  <button
+                    type="button"
+                    @click="ligaSeleccionada = 'dobleve_jueves_serie_b_ascenso'; abrirCompetencia('semestre')"
+                    class="w-full rounded-2xl border text-left px-4 py-4 transition cursor-pointer"
+                    :class="ligaSeleccionada === 'dobleve_jueves_serie_b_ascenso' && competenciaExpandida === 'semestre' ? 'border-primary bg-primary/15 text-white' : 'border-white/10 bg-white/3 text-white/78 hover:bg-white/6'"
+                  >
+                    <p class="text-xs font-black uppercase tracking-[0.18em] text-primary">Jueves</p>
+                    <p class="text-lg font-black mt-1">Liga Dobleve Serie B Ascenso</p>
+                  </button>
+                  <button
+                    type="button"
+                    @click="ligaSeleccionada = 'dobleve_domingos_serie_c'; abrirCompetencia('semestre')"
+                    class="w-full rounded-2xl border text-left px-4 py-4 transition cursor-pointer"
+                    :class="ligaSeleccionada === 'dobleve_domingos_serie_c' && competenciaExpandida === 'semestre' ? 'border-primary bg-primary/15 text-white' : 'border-white/10 bg-white/3 text-white/78 hover:bg-white/6'"
+                  >
+                    <p class="text-xs font-black uppercase tracking-[0.18em] text-primary">Domingos</p>
+                    <p class="text-lg font-black mt-1">Liga Dobleve Serie C</p>
+                  </button>
+                </div>
+              </div>
+
+              <div class="rounded-2xl border border-primary/20 bg-primary/10 p-4 sm:p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-left">
+                  <div>
+                    <h2 class="text-white text-lg sm:text-xl font-400" style="font-family: 'Collegiate Black', sans-serif;">
+                      ¿Vamos por un nuevo Torneo Interno?
+                    </h2>
+                    <p class="text-white/72 text-sm font-semibold mt-1">Ayúdanos a decidir si hacemos una segunda versión.</p>
+                  </div>
+                  <div class="flex flex-col items-start sm:items-end gap-2">
+                    <button
+                      @click="reaccionarConFuego"
+                      :class="[
+                        'inline-flex items-center gap-2 px-3 py-2 rounded-xl font-400 text-xs sm:text-sm transition-all duration-200 hover:scale-105',
+                        dioFuegoFinal ? 'bg-green-600 text-white' : 'bg-white/10 text-white border border-primary/50 hover:bg-primary/20'
+                      ]"
+                      type="button"
+                    >
+                      <span class="text-base" :class="dioFuegoFinal ? 'animate-pulse' : ''">👍</span>
+                      <span>{{ dioFuegoFinal ? '¡Me interesa!' : '¡Quiero jugar!' }}</span>
+                      <span class="bg-black/20 px-2 py-0.5 rounded-full">{{ fuegitosFinal }}</span>
+                    </button>
+                    <p class="text-white/50 text-[11px]">Toca el pulgar para votar</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+
+        <div class="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 md:pb-0">
+          <button
+            type="button"
+            @click="abrirCompetencia('semestre')"
+            class="min-w-65 md:min-w-0 rounded-3xl border p-4 text-left transition-all cursor-pointer"
+            :class="competenciaExpandida === 'semestre' ? 'border-primary bg-linear-to-br from-primary/18 via-primary/10 to-white/6 shadow-[0_18px_45px_rgba(20,184,166,0.18)]' : 'border-white/10 bg-white/3 hover:bg-white/6'"
+          >
+            <p class="text-[11px] font-black uppercase tracking-[0.22em]" :class="competenciaExpandida === 'semestre' ? 'text-primary' : 'text-white/55'">Hoy compite Vikingas</p>
+            <p class="text-white text-lg font-black mt-2">Semestre activo</p>
+            <p class="text-sm mt-2 leading-relaxed" :class="competenciaExpandida === 'semestre' ? 'text-white/82' : 'text-white/60'">Resultados, rivales y goleadoras de las ligas que están en juego ahora.</p>
+          </button>
+
+          <button
+            type="button"
+            @click="abrirCompetencia('verano')"
+            class="min-w-65 md:min-w-0 rounded-3xl border p-4 text-left transition-all cursor-pointer"
+            :class="competenciaExpandida === 'verano' ? 'border-primary bg-linear-to-br from-primary/18 via-primary/10 to-white/6 shadow-[0_18px_45px_rgba(20,184,166,0.18)]' : 'border-white/10 bg-white/3 hover:bg-white/6'"
+          >
+            <p class="text-[11px] font-black uppercase tracking-[0.22em]" :class="competenciaExpandida === 'verano' ? 'text-primary' : 'text-white/55'">Logro destacado</p>
+            <p class="text-white text-lg font-black mt-2">Summer Cup 2026</p>
+            <p class="text-sm mt-2 leading-relaxed" :class="competenciaExpandida === 'verano' ? 'text-white/82' : 'text-white/60'">Campaña campeona de Vikingas Ascenso, ideal para revisar el recorrido completo.</p>
+          </button>
+
+          <button
+            type="button"
+            @click="abrirCompetencia('interno')"
+            class="min-w-65 md:min-w-0 rounded-3xl border p-4 text-left transition-all cursor-pointer"
+            :class="competenciaExpandida === 'interno' ? 'border-primary bg-linear-to-br from-primary/18 via-primary/10 to-white/6 shadow-[0_18px_45px_rgba(20,184,166,0.18)]' : 'border-white/10 bg-white/3 hover:bg-white/6'"
+          >
+            <p class="text-[11px] font-black uppercase tracking-[0.22em]" :class="competenciaExpandida === 'interno' ? 'text-primary' : 'text-white/55'">Comunidad Vikinga</p>
+            <p class="text-white text-lg font-black mt-2">Campeonato interno</p>
+            <p class="text-sm mt-2 leading-relaxed" :class="competenciaExpandida === 'interno' ? 'text-white/82' : 'text-white/60'">Equipos, ambiente y próximos pasos del torneo hecho para la propia comunidad.</p>
+          </button>
         </div>
       </div>
 
-      <!-- CAMPEONATO INTERNO VIKINGAS 2026 -->
-      <div class="mb-8 bg-black border-2 border-primary rounded-lg overflow-hidden">
-        <button
-          @click="competenciaExpandida = competenciaExpandida === 'interno' ? null : 'interno'"
-          class="w-full px-6 py-4 bg-primary-dark flex items-center justify-between hover:bg-primary transition-colors cursor-pointer"
-        >
-          <div class="flex items-center gap-3">
-            <svg class="w-8 h-8 text-black" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-            </svg>
-            <div class="text-left">
-              <h2 class="text-2xl tracking-wider font-400 text-white" style="font-family: 'Collegiate Black', sans-serif;">
-                1ER CAMPEONATO INTERNO VIKINGAS
-              </h2>
-              <p class="text-black/70 text-sm">7 de Febrero 2026 • Cancha Tricolor La Florida</p>
+      <!-- LIGAS SEMESTRE 2026 -->
+      <section v-if="competenciaExpandida === 'semestre'" class="mt-8 mb-8 rounded-[30px] border border-primary/35 bg-white/5 shadow-[0_30px_90px_rgba(0,0,0,0.34)] ring-1 ring-primary/10 overflow-hidden">
+        <div class="border-b border-white/8 bg-linear-to-r from-primary-dark via-primary/90 to-[#0d2924] px-4 py-5 sm:px-8 sm:py-6">
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div class="max-w-2xl">
+              <p class="text-black/70 text-xs font-black uppercase tracking-[0.22em]">Panel principal</p>
+              <h2 class="text-2xl sm:text-4xl tracking-wide font-400 text-white mt-2" style="font-family: 'Collegiate Black', sans-serif;">Ligas semestre 2026</h2>
+              <p class="text-black/75 text-sm sm:text-base mt-3 font-semibold">El foco está en la competencia actual: rivales, resultados y goleadoras en una sola vista limpia para seguir el ritmo del semestre.</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 w-full sm:w-auto sm:min-w-70">
+              <div class="rounded-2xl bg-black/18 px-4 py-3 backdrop-blur-sm">
+                <p class="text-[11px] uppercase font-black tracking-[0.2em] text-black/60">Fechas</p>
+                <p class="text-2xl font-black text-white mt-1">{{ resumenSemestreGlobal.totalFechas }}</p>
+              </div>
+              <div class="rounded-2xl bg-black/18 px-4 py-3 backdrop-blur-sm">
+                <p class="text-[11px] uppercase font-black tracking-[0.2em] text-black/60">Resultados</p>
+                <p class="text-2xl font-black text-white mt-1">{{ resumenSemestreGlobal.fechasConResultado }}</p>
+              </div>
             </div>
           </div>
-          <svg 
-            class="w-6 h-6 text-black transition-transform duration-300"
-            :class="competenciaExpandida === 'interno' ? 'rotate-180' : ''"
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-          </svg>
-        </button>
+        </div>
 
-        <div 
-          v-show="competenciaExpandida === 'interno'"
-          class="p-8"
-        >
-          <!-- Loading State -->
+        <div class="p-4 sm:p-8 space-y-6 bg-linear-to-b from-white/2 to-transparent">
+          <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,320px)_1fr] gap-6 items-start">
+            <div class="rounded-[26px] border border-primary/25 bg-linear-to-b from-primary/14 to-black/20 p-5">
+              <div class="flex items-start justify-between gap-3 mb-3">
+                <div>
+                  <label class="block text-xs font-black uppercase tracking-[0.2em] text-primary">Selecciona una liga</label>
+                  <p class="text-sm text-white/68 mt-2">Abre este menú para cambiar entre la liga de jueves y la de domingos.</p>
+                </div>
+                <div class="shrink-0 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-primary">
+                  Menú
+                </div>
+              </div>
+
+              <div class="relative">
+                <select
+                  v-model="ligaSeleccionada"
+                  class="w-full appearance-none rounded-2xl border border-primary/35 bg-black/85 text-white px-4 py-3 pr-12 font-semibold shadow-[0_10px_30px_rgba(0,0,0,0.18)] focus:outline-hidden focus:border-primary"
+                >
+                  <option v-for="liga in opcionesLigasSemestre" :key="liga.id" :value="liga.id">
+                    {{ liga.label }}
+                  </option>
+                </select>
+
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-primary">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                  </svg>
+                </div>
+              </div>
+
+              <p class="text-[12px] text-white/50 mt-2">Toca el campo para ver las opciones disponibles.</p>
+
+              <div v-if="ligaActiva" class="mt-5 space-y-4">
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <p class="text-white font-black text-lg">{{ ligaActiva.nombre }}</p>
+                  <p class="text-white/72 text-sm mt-1">{{ ligaActiva.descripcion }} • {{ ligaActiva.equipo }}</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="rounded-2xl bg-black/25 border border-white/10 p-3">
+                    <p class="text-[11px] uppercase font-black tracking-[0.18em] text-white/50">Jugadas</p>
+                    <p class="text-2xl font-black text-white mt-1">{{ resumenLigaActiva.fechasConResultado }}</p>
+                  </div>
+                  <div class="rounded-2xl bg-black/25 border border-white/10 p-3">
+                    <p class="text-[11px] uppercase font-black tracking-[0.18em] text-white/50">Pendientes</p>
+                    <p class="text-2xl font-black text-white mt-1">{{ resumenLigaActiva.totalFechas - resumenLigaActiva.fechasConResultado }}</p>
+                  </div>
+                  <div class="rounded-2xl bg-black/25 border border-white/10 p-3">
+                    <p class="text-[11px] uppercase font-black tracking-[0.18em] text-white/50">GF</p>
+                    <p class="text-2xl font-black text-white mt-1">{{ resumenLigaActiva.golesVikingas }}</p>
+                  </div>
+                  <div class="rounded-2xl bg-black/25 border border-white/10 p-3">
+                    <p class="text-[11px] uppercase font-black tracking-[0.18em] text-white/50">GC</p>
+                    <p class="text-2xl font-black text-white mt-1">{{ resumenLigaActiva.golesRival }}</p>
+                  </div>
+                </div>
+
+                <button
+                  v-if="isAdmin"
+                  @click="agregarFechaLiga(ligaSeleccionada)"
+                  :disabled="guardandoLiga"
+                  class="w-full rounded-2xl bg-primary text-black font-black px-4 py-3 hover:bg-primary/90 transition disabled:opacity-60 cursor-pointer"
+                >
+                  {{ guardandoLiga ? 'Guardando...' : 'Agregar nueva fecha' }}
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div v-if="cargandoLigas" class="rounded-[26px] border border-gray-800 bg-white/5 p-8 text-center text-white/70 font-semibold">
+                Cargando ligas del semestre...
+              </div>
+
+              <div v-else-if="!ligaActiva" class="rounded-[26px] border border-gray-800 bg-white/5 p-8 text-center text-white/70 font-semibold">
+                No se pudo cargar la liga seleccionada.
+              </div>
+
+              <div
+                v-else
+                v-for="partido in ligaActiva.partidos"
+                :key="partido.id"
+                class="rounded-[26px] border border-white/10 bg-linear-to-br from-white/6 to-black/18 p-4 sm:p-5 shadow-[0_16px_40px_rgba(0,0,0,0.2)]"
+              >
+                <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  <div>
+                    <p class="text-primary text-xs font-black uppercase tracking-[0.18em]">Fecha {{ partido.fechaNumero }}</p>
+                    <h3 class="text-white text-lg sm:text-2xl font-black mt-1 leading-tight">{{ obtenerTituloPartidoLiga(partido) }}</h3>
+                    <p class="text-white/62 text-sm mt-1">{{ obtenerEstadoPartidoLiga(partido) }}</p>
+                  </div>
+
+                  <div v-if="isAdmin" class="grid grid-cols-1 sm:flex sm:flex-wrap gap-2 w-full md:w-auto">
+                    <button
+                      @click="guardarPartidoLiga(ligaSeleccionada, partido.id)"
+                      :disabled="guardandoLiga"
+                      class="w-full sm:w-auto rounded-2xl bg-primary text-black font-black px-4 py-2.5 hover:bg-primary/90 transition disabled:opacity-60 cursor-pointer"
+                    >
+                      {{ guardandoLiga ? 'Guardando...' : 'Guardar fecha' }}
+                    </button>
+                    <button
+                      @click="solicitarEliminarFechaLiga(ligaSeleccionada, partido.id)"
+                      :disabled="guardandoLiga"
+                      class="w-full sm:w-auto rounded-2xl border border-red-400/40 bg-red-500/10 text-red-200 font-black px-4 py-2.5 hover:bg-red-500/18 transition disabled:opacity-60 cursor-pointer"
+                    >
+                      Borrar fecha
+                    </button>
+                  </div>
+                </div>
+
+                <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_220px_220px] gap-4">
+                  <div class="rounded-2xl border border-white/10 bg-black/28 p-4">
+                    <label class="block text-xs font-black uppercase tracking-[0.18em] text-white/55 mb-2">Partido</label>
+                    <div class="flex flex-col items-start gap-2 text-white font-black">
+                      <span class="shrink-0 text-sm sm:text-base">Vikingas vs</span>
+                      <input
+                        v-if="isAdmin"
+                        v-model="partido.rival"
+                        type="text"
+                        class="w-full rounded-xl border border-gray-600 bg-black px-3 py-2 text-white font-semibold focus:outline-hidden focus:border-primary"
+                        placeholder="Rival"
+                      />
+                      <span v-else class="text-white/80">{{ partido.rival || 'Por definir' }}</span>
+                    </div>
+                  </div>
+
+                  <div class="rounded-2xl border border-white/10 bg-black/28 p-4">
+                    <label class="block text-xs font-black uppercase tracking-[0.18em] text-white/55 mb-2">Goles Vikingas</label>
+                    <input
+                      v-if="isAdmin"
+                      v-model.number="partido.golesVikingas"
+                      type="number"
+                      min="0"
+                      class="w-full rounded-xl border border-gray-600 bg-black px-3 py-2 text-white font-semibold focus:outline-hidden focus:border-primary"
+                      placeholder="0"
+                    />
+                    <p v-else class="text-2xl sm:text-3xl font-black text-white">{{ mostrarMarcador(partido.golesVikingas) }}</p>
+                  </div>
+
+                  <div class="rounded-2xl border border-white/10 bg-black/28 p-4">
+                    <label class="block text-xs font-black uppercase tracking-[0.18em] text-white/55 mb-2">Goles rival</label>
+                    <input
+                      v-if="isAdmin"
+                      v-model.number="partido.golesRival"
+                      type="number"
+                      min="0"
+                      class="w-full rounded-xl border border-gray-600 bg-black px-3 py-2 text-white font-semibold focus:outline-hidden focus:border-primary"
+                      placeholder="0"
+                    />
+                    <p v-else class="text-2xl sm:text-3xl font-black text-white">{{ mostrarMarcador(partido.golesRival) }}</p>
+                  </div>
+                </div>
+
+                <div class="mt-4 rounded-2xl border border-white/10 bg-black/18 p-4">
+                  <label class="block text-xs font-black uppercase tracking-[0.18em] text-white/55 mb-2">Goleadoras Vikingas</label>
+
+                  <input
+                    v-if="isAdmin"
+                    v-model="partido.goleadorasVikingasTexto"
+                    type="text"
+                    class="w-full rounded-xl border border-gray-600 bg-black px-3 py-2 text-white font-semibold focus:outline-hidden focus:border-primary"
+                  />
+
+                  <div v-else-if="obtenerGoleadorasPartido(partido).length > 0" class="flex flex-wrap gap-2">
+                    <span
+                      v-for="goleadora in obtenerGoleadorasPartido(partido)"
+                      :key="`${partido.id}-${goleadora}`"
+                      class="rounded-full bg-primary/18 border border-primary/30 px-3 py-1 text-sm font-bold text-white"
+                    >
+                      {{ goleadora }}
+                    </span>
+                  </div>
+
+                  <p v-else class="text-sm text-white/60">Sin goleadoras registradas.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LIGA DOBLEVE VERANO 2026 -->
+      <section v-if="competenciaExpandida === 'verano'" class="mb-8 rounded-[30px] border border-white/10 bg-white/4 overflow-hidden shadow-[0_24px_70px_rgba(0,0,0,0.28)]">
+        <div class="border-b border-white/8 bg-linear-to-r from-primary-dark via-[#163531] to-[#1d4a42] px-4 py-5 sm:px-8 sm:py-6">
+          <div class="grid gap-4 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
+            <div>
+              <p class="text-primary text-xs font-black uppercase tracking-[0.22em]">Archivo campeón</p>
+              <h2 class="text-2xl sm:text-4xl font-400 tracking-wide text-white mt-2" style="font-family: 'Collegiate Black', sans-serif;">LigaDobleve Summer Cup 2026</h2>
+              <p class="text-white/78 text-sm sm:text-base font-semibold mt-3">Un torneo que mezcló resistencia, carácter y cierre fuerte. Aquí queda ordenado el camino completo hasta el título.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-3 w-full">
+              <div class="rounded-2xl bg-black/18 px-4 py-3">
+                <p class="text-[11px] uppercase font-black tracking-[0.2em] text-white/50">Categoría</p>
+                <p class="text-white font-black mt-1">Serie AB+</p>
+              </div>
+              <div class="rounded-2xl bg-black/18 px-4 py-3">
+                <p class="text-[11px] uppercase font-black tracking-[0.2em] text-white/50">Resultado</p>
+                <p class="text-white font-black mt-1">Campeonas</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 sm:p-8 space-y-8">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="rounded-[26px] border border-white/10 bg-black/35 p-6">
+              <h3 class="text-primary font-black text-lg mb-4 uppercase tracking-[0.14em]">Fase de grupos</h3>
+              <div class="space-y-3">
+                <div class="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between bg-white/5 p-3 rounded-2xl">
+                  <span class="text-white font-medium">Vikingas vs Vieja Escuela</span>
+                  <span class="text-red-400 font-bold">1 - 5</span>
+                </div>
+                <div class="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between bg-white/5 p-3 rounded-2xl">
+                  <span class="text-white font-medium">Vikingas vs De Cero</span>
+                  <span class="text-red-400 font-bold">3 - 4</span>
+                </div>
+                <div class="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between bg-white/5 p-3 rounded-2xl">
+                  <span class="text-white font-medium">Vikingas vs Panteras</span>
+                  <span class="text-red-400 font-bold">2 - 4</span>
+                </div>
+                <div class="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between bg-white/5 p-3 rounded-2xl">
+                  <span class="text-white font-medium">Vikingas vs Florida</span>
+                  <span class="text-red-400 font-bold">1 - 11</span>
+                </div>
+                <div class="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between bg-white/5 p-3 rounded-2xl">
+                  <span class="text-white font-medium">Vikingas vs Clever</span>
+                  <span class="text-red-400 font-bold">3 - 5</span>
+                </div>
+                <div class="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between bg-white/5 p-3 rounded-2xl">
+                  <span class="text-white font-medium">Vikingas vs Firegol</span>
+                  <span class="text-red-400 font-bold">1 - 4</span>
+                </div>
+                <div class="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between bg-primary/20 border border-primary p-3 rounded-2xl">
+                  <span class="text-white font-bold">Vikingas vs Leyendas</span>
+                  <span class="text-primary font-bold">5 - 2</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-[26px] border border-primary/25 bg-linear-to-br from-primary/10 to-black/30 p-6">
+              <h3 class="text-primary font-black text-lg mb-4 uppercase tracking-[0.14em]">Playoffs y final</h3>
+              <div class="space-y-3">
+                <div class="bg-primary/18 border border-primary/30 p-4 rounded-2xl">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-primary text-xs font-bold uppercase tracking-[0.18em]">Semifinal</span>
+                  </div>
+                  <div class="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <span class="text-white font-bold">Vikingas vs Clever</span>
+                    <span class="text-primary font-bold text-xl">7 - 2</span>
+                  </div>
+                </div>
+
+                <div class="bg-primary/18 border border-primary/30 p-4 rounded-2xl">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-primary text-xs font-bold uppercase flex items-center gap-1 tracking-[0.18em]">
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                      </svg>
+                      Final
+                    </span>
+                  </div>
+                  <div class="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <span class="text-white font-bold">Vikingas vs Firegol</span>
+                    <span class="text-primary font-bold text-xl">4 - 2</span>
+                  </div>
+                </div>
+
+                <div class="mt-6 rounded-[26px] bg-primary-dark p-6 text-center">
+                  <p class="text-black text-2xl font-black mb-2">Campeonas</p>
+                  <p class="text-black font-bold text-sm uppercase tracking-[0.18em]">Serie AB+ Liga de Verano</p>
+                  <p class="text-black/70 text-xs mt-2">Vikingas Ascenso</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="rounded-[26px] border border-primary/30 bg-primary-dark p-6">
+              <h3 class="text-2xl font-bold text-black mb-3" style="font-family: 'Collegiate Black', sans-serif;">Campeonas Serie AB+</h3>
+              <p class="text-black/80 text-sm leading-relaxed">CD Vikingas, en categoría Vikingas Ascenso, logró sobreponerse a una fase de grupos difícil y cerró el torneo con una identidad competitiva mucho más fuerte en playoffs.</p>
+              <a
+                href="https://trotamundos.cl/index.php/ligadobleve-summer-cup/"
+                target="_blank"
+                class="inline-flex mt-4 bg-black hover:bg-black/80 text-primary px-4 py-2 rounded-xl font-bold transition text-sm"
+              >
+                Ver página oficial →
+              </a>
+            </div>
+
+            <div class="rounded-[26px] border border-white/10 bg-black/35 p-6">
+              <h3 class="text-white font-black text-lg mb-4 uppercase tracking-[0.14em]">Claves del torneo</h3>
+              <div class="space-y-3 text-sm text-white/80">
+                <div class="rounded-2xl bg-white/5 p-4">Campeonas de la Serie Oro AB+ en la Liga de Verano.</div>
+                <div class="rounded-2xl bg-white/5 p-4">Semifinal dominante: triunfo 7-2 ante Clever.</div>
+                <div class="rounded-2xl bg-white/5 p-4">Final sólida: victoria 4-2 frente a Firegol.</div>
+                <div class="rounded-2xl bg-white/5 p-4">Remontada emocional y deportiva que marcó el tono del año.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CAMPEONATO INTERNO VIKINGAS 2026 -->
+      <section v-if="competenciaExpandida === 'interno'" class="mb-8 rounded-[30px] border border-white/10 bg-white/4 overflow-hidden shadow-[0_24px_70px_rgba(0,0,0,0.28)]">
+        <div class="border-b border-white/8 bg-linear-to-r from-[#0f2f2a] via-[#18423b] to-primary-dark px-4 py-5 sm:px-8 sm:py-6">
+          <div class="grid gap-4 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+            <div>
+              <p class="text-primary text-xs font-black uppercase tracking-[0.22em]">Vikingas por dentro</p>
+              <h2 class="text-2xl sm:text-4xl tracking-wide font-400 text-white mt-2" style="font-family: 'Collegiate Black', sans-serif;">1er Campeonato Interno Vikingas</h2>
+              <p class="text-white/78 text-sm sm:text-base font-semibold mt-3">Una competencia creada para convivir, jugar y seguir fortaleciendo la identidad del club. Acá se muestran equipos, energía y próximas decisiones.</p>
+            </div>
+            <div class="grid grid-cols-3 gap-2 sm:gap-3">
+              <div class="rounded-2xl bg-black/18 px-4 py-3">
+                <p class="text-[11px] uppercase font-black tracking-[0.18em] text-white/50">Inicio</p>
+                <p class="text-white font-black mt-1">7 Feb</p>
+              </div>
+              <div class="rounded-2xl bg-black/18 px-4 py-3">
+                <p class="text-[11px] uppercase font-black tracking-[0.18em] text-white/50">Lugar</p>
+                <p class="text-white font-black mt-1">La Florida</p>
+              </div>
+              <div class="rounded-2xl bg-black/18 px-4 py-3">
+                <p class="text-[11px] uppercase font-black tracking-[0.18em] text-white/50">Equipos</p>
+                <p class="text-white font-black mt-1">3</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 sm:p-8">
           <div v-if="loadingCampeonato" class="text-center py-12">
             <div class="inline-block">
               <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
@@ -93,397 +504,70 @@
           </div>
 
           <div v-else>
-          <!-- Info del torneo -->
-          <div class="bg-primary/10 border border-primary rounded-lg p-6 mb-8">
-            <div class="grid md:grid-cols-3 gap-6 text-center">
-              <div>
-                <p class="text-primary text-sm font-bold mb-1">INICIO</p>
-                <p class="text-white font-bold">7 de Febrero 2026</p>
-                <p class="text-white/70 text-sm">19:00 hrs</p>
-              </div>
-              <div>
-                <p class="text-primary text-sm font-bold mb-1">LUGAR</p>
-                <p class="text-white font-bold">Tricolor La Florida</p>
-              </div>
-              <div>
-                <p class="text-primary text-sm font-bold mb-1">EQUIPOS</p>
-                <p class="text-white font-bold">3 Equipos Mixtos</p>
-                <p class="text-white/70 text-sm">Escuela + Ascenso</p>
-              </div>
-            </div>
-          </div>
-
-
-
-          <!-- Equipos participantes -->
-          <div v-if="equipos.verserkers && equipos.internadas && equipos.siemprealpalo">
-          <h3 class="text-primary font-bold text-xl mb-6 text-center flex items-center justify-center gap-2">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 7a2 2 0 1 1 0 4 2 2 0 0 1 0-4m0-2a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 11c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"/>
-            </svg>
-            EQUIPOS PARTICIPANTES
-          </h3>
-
-          <div class="grid md:grid-cols-3 gap-6">
-            <!-- Las Verserkers - EQUIPO 1 -->
-            <div class="bg-linear-to-br from-cyan-900/50 to-cyan-700/30 border-2 border-cyan-400 rounded-lg p-6 hover:shadow-xl hover:scale-105 transition-all">
-              <div class="flex flex-col items-center text-center">
-                <div class="w-20 h-20 bg-white rounded-full p-3 mb-4 shadow-lg">
-                  <img src="../assets/versekersLogo.jpeg" alt="Las Versekers" class="w-full h-full object-contain" />
+            <div class="bg-primary/10 border border-primary/35 rounded-[26px] p-4 sm:p-6 mb-8">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-center">
+                <div>
+                  <p class="text-primary text-sm font-bold mb-1 uppercase tracking-[0.18em]">Inicio</p>
+                  <p class="text-white font-bold">7 de Febrero 2026</p>
+                  <p class="text-white/70 text-sm">19:00 hrs</p>
                 </div>
-                <h4 class="text-2xl font-400 text-white mb-2" style="font-family: 'Collegiate Black', sans-serif;">
-                  LAS VERSERKERS
-                </h4>
-                <div class="flex items-center gap-2 text-cyan-300 mb-4">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                  </svg>
-                  <span class="text-sm font-bold">Capitana: Barby</span>
+                <div>
+                  <p class="text-primary text-sm font-bold mb-1 uppercase tracking-[0.18em]">Lugar</p>
+                  <p class="text-white font-bold">Tricolor La Florida</p>
                 </div>
-          
-           
+                <div>
+                  <p class="text-primary text-sm font-bold mb-1 uppercase tracking-[0.18em]">Formato</p>
+                  <p class="text-white font-bold">3 Equipos Mixtos</p>
+                  <p class="text-white/70 text-sm">Escuela + Ascenso</p>
+                </div>
               </div>
             </div>
 
-            <!-- Inter Nadas - EQUIPO 2 -->
-            <div class="bg-linear-to-br from-gray-900/50 to-gray-700/30 border-2 border-gray-400 rounded-lg p-6 hover:shadow-xl hover:scale-105 transition-all relative">
-              <div class="absolute top-4 right-4 bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold">
-                🏆 CAMPEONAS
-              </div>
-              <div class="flex flex-col items-center text-center">
-                <div class="w-20 h-20 bg-white rounded-full p-3 mb-4 shadow-lg">
-                  <img src="../assets/internadasLogo.jpeg" alt="Inter Nadas" class="w-full h-full object-contain" />
+            <div v-if="equipos.verserkers && equipos.internadas && equipos.siemprealpalo">
+              <h3 class="text-primary font-black text-xl mb-6 text-center uppercase tracking-[0.18em]">Equipos participantes</h3>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <div class="bg-linear-to-br from-cyan-900/50 to-cyan-700/30 border border-cyan-300/70 rounded-[26px] p-6 hover:shadow-xl hover:scale-[1.02] transition-all">
+                  <div class="flex flex-col items-center text-center">
+                    <div class="w-20 h-20 bg-white rounded-full p-3 mb-4 shadow-lg">
+                      <img src="../assets/versekersLogo.jpeg" alt="Las Versekers" class="w-full h-full object-contain" />
+                    </div>
+                    <h4 class="text-2xl font-400 text-white mb-2" style="font-family: 'Collegiate Black', sans-serif;">LAS VERSERKERS</h4>
+                    <span class="text-sm font-bold text-cyan-200">Capitana: Barby</span>
+                  </div>
                 </div>
-                <h4 class="text-2xl font-400 text-white mb-2" style="font-family: 'Collegiate Black', sans-serif;">
-                  INTER NADAS
-                </h4>
-                <div class="flex items-center gap-2 text-gray-300 mb-4">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                  </svg>
-                  <span class="text-sm font-bold">Capitana: Pau Motta</span>
+
+                <div class="bg-linear-to-br from-gray-900/50 to-gray-700/30 border border-gray-300/70 rounded-[26px] p-6 hover:shadow-xl hover:scale-[1.02] transition-all relative">
+                  <div class="absolute top-4 right-4 bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold">Campeonas</div>
+                  <div class="flex flex-col items-center text-center">
+                    <div class="w-20 h-20 bg-white rounded-full p-3 mb-4 shadow-lg">
+                      <img src="../assets/internadasLogo.jpeg" alt="Inter Nadas" class="w-full h-full object-contain" />
+                    </div>
+                    <h4 class="text-2xl font-400 text-white mb-2" style="font-family: 'Collegiate Black', sans-serif;">INTER NADAS</h4>
+                    <span class="text-sm font-bold text-gray-200">Capitana: Pau Motta</span>
+                  </div>
                 </div>
-           
+
+                <div class="bg-linear-to-br from-red-900/50 to-red-700/30 border border-red-300/70 rounded-[26px] p-6 hover:shadow-xl hover:scale-[1.02] transition-all">
+                  <div class="flex flex-col items-center text-center">
+                    <div class="w-20 h-20 bg-white rounded-full p-3 mb-4 shadow-lg">
+                      <img src="../assets/siemprealpaloLogo.jpeg" alt="Siempre al Palo" class="w-full h-full object-contain" />
+                    </div>
+                    <h4 class="text-2xl font-400 text-white mb-2" style="font-family: 'Collegiate Black', sans-serif;">SIEMPRE AL PALO</h4>
+                    <span class="text-sm font-bold text-red-200">Capitana: Dany Farias</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- Siempre al Palo - EQUIPO 3 -->
-            <div class="bg-linear-to-br from-red-900/50 to-red-700/30 border-2 border-red-400 rounded-lg p-6 hover:shadow-xl hover:scale-105 transition-all">
-              <div class="flex flex-col items-center text-center">
-                <div class="w-20 h-20 bg-white rounded-full p-3 mb-4 shadow-lg">
-                  <img src="../assets/siemprealpaloLogo.jpeg" alt="Siempre al Palo" class="w-full h-full object-contain" />
-                </div>
-                <h4 class="text-2xl font-400 text-white mb-2" style="font-family: 'Collegiate Black', sans-serif;">
-                  SIEMPRE AL PALO
-                </h4>
-                <div class="flex items-center gap-2 text-red-300 mb-4">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                  </svg>
-                  <span class="text-sm font-bold">Capitana: Dany Farias</span>
-                </div>
-           
-             
-              </div>
-            </div>
-          </div>
-          </div>
-
-          <!-- Próximamente Versión 2 -->
-          <div class="mt-8 bg-linear-to-br from-blue-900/40 to-purple-900/40 border-2 border-blue-400 rounded-lg p-8 text-center">
-            <h3 class="text-white text-2xl font-300 mb-2" style="font-family: 'Collegiate Black', sans-serif;">
-              ¡PRÓXIMAMENTE 2da VERSIÓN!
-            </h3>
-            <p class="text-white/80 text-base mb-4">
-              Estamos preparando la segunda edición del torneo interno con nuevas energías.
-            </p>
-            <p class="text-primary font-bold text-sm">
-              Mantente atenta para más detalles
-            </p>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- LIGA DOBLEVE VERANO 2026 -->
-      <div class="mb-8 bg-black border-2 border-primary rounded-lg overflow-hidden">
-        <button
-          @click="competenciaExpandida = competenciaExpandida === 'verano' ? null : 'verano'"
-          class="w-full px-6 py-4 bg-primary-dark flex items-center justify-between hover:bg-primary transition-colors cursor-pointer"
-        >
-          <div class="flex items-center gap-3">
-            <svg class="w-8 h-8 text-black" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-            </svg>
-            <div class="text-left">
-              <h2 class="text-2xl font400 tracking-wider text-white" style="font-family: 'Collegiate Black', sans-serif;">
-                LIGADOBLEVE SUMMER CUP 2026
-              </h2>
-              <p class="text-black/70 text-sm">🥇 Campeonas Serie AB+ • Vikingas Ascenso • Enero 2026</p>
-            </div>
-          </div>
-          <svg 
-            class="w-6 h-6 text-black transition-transform duration-300"
-            :class="competenciaExpandida === 'verano' ? 'rotate-180' : ''"
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-          </svg>
-        </button>
-
-        <div 
-          v-show="competenciaExpandida === 'verano'"
-          class="p-8"
-        >
-
-      <!-- Loading State -->
-      <!-- <div v-if="loading" class="text-center py-12">
-        <div class="inline-block">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-        <p class="text-white/70 mt-4 font-medium">Cargando tabla de posiciones...</p>
-      </div>
-
-      <div v-else-if="error" class="bg-red-900/20 border border-primary text-primary px-6 py-4 rounded-lg mb-6">
-        <h3 class="font-bold mb-2 text-white">Error al cargar los datos</h3>
-        <p class="text-sm mb-4">{{ error }}</p>
-        <button 
-          @click="fetchTabla"
-          class="bg-primary hover:bg-primary/80 text-black px-4 py-2 rounded font-bold transition cursor-pointer"
-        >
-          Intentar de nuevo
-        </button>
-      </div>
-
-      <div v-else class="bg-black  border-2 border-primary rounded-lg shadow-2xl overflow-hidden">
-        <div class="bg-primary-dark px-6 py-3 border-b-2 border-primary">
-          <p class="text-black font-bold text-sm">
-            Última actualización: {{ formatDate(lastUpdate) }}
-          </p>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="bg-primary-dark border-b-2 border-primary">
-                <th class="px-4 py-4 text-left text-black font-bold">#</th>
-                <th class="px-4 py-4 text-left text-black font-bold">EQUIPO</th>
-                <th class="px-4 py-4 text-center text-black font-bold">PJ</th>
-                <th class="px-4 py-4 text-center text-black font-bold">PG</th>
-                <th class="px-4 py-4 text-center text-black font-bold">PE</th>
-                <th class="px-4 py-4 text-center text-black font-bold">PP</th>
-                <th class="px-4 py-4 text-center text-black font-bold">DG</th>
-                <th class="px-4 py-4 text-center text-black font-bold">Pts</th>
-                <th class="px-4 py-4 text-center text-black font-bold">GF</th>
-                <th class="px-4 py-4 text-center text-black font-bold">GC</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr 
-                v-for="(equipo, index) in tabla" 
-                :key="index"
-                :class="[
-                  'border-b border-white/10 hover:bg-primary/5 transition',
-                  index === 0 ? 'bg-primary/10' : index === 1 ? 'bg-primary/5' : ''
-                ]"
-              >
-                <td class="px-4 py-4 text-center font-bold">
-                  <span v-if="index === 0" class="text-2xl">🥇</span>
-                  <span v-else-if="index === 1" class="text-2xl">🥈</span>
-                  <span v-else-if="index === 2" class="text-2xl">🥉</span>
-                  <span v-else class="text-primary font-bold text-lg">{{ equipo.posicion }}</span>
-                </td>
-
-                <td class="px-4 py-4 font-bold text-white">
-                  {{ equipo.equipo }}
-                  <span v-if="equipo.equipo === 'CD Vikingas'" class="ml-2 text-xs bg-primary text-black px-2 py-1 rounded font-bold">VIKINGAS</span>
-                </td>
-
-                <td class="px-4 py-4 text-center text-white/70 font-medium">{{ equipo.pj }}</td>
-                <td class="px-4 py-4 text-center text-primary font-bold">{{ equipo.pg }}</td>
-                <td class="px-4 py-4 text-center text-yellow-400 font-bold">{{ equipo.pe }}</td>
-                <td class="px-4 py-4 text-center text-red-400 font-bold">{{ equipo.pp }}</td>
-                <td class="px-4 py-4 text-center font-bold" :class="parseInt(equipo.dg) >= 0 ? 'text-primary' : 'text-red-400'">
-                  {{ equipo.dg > 0 ? '+' : '' }}{{ equipo.dg }}
-                </td>
-                <td class="px-4 py-4 text-center text-primary font-bold text-lg">{{ equipo.ptos }}</td>
-                <td class="px-4 py-4 text-center text-white/70 font-medium">{{ equipo.gf }}</td>
-                <td class="px-4 py-4 text-center text-white/70 font-medium">{{ equipo.gc }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="bg-primary-dark px-6 py-4 border-t-2 border-primary">
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 text-xs">
-            <div class="text-black font-bold"><span class="font-black">PJ:</span> Part. Jugados</div>
-            <div class="text-black font-bold"><span class="font-black">PG:</span> Part. Ganados</div>
-            <div class="text-black font-bold"><span class="font-black">PE:</span> Part. Empatados</div>
-            <div class="text-black font-bold"><span class="font-black">PP:</span> Part. Perdidos</div>
-            <div class="text-black font-bold"><span class="font-black">DG:</span> Dif. Goles</div>
-            <div class="text-black font-bold"><span class="font-black">Pts:</span> Puntos</div>
-            <div class="text-black font-bold"><span class="font-black">GF:</span> Goles a Favor</div>
-            <div class="text-black font-bold"><span class="font-black">GC:</span> Goles en Contra</div>
-          </div>
-        </div>
-      </div> -->
-
-      <!-- Resultados del Torneo -->
-      <div class="bg-black border-2 border-primary rounded-lg p-8">
-        <h2 class="text-3xl font-bold text-white mb-6 text-center flex items-center justify-center gap-3" style="font-family: 'Collegiate Black', sans-serif;">
-          <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M3 3h8v8H3V3m10 0h8v8h-8V3M3 13h8v8H3v-8m13.33 0L13 16l-1.33-3 3-1.33L16 9l1.33 3 3 1.33-3 1.34L16 17l-1.33-3-3 1.33 3-1.33Z"/>
-          </svg>
-          RESULTADOS LIGA DOBLEVE VERANO 2026
-        </h2>
-        
-        <div class="grid md:grid-cols-2 gap-6">
-          <!-- Fase de Grupos -->
-          <div>
-            <h3 class="text-primary font-bold text-lg mb-4 border-b-2 border-primary pb-2">FASE DE GRUPOS</h3>
-            <div class="space-y-3">
-              <div class="flex justify-between items-center bg-white/5 p-3 rounded">
-                <span class="text-white font-medium">Vikingas vs Vieja Escuela</span>
-                <span class="text-red-400 font-bold">1 - 5</span>
-              </div>
-              <div class="flex justify-between items-center bg-white/5 p-3 rounded">
-                <span class="text-white font-medium">Vikingas vs De Cero</span>
-                <span class="text-red-400 font-bold">3 - 4</span>
-              </div>
-              <div class="flex justify-between items-center bg-white/5 p-3 rounded">
-                <span class="text-white font-medium">Vikingas vs Panteras</span>
-                <span class="text-red-400 font-bold">2 - 4</span>
-              </div>
-              <div class="flex justify-between items-center bg-white/5 p-3 rounded">
-                <span class="text-white font-medium">Vikingas vs Florida</span>
-                <span class="text-red-400 font-bold">1 - 11</span>
-              </div>
-              <div class="flex justify-between items-center bg-white/5 p-3 rounded">
-                <span class="text-white font-medium">Vikingas vs Clever</span>
-                <span class="text-red-400 font-bold">3 - 5</span>
-              </div>
-              <div class="flex justify-between items-center bg-white/5 p-3 rounded">
-                <span class="text-white font-medium">Vikingas vs Firegol</span>
-                <span class="text-red-400 font-bold">1 - 4</span>
-              </div>
-              <div class="flex justify-between items-center bg-primary/20 border-2 border-primary p-3 rounded">
-                <span class="text-white font-bold">Vikingas vs Leyendas</span>
-                <span class="text-primary font-bold">5 - 2</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Playoffs/Final -->
-          <div>
-            <h3 class="text-primary font-bold text-lg mb-4 border-b-2 border-primary pb-2 flex items-center gap-2">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-              </svg>
-              PLAYOFFS - FINAL
-            </h3>
-            <div class="space-y-3">
-              <div class="bg-primary/20 border-2 border-primary p-3 rounded">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-primary text-xs font-bold uppercase">Semifinal</span>
-                </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-white font-bold">Vikingas vs Clever</span>
-                  <span class="text-primary font-bold text-xl">7 - 2</span>
-                </div>
-              </div>
-              
-              <div class="bg-primary/20 border-2 border-primary p-3 rounded">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-primary text-xs font-bold uppercase flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                    </svg>
-                    Final
-                  </span>
-                </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-white font-bold">Vikingas vs Firegol</span>
-                  <span class="text-primary font-bold text-xl">4 - 2</span>
-                </div>
-              </div>
-              
-              <div class="mt-6 bg-primary-dark p-6 rounded-lg text-center">
-                <p class="text-black text-2xl font-black mb-2 flex items-center justify-center gap-2">
-                  <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                  </svg>
-                  CAMPEONAS
-                </p>
-                <p class="text-black font-bold text-sm">Serie AB+ Liga de Verano</p>
-                <p class="text-black/70 text-xs mt-2">Vikingas Ascenso</p>
-              </div>
+            <div class="mt-8 bg-linear-to-br from-[#113a4a]/70 to-[#30213f]/70 border border-primary/20 rounded-[26px] p-5 sm:p-8 text-center">
+              <h3 class="text-white text-2xl font-300 mb-2" style="font-family: 'Collegiate Black', sans-serif;">Próximamente 2da versión</h3>
+              <p class="text-white/80 text-base mb-4">Estamos preparando la segunda edición del torneo interno con nuevas energías y más espacio para compartir fútbol.</p>
+              <p class="text-primary font-bold text-sm uppercase tracking-[0.16em]">Mantente atenta para más detalles</p>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Información de la liga -->
-      <div class="mt-8 bg-primary-dark rounded-lg p-8 border-2 border-primary">
-        <h2 class="text-3xl font-bold text-black mb-6 flex items-center gap-3" style="font-family: 'Collegiate Black', sans-serif;">
-          <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-          </svg>
-          CAMPEONAS SERIE AB+
-        </h2>
-        <div class="grid md:grid-cols-2 gap-8">
-          <div>
-            <h3 class="text-black font-bold text-lg mb-3">LIGADOBLEVE SUMMER CUP 2026</h3>
-            <p class="text-black/80 text-sm mb-4 leading-relaxed">
-              ¡CD Vikingas - categoría Vikingas Ascenso - es campeona de la Serie Oro AB+ Liga de Verano! El equipo demostró una gran recuperación tras una fase de grupos complicada, logrando victorias contundentes en los playoffs para coronarse campeonas.
-            </p>
-            <a 
-              href="https://trotamundos.cl/index.php/ligadobleve-summer-cup/" 
-              target="_blank" 
-              class="inline-block bg-black hover:bg-black/80 text-primary px-4 py-2 rounded font-bold transition text-sm"
-            >
-              Ver página oficial →
-            </a>
-          </div>
-          <div>
-            <h3 class="text-black font-bold text-lg mb-3 flex items-center gap-2">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 7a2 2 0 1 1 0 4 2 2 0 0 1 0-4m0-2a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 11c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"/>
-              </svg>
-              LOGROS DEL TORNEO
-            </h3>
-            <ul class="text-black/80 text-sm space-y-2">
-              <li class="font-bold text-black flex items-center gap-2">
-                <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
-                </svg>
-                Campeonas Serie Oro AB+ Liga de Verano
-              </li>
-              <li class="font-bold text-black flex items-center gap-2">
-                <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
-                </svg>
-                Victoria 7-2 en semifinal vs Clever
-              </li>
-              <li class="font-bold text-black flex items-center gap-2">
-                <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
-                </svg>
-                Victoria 4-2 en final vs Firegol
-              </li>
-              <li class="font-semibold text-black flex items-center gap-2">
-                <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12.71,4.14C12.76,4.3 12.79,4.47 12.8,4.64C12.81,4.85 12.8,5.05 12.76,5.24C12.72,5.43 12.65,5.61 12.55,5.78L10.55,9.13C10.32,9.5 9.97,9.78 9.56,9.92C9.15,10.06 8.71,10.06 8.3,9.91L4.5,8.45C4.3,8.38 4.11,8.29 3.94,8.18C3.77,8.07 3.61,7.93 3.48,7.77C3.35,7.61 3.24,7.43 3.16,7.23C3.08,7.04 3.03,6.83 3.01,6.62C2.99,6.41 3,6.19 3.04,5.98C3.08,5.77 3.16,5.56 3.27,5.37C3.38,5.18 3.52,5.01 3.68,4.87C3.85,4.73 4.03,4.61 4.23,4.53L8.03,3.07C8.45,2.92 8.89,2.92 9.3,3.06C9.71,3.2 10.06,3.48 10.29,3.85L12.29,7.2C12.47,7.5 12.57,7.84 12.6,8.19C12.63,8.54 12.57,8.89 12.45,9.21L11.6,9.56L12.71,4.14M20.77,5.98C20.81,6.19 20.82,6.41 20.8,6.62C20.78,6.83 20.73,7.04 20.65,7.23C20.57,7.43 20.46,7.61 20.33,7.77C20.2,7.93 20.04,8.07 19.87,8.18C19.7,8.29 19.51,8.38 19.31,8.45L15.51,9.91C15.1,10.06 14.66,10.06 14.25,9.92C13.84,9.78 13.49,9.5 13.26,9.13L11.26,5.78C11.16,5.61 11.09,5.43 11.05,5.24C11.01,5.05 11,4.85 11.01,4.64C11.02,4.47 11.05,4.3 11.1,4.14L12.21,9.56L11.36,9.21C11.24,8.89 11.18,8.54 11.21,8.19C11.24,7.84 11.34,7.5 11.52,7.2L13.52,3.85C13.75,3.48 14.1,3.2 14.51,3.06C14.92,2.92 15.36,2.92 15.78,3.07L19.58,4.53C19.78,4.61 19.96,4.73 20.13,4.87C20.29,5.01 20.43,5.18 20.54,5.37C20.65,5.56 20.73,5.77 20.77,5.98M17.64,14C17.64,15.96 16.62,17.76 15,18.85V21.97H9V18.85C7.38,17.76 6.36,15.96 6.36,14H17.64Z"/>
-                </svg>
-                Gran remontada en playoffs
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-        </div>
-      </div>
+      </section>
     </div>
     
     <!-- Modal de confirmación -->
@@ -497,7 +581,6 @@
       :cargando="modalCargando"
       @confirmar="modalConfig.accion"
     />
-  </div>
   </div>
 </template>
 
@@ -543,7 +626,7 @@ const tabla = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const lastUpdate = ref(null);
-const competenciaExpandida = ref('interno'); // 'verano' o 'interno'
+const competenciaExpandida = ref('semestre'); // 'verano', 'interno' o 'semestre'
 
 // Estados para partidos y tabla del campeonato interno
 const partidos = ref([]);
@@ -583,10 +666,252 @@ const fuegitosFinal = ref(0);
 const dioFuegoFinal = ref(false);
 const fueguitoLoading = ref(false);
 const invitadaSesionId = ref(`guest_${Math.random().toString(36).slice(2, 12)}`);
+const ligaSeleccionada = ref('dobleve_jueves_serie_b_ascenso');
+const ligasSemestre = ref({});
+const cargandoLigas = ref(false);
+const guardandoLiga = ref(false);
+
+const COMPETENCIAS_SEMESTRE_DOC = 'competenciasSemestre2026';
 
 let unsubscribe = null;
 
+const crearFechaLiga = (fechaNumero = 1, overrides = {}) => ({
+  id: overrides.id || `fecha_${fechaNumero}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+  fechaNumero,
+  rival: '',
+  golesVikingas: '',
+  golesRival: '',
+  goleadorasVikingas: [],
+  goleadorasVikingasTexto: '',
+  ...overrides
+});
+
+const normalizarListadoTexto = (valor = '') => {
+  return valor
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
+const obtenerLigasSemestreBase = () => ({
+  dobleve_jueves_serie_b_ascenso: {
+    id: 'dobleve_jueves_serie_b_ascenso',
+    nombre: 'Liga Dobleve Jueves',
+    descripcion: 'Serie B Ascenso',
+    equipo: 'Vikingas Ascenso',
+    dias: 'Jueves',
+    categoria: 'Serie B Ascenso',
+    partidos: [crearFechaLiga(1)]
+  },
+  dobleve_domingos_serie_c: {
+    id: 'dobleve_domingos_serie_c',
+    nombre: 'Liga Dobleve Domingos',
+    descripcion: 'Serie C',
+    equipo: 'Vikingas Serie C',
+    dias: 'Domingos',
+    categoria: 'Serie C',
+    partidos: [crearFechaLiga(1)]
+  }
+});
+
+const normalizarMarcadorEditable = (valor) => {
+  if (valor === '' || valor === null || valor === undefined) return '';
+  const numero = Number(valor);
+  return Number.isFinite(numero) && numero >= 0 ? Math.round(numero) : '';
+};
+
+const normalizarLigasSemestre = (data = {}) => {
+  const base = obtenerLigasSemestreBase();
+  const ligasNormalizadas = {};
+
+  Object.entries(base).forEach(([ligaId, ligaBase]) => {
+    const ligaData = data?.[ligaId] || {};
+    const partidosOrigen = Array.isArray(ligaData.partidos) && ligaData.partidos.length > 0
+      ? ligaData.partidos
+      : ligaBase.partidos;
+
+    ligasNormalizadas[ligaId] = {
+      ...ligaBase,
+      ...ligaData,
+      partidos: partidosOrigen.map((partido, index) =>
+        crearFechaLiga(Number(partido?.fechaNumero) || index + 1, {
+          ...partido,
+          fechaNumero: Number(partido?.fechaNumero) || index + 1,
+          rival: (partido?.rival || '').toString(),
+          golesVikingas: normalizarMarcadorEditable(partido?.golesVikingas),
+          golesRival: normalizarMarcadorEditable(partido?.golesRival),
+          goleadorasVikingas: Array.isArray(partido?.goleadorasVikingas)
+            ? partido.goleadorasVikingas.map((item) => (item || '').toString().trim()).filter(Boolean)
+            : [],
+          goleadorasVikingasTexto: Array.isArray(partido?.goleadorasVikingas)
+            ? partido.goleadorasVikingas.map((item) => (item || '').toString().trim()).filter(Boolean).join(', ')
+            : ''
+        })
+      )
+    };
+  });
+
+  return ligasNormalizadas;
+};
+
+const opcionesLigasSemestre = computed(() => {
+  return Object.values(ligasSemestre.value).map((liga) => ({
+    id: liga.id,
+    label: `${liga.nombre} · ${liga.descripcion}`
+  }));
+});
+
+const ligaActiva = computed(() => ligasSemestre.value[ligaSeleccionada.value] || null);
+
+const resumenLigaActiva = computed(() => {
+  const liga = ligaActiva.value;
+  const partidosLiga = liga?.partidos || [];
+  return {
+    totalFechas: partidosLiga.length,
+    fechasConResultado: partidosLiga.filter((partido) => partido.golesVikingas !== '' && partido.golesRival !== '').length,
+    golesVikingas: partidosLiga.reduce((acc, partido) => acc + (Number(partido.golesVikingas) || 0), 0),
+    golesRival: partidosLiga.reduce((acc, partido) => acc + (Number(partido.golesRival) || 0), 0)
+  };
+});
+
+const resumenSemestreGlobal = computed(() => {
+  const ligas = Object.values(ligasSemestre.value);
+  const partidos = ligas.flatMap((liga) => liga?.partidos || []);
+
+  return {
+    totalFechas: partidos.length,
+    fechasConResultado: partidos.filter((partido) => partido.golesVikingas !== '' && partido.golesRival !== '').length
+  };
+});
+
+const abrirCompetencia = (competenciaId) => {
+  competenciaExpandida.value = competenciaId;
+};
+
 const obtenerActorFuego = () => authUser.value?.uid || jugadoraAuthUser.value?.uid || invitadaSesionId.value;
+
+const obtenerRefLigasSemestre = () => doc(db, 'configuracion', COMPETENCIAS_SEMESTRE_DOC);
+
+const cargarLigasSemestre = async () => {
+  cargandoLigas.value = true;
+  try {
+    const refDoc = obtenerRefLigasSemestre();
+    const snap = await getDoc(refDoc);
+    const ligas = normalizarLigasSemestre(snap.data()?.ligas || {});
+    ligasSemestre.value = ligas;
+
+    if (!snap.exists()) {
+      await setDoc(refDoc, { ligas, updatedAt: new Date() }, { merge: true });
+    }
+  } catch (err) {
+    console.error('Error cargando ligas del semestre:', err);
+    ligasSemestre.value = normalizarLigasSemestre();
+  } finally {
+    cargandoLigas.value = false;
+  }
+};
+
+const guardarLigasSemestre = async () => {
+  guardandoLiga.value = true;
+  try {
+    const ligasNormalizadas = normalizarLigasSemestre(ligasSemestre.value);
+    ligasSemestre.value = ligasNormalizadas;
+    await setDoc(obtenerRefLigasSemestre(), {
+      ligas: ligasNormalizadas,
+      updatedAt: new Date()
+    }, { merge: true });
+  } finally {
+    guardandoLiga.value = false;
+  }
+};
+
+const agregarFechaLiga = async (ligaId) => {
+  const liga = ligasSemestre.value[ligaId];
+  if (!liga || guardandoLiga.value) return;
+
+  const siguienteFecha = (liga.partidos?.length || 0) + 1;
+  liga.partidos.push(crearFechaLiga(siguienteFecha));
+  await guardarLigasSemestre();
+};
+
+const eliminarFechaLiga = async (ligaId, partidoId) => {
+  const liga = ligasSemestre.value[ligaId];
+  if (!liga || guardandoLiga.value) return;
+
+  liga.partidos = (liga.partidos || [])
+    .filter((partido) => partido.id !== partidoId)
+    .map((partido, index) => ({
+      ...partido,
+      fechaNumero: index + 1
+    }));
+
+  await guardarLigasSemestre();
+};
+
+const solicitarEliminarFechaLiga = (ligaId, partidoId) => {
+  const liga = ligasSemestre.value[ligaId];
+  const partido = liga?.partidos?.find((item) => item.id === partidoId);
+  if (!liga || !partido || guardandoLiga.value) return;
+
+  modalConfig.value = {
+    titulo: `¿Borrar Fecha ${partido.fechaNumero}?`,
+    mensaje: `Se eliminará esta fecha de ${liga.nombre}.`,
+    detalles: 'La numeración de las fechas restantes se ajustará automáticamente.',
+    tipo: 'warning',
+    textoConfirmar: 'Borrar fecha',
+    accion: async () => {
+      try {
+        modalCargando.value = true;
+        await eliminarFechaLiga(ligaId, partidoId);
+        mostrarModal.value = false;
+      } catch (err) {
+        console.error('Error eliminando fecha de la liga:', err);
+        alert('No se pudo borrar la fecha. Intenta nuevamente.');
+      } finally {
+        modalCargando.value = false;
+      }
+    }
+  };
+
+  mostrarModal.value = true;
+};
+
+const guardarPartidoLiga = async (ligaId, partidoId) => {
+  const liga = ligasSemestre.value[ligaId];
+  const partido = liga?.partidos?.find((item) => item.id === partidoId);
+  if (!partido || guardandoLiga.value) return;
+
+  partido.rival = (partido.rival || '').toString().trim();
+  partido.golesVikingas = normalizarMarcadorEditable(partido.golesVikingas);
+  partido.golesRival = normalizarMarcadorEditable(partido.golesRival);
+  partido.goleadorasVikingas = normalizarListadoTexto((partido.goleadorasVikingasTexto || '').toString());
+  partido.goleadorasVikingasTexto = partido.goleadorasVikingas.join(', ');
+  await guardarLigasSemestre();
+};
+
+const mostrarMarcador = (valor) => {
+  return valor === '' || valor === null || valor === undefined ? '-' : valor;
+};
+
+const obtenerTituloPartidoLiga = (partido) => {
+  const rival = (partido?.rival || '').toString().trim();
+  return `Vikingas vs ${rival || 'Por definir'}`;
+};
+
+const obtenerEstadoPartidoLiga = (partido) => {
+  const tieneResultado = partido?.golesVikingas !== '' && partido?.golesRival !== '';
+  return tieneResultado
+    ? `Resultado cargado: ${mostrarMarcador(partido.golesVikingas)} - ${mostrarMarcador(partido.golesRival)}`
+    : 'Resultado pendiente';
+};
+
+const obtenerGoleadorasPartido = (partido) => {
+  if (Array.isArray(partido?.goleadorasVikingas) && partido.goleadorasVikingas.length > 0) {
+    return partido.goleadorasVikingas;
+  }
+
+  return normalizarListadoTexto((partido?.goleadorasVikingasTexto || '').toString());
+};
 
 const cargarFueguitosFinal = async () => {
   try {
@@ -1146,6 +1471,7 @@ const obtenerColorTexto = (equipoData) => {
 
 onMounted(async () => {
   await cargarFueguitosFinal();
+  await cargarLigasSemestre();
 
   fetchTabla();
   

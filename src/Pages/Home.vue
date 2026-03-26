@@ -1,15 +1,15 @@
 <template>
     <!-- Hero Section con Imagen de Fondo -->
-    <div class="relative w-full h-screen min-h-[600px] overflow-hidden">
+    <div class="relative w-full h-screen min-h-150 overflow-hidden">
       <!-- Imagen de fondo -->
       <div class="absolute inset-0 z-0">
         <img 
-          :src="heroData.imagenFondo || 'https://firebasestorage.googleapis.com/v0/b/loginvk-955b2.firebasestorage.app/o/slide2.webp?alt=media&token=88083cd1-4f14-4e7f-9aef-0bb1421f92e0'"
+src="../assets/hero/IMG_20260323_223532.jpg"
           alt="CD Vikingas"
           class="w-full h-full object-cover"
         />
         <!-- Overlay oscuro para legibilidad -->
-        <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80"></div>
+        <div class="absolute inset-0 bg-linear-to-b from-black/70 via-black/50 to-black/80"></div>
       </div>
 
       <!-- Contenido principal -->
@@ -65,13 +65,13 @@
             to="/competencias"
             class="bg-primary hover:bg-primary/90 text-black px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-2xl"
           >
-            Ver Campeonato
+            Acompaña la temporada
           </router-link>
           <router-link
             to="/historia"
             class="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border-2 border-white/50 px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-2xl"
           >
-            Conoce el Club
+            Conoce a Vikingas
           </router-link>
         </div>
 
@@ -85,7 +85,7 @@
     </div>
     
     <!-- Banner de noticias -->
-    <div class="bg-gradient-to-r from-primary via-yellow-400 to-primary py-3 px-4 relative overflow-hidden">
+    <div class="bg-linear-to-r from-primary via-yellow-400 to-primary py-3 px-4 relative overflow-hidden">
       <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMi01LjM3MyAxMi0xMiAxMi0xMi01LjM3My0xMi0xMnptMC0zNGMwLTYuNjI3IDUuMzczLTEyIDEyLTEyczEyIDUuMzczIDEyIDEyLTUuMzczIDEyLTEyIDEyLTEyLTUuMzczLTEyLTEyem0wIDY4YzAtNi42MjcgNS4zNzMtMTIgMTItMTJzMTIgNS4zNzMgMTIgMTItNS4zNzMgMTItMTIgMTItMTItNS4zNzMtMTItMTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
       
       <div class="max-w-6xl mx-auto relative z-10">
@@ -101,18 +101,28 @@
           <div class="text-center md:text-left">
             <div class="inline-flex items-center gap-2 bg-black/20 text-black px-3 py-1 rounded-full text-[11px] md:text-xs font-black tracking-wider uppercase mb-2">
               <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
-              NUEVA CATEGORIA SERIE C
+              COMIENZA LA TEMPORADA 2026
             </div>
             <h2 class="text-3xl md:text-4xl font-black tracking-widest text-black mb-1 uppercase" style="font-family: 'Gobold High', sans-serif;">
-              LIGA DOBLEVE DOMINGOS
+              LIGA DOBLEVE SERIES B Y C
             </h2>
             <p class="text-black/90 font-bold text-sm md:text-base mb-2">
-              Apoyemos a nuestra nueva categoria
+              Primer semestre en marcha. Vamos VKS.
             </p>
           </div>
           
           <!-- Botón de Like y CTA -->
           <div class="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+            <router-link
+              to="/competencias"
+              class="flex items-center gap-2.5 bg-black text-primary hover:bg-black/90 px-5 py-3 rounded-lg font-black text-sm transition-all transform hover:scale-105 shadow-xl min-w-48 justify-center"
+            >
+              Ver resultados
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </router-link>
+
             <!-- Botón de Like -->
             <button
               @click="toggleLike"
@@ -165,13 +175,13 @@ import UltimosResultados from '../components/UltimosResultados.vue';
 const heroData = ref({
   imagenFondo: 'https://firebasestorage.googleapis.com/v0/b/loginvk-955b2.firebasestorage.app/o/slide2.webp?alt=media&token=88083cd1-4f14-4e7f-9aef-0bb1421f92e0',
   titulo: 'CD VIKINGAS',
-  badgeCampeonato: 'CAMPEONAS COPA ORO AB+',
+  badgeCampeonato: 'JUNTAS, SOMOS ETERNAS',
   subtitulo: 'Fút 7 femenino - Puente alto - desde 2019',
   stat1Numero: '6',
   stat1Texto: 'Años de Historia',
-  stat2Numero: '40+',
+  stat2Numero: '50+',
   stat2Texto: 'Jugadoras',
-  stat3Numero: '2',
+  stat3Numero: '3',
   stat3Texto: 'Categorías'
 });
 

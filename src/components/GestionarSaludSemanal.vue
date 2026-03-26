@@ -2,7 +2,7 @@
   <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
     <div class="bg-linear-to-r from-primary-dark via-primary to-primary-dark p-6 sm:p-8 text-white">
       <h2 class="text-2xl sm:text-3xl font-black">Salud semanal</h2>
-      <p class="text-xs sm:text-sm text-white/80 mt-1">Respuestas pre-entreno de dolor, fatiga y sueño</p>
+      <p class="text-xs sm:text-sm text-white/80 mt-1">Chequeo semanal de dolor, fatiga, sueño y contexto de ciclo menstrual</p>
     </div>
 
     <div class="p-6 space-y-5">
@@ -39,6 +39,50 @@
         >Pendientes revisión</button>
       </div>
 
+   
+      <div v-if="respuestasFiltradas.length > 0" class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div class="rounded-2xl border border-gray-200 bg-gray-50 p-5">
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 class="text-base font-black text-gray-900">Indicadores del grupo</h3>
+              <p class="text-sm text-gray-500">Resumen rápido sobre las respuestas visibles</p>
+            </div>
+            <div class="text-sm font-bold text-gray-500">{{ respuestasFiltradas.length }} respuestas</div>
+          </div>
+
+          <div class="space-y-4">
+            <div v-for="item in barrasResumen" :key="item.id">
+              <div class="flex items-center justify-between gap-3 text-sm mb-1.5">
+                <span class="font-semibold text-gray-700">{{ item.label }}</span>
+                <span class="font-black" :class="item.textClass">{{ item.valor }} · {{ porcentaje(item.valor) }}</span>
+              </div>
+              <div class="h-3 rounded-full bg-white border border-gray-200 overflow-hidden">
+                <div class="h-full rounded-full transition-all" :class="item.barClass" :style="{ width: anchoBarra(item.valor) }"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-gray-200 bg-white p-5">
+          <div class="mb-4">
+            <h3 class="text-base font-black text-gray-900">Promedios semanales</h3>
+            <p class="text-sm text-gray-500">Lectura general del estado del plantel visible</p>
+          </div>
+
+          <div class="space-y-4">
+            <div v-for="item in barrasPromedio" :key="item.id">
+              <div class="flex items-center justify-between gap-3 text-sm mb-1.5">
+                <span class="font-semibold text-gray-700">{{ item.label }}</span>
+                <span class="font-black" :class="item.textClass">{{ item.valor }}/5</span>
+              </div>
+              <div class="h-3 rounded-full bg-gray-100 overflow-hidden">
+                <div class="h-full rounded-full transition-all" :class="item.barClass" :style="{ width: `${(item.valor / 5) * 100}%` }"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div v-if="respuestasFiltradas.length === 0" class="p-10 rounded-xl border border-gray-200 bg-gray-50 text-center text-gray-500 font-semibold">
         No hay respuestas para mostrar.
       </div>
@@ -68,6 +112,8 @@
             <p><strong>Fatiga:</strong> {{ item.fatiga }}/5</p>
             <p><strong>Sueño:</strong> {{ item.sueno }}/5</p>
           </div>
+
+          <p class="text-sm text-gray-600 mt-2"><strong>Período esta semana:</strong> {{ item.enPeriodo === true ? 'Sí' : item.enPeriodo === false ? 'No' : 'Sin informar' }}</p>
 
           <p v-if="item.comentarios" class="text-sm text-gray-600 mt-2"><strong>Comentario:</strong> {{ item.comentarios }}</p>
 
@@ -116,6 +162,101 @@ const respuestasFiltradas = computed(() => {
   if (filtro.value === 'pendientes') return respuestas.value.filter((item) => item.revisada !== true);
   return respuestas.value;
 });
+
+const promedio = (valores = []) => {
+  if (valores.length === 0) return 0;
+  const suma = valores.reduce((acc, valor) => acc + Number(valor || 0), 0);
+  return Number((suma / valores.length).toFixed(1));
+};
+
+const indicadores = computed(() => {
+  const items = respuestasFiltradas.value;
+  return {
+    fatigaAlta: items.filter((item) => Number(item.fatiga) >= 4).length,
+    dolorAlto: items.filter((item) => Number(item.dolor) >= 4).length,
+    enPeriodo: items.filter((item) => item.enPeriodo === true).length,
+    riesgoAlto: items.filter((item) => item.riesgo === 'alto').length,
+    suenoBajo: items.filter((item) => Number(item.sueno) <= 2).length,
+    riesgoMedioAlto: items.filter((item) => item.riesgo === 'alto' || item.riesgo === 'medio').length
+  };
+});
+
+const barrasResumen = computed(() => ([
+  {
+    id: 'fatiga-alta',
+    label: 'Fatiga alta',
+    valor: indicadores.value.fatigaAlta,
+    barClass: 'bg-rose-500',
+    textClass: 'text-rose-700'
+  },
+  {
+    id: 'dolor-alto',
+    label: 'Dolor alto / lesionadas',
+    valor: indicadores.value.dolorAlto,
+    barClass: 'bg-red-500',
+    textClass: 'text-red-700'
+  },
+  {
+    id: 'en-periodo',
+    label: 'En período',
+    valor: indicadores.value.enPeriodo,
+    barClass: 'bg-violet-500',
+    textClass: 'text-violet-700'
+  },
+  {
+    id: 'sueno-bajo',
+    label: 'Sueño bajo',
+    valor: indicadores.value.suenoBajo,
+    barClass: 'bg-slate-500',
+    textClass: 'text-slate-700'
+  },
+  {
+    id: 'riesgo-medio-alto',
+    label: 'Riesgo medio o alto',
+    valor: indicadores.value.riesgoMedioAlto,
+    barClass: 'bg-amber-500',
+    textClass: 'text-amber-700'
+  }
+]));
+
+const barrasPromedio = computed(() => {
+  const items = respuestasFiltradas.value;
+  return [
+    {
+      id: 'promedio-dolor',
+      label: 'Dolor promedio',
+      valor: promedio(items.map((item) => item.dolor)),
+      barClass: 'bg-red-500',
+      textClass: 'text-red-700'
+    },
+    {
+      id: 'promedio-fatiga',
+      label: 'Fatiga promedio',
+      valor: promedio(items.map((item) => item.fatiga)),
+      barClass: 'bg-rose-500',
+      textClass: 'text-rose-700'
+    },
+    {
+      id: 'promedio-sueno',
+      label: 'Sueño promedio',
+      valor: promedio(items.map((item) => item.sueno)),
+      barClass: 'bg-blue-500',
+      textClass: 'text-blue-700'
+    }
+  ];
+});
+
+const porcentaje = (valor) => {
+  const total = respuestasFiltradas.value.length;
+  if (!total) return '0%';
+  return `${Math.round((Number(valor || 0) / total) * 100)}%`;
+};
+
+const anchoBarra = (valor) => {
+  const total = respuestasFiltradas.value.length;
+  if (!total) return '0%';
+  return `${(Number(valor || 0) / total) * 100}%`;
+};
 
 const cargar = () => {
   unsubscribe = escucharRespuestasSaludSemanal((items) => {

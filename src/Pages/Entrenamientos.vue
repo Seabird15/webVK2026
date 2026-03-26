@@ -73,6 +73,39 @@
       />
     </div>
 
+    <div class="max-w-6xl mx-auto px-6 mt-4">
+      <div class="rounded-3xl border border-primary/20 bg-linear-to-r from-primary-dark via-[#12342f] to-black p-4 sm:p-5 shadow-[0_14px_36px_rgba(0,0,0,0.24)]">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div class="text-center lg:text-left">
+            <p class="inline-flex items-center justify-center lg:justify-start rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.2em] text-primary">
+              Competencia activa
+            </p>
+            <h3 class="text-white text-lg sm:text-xl font-black mt-3">Sigue la competencia de Vikingas</h3>
+            <p class="text-white/80 text-sm sm:text-base mt-1.5">
+              Revisa el avance del semestre, sigue cada fecha y recuerda que los resultados en tiempo real tambien los puedes ver desde el inicio.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:min-w-90">
+            <router-link
+              to="/competencias"
+              class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-black text-black transition hover:bg-primary/90"
+            >
+              Ver competencia
+              <ChevronRightIcon class="w-4 h-4" />
+            </router-link>
+            <router-link
+              to="/home"
+              class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/8 px-4 py-3 text-sm font-black text-white transition hover:bg-white/12"
+            >
+              Ver resultados en vivo
+              <HomeIcon class="w-4 h-4" />
+            </router-link>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Contenido -->
     <div class="max-w-6xl mx-auto p-6">
       <!-- Notificaciones de Feedback -->
@@ -1282,6 +1315,8 @@ import {
   BellIcon,
   ExclamationCircleIcon,
   QuestionMarkCircleIcon,
+  ChevronRightIcon,
+  HomeIcon,
   XMarkIcon as CloseIcon
 } from '@heroicons/vue/24/outline';
 import { logoutJugadora, jugadoraAuthUser, jugadoraData, actualizarCategoriaSeleccionadaJugadora, obtenerEquiposJugadoraDesdeDatos } from '../firebase/jugadorasAuth';
