@@ -79,7 +79,7 @@ const convertirEquiposAString = (equipos) => {
     : resolverEquiposDesdeCampos(equipos);
 
   if (equiposNormalizados.length === 0) return '';
-  if (equiposNormalizados.length === 2 && equiposNormalizados.includes('ascenso') && equiposNormalizados.includes('escuela')) {
+  if (equiposNormalizados.length > 1) {
     return 'ambos';
   }
 

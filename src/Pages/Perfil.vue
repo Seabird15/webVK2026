@@ -45,7 +45,7 @@
                 <p><strong>Email:</strong> {{ jugadoraAuthUser?.email }}</p>
                 <p><strong>Posición:</strong> {{ formData.posicion }}</p>
                 <p><strong>Dorsal:</strong> #{{ formData.dorsal }}</p>
-                <p><strong>Equipo:</strong> {{ formData.equipo === 'ambos' ? 'Ascenso y Escuela' : formData.equipo }}</p>
+                <p><strong>Equipos:</strong> {{ equiposSeleccionadosTexto }}</p>
                 <p><strong>Estado:</strong> {{ formatearEstadoSalud(formData.estadoSalud) }}</p>
                 <p><strong>Fecha de nacimiento:</strong> {{ formatearFecha(formData.fechaNacimiento) }}</p>
               </div>
@@ -121,20 +121,27 @@
             </div>
           </div>
 
-          <!-- Equipo y Fecha de nacimiento -->
+          <!-- Equipos y Fecha de nacimiento -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-bold text-gray-700 mb-2">Equipo *</label>
-              <select
-                v-model="formData.equipo"
-                required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                :disabled="isLoading"
-              >
-                <option value="ascenso">Ascenso</option>
-                <option value="escuela">Escuela</option>
-                <option value="ambos">Ambos</option>
-              </select>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Equipos *</label>
+              <p class="text-xs text-gray-500 mb-3">Puedes elegir uno, dos o los tres equipos.</p>
+              <div class="space-y-2 border border-gray-300 rounded-lg p-4 bg-gray-50/60">
+                <label
+                  v-for="opcion in opcionesEquipos"
+                  :key="opcion.value"
+                  class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white cursor-pointer transition-colors"
+                >
+                  <input
+                    v-model="formData.equipos"
+                    type="checkbox"
+                    :value="opcion.value"
+                    class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    :disabled="isLoading"
+                  />
+                  <span class="font-medium text-gray-700">{{ opcion.label }}</span>
+                </label>
+              </div>
             </div>
             <div>
               <label class="block text-sm font-bold text-gray-700 mb-2">Fecha de nacimiento *</label>
@@ -214,41 +221,32 @@
         <div class="bg-white rounded-lg shadow-lg p-8">
           <h2 class="text-2xl font-bold mb-6">Mis equipos</h2>
 
-          <div v-if="formData.equipo === 'ambos'" class="space-y-4">
+          <div v-if="equiposDisponibles.length > 1" class="space-y-4">
             <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p class="text-blue-900 font-bold">Perteneces a ambos equipos</p>
-              <p class="text-blue-700 text-sm mt-1">Puedes entrenar en Ascenso o Escuela</p>
+              <p class="text-blue-900 font-bold">Perteneces a varios equipos</p>
+              <p class="text-blue-700 text-sm mt-1">Elige qué equipo quieres visualizar en la app.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               <button
-                @click="cambiarEquipoDesdePerf('ascenso')"
+                v-for="opcion in equiposDisponibles"
+                :key="opcion.value"
+                @click="cambiarEquipoDesdePerf(opcion.value)"
                 :class="[
                   'p-6 rounded-lg font-bold transition-colors cursor-pointer',
-                  categoriaSeleccionada === 'ascenso'
+                  categoriaSeleccionada === opcion.value
                     ? 'bg-primary text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 ]"
               >
-                🏆 Equipo Ascenso
-              </button>
-              <button
-                @click="cambiarEquipoDesdePerf('escuela')"
-                :class="[
-                  'p-6 rounded-lg font-bold transition-colors cursor-pointer',
-                  categoriaSeleccionada === 'escuela'
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                ]"
-              >
-                📚 Equipo Escuela
+                {{ opcion.emoji }} {{ opcion.ctaLabel }}
               </button>
             </div>
           </div>
 
           <div v-else class="p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p class="text-green-900 font-bold">Equipo: {{ formData.equipo === 'ascenso' ? 'Ascenso' : 'Escuela' }}</p>
-            <p class="text-green-700 text-sm mt-1">Estás inscrita en {{ formData.equipo }}</p>
+            <p class="text-green-900 font-bold">Equipo: {{ equiposSeleccionadosTexto }}</p>
+            <p class="text-green-700 text-sm mt-1">Estás inscrita en {{ equiposSeleccionadosTexto.toLowerCase() }}</p>
           </div>
         </div>
       </div>
@@ -267,7 +265,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { 
   logoutJugadora, 
@@ -279,6 +277,40 @@ import {
   errorJugadora
 } from '../firebase/jugadorasAuth';
 
+const opcionesEquipos = [
+  { value: 'ascenso', label: 'Ascenso', ctaLabel: 'Equipo Ascenso', emoji: '🏆' },
+  { value: 'serieC', label: 'Serie C', ctaLabel: 'Equipo Serie C', emoji: '💜' },
+  { value: 'escuela', label: 'Escuela', ctaLabel: 'Equipo Escuela', emoji: '📚' }
+];
+
+const normalizarEquipo = (equipo) => {
+  const valor = (equipo || '').toString().trim().toLowerCase();
+  if (valor === 'seriec') return 'serieC';
+  if (valor === 'ascenso' || valor === 'escuela') return valor;
+  return '';
+};
+
+const obtenerEquiposDesdeDatos = (data = {}) => {
+  if (Array.isArray(data?.equipos) && data.equipos.length > 0) {
+    return [...new Set(data.equipos.map(normalizarEquipo).filter(Boolean))];
+  }
+
+  if (data?.equipo === 'ambos') {
+    return ['ascenso', 'escuela'];
+  }
+
+  const equipoNormalizado = normalizarEquipo(data?.equipo);
+  return equipoNormalizado ? [equipoNormalizado] : [];
+};
+
+const formatearEquipos = (equipos = []) => {
+  const labels = opcionesEquipos
+    .filter(opcion => equipos.includes(opcion.value))
+    .map(opcion => opcion.label);
+
+  return labels.length ? labels.join(', ') : '-';
+};
+
 const router = useRouter();
 const editando = ref(false);
 const tabActivo = ref('datos');
@@ -286,7 +318,8 @@ const previewFoto = ref(null);
 const fotoFile = ref(null);
 const isLoading = ref(false);
 const error = ref(null);
-const categoriaSeleccionada = ref(jugadoraData.value?.categoriaSeleccionada || jugadoraData.value?.equipo || 'ascenso');
+const equiposIniciales = obtenerEquiposDesdeDatos(jugadoraData.value);
+const categoriaSeleccionada = ref(jugadoraData.value?.categoriaSeleccionada || equiposIniciales[0] || 'ascenso');
 
 const fotoPerfil = ref(jugadoraData.value?.fotoPerfil || null);
 
@@ -295,10 +328,13 @@ const formData = reactive({
   apellido: jugadoraData.value?.apellido || '',
   dorsal: jugadoraData.value?.dorsal || null,
   posicion: jugadoraData.value?.posicion || '',
-  equipo: jugadoraData.value?.equipo || 'ascenso',
+  equipos: equiposIniciales,
   fechaNacimiento: jugadoraData.value?.fechaNacimiento || '',
   estadoSalud: jugadoraData.value?.estadoSalud || 'disponible'
 });
+
+const equiposSeleccionadosTexto = computed(() => formatearEquipos(formData.equipos));
+const equiposDisponibles = computed(() => opcionesEquipos.filter(opcion => formData.equipos.includes(opcion.value)));
 
 const formatearEstadoSalud = (estado) => {
   const map = {
@@ -351,7 +387,7 @@ const cancelarEdicion = () => {
   formData.apellido = jugadoraData.value?.apellido || '';
   formData.dorsal = jugadoraData.value?.dorsal || null;
   formData.posicion = jugadoraData.value?.posicion || '';
-  formData.equipo = jugadoraData.value?.equipo || 'ascenso';
+  formData.equipos = obtenerEquiposDesdeDatos(jugadoraData.value);
   formData.fechaNacimiento = jugadoraData.value?.fechaNacimiento || '';
   formData.estadoSalud = jugadoraData.value?.estadoSalud || 'disponible';
   previewFoto.value = null;
@@ -379,10 +415,14 @@ const handleFotoChange = (event) => {
 const handleGuardar = async () => {
   error.value = null;
 
-  if (!formData.nombre || !formData.apellido || !formData.dorsal || !formData.posicion || !formData.fechaNacimiento) {
+  if (!formData.nombre || !formData.apellido || formData.equipos.length === 0 || !formData.dorsal || !formData.posicion || !formData.fechaNacimiento) {
     error.value = 'Por favor completa todos los campos requeridos';
     return;
   }
+
+  const categoriaActualizada = formData.equipos.includes(categoriaSeleccionada.value)
+    ? categoriaSeleccionada.value
+    : formData.equipos[0];
 
   isLoading.value = true;
 
@@ -393,9 +433,10 @@ const handleGuardar = async () => {
       apellido: formData.apellido,
       dorsal: formData.dorsal,
       posicion: formData.posicion,
-      equipo: formData.equipo,
+      equipos: [...formData.equipos],
       fechaNacimiento: formData.fechaNacimiento,
-      estadoSalud: formData.estadoSalud
+      estadoSalud: formData.estadoSalud,
+      categoriaSeleccionada: categoriaActualizada
     },
     fotoFile.value
   );
@@ -433,10 +474,10 @@ onMounted(() => {
     formData.apellido = jugadoraData.value.apellido || '';
     formData.dorsal = jugadoraData.value.dorsal || null;
     formData.posicion = jugadoraData.value.posicion || '';
-    formData.equipo = jugadoraData.value.equipo || 'ascenso';
+    formData.equipos = obtenerEquiposDesdeDatos(jugadoraData.value);
     formData.fechaNacimiento = jugadoraData.value.fechaNacimiento || '';
     formData.estadoSalud = jugadoraData.value?.estadoSalud || 'disponible';
-    categoriaSeleccionada.value = jugadoraData.value?.categoriaSeleccionada || jugadoraData.value?.equipo || 'ascenso';
+    categoriaSeleccionada.value = jugadoraData.value?.categoriaSeleccionada || formData.equipos[0] || 'ascenso';
     fotoPerfil.value = jugadoraData.value.fotoPerfil || null;
   }
 });

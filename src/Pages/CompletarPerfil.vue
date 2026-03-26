@@ -41,22 +41,28 @@
           </div>
         </div>
 
-        <!-- Equipo -->
+        <!-- Equipos -->
         <div>
           <label class="block text-sm font-bold text-gray-700 mb-2">
-            Equipo *
+            Equipos *
           </label>
-          <select
-            v-model="formData.equipo"
-            required
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            :disabled="isLoading"
-          >
-            <option value="">Selecciona un equipo</option>
-            <option value="ascenso">Ascenso</option>
-            <option value="escuela">Escuela</option>
-            <option value="ambos">Ambos</option>
-          </select>
+          <p class="text-xs text-gray-500 mb-3">Puedes elegir uno, dos o los tres equipos.</p>
+          <div class="space-y-2 border border-gray-300 rounded-lg p-4 bg-gray-50/60">
+            <label
+              v-for="opcion in opcionesEquipos"
+              :key="opcion.value"
+              class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white cursor-pointer transition-colors"
+            >
+              <input
+                v-model="formData.equipos"
+                type="checkbox"
+                :value="opcion.value"
+                class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                :disabled="isLoading"
+              />
+              <span class="font-medium text-gray-700">{{ opcion.label }}</span>
+            </label>
+          </div>
         </div>
 
         <!-- Dorsal y Posición -->
@@ -168,6 +174,12 @@ import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { completarPerfilJugadora, isLoadingJugadora, errorJugadora, jugadoraAuthUser } from '../firebase/jugadorasAuth';
 
+const opcionesEquipos = [
+  { value: 'ascenso', label: 'Ascenso' },
+  { value: 'serieC', label: 'Serie C' },
+  { value: 'escuela', label: 'Escuela' }
+];
+
 const router = useRouter();
 const inputFoto = ref(null);
 const previewFoto = ref(null);
@@ -178,7 +190,7 @@ const error = ref(null);
 const formData = reactive({
   nombre: '',
   apellido: '',
-  equipo: '',
+  equipos: [],
   dorsal: null,
   posicion: '',
   fechaNacimiento: '',
@@ -214,7 +226,7 @@ const handleSubmit = async () => {
   error.value = null;
 
   // Validaciones
-  if (!formData.nombre || !formData.apellido || !formData.equipo || !formData.dorsal || !formData.posicion || !formData.fechaNacimiento) {
+  if (!formData.nombre || !formData.apellido || formData.equipos.length === 0 || !formData.dorsal || !formData.posicion || !formData.fechaNacimiento) {
     error.value = 'Por favor completa todos los campos requeridos';
     // // console.warn('Validación fallida - campos incompletos');
     return;
@@ -228,7 +240,7 @@ const handleSubmit = async () => {
     {
       nombre: formData.nombre,
       apellido: formData.apellido,
-      equipo: formData.equipo,
+      equipos: [...formData.equipos],
       dorsal: formData.dorsal,
       posicion: formData.posicion,
       fechaNacimiento: formData.fechaNacimiento
@@ -241,7 +253,7 @@ const handleSubmit = async () => {
 
   if (success) {
     // Redirigir según equipo
-    if (formData.equipo === 'ambos') {
+    if (formData.equipos.length > 1) {
       router.push('/seleccionar-categoria');
     } else {
       router.push('/entrenamientos');

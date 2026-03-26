@@ -1,86 +1,91 @@
 <template>
     <!-- Hero Section con Imagen de Fondo -->
-    <div class="relative w-full h-screen min-h-150 overflow-hidden">
+    <div class="relative w-full overflow-hidden">
       <!-- Imagen de fondo -->
       <div class="absolute inset-0 z-0">
         <img 
-src="../assets/hero/IMG_20260323_223532.jpg"
+src="../assets/hero/bghero.PNG"
           alt="CD Vikingas"
           class="w-full h-full object-cover"
         />
         <!-- Overlay oscuro para legibilidad -->
         <div class="absolute inset-0 bg-linear-to-b from-black/70 via-black/50 to-black/80"></div>
+        <div class="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-black/60 to-transparent"></div>
       </div>
 
-      <div class="absolute top-4 left-0 right-0 z-20 px-4 sm:px-6 lg:px-8">
+      <div class="absolute top-3 left-0 right-0 z-20 px-4 sm:top-4 sm:px-6 lg:px-8">
         <Eventos :live-banner-only="true" :compact-banner="true" details-href="#eventos-home" />
       </div>
 
       <!-- Contenido principal -->
-      <div class="relative z-10 h-full flex flex-col items-center justify-center px-4 pt-28 sm:pt-32 text-center">
-        <!-- Logo o escudo (opcional) -->
-        <div class="mb-6 animate-fade-in">
-          <img 
-            src="@/assets/logoVk.png" 
-            alt="CD Vikingas Logo"
-            class="h-24 md:h-32 w-auto mx-auto drop-shadow-2xl"
-          />
-        </div>
+      <div class="relative z-10 flex items-center px-4 py-28 sm:px-6 sm:py-32 lg:px-8" style="min-height: max(100svh, 54rem);">
+        <div class="w-full max-w-6xl mx-auto">
+          <div class="mx-auto flex max-w-5xl flex-col items-center rounded-4xl border border-white/15 bg-white/8 px-5 py-8 text-center shadow-[0_30px_80px_rgba(0,0,0,0.35)] backdrop-blur-xs sm:px-8 sm:py-10 md:px-10 md:py-12 lg:px-14 lg:py-14">
+            <!-- Logo o escudo -->
+            <div class="mb-5 animate-fade-in sm:mb-6">
+              <img 
+                src="@/assets/logoVk.png" 
+                alt="CD Vikingas Logo"
+                class="h-18 w-auto mx-auto drop-shadow-2xl sm:h-22 md:h-28 lg:h-32"
+              />
+            </div>
 
-        <!-- Título principal -->
-        <h1 class="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-4 animate-slide-up" style="font-family: 'Gobold High', sans-serif; text-shadow: 0 4px 20px rgba(0,0,0,0.5);">
-          {{ heroData.titulo }}
-        </h1>
+            <!-- Badge de campeonato -->
+            <div class="mb-5 animate-slide-up" style="animation-delay: 0.15s;">
+              <div class="inline-flex max-w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-black shadow-2xl sm:px-6 sm:py-3 sm:text-sm md:text-base">
+                <svg class="h-5 w-5 shrink-0 sm:h-6 sm:w-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                </svg>
+                <span>{{ heroData.badgeCampeonato }}</span>
+              </div>
+            </div>
 
-        <!-- Badge de campeonato -->
-        <div class="mb-6 animate-slide-up" style="animation-delay: 0.2s;">
-          <div class="inline-flex items-center gap-2 bg-primary text-black px-6 py-3 rounded-full font-bold text-lg md:text-xl shadow-2xl">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-            </svg>
-            <span>{{ heroData.badgeCampeonato }}</span>
+            <!-- Título principal -->
+            <h1 class="mb-4 max-w-4xl text-4xl font-black leading-none text-white animate-slide-up sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl" style="font-family: 'Gobold High', sans-serif; text-shadow: 0 4px 20px rgba(0,0,0,0.5); animation-delay: 0.25s;">
+              {{ heroData.titulo }}
+            </h1>
+
+            <!-- Subtítulo -->
+            <p class="mb-8 max-w-3xl text-base font-bold leading-relaxed text-white/90 animate-slide-up sm:text-lg md:mb-10 md:text-xl lg:text-2xl" style="animation-delay: 0.35s; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+              {{ heroData.subtitulo }}
+            </p>
+
+            <!-- Stats Grid -->
+            <div class="mb-8 grid w-full max-w-4xl grid-cols-1 gap-3 animate-slide-up sm:grid-cols-3 sm:gap-4 md:mb-10 md:gap-5" style="animation-delay: 0.45s;">
+              <div class="rounded-2xl border border-white/20 bg-black/25 px-4 py-4 backdrop-blur-md transition-all hover:bg-black/35 sm:px-3 sm:py-5 md:px-5 md:py-6">
+                <div class="mb-1 text-3xl font-black text-primary sm:text-4xl md:text-5xl">{{ heroData.stat1Numero }}</div>
+                <div class="text-sm font-semibold text-white/80 md:text-base">{{ heroData.stat1Texto }}</div>
+              </div>
+              <div class="rounded-2xl border border-white/20 bg-black/25 px-4 py-4 backdrop-blur-md transition-all hover:bg-black/35 sm:px-3 sm:py-5 md:px-5 md:py-6">
+                <div class="mb-1 text-3xl font-black text-primary sm:text-4xl md:text-5xl">{{ heroData.stat2Numero }}</div>
+                <div class="text-sm font-semibold text-white/80 md:text-base">{{ heroData.stat2Texto }}</div>
+              </div>
+              <div class="rounded-2xl border border-white/20 bg-black/25 px-4 py-4 backdrop-blur-md transition-all hover:bg-black/35 sm:px-3 sm:py-5 md:px-5 md:py-6">
+                <div class="mb-1 text-3xl font-black text-primary sm:text-4xl md:text-5xl">{{ heroData.stat3Numero }}</div>
+                <div class="text-sm font-semibold text-white/80 md:text-base">{{ heroData.stat3Texto }}</div>
+              </div>
+            </div>
+
+            <!-- CTAs -->
+            <div class="mx-auto flex w-full max-w-2xl flex-col items-center justify-center gap-3 animate-slide-up sm:flex-row sm:flex-wrap sm:gap-4" style="animation-delay: 0.55s;">
+              <router-link
+                to="/competencias"
+                class="flex w-full items-center justify-center rounded-xl bg-primary px-6 py-4 text-base font-black text-black shadow-2xl transition-all hover:scale-105 hover:bg-primary/90 sm:w-auto sm:min-w-64 sm:px-8 sm:text-lg"
+              >
+                Acompaña la temporada
+              </router-link>
+              <router-link
+                to="/historia"
+                class="flex w-full items-center justify-center rounded-xl border-2 border-white/50 bg-white/15 px-6 py-4 text-base font-black text-white shadow-2xl backdrop-blur-md transition-all hover:scale-105 hover:bg-white/25 sm:w-auto sm:min-w-64 sm:px-8 sm:text-lg"
+              >
+                Conoce a Vikingas
+              </router-link>
+            </div>
           </div>
-        </div>
-
-        <!-- Subtítulo -->
-        <p class="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl font-bold animate-slide-up" style="animation-delay: 0.3s; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
-          {{ heroData.subtitulo }}
-        </p>
-
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-3 gap-4 md:gap-8 mb-10 max-w-4xl animate-slide-up" style="animation-delay: 0.4s;">
-          <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 md:p-6 hover:bg-white/20 transition-all">
-            <div class="text-3xl md:text-5xl font-black text-primary mb-2">{{ heroData.stat1Numero }}</div>
-            <div class="text-xs md:text-sm text-white/80 font-semibold">{{ heroData.stat1Texto }}</div>
-          </div>
-          <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 md:p-6 hover:bg-white/20 transition-all">
-            <div class="text-3xl md:text-5xl font-black text-primary mb-2">{{ heroData.stat2Numero }}</div>
-            <div class="text-xs md:text-sm text-white/80 font-semibold">{{ heroData.stat2Texto }}</div>
-          </div>
-          <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 md:p-6 hover:bg-white/20 transition-all">
-            <div class="text-3xl md:text-5xl font-black text-primary mb-2">{{ heroData.stat3Numero }}</div>
-            <div class="text-xs md:text-sm text-white/80 font-semibold">{{ heroData.stat3Texto }}</div>
-          </div>
-        </div>
-
-        <!-- CTAs -->
-        <div class="flex flex-col sm:flex-row gap-4 animate-slide-up" style="animation-delay: 0.5s;">
-          <router-link
-            to="/competencias"
-            class="bg-primary hover:bg-primary/90 text-black px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-2xl"
-          >
-            Acompaña la temporada
-          </router-link>
-          <router-link
-            to="/historia"
-            class="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border-2 border-white/50 px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-2xl"
-          >
-            Conoce a Vikingas
-          </router-link>
         </div>
 
         <!-- Scroll indicator -->
-        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+        <div class="hidden lg:block absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
           <svg class="w-6 h-6 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
           </svg>
