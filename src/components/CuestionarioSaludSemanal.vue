@@ -41,11 +41,6 @@
         <p class="text-sm text-amber-800 mt-1">Solo se puede responder una vez por semana.</p>
       </div>
 
-      <div class="rounded-2xl border border-rose-200 bg-rose-50 p-4">
-        <p class="text-sm font-black text-rose-900">Salud femenina y carga física</p>
-        <p class="text-sm text-rose-800 mt-1">Indicar si estás en tu período ayuda a ajustar mejor la carga.</p>
-      </div>
-
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="rounded-2xl border border-gray-200 p-4 bg-gray-50">
           <p class="text-sm font-bold text-gray-700 mb-1">Dolor corporal o molestia física</p>
@@ -107,7 +102,7 @@
 
       <div class="rounded-2xl border border-rose-200 p-4 bg-white">
         <p class="text-sm font-bold text-gray-700 mb-1">¿Estás en tu período esta semana?</p>
-        <p class="text-xs text-gray-500 mb-3">Nos ayuda a interpretar mejor la carga.</p>
+        <p class="text-xs text-gray-500 mb-3">Nos permite ajustar mejor la carga, cuidar la recuperación y reducir riesgo de molestias o lesiones.</p>
         <div class="flex flex-wrap gap-2">
           <button
             type="button"

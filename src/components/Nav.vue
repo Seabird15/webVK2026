@@ -1,7 +1,7 @@
 <template>
   <nav class="bg-primary-dark text-black">
     <!-- Frase  -->
-    <div class="bg-black text-white text-center py-2 px-4 text-xs md:text-sm font-semibold tracking-wider">
+    <div class="sticky top-0 z-50 bg-black text-white text-center py-2 px-4 text-xs md:text-sm font-semibold tracking-wider shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
 "Cuando pienses en dejarlo, recuerda el porqué comenzaste"
     </div>
 
