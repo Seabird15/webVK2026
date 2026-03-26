@@ -12,8 +12,12 @@ src="../assets/hero/IMG_20260323_223532.jpg"
         <div class="absolute inset-0 bg-linear-to-b from-black/70 via-black/50 to-black/80"></div>
       </div>
 
+      <div class="absolute top-4 left-0 right-0 z-20 px-4 sm:px-6 lg:px-8">
+        <Eventos :live-banner-only="true" :compact-banner="true" details-href="#eventos-home" />
+      </div>
+
       <!-- Contenido principal -->
-      <div class="relative z-10 h-full flex flex-col items-center justify-center px-4 text-center">
+      <div class="relative z-10 h-full flex flex-col items-center justify-center px-4 pt-28 sm:pt-32 text-center">
         <!-- Logo o escudo (opcional) -->
         <div class="mb-6 animate-fade-in">
           <img 
@@ -157,7 +161,9 @@ src="../assets/hero/IMG_20260323_223532.jpg"
       </div>
     </div>
     
-    <Eventos />
+    <div id="eventos-home">
+      <Eventos />
+    </div>
     <UltimosResultados />
 </template>
 

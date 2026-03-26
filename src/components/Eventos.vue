@@ -1,38 +1,47 @@
 <template>
-    <div class="w-full py-12 px-4">
+    <div :class="liveBannerOnly ? 'w-full' : 'w-full py-12 px-4'">
         <div class="max-w-6xl mx-auto">
             <div
-                v-if="proximoPartido && proximoPartido.estado === 'EN_CURSO'"
-                class="mb-6 rounded-3xl border border-red-500/40 bg-linear-to-r from-red-600/20 via-red-500/15 to-black/40 p-4 sm:p-5 shadow-[0_16px_40px_rgba(0,0,0,0.24)]"
+                v-if="mostrarBannerEnVivo"
+                :class="[
+                    'rounded-3xl border border-red-500/40 bg-linear-to-r from-red-600/20 via-red-500/15 to-black/40 shadow-[0_16px_40px_rgba(0,0,0,0.24)]',
+                    compactBanner ? 'p-3 sm:p-4' : 'p-4 sm:p-5',
+                    liveBannerOnly ? 'backdrop-blur-md' : 'mb-6'
+                ]"
             >
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div class="text-center sm:text-left">
-                        <div class="inline-flex items-center gap-2 rounded-full bg-red-500 px-3 py-1 text-[11px] font-black uppercase tracking-[0.2em] text-white">
+                        <div :class="[
+                            'inline-flex items-center gap-2 rounded-full bg-red-500 font-black uppercase tracking-[0.2em] text-white',
+                            compactBanner ? 'px-2.5 py-1 text-[10px]' : 'px-3 py-1 text-[11px]'
+                        ]">
                             <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
                             En vivo
                         </div>
-                        <p class="text-white text-xl sm:text-2xl font-black mt-3">Se esta jugando ahora</p>
-                        <p class="text-white/80 text-sm sm:text-base mt-1.5">
+                        <p v-if="!compactBanner" :class="['text-white font-black mt-3', compactBanner ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl']">Se esta jugando ahora</p>
+                        <p :class="['text-white/80 mt-1.5', compactBanner ? 'text-xs sm:text-sm' : 'text-sm sm:text-base']">
                             {{ proximoPartido.equipo1.nombre }} vs {{ proximoPartido.equipo2.nombre }}
                             <span class="text-red-300 font-bold">• {{ proximoPartido.liga }}</span>
                         </p>
-                        <p class="text-red-200 text-xs sm:text-sm font-bold uppercase tracking-[0.18em] mt-2">
+                        <p :class="['text-red-200 font-bold uppercase tracking-[0.18em] mt-2', compactBanner ? 'text-[11px] sm:text-xs' : 'text-xs sm:text-sm']">
                             {{ obtenerEtiquetaTiempoPartido(proximoPartido) }}
                         </p>
+                        <a
+                            v-if="detailsHref"
+                            :href="detailsHref"
+                            @click.prevent="irAMasDetalles"
+                            class="inline-flex mt-3 items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-white hover:bg-white/12"
+                        >
+                            Ver mas detalles
+                            <span aria-hidden="true">↓</span>
+                        </a>
                     </div>
 
-                    <div class="self-center rounded-2xl bg-black/55 px-4 py-3 text-center min-w-36 border border-white/10">
-                        <div class="flex items-center justify-center gap-2 text-white font-black text-2xl">
-                            <span>{{ proximoPartido.golesLocal }}</span>
-                            <span class="text-white/40">-</span>
-                            <span>{{ proximoPartido.golesVisita }}</span>
-                        </div>
-                        <p class="text-[11px] uppercase tracking-[0.16em] font-bold text-red-300 mt-1">Marcador actual</p>
-                    </div>
+                
                 </div>
             </div>
 
-            <div class="grid lg:grid-cols-5 grid-cols-1 gap-8">
+            <div v-if="!liveBannerOnly" class="grid lg:grid-cols-5 grid-cols-1 gap-8">
                 <!-- Próximo Partido -->
                 <div class="col-span-2 border-5 border-primary-dark bg-black/50 p-8 rounded-lg">
                     <div class="flex items-center justify-between mb-8">
@@ -209,9 +218,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { collection, doc, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../firebase/config';
+
+const props = defineProps({
+    liveBannerOnly: {
+        type: Boolean,
+        default: false
+    },
+    compactBanner: {
+        type: Boolean,
+        default: false
+    },
+    detailsHref: {
+        type: String,
+        default: ''
+    }
+});
 
 const proximoPartido = ref(null);
 const ultimoPartido = ref(null);
@@ -229,6 +253,24 @@ const partidosNuevos = ref([]);
 const partidoDestacadoHome = ref(null);
 const ahora = ref(Date.now());
 let intervaloReloj = null;
+
+const mostrarBannerEnVivo = computed(() => {
+    return proximoPartido.value && proximoPartido.value.estado === 'EN_CURSO';
+});
+
+const irAMasDetalles = () => {
+    if (!props.detailsHref) return;
+
+    if (props.detailsHref.startsWith('#')) {
+        const destino = document.querySelector(props.detailsHref);
+        if (destino) {
+            destino.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        return;
+    }
+
+    window.location.href = props.detailsHref;
+};
 
 const logoUrlVikingas = new URL('../assets/logoVk.png', import.meta.url).href;
 const logoUrlVerserkers = new URL('../assets/versekersLogo.jpeg', import.meta.url).href;
