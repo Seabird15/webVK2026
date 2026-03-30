@@ -288,7 +288,7 @@
               </p>
 
               <p v-if="!puedeVotarMvp && !mvpCerrada" class="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-lg p-2">
-                Solo jugadoras inscritas pueden votar MVP desde su cuenta.
+                Todas las jugadoras del plantel pueden votar desde su cuenta, pero solo por jugadoras inscritas en el evento.
               </p>
             </div>
           </div>
@@ -577,7 +577,7 @@ import {
   SparklesIcon,
   LockClosedIcon
 } from '@heroicons/vue/24/outline';
-import { jugadoraAuthUser, jugadoraData } from '../firebase/jugadorasAuth';
+import { jugadoraAuthUser, jugadoraData, fetchJugadorasRegistradasPorEquipo } from '../firebase/jugadorasAuth';
 import { 
   inscribirseEntrenamiento, 
   desuscribirseEntrenamiento,
@@ -612,6 +612,7 @@ const mvpVotoUsuario = ref(null);
 const mvpGanadoraFoto = ref('');
 const mvpGanadoraFotoCargando = ref(false);
 const cacheFotosJugadoras = ref({});
+const jugadorasDisponiblesMvp = ref([]);
 const VENTANA_VISIBILIDAD_JUGADORAS_MS = 24 * 60 * 60 * 1000;
 const DURACION_PARTIDO_DEFAULT_MS = 90 * 60 * 1000;
 
@@ -852,6 +853,48 @@ const mvpPendienteHabilitacion = computed(() => {
   return mvpEsPartido.value && mvpHabilitadoEvento.value && !fechaPasada(entrenamiento.value);
 });
 
+const normalizarNombreMvp = (nombre) => (nombre || '').toString().trim().toLowerCase();
+
+const construirNombreJugadoraMvp = (jugadora = {}) => {
+  const nombreCompleto = `${jugadora?.nombre || ''} ${jugadora?.apellido || ''}`.trim();
+  return nombreCompleto || (jugadora?.displayName || '').toString().trim();
+};
+
+const obtenerJugadorasRegistradasParaMvp = async (equipo) => {
+  if (!equipo) return [];
+
+  if (equipo === 'ambos') {
+    const [ascenso, escuela] = await Promise.all([
+      fetchJugadorasRegistradasPorEquipo('ascenso'),
+      fetchJugadorasRegistradasPorEquipo('escuela')
+    ]);
+
+    const mapa = new Map();
+    [...ascenso, ...escuela].forEach((jugadora) => {
+      if (jugadora?.id && !mapa.has(jugadora.id)) {
+        mapa.set(jugadora.id, jugadora);
+      }
+    });
+
+    return [...mapa.values()];
+  }
+
+  return fetchJugadorasRegistradasPorEquipo(equipo);
+};
+
+const cargarJugadorasDisponiblesMvp = async (equipo) => {
+  if (!equipo) {
+    jugadorasDisponiblesMvp.value = [];
+    return;
+  }
+
+  try {
+    jugadorasDisponiblesMvp.value = await obtenerJugadorasRegistradasParaMvp(equipo);
+  } catch {
+    jugadorasDisponiblesMvp.value = [];
+  }
+};
+
 const candidatasMvp = computed(() => {
   const desdeInscripciones = [
     ...inscritasOrganizadas.value.confirmadas,
@@ -900,6 +943,15 @@ const mvpGanadora = computed(() => {
 
 const obtenerFotoCandidata = (nombre) => {
   if (!entrenamiento.value || !nombre) return '';
+
+  const jugadoraRegistrada = jugadorasDisponiblesMvp.value.find(
+    (jugadora) => normalizarNombreMvp(construirNombreJugadoraMvp(jugadora)) === normalizarNombreMvp(nombre)
+  );
+
+  if (jugadoraRegistrada) {
+    return jugadoraRegistrada.fotoPerfil || jugadoraRegistrada.foto || jugadoraRegistrada.photoURL || jugadoraRegistrada.imagen || jugadoraRegistrada.urlFoto || '';
+  }
+
   const convocadas = Array.isArray(entrenamiento.value.jugadorasConvocadas)
     ? entrenamiento.value.jugadorasConvocadas
     : [];
@@ -915,6 +967,12 @@ const normalizarNombre = (nombre) => (nombre || '').toString().trim().toLowerCas
 const obtenerJugadoraIdGanadora = () => {
   const nombreGanadora = normalizarNombre(mvpGanadora.value?.nombre);
   if (!nombreGanadora) return null;
+
+  const encontradaEnRegistro = jugadorasDisponiblesMvp.value.find(
+    (jugadora) => normalizarNombre(construirNombreJugadoraMvp(jugadora)) === nombreGanadora && jugadora?.id
+  );
+
+  if (encontradaEnRegistro?.id) return encontradaEnRegistro.id;
 
   const inscripciones = [
     ...inscritasOrganizadas.value.confirmadas,
@@ -992,23 +1050,18 @@ watch(
   { immediate: true }
 );
 
+watch(
+  () => entrenamiento.value?.equipo,
+  (equipo) => {
+    cargarJugadorasDisponiblesMvp(equipo || '');
+  },
+  { immediate: true }
+);
+
 const puedeVotarMvp = computed(() => {
-  const uid = jugadoraAuthUser.value?.uid;
-
-  const inscritaEnDetalle = !!uid && (
-    inscritasOrganizadas.value.confirmadas.some((item) => item?.jugadoraId === uid)
-    || inscritasOrganizadas.value.bajas.some((item) => item?.jugadoraId === uid)
-    || inscritasOrganizadas.value.pendientes.some((item) => item?.jugadoraId === uid)
-  );
-
-  const inscritaPorEstado = estadoInscripcion.value === 'confirmada'
-    || estadoInscripcion.value === 'baja'
-    || estadoInscripcion.value === 'pendiente';
-
   return esMvpDisponible.value
     && !!jugadoraAuthUser.value
     && !vieneDeAdmin.value
-    && (inscritaEnDetalle || inscritaPorEstado)
     && !mvpYaVotado.value
     && !mvpCerrada.value;
 });

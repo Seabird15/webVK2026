@@ -31,6 +31,51 @@ const normalizarVotosMvp = (mvpVotos = []) => {
     .sort((a, b) => b.votos - a.votos);
 };
 
+const normalizarNombreMvp = (nombre) => (nombre || '').toString().trim().toLowerCase();
+
+const construirNombreJugadoraMvp = (jugadora = {}) => {
+  const nombreCompleto = `${jugadora?.nombre || ''} ${jugadora?.apellido || ''}`.trim();
+  return nombreCompleto || (jugadora?.displayName || '').toString().trim();
+};
+
+const perteneceEquipoMvp = (jugadora = {}, equipo = '') => {
+  if (!equipo) return false;
+
+  const equipoNormalizado = (equipo || '').toString().trim().toLowerCase();
+  const equiposJugadora = Array.isArray(jugadora?.equipos)
+    ? jugadora.equipos.map((item) => (item || '').toString().trim().toLowerCase())
+    : [];
+
+  if (equipoNormalizado === 'ambos') {
+    return equiposJugadora.includes('ascenso')
+      || equiposJugadora.includes('escuela')
+      || ['ascenso', 'escuela', 'ambos'].includes((jugadora?.equipo || '').toString().trim().toLowerCase());
+  }
+
+  if (equiposJugadora.length > 0) {
+    return equiposJugadora.includes(equipoNormalizado);
+  }
+
+  const equipoJugadora = (jugadora?.equipo || '').toString().trim().toLowerCase();
+  if (equipoNormalizado === 'ascenso' || equipoNormalizado === 'escuela') {
+    return equipoJugadora === equipoNormalizado || equipoJugadora === 'ambos';
+  }
+
+  return equipoJugadora === equipoNormalizado;
+};
+
+const obtenerJugadorasRegistradasParaMvp = async (equipo) => {
+  if (!equipo) return [];
+
+  const snapshot = await getDocs(collection(db, 'jugadoraRegistro'));
+  return snapshot.docs
+    .map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    }))
+    .filter((jugadora) => perteneceEquipoMvp(jugadora, equipo));
+};
+
 const limpiarProximoPartidoHome = async (entrenamientoIdActivo = null) => {
   const q = query(
     collection(db, 'entrenamientos'),
@@ -303,16 +348,14 @@ export const votarMvpEntrenamiento = async (entrenamientoId, jugadoraId, jugador
       )
     );
 
-    const jugadoraInscrita = inscripcionesSnap.docs.some((docSnap) => {
-      const data = docSnap.data() || {};
-      return data.jugadoraId === idVotante;
-    });
+    const jugadorasDisponiblesMvp = await obtenerJugadorasRegistradasParaMvp(entrenamiento?.equipo || '');
+    const votanteValida = jugadorasDisponiblesMvp.some((jugadora) => jugadora?.id === idVotante);
 
-    if (!jugadoraInscrita) {
-      throw new Error('Solo las jugadoras inscritas en este evento pueden votar MVP.');
+    if (!votanteValida) {
+      throw new Error('Solo las jugadoras del plantel pueden votar MVP en este evento.');
     }
 
-    const nombreVotoNormalizado = nombreVoto.toLowerCase();
+    const nombreVotoNormalizado = normalizarNombreMvp(nombreVoto);
     const candidataInscrita = inscripcionesSnap.docs.some((docSnap) => {
       const data = docSnap.data() || {};
       const nombreInscrita = (data.jugadoraNombre || '').toString().trim().toLowerCase();
