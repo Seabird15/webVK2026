@@ -113,6 +113,8 @@
             <p><strong>Sueño:</strong> {{ item.sueno }}/5</p>
           </div>
 
+          <p class="text-sm text-gray-600 mt-2"><strong>Respondido:</strong> {{ formatearFechaRespuesta(item.fechaRespuesta || item.updatedAt || item.createdAt) }}</p>
+
           <p class="text-sm text-gray-600 mt-2"><strong>Período esta semana:</strong> {{ item.enPeriodo === true ? 'Sí' : item.enPeriodo === false ? 'No' : 'Sin informar' }}</p>
 
           <p v-if="item.comentarios" class="text-sm text-gray-600 mt-2"><strong>Comentario:</strong> {{ item.comentarios }}</p>
@@ -258,11 +260,29 @@ const anchoBarra = (valor) => {
   return `${(Number(valor || 0) / total) * 100}%`;
 };
 
+const formatearFechaRespuesta = (valor) => {
+  if (!valor) return 'Sin fecha';
+
+  const fecha = valor?.seconds
+    ? new Date(valor.seconds * 1000)
+    : new Date(valor);
+
+  if (Number.isNaN(fecha.getTime())) return 'Sin fecha';
+
+  return fecha.toLocaleString('es-CL', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
 const cargar = () => {
   unsubscribe = escucharRespuestasSaludSemanal((items) => {
     respuestas.value = [...items].sort((a, b) => {
-      const aMs = a?.updatedAt?.seconds ? a.updatedAt.seconds : 0;
-      const bMs = b?.updatedAt?.seconds ? b.updatedAt.seconds : 0;
+      const aMs = a?.fechaRespuesta?.seconds || a?.updatedAt?.seconds || a?.createdAt?.seconds || 0;
+      const bMs = b?.fechaRespuesta?.seconds || b?.updatedAt?.seconds || b?.createdAt?.seconds || 0;
       return bMs - aMs;
     });
   });

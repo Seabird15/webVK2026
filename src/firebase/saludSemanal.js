@@ -4,8 +4,6 @@ import {
   getDoc,
   getDocs,
   onSnapshot,
-  orderBy,
-  query,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -99,6 +97,7 @@ export const guardarRespuestaSaludSemanal = async ({
     }),
     revisada: false,
     notificadaAdmin: false,
+    fechaRespuesta: serverTimestamp(),
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
   };
@@ -109,8 +108,7 @@ export const guardarRespuestaSaludSemanal = async ({
 
 export const escucharRespuestasSaludSemanal = (callback) => {
   const refCol = collection(db, SALUD_COLLECTION);
-  const q = query(refCol, orderBy('updatedAt', 'desc'));
-  return onSnapshot(q, (snapshot) => {
+  return onSnapshot(refCol, (snapshot) => {
     const items = snapshot.docs.map((documento) => ({ id: documento.id, ...documento.data() }));
     callback(items);
   });
@@ -169,7 +167,13 @@ export const limpiarSaludSemanalAntiguaS = async (semanasMaximas = 1) => {
     let eliminados = 0;
     for (const doc of snapshot.docs) {
       const data = doc.data();
-      const fechaActualizacion = data.updatedAt?.seconds ? data.updatedAt.seconds * 1000 : data.createdAt?.seconds ? data.createdAt.seconds * 1000 : 0;
+      const fechaActualizacion = data.fechaRespuesta?.seconds
+        ? data.fechaRespuesta.seconds * 1000
+        : data.updatedAt?.seconds
+          ? data.updatedAt.seconds * 1000
+          : data.createdAt?.seconds
+            ? data.createdAt.seconds * 1000
+            : 0;
       const diferencia = ahora - fechaActualizacion;
       
       if (diferencia > semanasMs) {

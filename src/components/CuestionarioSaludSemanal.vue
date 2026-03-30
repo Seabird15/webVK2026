@@ -24,6 +24,7 @@
         <div v-if="yaRespondido && !isLoading" class="hidden sm:block text-right text-xs text-gray-500">
           <p>Dolor {{ form.dolor }}/5</p>
           <p>Fatiga {{ form.fatiga }}/5</p>
+          <p v-if="fechaRespuestaTexto">Respondido {{ fechaRespuestaTexto }}</p>
         </div>
         <span class="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 transition-transform" :class="expandido ? 'rotate-180' : ''">
           <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -39,6 +40,11 @@
       <div v-if="!yaRespondido" class="rounded-2xl border border-amber-200 bg-amber-50 p-4">
         <p class="text-sm font-black text-amber-900">Tienes este chequeo semanal pendiente</p>
         <p class="text-sm text-amber-800 mt-1">Solo se puede responder una vez por semana.</p>
+      </div>
+
+      <div v-else-if="fechaRespuestaTexto" class="rounded-2xl border border-green-200 bg-green-50 p-4">
+        <p class="text-sm font-black text-green-900">Respuesta registrada</p>
+        <p class="text-sm text-green-800 mt-1">Contestaste este chequeo el {{ fechaRespuestaTexto }}.</p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -148,6 +154,7 @@
     </div>
 
     <div v-else-if="!isLoading" class="mt-4 flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-600">
+      <span v-if="yaRespondido && fechaRespuestaTexto" class="rounded-full bg-green-50 text-green-700 px-3 py-1 font-semibold">Respondido {{ fechaRespuestaTexto }}</span>
       <span v-if="yaRespondido" class="rounded-full bg-gray-100 px-3 py-1 font-semibold">Dolor {{ form.dolor }}/5</span>
       <span v-if="yaRespondido" class="rounded-full bg-gray-100 px-3 py-1 font-semibold">Fatiga {{ form.fatiga }}/5</span>
       <span v-if="yaRespondido" class="rounded-full bg-gray-100 px-3 py-1 font-semibold">Sueño {{ form.sueno }}/5</span>
@@ -178,6 +185,7 @@ const yaRespondido = ref(false);
 const mensaje = ref('');
 const tipoMensaje = ref('ok');
 const expandido = ref(false);
+const fechaRespuesta = ref(null);
 
 const form = reactive({
   dolor: 1,
@@ -220,6 +228,24 @@ const periodoTexto = computed(() => {
   return 'Selecciona una opción.';
 });
 
+const fechaRespuestaTexto = computed(() => {
+  if (!fechaRespuesta.value) return '';
+
+  const fecha = fechaRespuesta.value?.seconds
+    ? new Date(fechaRespuesta.value.seconds * 1000)
+    : new Date(fechaRespuesta.value);
+
+  if (Number.isNaN(fecha.getTime())) return '';
+
+  return fecha.toLocaleString('es-CL', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+});
+
 const cargarRespuesta = async () => {
   isLoading.value = true;
   mensaje.value = '';
@@ -231,9 +257,12 @@ const cargarRespuesta = async () => {
       form.sueno = Number(respuesta.sueno) || 5;
       form.enPeriodo = typeof respuesta.enPeriodo === 'boolean' ? respuesta.enPeriodo : null;
       form.comentarios = (respuesta.comentarios || '').toString();
+      fechaRespuesta.value = respuesta.fechaRespuesta || respuesta.updatedAt || respuesta.createdAt || null;
       yaRespondido.value = true;
       tipoMensaje.value = 'ok';
       mensaje.value = 'Tu chequeo de esta semana ya fue registrado.';
+    } else {
+      fechaRespuesta.value = null;
     }
   } finally {
     isLoading.value = false;
@@ -262,6 +291,7 @@ const guardar = async () => {
       comentarios: form.comentarios
     });
 
+    fechaRespuesta.value = new Date();
     yaRespondido.value = true;
     tipoMensaje.value = 'ok';
     mensaje.value = 'Respuesta semanal registrada correctamente.';
