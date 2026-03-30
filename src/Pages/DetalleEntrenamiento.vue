@@ -239,10 +239,10 @@
                 <span class="text-primary-dark font-black">{{ totalVotosMvp }}</span>
               </div>
 
-              <div v-if="topMvp.length > 0" class="bg-primary/10 border border-primary/20 rounded-lg p-3">
-                <p class="text-xs text-gray-600 font-semibold mb-2">Top 3 MVP</p>
+              <div v-if="rankingMvpVisible.length > 0" class="bg-primary/10 border border-primary/20 rounded-lg p-3">
+                <p class="text-xs text-gray-600 font-semibold mb-2">{{ mvpCerrada ? 'Top 3 MVP' : 'Ranking MVP' }}</p>
                 <div class="space-y-1.5">
-                  <div v-for="(item, index) in topMvp" :key="`top-mvp-${entrenamiento.id}-${item.nombre}`" class="flex items-center justify-between text-xs text-primary-dark">
+                  <div v-for="(item, index) in rankingMvpVisible" :key="`top-mvp-${entrenamiento.id}-${item.nombre}`" class="flex items-center justify-between text-xs text-primary-dark">
                     <div class="flex items-center gap-2 min-w-0">
                       <span class="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-black shrink-0">{{ index + 1 }}</span>
                       <span class="font-bold truncate">{{ item.nombre }}</span>
@@ -913,15 +913,19 @@ const totalVotosMvp = computed(() => {
 });
 
 const mvpLider = computed(() => {
-  if (topMvp.value.length === 0) return null;
-  return topMvp.value[0];
+  if (rankingMvp.value.length === 0) return null;
+  return rankingMvp.value[0];
 });
 
-const topMvp = computed(() => {
+const rankingMvp = computed(() => {
   if (!Array.isArray(entrenamiento.value?.mvpVotos) || entrenamiento.value.mvpVotos.length === 0) return [];
   return [...entrenamiento.value.mvpVotos]
     .sort((a, b) => (Number(b?.votos) || 0) - (Number(a?.votos) || 0))
-    .slice(0, 3);
+});
+
+const rankingMvpVisible = computed(() => {
+  if (!mvpCerrada.value) return rankingMvp.value;
+  return rankingMvp.value.slice(0, 3);
 });
 
 const mvpGanadora = computed(() => {

@@ -1003,10 +1003,10 @@
               <span>Votación finalizada</span>
             </p>
 
-            <div v-if="topMvpSeleccionado.length > 0" class="mb-2 p-2 bg-primary/10 border border-primary/20 rounded">
-              <p class="text-[11px] font-black text-primary-dark uppercase tracking-wide mb-1">Top 3 MVP</p>
+            <div v-if="rankingMvpVisibleSeleccionado.length > 0" class="mb-2 p-2 bg-primary/10 border border-primary/20 rounded">
+              <p class="text-[11px] font-black text-primary-dark uppercase tracking-wide mb-1">{{ mvpCerradaSeleccionado ? 'Top 3 MVP' : 'Ranking MVP' }}</p>
               <div class="space-y-1">
-                <div v-for="(item, index) in topMvpSeleccionado" :key="`mvp-top-${entrenamientoSeleccionado.id}-${item.nombre}`" class="flex items-center justify-between text-xs text-primary-dark">
+                <div v-for="(item, index) in rankingMvpVisibleSeleccionado" :key="`mvp-top-${entrenamientoSeleccionado.id}-${item.nombre}`" class="flex items-center justify-between text-xs text-primary-dark">
                   <div class="flex items-center gap-2 min-w-0">
                     <span class="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-black shrink-0">{{ index + 1 }}</span>
                     <span class="font-bold truncate">{{ item.nombre }}</span>
@@ -1668,15 +1668,19 @@ const totalVotosMvpSeleccionado = computed(() => {
 });
 
 const liderMvpSeleccionado = computed(() => {
-  if (topMvpSeleccionado.value.length === 0) return null;
-  return topMvpSeleccionado.value[0];
+  if (rankingMvpSeleccionado.value.length === 0) return null;
+  return rankingMvpSeleccionado.value[0];
 });
 
-const topMvpSeleccionado = computed(() => {
+const rankingMvpSeleccionado = computed(() => {
   if (!Array.isArray(entrenamientoSeleccionado.value?.mvpVotos) || entrenamientoSeleccionado.value.mvpVotos.length === 0) return [];
   return [...entrenamientoSeleccionado.value.mvpVotos]
     .sort((a, b) => (Number(b?.votos) || 0) - (Number(a?.votos) || 0))
-    .slice(0, 3);
+});
+
+const rankingMvpVisibleSeleccionado = computed(() => {
+  if (!mvpCerradaSeleccionado.value) return rankingMvpSeleccionado.value;
+  return rankingMvpSeleccionado.value.slice(0, 3);
 });
 
 const mvpGanadoraSeleccionado = computed(() => {
