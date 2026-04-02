@@ -182,7 +182,6 @@ export const limpiarSaludSemanalAntiguaS = async (semanasMaximas = 1) => {
       }
     }
     
-    console.log(`🗑️ Limpiados ${eliminados} registros de salud antiguos (>${semanasMaximas} semana${semanasMaximas > 1 ? 's' : ''})`);
     return eliminados;
   } catch (err) {
     console.error('Error limpiando registros de salud antiguos:', err);

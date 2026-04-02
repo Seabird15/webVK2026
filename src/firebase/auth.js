@@ -24,7 +24,7 @@ const fetchUserRole = async (uid) => {
       userRole.value = role;
       return role;
     } else {
-      console.warn('No existe documento de usuario en Firestore para UID:', uid);
+    //  console.warn('No existe documento de usuario en Firestore para UID:', uid);
     }
     return null;
   } catch (err) {

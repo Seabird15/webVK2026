@@ -149,18 +149,15 @@ let ignorarProximoAuthChange = false;
 
 // Observar cambios de autenticación para jugadoras
 onAuthStateChanged(auth, async (user) => {
-  console.log('🔐 onAuthStateChanged ejecutado - user:', user?.uid);
   
   // Si debemos ignorar este cambio, solo marcamos el flag como falso
   if (ignorarProximoAuthChange) {
     ignorarProximoAuthChange = false;
     authReady.value = true; // Marcar que Auth está listo
-    console.log('✅ Ignorando onAuthStateChanged después del registro');
     return;
   }
   
   jugadoraAuthUser.value = user;
-  console.log('✅ jugadoraAuthUser actualizado a:', user?.uid);
   
   if (user) {
     // Intentar cargar datos de Firestore
@@ -169,23 +166,19 @@ onAuthStateChanged(auth, async (user) => {
     
     if (jugadoraRegistroDoc.exists()) {
       jugadoraData.value = normalizarDatosJugadora(user.uid, jugadoraRegistroDoc.data());
-      console.log('✅ Documento de jugadora cargado desde Firestore');
     } else {
       // Si no existe, crear estado vacío (perfil no completado aún)
       jugadoraData.value = {
         id: user.uid,
         perfilCompleto: false
       };
-      console.log('⚠️ Documento de jugadora no existe en Firestore para UID:', user.uid);
     }
   } else {
     jugadoraData.value = null;
-    console.log('❌ Usuario desautenticado');
   }
   
   // Marcar que Auth está listo
   authReady.value = true;
-  console.log('✅ authReady.value = true');
 });
 
 // Login de jugadora

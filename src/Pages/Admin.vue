@@ -1145,13 +1145,11 @@ const cargarTodasJugadoras = async () => {
 // Función para iniciar el listener de feedbacks en tiempo real
 const iniciarListenerFeedbacks = async () => {
   try {
-    console.log('🎧 Iniciando listener de feedbacks para admin');
     // Limpiar feedbacks más antiguos de 2 días (una sola vez al inicio)
     await limpiarFeedbacksAntiguos(2);
     
     // Configurar listener en tiempo real
     unsubscribeFeedbacks = escucharTodosFeedbacks((feedbacks) => {
-      console.log('✅ Feedbacks actualizados en tiempo real:', feedbacks.length);
       todosFeedbacks.value = feedbacks;
     });
   } catch (err) {

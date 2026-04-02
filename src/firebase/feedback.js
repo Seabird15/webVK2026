@@ -43,7 +43,6 @@ export const obtenerFeedbackJugadora = async (jugadoraId) => {
 // Escuchar feedbacks en tiempo real
 export const escucharFeedbackJugadora = (jugadoraId, callback) => {
   try {
-    console.log('🎧 Iniciando listener de feedback para UID:', jugadoraId);
     const q = query(
       collection(db, 'feedbackJugadoras'),
       where('jugadoraId', '==', jugadoraId),
@@ -53,7 +52,6 @@ export const escucharFeedbackJugadora = (jugadoraId, callback) => {
     const unsubscribe = onSnapshot(
       q, 
       (snapshot) => {
-        console.log('✅ onSnapshot activado, documentos encontrados:', snapshot.docs.length);
         const data = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
@@ -80,7 +78,7 @@ export const escucharFeedbackJugadora = (jugadoraId, callback) => {
 export const crearFeedback = async (jugadoraId, jugadoraNombre, mensaje, tipo = 'general') => {
   try {
     isLoadingFeedback.value = true;
-    console.log('📤 Creando feedback para jugadoraId:', jugadoraId, 'Nombre:', jugadoraNombre);
+    ('📤 Creando feedback para jugadoraId:', jugadoraId, 'Nombre:', jugadoraNombre);
     const docRef = await addDoc(collection(db, 'feedbackJugadoras'), {
       jugadoraId,
       jugadoraNombre,
@@ -92,7 +90,6 @@ export const crearFeedback = async (jugadoraId, jugadoraNombre, mensaje, tipo = 
       reaccionadoAt: null
     });
     
-    console.log('✅ Feedback creado con ID:', docRef.id);
     errorFeedback.value = null;
     return docRef.id;
   } catch (err) {
@@ -125,7 +122,6 @@ export const agregarReaccionFeedback = async (feedbackId, reaccion) => {
       throw new Error('Reacción inválida');
     }
     
-    console.log('📤 Guardando reacción:', reaccion, 'para feedback:', feedbackId);
     
     // Actualizar: marcar como leído + guardar reacción + timestamp de respuesta
     await updateDoc(doc(db, 'feedbackJugadoras', feedbackId), {
@@ -134,7 +130,6 @@ export const agregarReaccionFeedback = async (feedbackId, reaccion) => {
       reaccionadoAt: serverTimestamp()
     });
     
-    console.log('✅ Reacción guardada exitosamente');
     errorFeedback.value = null;
   } catch (err) {
     errorFeedback.value = err.message;
@@ -220,11 +215,9 @@ export const limpiarFeedbacksAntiguos = async (diasMaximo = 2) => {
       if (diferencia > diasMs) {
         await deleteDoc(doc.ref);
         eliminados++;
-        console.log(`🗑️ Feedback eliminado: ${data.jugadoraNombre} (${data.reaccion ? 'respondido' : 'sin responder'})`);
       }
     }
     
-    console.log(`🗑️ Limpiados ${eliminados} feedbacks antiguos (>${diasMaximo} días)`);
     return eliminados;
   } catch (err) {
     console.error('Error limpiando feedbacks antiguos:', err);
@@ -235,7 +228,6 @@ export const limpiarFeedbacksAntiguos = async (diasMaximo = 2) => {
 // Escuchar TODOS los feedbacks en tiempo real (para admin ver respuestas)
 export const escucharTodosFeedbacks = (callback) => {
   try {
-    console.log('🎧 Iniciando listener de todos los feedbacks (admin)');
     const q = query(
       collection(db, 'feedbackJugadoras')
     );
@@ -243,7 +235,6 @@ export const escucharTodosFeedbacks = (callback) => {
     const unsubscribe = onSnapshot(
       q, 
       (snapshot) => {
-        console.log('✅ onSnapshot activado, total feedbacks:', snapshot.docs.length);
         const data = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()

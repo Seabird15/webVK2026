@@ -1545,7 +1545,6 @@ const obtenerIniciales = (nombre) => {
 };
 
 // Verificar autenticación
-console.log('🔐 jugadoraAuthUser.value al cargar Entrenamientos:', jugadoraAuthUser.value);
 if (!jugadoraAuthUser.value) {
   console.warn('⚠️ Usuario NO autenticado, redirigiendo a login-jugadora');
   router.push('/login-jugadora');
@@ -2429,8 +2428,6 @@ const handleLogout = async () => {
 };
 
 onMounted(() => {
-  console.log('📱 onMounted - jugadoraAuthUser.value:', jugadoraAuthUser.value);
-  console.log('📱 onMounted - jugadoraAuthUser.value?.uid:', jugadoraAuthUser.value?.uid);
   
   cargarEntrenamientos();
   cargarBannerMensualidad();
@@ -2474,21 +2471,16 @@ watch(
 watch(
   () => jugadoraAuthUser.value?.uid,
   (uid) => {
-    console.log('🔍 Watch detectado UID cambio:', uid);
-    console.log('🔐 jugadoraAuthUser.value completo:', jugadoraAuthUser.value);
     
     // Limpiar listener anterior si existe
     if (unsubFeedback.value) {
-      console.log('🧹 Limpiando listener anterior de feedback');
       unsubFeedback.value();
     }
     
     // Suscribirse si hay UID disponible
     if (uid) {
-      console.log('🎯 UID de jugadora registrado:', uid);
       try {
         unsubFeedback.value = escucharFeedbackJugadora(uid, (data) => {
-          console.log('📨 Feedbacks recibidos:', data);
           feedbacks.value = data;
         });
       } catch (err) {
