@@ -85,7 +85,7 @@
     <!-- Frase cierre -->
     <div class="ct-fade mx-auto max-w-7xl border-t border-white/10 px-4 py-12 text-center sm:px-6 lg:px-8 lg:py-16">
       <p class="mx-auto max-w-3xl text-[clamp(1.8rem,4vw,3.6rem)] font-black italic leading-tight text-white" style="font-family: 'Gobold High', sans-serif;">
-        Escribinos. Acá siempre hay cancha, grupo y ganas de sumar.
+        Contactanos. Acá siempre hay cancha, grupo y ganas de sumar.
       </p>
       <p class="mt-8 text-sm text-white/40">
         © 2026 Club Deportivo Social y Cultural Vikingas. Todos los derechos reservados.
