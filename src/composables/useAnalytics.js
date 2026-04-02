@@ -126,6 +126,54 @@ export const trackSolicitudRegistro = (equipo) => {
 };
 
 /**
+ * Trackea click en CTA principal
+ * @param {string} label - Texto o label del CTA
+ * @param {string} location - Dónde está el CTA (hero, home, contacto, etc.)
+ */
+export const trackCTAClick = (label, location) => {
+  trackEvent('cta_click', {
+    cta_label: label,
+    cta_location: location
+  });
+};
+
+/**
+ * Trackea click en enlace externo
+ * @param {string} url - URL del enlace
+ * @param {string} label - Texto del enlace
+ */
+export const trackOutboundClick = (url, label) => {
+  trackEvent('outbound_click', {
+    link_url: url,
+    link_label: label
+  });
+};
+
+/**
+ * Trackea cambio de tab/sección
+ * @param {string} tab - Tab seleccionado
+ * @param {string} section - Sección del sitio
+ */
+export const trackTabChange = (tab, section) => {
+  trackEvent('tab_change', {
+    tab_name: tab,
+    section: section
+  });
+};
+
+/**
+ * Trackea interacción social (like, reacción)
+ * @param {string} type - Tipo de interacción
+ * @param {string} context - Contexto
+ */
+export const trackSocialInteraction = (type, context) => {
+  trackEvent('social_interaction', {
+    interaction_type: type,
+    context: context
+  });
+};
+
+/**
  * Hook principal para usar en componentes Vue
  */
 export const useAnalytics = () => {
@@ -139,6 +187,10 @@ export const useAnalytics = () => {
     trackClickSponsor,
     trackDescargaFixture,
     trackAccesoPerfil,
-    trackSolicitudRegistro
+    trackSolicitudRegistro,
+    trackCTAClick,
+    trackOutboundClick,
+    trackTabChange,
+    trackSocialInteraction
   };
 };

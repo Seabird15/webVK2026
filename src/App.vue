@@ -62,7 +62,9 @@ watch(jugadoraData, (newData, oldData) => {
   <div class="bg-black min-h-screen">
     <Nav />
     <Loader />
-    <RouterView />
+    <main>
+      <RouterView />
+    </main>
     <Footer />
   </div>
 </template>

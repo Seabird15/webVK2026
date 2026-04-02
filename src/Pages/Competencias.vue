@@ -588,6 +588,7 @@
 import { ref, onMounted, computed, onUnmounted } from 'vue';
 import { doc, getDoc, setDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import { trackSocialInteraction, trackTabChange } from '../composables/useAnalytics';
 import ModalConfirmacion from '../components/ModalConfirmacion.vue';
 import { authUser, userRole } from '../firebase/auth';
 import { jugadoraAuthUser } from '../firebase/jugadorasAuth';
@@ -786,6 +787,7 @@ const resumenSemestreGlobal = computed(() => {
 
 const abrirCompetencia = (competenciaId) => {
   competenciaExpandida.value = competenciaId;
+  trackTabChange(competenciaId, 'competencias');
 };
 
 const obtenerActorFuego = () => authUser.value?.uid || jugadoraAuthUser.value?.uid || invitadaSesionId.value;
@@ -949,6 +951,7 @@ const reaccionarConFuego = async () => {
 
       fuegitosFinal.value = Math.max(0, fuegitosFinal.value - 1);
       dioFuegoFinal.value = false;
+      trackSocialInteraction('unlike', 'competencias_quiero_jugar');
     } catch (err) {
       console.error('Error quitando fueguito:', err);
     }
@@ -963,6 +966,7 @@ const reaccionarConFuego = async () => {
 
       fuegitosFinal.value += 1;
       dioFuegoFinal.value = true;
+      trackSocialInteraction('like', 'competencias_quiero_jugar');
     } catch (err) {
       console.error('Error agregando fueguito:', err);
     }

@@ -1,215 +1,228 @@
 <template>
-    <div :class="liveBannerOnly ? 'w-full' : 'w-full py-12 px-4'">
-        <div class="max-w-6xl mx-auto">
+    <div :class="liveBannerOnly ? 'w-full' : 'w-full bg-[#0f1718] py-14 px-4 sm:px-6 lg:px-8'">
+        <div class="mx-auto max-w-6xl">
             <div
                 v-if="mostrarBannerEnVivo"
                 :class="[
-                    'rounded-3xl border border-red-500/40 bg-linear-to-r from-red-600/20 via-red-500/15 to-black/40 shadow-[0_16px_40px_rgba(0,0,0,0.24)]',
-                    compactBanner ? 'p-3 sm:p-4' : 'p-4 sm:p-5',
-                    liveBannerOnly ? 'backdrop-blur-md' : 'mb-6'
+                    'overflow-hidden rounded-4xl border border-white/10 bg-[#162122]/90 shadow-[0_18px_40px_rgba(0,0,0,0.2)] backdrop-blur-sm',
+                    compactBanner ? 'px-4 py-3 sm:px-5' : 'mb-8 px-5 py-5 sm:px-6 sm:py-6'
                 ]"
             >
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div class="text-center sm:text-left">
                         <div :class="[
-                            'inline-flex items-center gap-2 rounded-full bg-red-500 font-black uppercase tracking-[0.2em] text-white',
+                            'inline-flex items-center gap-2 rounded-full bg-[#3a1719] text-[#ffb4ae] font-black uppercase tracking-[0.18em]',
                             compactBanner ? 'px-2.5 py-1 text-[10px]' : 'px-3 py-1 text-[11px]'
                         ]">
-                            <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                            <span class="h-2 w-2 rounded-full bg-[#ef4444] animate-pulse"></span>
                             En vivo
                         </div>
-                        <p v-if="!compactBanner" :class="['text-white font-black mt-3', compactBanner ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl']">Se esta jugando ahora</p>
-                        <p :class="['text-white/80 mt-1.5', compactBanner ? 'text-xs sm:text-sm' : 'text-sm sm:text-base']">
-                            {{ proximoPartido.equipo1.nombre }} vs {{ proximoPartido.equipo2.nombre }}
-                            <span class="text-red-300 font-bold">• {{ proximoPartido.liga }}</span>
+                        <p v-if="!compactBanner" class="mt-3 text-lg font-bold text-white sm:text-xl">
+                            Se está jugando ahora
                         </p>
-                        <p :class="['text-red-200 font-bold uppercase tracking-[0.18em] mt-2', compactBanner ? 'text-[11px] sm:text-xs' : 'text-xs sm:text-sm']">
+                        <p :class="['mt-1.5 text-white/78', compactBanner ? 'text-xs sm:text-sm' : 'text-sm sm:text-base']">
+                            {{ proximoPartido.equipo1.nombre }} vs {{ proximoPartido.equipo2.nombre }}
+                            <span class="font-semibold text-primary">• {{ proximoPartido.liga }}</span>
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-3 sm:items-end">
+                        <p :class="['font-black uppercase tracking-[0.18em] text-[#b42318]', compactBanner ? 'text-[11px] sm:text-xs' : 'text-xs sm:text-sm']">
                             {{ obtenerEtiquetaTiempoPartido(proximoPartido) }}
                         </p>
                         <a
                             v-if="detailsHref"
                             :href="detailsHref"
                             @click.prevent="irAMasDetalles"
-                            class="inline-flex mt-3 items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-white hover:bg-white/12"
+                            class="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/6 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-white transition-colors duration-200 hover:bg-white/10"
                         >
-                            Ver mas detalles
+                            Ver más detalles
                             <span aria-hidden="true">↓</span>
                         </a>
                     </div>
-
-                
                 </div>
             </div>
 
-            <div v-if="!liveBannerOnly" class="grid lg:grid-cols-5 grid-cols-1 gap-8">
-                <!-- Próximo Partido -->
-                <div class="col-span-2 border-5 border-primary-dark bg-black/50 p-8 rounded-lg">
-                    <div class="flex items-center justify-between mb-8">
-                        <h2 class="text-white font-bold text-lg tracking-wide">PRÓXIMO PARTIDO</h2>
-                        <span class="text-primary text-2xl">→</span>
+            <div v-if="!liveBannerOnly" class="grid gap-5 lg:grid-cols-2">
+                <article class="rounded-4xl border border-primary bg-[#162122] px-5 py-6 shadow-[0_18px_36px_rgba(0,0,0,0.18)] sm:px-6 sm:py-7">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-[0.8rem] font-bold italic tracking-[0.04em] text-white/62">Próximo encuentro</p>
+                            <h2 class="mt-2 text-[clamp(1.9rem,4vw,3rem)] font-black uppercase leading-[0.92] text-white" style="font-family: 'Gobold High', sans-serif;">
+                                Próximo partido
+                            </h2>
+                        </div>
+                        <span class="mt-1 rounded-full bg-primary/12 px-3 py-1 text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">
+                            {{ proximoPartido?.liga || 'Agenda' }}
+                        </span>
                     </div>
 
-                    <div v-if="proximoPartido" class="space-y-6">
-                        <!-- Fecha y Liga -->
-                        <div class="text-center space-y-1">
-                            <p class="text-white text-sm uppercase">{{ proximoPartido.fecha }}</p>
-                            <p class="text-white/70 text-xs uppercase">{{ proximoPartido.liga }}</p>
-                                                        <p v-if="proximoPartido.equipoCategoria" class="text-primary text-[11px] font-bold uppercase">
-                                                            Equipo: {{ proximoPartido.equipoCategoria }}
-                                                        </p>
+                    <div v-if="proximoPartido" class="mt-6 space-y-6">
+                        <div class="text-center space-y-2">
+                            <p class="text-sm font-semibold uppercase tracking-[0.14em] text-white/78">{{ proximoPartido.fecha }}</p>
+                            <p class="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-white/48">{{ proximoPartido.hora }}</p>
+                            <p v-if="proximoPartido.equipoCategoria" class="text-[0.72rem] font-black uppercase tracking-[0.18em] text-primary">
+                                {{ proximoPartido.equipoCategoria }}
+                            </p>
                         </div>
 
-                        <!-- Equipos -->
-                        <div class="flex items-center justify-between gap-3">
-                            <div class="flex flex-col items-center gap-2">
-                                <img v-if="proximoPartido.equipo1.logo" :src="proximoPartido.equipo1.logo" :alt="proximoPartido.equipo1.nombre"
-                                    class="w-16 h-16 object-contain">
-                                <p class="text-white text-sm font-bold">{{ proximoPartido.equipo1.nombre }}</p>
+                        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-4xl bg-[#1b292a] px-4 py-5 sm:px-5">
+                            <div class="flex flex-col items-center gap-3 text-center">
+                                <img
+                                    v-if="proximoPartido.equipo1.logo"
+                                    :src="proximoPartido.equipo1.logo"
+                                    :alt="proximoPartido.equipo1.nombre"
+                                    class="h-16 w-16 object-contain sm:h-20 sm:w-20"
+                                >
+                                <p class="text-sm font-bold text-white">{{ proximoPartido.equipo1.nombre }}</p>
                             </div>
 
-                            <div class="text-center p-4 bg-primary rounded-lg min-w-28">
+                            <div class="rounded-[1.6rem] bg-[#101819] px-4 py-3 text-center shadow-[0_10px_24px_rgba(0,0,0,0.16)]">
                                 <div v-if="proximoPartido.estado === 'EN_CURSO'" class="space-y-2">
-                                    <!-- Mostrar resultado en tiempo real -->
-                                    <div class="flex gap-1 justify-center">
-                                        <span class="bg-black text-white font-black px-2 py-1 rounded text-sm">{{ proximoPartido.golesLocal }}</span>
-                                        <span class="text-white/70 font-bold">-</span>
-                                        <span class="bg-black text-white font-black px-2 py-1 rounded text-sm">{{ proximoPartido.golesVisita }}</span>
+                                    <div class="flex items-center justify-center gap-2 text-[1.1rem] font-black text-white">
+                                        <span>{{ proximoPartido.golesLocal }}</span>
+                                        <span class="text-white/40">-</span>
+                                        <span>{{ proximoPartido.golesVisita }}</span>
                                     </div>
-                                    <p class="text-xs font-bold text-black animate-pulse">{{ obtenerEtiquetaTiempoPartido(proximoPartido) }}</p>
-                                    <div v-if="proximoPartido.goleadoresLocal && proximoPartido.goleadoresLocal.length" class="mt-2">
-                                        <p class="text-xs text-white/70">Goleadoras:</p>
-                                        <ul class="text-white text-sm list-disc list-inside">
-                                            <li v-for="(gol, idx) in proximoPartido.goleadoresLocal" :key="idx">
-                                                {{ gol.jugadora }}<span v-if="tieneMinutoValido(gol.minuto)"> (min {{ gol.minuto }})</span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div v-else>
-                                    <p class="text-xs font-black">{{ proximoPartido.hora }}</p>
-                                    <p class="text-[10px] font-bold mt-1" :class="proximoPartido.estado === 'EN_CURSO' ? 'text-red-700' : 'text-black/70'">
-                                      {{ proximoPartido.estado === 'EN_CURSO' ? 'EN CURSO' : 'PROGRAMADO' }}
+                                    <p class="text-[0.68rem] font-black uppercase tracking-[0.16em] text-[#b42318]">
+                                        {{ obtenerEtiquetaTiempoPartido(proximoPartido) }}
                                     </p>
                                 </div>
-                            </div>
-
-                            <div class="flex flex-col items-center gap-2">
-                                <img v-if="proximoPartido.equipo2.logo" :src="proximoPartido.equipo2.logo" :alt="proximoPartido.equipo2.nombre"
-                                    class="w-16 h-16 object-contain">
-                                <p class="text-white text-sm font-bold">{{ proximoPartido.equipo2.nombre }}</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Lugar del partido -->
-                        <div class="text-center space-y-1">
-                            <p class="text-white/70 text-xs">📍 {{ proximoPartido.lugar }}</p>
-                            <p v-if="proximoPartido.numeroFecha" class="text-primary text-[11px] font-bold uppercase">Fecha {{ proximoPartido.numeroFecha }}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Mensaje cuando no hay próximo partido -->
-                    <div v-else class="text-center py-8">
-                        <p class="text-white/50 text-sm">No hay partidos programados próximamente</p>
-                    </div>
-                </div>
-
-                <!-- Logo Vikingas Centro -->
-                <div class="hidden lg:block ">
-                    <div class="col-span-1 flex items-center justify-center">
-                        <img src="https://firebasestorage.googleapis.com/v0/b/fitapp-4fa5d.firebasestorage.app/o/VIKINGAS.svg?alt=media&token=9d4b0792-2e5a-4fe5-a1b7-f9f34a3b9099"
-                            alt="Vikingas" class="h-32 w-auto">
-                    </div>
-                </div>
-                    <p class="block lg:hidden font-bold text-white text-center text-4xl tracking-wider">VIKINGAS</p>
-
-
-
-                <!-- Último Partido -->
-                <div class="col-span-2 border-5 border-primary bg-black/50 p-8 rounded-lg">
-                    <div class="flex items-center justify-between mb-8">
-                        <h2 class="text-white font-bold text-lg tracking-wide">ÚLTIMO PARTIDO</h2>
-                        <span class="text-primary text-2xl">→</span>
-                    </div>
-
-                    <div v-if="ultimoPartido" class="space-y-6">
-                        <!-- Fecha y Liga -->
-                        <div class="text-center space-y-1">
-                            <p class="text-white text-sm uppercase">{{ ultimoPartido.fecha }}</p>
-                            <p class="text-white/70 text-xs uppercase">{{ ultimoPartido.liga }}</p>
-                        </div>
-
-                        <!-- Equipos y Resultado -->
-                        <div class="flex items-center justify-between">
-                            <div class="flex flex-col items-center gap-2">
-                                <img :src="ultimoPartido.equipo1.logo || logoUrlVikingas" :alt="ultimoPartido.equipo1.nombre"
-                                    class="w-16 h-16">
-                                <p class="text-white text-sm font-bold">{{ ultimoPartido.equipo1.nombre }}</p>
-                            </div>
-
-                            <div class="text-center space-y-2">
-                                <div class="flex gap-2 justify-center">
-                                    <span class="bg-primary text-black font-bold px-3 py-1 rounded text-lg">{{
-                                        ultimoPartido.resultado.equipo1 }}</span>
-                                    <span class="text-white/50">-</span>
-                                    <span class="bg-primary text-black font-bold px-3 py-1 rounded text-lg">{{
-                                        ultimoPartido.resultado.equipo2 }}</span>
+                                <div v-else>
+                                    <p class="text-sm font-black uppercase tracking-[0.12em] text-white">{{ proximoPartido.hora }}</p>
+                                    <p class="mt-1 text-[0.65rem] font-black uppercase tracking-[0.18em] text-white/42">Programado</p>
                                 </div>
                             </div>
 
-                            <div class="flex flex-col items-center gap-2">
-                                <img v-if="ultimoPartido.equipo2.logo" :src="ultimoPartido.equipo2.logo" :alt="ultimoPartido.equipo2.nombre"
-                                    class="w-16 h-16 object-contain">
-                                <p class="text-white text-sm font-bold">{{ ultimoPartido.equipo2.nombre }}</p>
+                            <div class="flex flex-col items-center gap-3 text-center">
+                                <img
+                                    v-if="proximoPartido.equipo2.logo"
+                                    :src="proximoPartido.equipo2.logo"
+                                    :alt="proximoPartido.equipo2.nombre"
+                                    class="h-16 w-16 object-contain sm:h-20 sm:w-20"
+                                >
+                                <p class="text-sm font-bold text-white">{{ proximoPartido.equipo2.nombre }}</p>
                             </div>
                         </div>
 
-                        <div v-if="ultimoPartido.goleadoresLocal && ultimoPartido.goleadoresLocal.length" class="rounded-2xl border border-white/10 bg-black/30 p-4">
-                            <button
-                                @click="mostrarGoleadorasUltimoPartido = true"
-                                class="w-full flex items-center justify-between gap-3 text-left"
-                            >
-                                <div>
-                                    <p class="text-primary text-[11px] font-black uppercase tracking-[0.18em]">Resumen del partido</p>
-                                    <p class="text-white font-bold text-sm mt-1">Ver goleadoras de Vikingas</p>
-                                </div>
-                                <span class="text-primary text-xs font-black uppercase">Abrir</span>
-                            </button>
+                        <div class="flex flex-col items-center justify-center gap-2 text-center">
+                            <p class="text-sm text-white/62">{{ proximoPartido.lugar }}</p>
+                            <p v-if="proximoPartido.numeroFecha" class="text-[0.72rem] font-black uppercase tracking-[0.18em] text-primary">
+                                Fecha {{ proximoPartido.numeroFecha }}
+                            </p>
+                        </div>
+
+                        <div v-if="proximoPartido.goleadoresLocal && proximoPartido.goleadoresLocal.length && proximoPartido.estado === 'EN_CURSO'" class="rounded-[1.6rem] bg-[#1b292a] px-4 py-4">
+                            <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Goleadoras de Vikingas</p>
+                            <ul class="mt-2 space-y-1 text-sm text-white/78">
+                                <li v-for="(gol, idx) in proximoPartido.goleadoresLocal" :key="`gol-en-vivo-${idx}`">
+                                    {{ gol.jugadora }}<span v-if="tieneMinutoValido(gol.minuto)"> · {{ gol.minuto }}'</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
-                </div>
+
+                    <div v-else class="mt-6 rounded-[1.8rem] bg-[#1b292a] px-5 py-8 text-center text-sm text-white/46">
+                        No hay partidos programados próximamente.
+                    </div>
+                </article>
+
+                <article class="rounded-4xl border border-primary bg-[#162122] px-5 py-6 shadow-[0_18px_36px_rgba(0,0,0,0.18)] sm:px-6 sm:py-7">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-[0.8rem] font-bold italic tracking-[0.04em] text-white/62">Lo más reciente</p>
+                            <h2 class="mt-2 text-[clamp(1.9rem,4vw,3rem)] font-black uppercase leading-[0.92] text-white" style="font-family: 'Gobold High', sans-serif;">
+                                Último partido
+                            </h2>
+                        </div>
+                        <img :src="logoUrlVikingas" alt="Escudo Vikingas" class="h-12 w-12 object-contain opacity-90">
+                    </div>
+
+                    <div v-if="ultimoPartido" class="mt-6 space-y-6">
+                        <div class="text-center space-y-2">
+                            <p class="text-sm font-semibold uppercase tracking-[0.14em] text-white/78">{{ ultimoPartido.fecha }}</p>
+                            <p class="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-white/48">{{ ultimoPartido.liga }}</p>
+                        </div>
+
+                        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-4xl bg-[#1b292a] px-4 py-5 sm:px-5">
+                            <div class="flex flex-col items-center gap-3 text-center">
+                                <img
+                                    :src="ultimoPartido.equipo1.logo || logoUrlVikingas"
+                                    :alt="ultimoPartido.equipo1.nombre"
+                                    class="h-16 w-16 object-contain sm:h-20 sm:w-20"
+                                >
+                                <p class="text-sm font-bold text-white">{{ ultimoPartido.equipo1.nombre }}</p>
+                            </div>
+
+                            <div class="rounded-[1.6rem] bg-[#101819] px-4 py-3 text-center shadow-[0_10px_24px_rgba(0,0,0,0.16)]">
+                                <div class="flex items-center justify-center gap-2 text-[1.2rem] font-black text-white">
+                                    <span>{{ ultimoPartido.resultado.equipo1 }}</span>
+                                    <span class="text-white/40">-</span>
+                                    <span>{{ ultimoPartido.resultado.equipo2 }}</span>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col items-center gap-3 text-center">
+                                <img
+                                    v-if="ultimoPartido.equipo2.logo"
+                                    :src="ultimoPartido.equipo2.logo"
+                                    :alt="ultimoPartido.equipo2.nombre"
+                                    class="h-16 w-16 object-contain sm:h-20 sm:w-20"
+                                >
+                                <p class="text-sm font-bold text-white">{{ ultimoPartido.equipo2.nombre }}</p>
+                            </div>
+                        </div>
+
+                        <button
+                            v-if="ultimoPartido.goleadoresLocal && ultimoPartido.goleadoresLocal.length"
+                            @click="mostrarGoleadorasUltimoPartido = true"
+                            class="flex w-full items-center justify-between gap-3 rounded-[1.6rem] border border-white/10 bg-[#1b292a] px-4 py-4 text-left transition-colors duration-200 hover:bg-[#213132]"
+                        >
+                            <div>
+                                <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Resumen</p>
+                                <p class="mt-1 text-sm font-bold text-white">Ver goleadoras de Vikingas</p>
+                            </div>
+                            <span class="text-[0.72rem] font-black uppercase tracking-[0.18em] text-white/50">Abrir</span>
+                        </button>
+                    </div>
+
+                    <div v-else class="mt-6 rounded-[1.8rem] bg-[#1b292a] px-5 py-8 text-center text-sm text-white/46">
+                        Aún no hay un resultado reciente para mostrar.
+                    </div>
+                </article>
             </div>
         </div>
 
         <div
             v-if="mostrarGoleadorasUltimoPartido && ultimoPartido && ultimoPartido.goleadoresLocal && ultimoPartido.goleadoresLocal.length"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-[#0d2021]/52 p-4 backdrop-blur-sm"
             @click.self="mostrarGoleadorasUltimoPartido = false"
         >
-            <div class="w-full max-w-lg rounded-3xl border border-primary/25 bg-[#071311] p-5 sm:p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
-                <div class="flex items-start justify-between gap-4 mb-5">
+            <div class="w-full max-w-lg rounded-4xl border border-white/10 bg-[#162122] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.26)] sm:p-6">
+                <div class="mb-5 flex items-start justify-between gap-4">
                     <div>
-                        <p class="text-primary text-[11px] font-black uppercase tracking-[0.2em]">Último partido</p>
-                        <h3 class="text-white text-xl sm:text-2xl font-black mt-2">Goleadoras de Vikingas</h3>
-                        <p class="text-white/60 text-sm mt-1">{{ ultimoPartido.equipo1.nombre }} vs {{ ultimoPartido.equipo2.nombre }}</p>
+                        <p class="text-[0.68rem] font-black uppercase tracking-[0.2em] text-primary">Último partido</p>
+                        <h3 class="mt-2 text-xl font-black text-white sm:text-2xl">Goleadoras de Vikingas</h3>
+                        <p class="mt-1 text-sm text-white/58">{{ ultimoPartido.equipo1.nombre }} vs {{ ultimoPartido.equipo2.nombre }}</p>
                     </div>
 
                     <button
                         @click="mostrarGoleadorasUltimoPartido = false"
-                        class="shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-white hover:bg-white/10"
+                        class="shrink-0 rounded-full border border-white/10 bg-white/6 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-white hover:bg-white/10"
                     >
                         Cerrar
                     </button>
                 </div>
 
-                <div class="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
+                <div class="max-h-[60vh] space-y-2 overflow-y-auto pr-1">
                     <div
                         v-for="(gol, idx) in ultimoPartido.goleadoresLocal"
                         :key="`modal-ultimo-gol-${idx}`"
-                        class="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-white/5 px-4 py-3 text-sm text-white"
+                        class="flex items-center justify-between gap-3 rounded-[1.4rem] border border-white/8 bg-[#1b292a] px-4 py-3 text-sm text-white"
                     >
                         <span class="font-semibold">{{ gol.jugadoraNombre || gol.jugadora }}</span>
-                        <span v-if="tieneMinutoValido(gol.minuto)" class="text-primary font-black">{{ gol.minuto }}'</span>
-                        <span v-else class="text-white/40 text-xs font-bold uppercase">Gol</span>
+                        <span v-if="tieneMinutoValido(gol.minuto)" class="font-black text-primary">{{ gol.minuto }}'</span>
+                        <span v-else class="text-xs font-bold uppercase text-white/40">Gol</span>
                     </div>
                 </div>
             </div>

@@ -4,8 +4,8 @@
   "description": "Club Deportivo de Fútbol Femenino - Puente Alto",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#00ECB1",
+  "background_color": "#0b1112",
+  "theme_color": "#0b1112",
   "orientation": "portrait-primary",
   "icons": [
     {

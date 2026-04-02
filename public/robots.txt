@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /login
+Disallow: /login-jugadora
+Disallow: /solicitud-acceso
+Disallow: /completar-perfil
+Disallow: /seleccionar-categoria
+Disallow: /entrenamientos
+Disallow: /perfil
+
+Sitemap: https://clubdeportivovikingas.cl/sitemap.xml

@@ -64,6 +64,7 @@
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
+              @click="trackOutboundClick('https://instagram.com/cdvikingas', 'Instagram nav')"
               class="text-black hover:text-black/70 transition-colors"
             >
               <svg class="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -146,6 +147,7 @@ import {
   UserIcon,
   ShieldCheckIcon
 } from '@heroicons/vue/24/outline';
+import { trackOutboundClick } from '../composables/useAnalytics';
 
 const isMenuOpen = ref(false);
 const brandName = 'Vikingas';
@@ -157,7 +159,7 @@ const navLinks = [
   { id: 3, label: 'Equipo', path: '/equipo', icon: UserGroupIcon },
   { id: 4, label: 'Competencias', path: '/competencias', icon: TrophyIcon },
   { id: 5, label: 'Estadísticas', path: '/estadisticas', icon: ChartBarIcon },
-  { id: 6, label: 'Indumentarias', path: '/indumentarias', icon: PhotoIcon },
+  { id: 6, label: 'Indumentaria', path: '/indumentaria', icon: PhotoIcon },
   { id: 7, label: 'Fotos', path: '/fotos', icon: PhotoIcon },
   { id: 8, label: 'Contacto', path: '/contacto', icon: EnvelopeIcon },
 ];
