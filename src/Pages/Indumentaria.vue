@@ -98,18 +98,18 @@
       <div class="indu-fade mt-14 rounded-4xl border border-(--indu-primary)/20 bg-[linear-gradient(135deg,rgba(44,207,191,0.08),rgba(216,178,85,0.06))] px-6 py-10 sm:px-10 lg:mt-18 lg:px-14 lg:py-14">
         <div class="grid items-center gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <div>
-            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--indu-primary)">Poder femenino</p>
+            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--indu-primary)">Amor a la camiseta</p>
             <h3 class="mt-3 text-[clamp(2rem,4vw,3.2rem)] font-black uppercase leading-[0.94] text-white" style="font-family: 'Gobold High', sans-serif;">
-              Vestir estos colores<br>es una actitud
+              La camiseta<br>se transpira
             </h3>
             <p class="mt-5 max-w-xl text-[1rem] leading-8 text-white/78 sm:text-[1.05rem]">
-              En un deporte donde todavía toca pelear por espacios, cada vez que una jugadora se pone esta camiseta dice algo claro: estoy acá, pertenezco, y no necesito que nadie me dé permiso.
+              Esta camiseta tiene historia. La de cada una que llegó sin conocer a nadie y hoy no se imagina un fin de semana sin cancha. La de las que se quedaron cuando todo costaba el doble.
             </p>
             <p class="mt-4 max-w-xl text-[1rem] leading-8 text-white/78 sm:text-[1.05rem]">
-              La ropa de Vikingas no es solo indumentaria deportiva. Es la piel del club. Es barrio, es garra, es el símbolo de mujeres que se cansaron de esperar y armaron su propia cancha.
+              Venimos de la cancha de cemento, de la falta de espacios, de hacernos un lugar entre la vida cotidiana para volver a jugar. Eso se nota en cada tela, en cada color, en cada detalle. Esto es ropa de cancha, de barrio, de club de verdad.
             </p>
             <p class="mt-4 max-w-xl text-[1rem] leading-8 text-white/78 sm:text-[1.05rem]">
-              Somos mujeres que volvieron a la pelota cuando el mundo les decía que ya no era tiempo. Y esta camiseta lo grita.
+              Este club pasó por todo: temporadas difíciles, lesiones, derrotas que dolieron y días en que éramos pocas. Y seguimos acá. Con la camiseta puesta por las que fueron, por las que somos, por las que serán.
             </p>
           </div>
           <div class="relative">

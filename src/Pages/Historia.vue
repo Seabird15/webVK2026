@@ -131,15 +131,18 @@
       <div class="historia-fade mt-14 rounded-4xl border border-(--historia-primary)/20 bg-[linear-gradient(135deg,rgba(44,207,191,0.08),rgba(216,178,85,0.06))] px-6 py-10 sm:px-10 lg:mt-18 lg:px-14 lg:py-14">
         <div class="grid items-center gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <div>
-            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">Por y para mujeres</p>
+            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">Legado y pertenencia</p>
             <h3 class="mt-3 text-[clamp(2rem,4vw,3.4rem)] font-black uppercase leading-15 text-white" style="font-family: 'Gobold High', sans-serif;">
               Nosotras al centro,<br>siempre
             </h3>
             <p class="mt-5 max-w-xl text-[1rem] leading-8 text-white/78 sm:text-[1.05rem]">
-              Vikingas existe porque mujeres decidieron crear su propio espacio en el fútbol. No esperamos que alguien nos abriera la puerta: la abrimos nosotras. Y seguiremos abriéndola para que lleguen más.
+              Vikingas existe porque hubo mujeres que siguieron incluso cuando era difícil. Cuando faltaban espacios, tiempo, energía o respuestas, el club se sostuvo igual: estando juntas.
             </p>
             <p class="mt-4 max-w-xl text-[1rem] leading-8 text-white/78 sm:text-[1.05rem]">
-              Creemos en los procesos, en nuestras jugadoras, en formarnos paso a paso. Si logramos cosas —y las logramos— es porque tomamos el camino difícil, el más bonito: el que se construye con paciencia, compromiso y la convicción de que las mujeres merecemos más canchas, más espacios y más voz.
+              Nuestra historia también está hecha de derrotas que dolieron, de lesiones, de días en que parecía más fácil soltar que seguir. Pero siempre hubo una al lado de la otra para empujar, esperar, volver y no dejar caer lo que habíamos construido.
+            </p>
+            <p class="mt-4 max-w-xl text-[1rem] leading-8 text-white/78 sm:text-[1.05rem]">
+              Por eso este club tiene sentido de pertenencia de verdad: porque aprendimos a pasar los momentos difíciles juntas y a seguir juntas. Así se hizo Vikingas, y así queremos que siga creciendo.
             </p>
           </div>
           <div class="relative">
@@ -196,13 +199,6 @@ const chapters = [
   }
 ]
 
-const values = [
-  'Sentido de pertenencia',
-  'Comunidad',
-  'Procesos',
-  'Espacio seguro',
-  'Lazos más allá del fútbol'
-]
 
 const achievements = [
   'Campeonas Oro Liga Dobleve Ascenso 2024',
