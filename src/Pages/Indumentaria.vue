@@ -12,28 +12,28 @@
       <div class="mx-auto grid min-h-100 max-w-7xl items-end gap-8 px-4 pb-12 pt-14 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.9fr)] lg:px-8 lg:pb-16 lg:pt-18">
         <div class="relative z-10 max-w-2xl">
           <p class="indu-fade text-sm font-semibold italic text-white/70 sm:text-base">
-            Más que una camiseta
+            {{ pageContent.hero.kicker }}
           </p>
           <h1 class="indu-fade mt-4 uppercase leading-[0.88]" style="font-family: 'Gobold High', sans-serif; font-size: clamp(3.5rem, 12vw, 7.5rem);">
-            <span class="block text-transparent [-webkit-text-stroke:1.5px_rgba(247,255,253,0.85)]">Nuestra</span>
-            <span class="block text-white">Camiseta</span>
+            <span class="block text-transparent [-webkit-text-stroke:1.5px_rgba(247,255,253,0.85)]">{{ pageContent.hero.titleStroke }}</span>
+            <span class="block text-white">{{ pageContent.hero.titleFill }}</span>
           </h1>
           <p class="indu-fade mt-6 max-w-xl text-[clamp(1rem,2.6vw,1.28rem)] leading-relaxed text-white/80">
-            Ponerse estos colores es cargar con la historia de un barrio, la fuerza de un grupo de mujeres y el orgullo de ser parte de algo que se levantó de verdad.
+            {{ pageContent.hero.description }}
           </p>
         </div>
 
         <div class="indu-fade relative z-10 lg:justify-self-end">
           <div class="relative overflow-hidden rounded-[2.2rem] border border-white/10 bg-white/6 p-3 shadow-[0_24px_60px_rgba(0,0,0,0.22)] backdrop-blur-sm">
             <img
-              :src="imgCamiseta2026"
-              alt="Camiseta Vikingas 2026"
-              class="h-80 w-full rounded-[1.7rem] object-cover sm:h-96 lg:w-112"
+              :src="pageContent.hero.image"
+              :alt="pageContent.hero.imageAlt"
+              class="h-80 w-full rounded-[1.7rem] object-cover sm:h-96 lg:w-md"
             >
             <div class="absolute inset-x-6 bottom-6 rounded-[1.6rem] bg-[rgba(10,17,18,0.74)] px-5 py-4 backdrop-blur-sm">
-              <p class="text-[0.72rem] font-black uppercase tracking-[0.2em] text-(--indu-primary)">Colección 2026</p>
+              <p class="text-[0.72rem] font-black uppercase tracking-[0.2em] text-(--indu-primary)">{{ pageContent.hero.badge }}</p>
               <p class="mt-2 text-sm leading-6 text-white/80 sm:text-base">
-                Diseñada con identidad. Usada con orgullo.
+                {{ pageContent.hero.caption }}
               </p>
             </div>
           </div>
@@ -46,24 +46,35 @@
       <div class="indu-paper indu-fade rounded-4xl px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
         <div class="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-10">
           <div>
-            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--indu-primary)">Identidad en cada tela</p>
+            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--indu-primary)">{{ pageContent.identity.kicker }}</p>
             <h2 class="mt-3 text-[clamp(2rem,4vw,3.2rem)] font-black uppercase leading-15 text-(--indu-ink)" style="font-family: 'Gobold High', sans-serif;">
-              Colores de barrio, fuerza de equipo
+              {{ pageContent.identity.title }}
             </h2>
           </div>
 
           <div class="space-y-4 text-[1rem] leading-8 text-(--indu-muted) sm:text-[1.05rem]">
-            <p>
-              Cada prenda de Vikingas nace del mismo lugar que el club: de la calle, del esfuerzo colectivo, de la convicción de que las mujeres merecemos un espacio propio en el fútbol. Ponerse la camiseta no es un gesto simbólico — es una declaración.
-            </p>
-            <p>
-              No seguimos tendencias, seguimos nuestra historia. Cada diseño lleva trazos de lo que somos: barrio, comunidad y mujeres que no piden permiso pa' estar en la cancha.
+            <p v-for="paragraph in pageContent.identity.paragraphs" :key="paragraph">
+              {{ paragraph }}
             </p>
           </div>
         </div>
       </div>
 
       <!-- Prendas destacadas -->
+      <div class="mt-10 flex items-end justify-between gap-4 lg:mt-14">
+        <div>
+          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--indu-primary)">{{ pageContent.catalog.kicker }}</p>
+          <h2 class="mt-3 text-[clamp(1.8rem,4vw,3rem)] font-black uppercase leading-[0.95] text-white" style="font-family: 'Gobold High', sans-serif;">
+            {{ pageContent.catalog.title }}
+          </h2>
+        </div>
+        <p class="hidden max-w-sm text-right text-sm leading-6 text-white/55 lg:block">
+          {{ pageContent.catalog.description }}
+        </p>
+      </div>
+      <p class="mt-4 max-w-2xl text-[1rem] leading-7 text-white/68 lg:hidden">
+        {{ pageContent.catalog.description }}
+      </p>
       <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3">
         <article
           v-for="item in prendas"
@@ -84,12 +95,24 @@
             >
               {{ item.tag }}
             </span>
+            <span
+              v-if="item.valor"
+              class="absolute bottom-4 right-4 rounded-full border border-white/15 bg-[rgba(8,18,19,0.8)] px-3 py-1 text-xl font-black uppercase tracking-[0.12em] text-white backdrop-blur-sm"
+            >
+              {{ item.valor }}
+            </span>
           </div>
           <div class="px-5 pb-5 pt-4">
-            <h3 class="text-lg font-black uppercase tracking-wide text-white" style="font-family: 'Gobold High', sans-serif;">
-              {{ item.nombre }}
-            </h3>
-            <p class="mt-1 text-sm leading-relaxed text-white/60">{{ item.desc }}</p>
+            <div class="flex items-start justify-between gap-4">
+              <h3 class="text-2xl font-400 uppercase tracking-widest text-white" style="font-family: 'Gobold High', sans-serif;">
+                {{ item.nombre }}
+              </h3>
+              <p v-if="item.categoria" class="shrink-0 text-[0.72rem] font-black uppercase tracking-[0.16em] text-(--indu-primary)">
+                {{ item.categoria }}
+              </p>
+            </div>
+            <p class="mt-3 text-sm font-semibold uppercase tracking-[0.08em] text-white/82">{{ item.subtitulo }}</p>
+            <p class="mt-2 text-sm leading-relaxed text-white/60">{{ item.desc }}</p>
           </div>
         </article>
       </div>
@@ -98,26 +121,24 @@
       <div class="indu-fade mt-14 rounded-4xl border border-(--indu-primary)/20 bg-[linear-gradient(135deg,rgba(44,207,191,0.08),rgba(216,178,85,0.06))] px-6 py-10 sm:px-10 lg:mt-18 lg:px-14 lg:py-14">
         <div class="grid items-center gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <div>
-            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--indu-primary)">Amor a la camiseta</p>
-            <h3 class="mt-3 text-[clamp(2rem,4vw,3.2rem)] font-black uppercase leading-[0.94] text-white" style="font-family: 'Gobold High', sans-serif;">
-              La camiseta<br>se transpira
+            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--indu-primary)">{{ pageContent.story.kicker }}</p>
+            <h3 class="mt-3 text-[clamp(2rem,4vw,3.2rem)] font-black uppercase leading-14 text-white" style="font-family: 'Gobold High', sans-serif;">
+              {{ pageContent.story.titleTop }}<br>{{ pageContent.story.titleBottom }}
             </h3>
-            <p class="mt-5 max-w-xl text-[1rem] leading-8 text-white/78 sm:text-[1.05rem]">
-              Esta camiseta tiene historia. La de cada una que llegó sin conocer a nadie y hoy no se imagina un fin de semana sin cancha. La de las que se quedaron cuando todo costaba el doble.
-            </p>
-            <p class="mt-4 max-w-xl text-[1rem] leading-8 text-white/78 sm:text-[1.05rem]">
-              Venimos de la cancha de cemento, de la falta de espacios, de hacernos un lugar entre la vida cotidiana para volver a jugar. Eso se nota en cada tela, en cada color, en cada detalle. Esto es ropa de cancha, de barrio, de club de verdad.
-            </p>
-            <p class="mt-4 max-w-xl text-[1rem] leading-8 text-white/78 sm:text-[1.05rem]">
-              Este club pasó por todo: temporadas difíciles, lesiones, derrotas que dolieron y días en que éramos pocas. Y seguimos acá. Con la camiseta puesta por las que fueron, por las que somos, por las que serán.
+            <p
+              v-for="(paragraph, index) in pageContent.story.paragraphs"
+              :key="paragraph"
+              :class="index === 0 ? 'mt-5 max-w-xl text-[1rem] leading-8 text-white/78 sm:text-[1.05rem]' : 'mt-4 max-w-xl text-[1rem] leading-8 text-white/78 sm:text-[1.05rem]'"
+            >
+              {{ paragraph }}
             </p>
           </div>
           <div class="relative">
             <div class="absolute -inset-3 rounded-4xl bg-[linear-gradient(135deg,rgba(44,207,191,0.22),rgba(216,178,85,0.12)_60%,transparent)] blur-2xl"></div>
             <img
-              :src="imgCortavientos"
-              alt="Cortavientos oficial Vikingas"
-              class="relative h-80 w-full rounded-4xl object-cover shadow-[0_22px_56px_rgba(0,0,0,0.22)] sm:h-96"
+              :src="pageContent.story.image"
+              :alt="pageContent.story.imageAlt"
+              class="relative h-80 w-full rounded-4xl object-contain shadow-[0_22px_56px_rgba(0,0,0,0.22)] sm:h-96"
             >
           </div>
         </div>
@@ -125,22 +146,22 @@
 
       <!-- CTA consultar -->
       <div class="indu-fade mt-12 text-center lg:mt-16">
-        <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--indu-primary)">¿Te tincó algo?</p>
+        <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--indu-primary)">{{ pageContent.cta.kicker }}</p>
         <h3 class="mt-3 text-[clamp(1.8rem,4vw,3rem)] font-black uppercase leading-[0.95] text-white" style="font-family: 'Gobold High', sans-serif;">
-          Consulta por tu prenda
+          {{ pageContent.cta.title }}
         </h3>
         <p class="mx-auto mt-4 max-w-xl text-[1rem] leading-8 text-white/68 sm:text-[1.05rem]">
-          Camisetas, cortavientos, polerones y más. Escríbenos por Instagram para ver disponibilidad y tallas.
+          {{ pageContent.cta.description }}
         </p>
         <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
           <a
-            href="https://instagram.com/cdvikingas"
+            :href="pageContent.cta.link"
             target="_blank"
             rel="noopener noreferrer"
-            @click="trackOutboundClick('https://instagram.com/cdvikingas', 'Instagram indumentaria')"
+            @click="trackOutboundClick(pageContent.cta.link, pageContent.cta.analyticsLabel)"
             class="inline-flex min-h-14 items-center gap-3 rounded-[1.35rem] bg-white px-6 py-4 text-[#082022] shadow-[0_14px_28px_rgba(0,0,0,0.12)] transition-transform duration-200 hover:-translate-y-1"
           >
-            <span class="text-[0.92rem] font-black uppercase tracking-[0.08em]">Escribir por Instagram</span>
+            <span class="text-[0.92rem] font-black uppercase tracking-[0.08em]">{{ pageContent.cta.buttonText }}</span>
             <svg class="h-5 w-5 text-(--indu-primary)" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
@@ -151,7 +172,7 @@
       <!-- Frase cierre -->
       <div class="indu-fade mt-14 border-t border-white/10 pt-12 text-center lg:mt-18">
         <p class="mx-auto max-w-3xl text-[clamp(1.8rem,4vw,3.8rem)] font-black italic leading-tight text-white" style="font-family: 'Gobold High', sans-serif;">
-          No es merch. Es la piel de un club que se armó desde abajo, con barrio, con garra y con el orgullo de ser mujeres futbolistas que no le deben nada a nadie.
+          {{ pageContent.closingQuote }}
         </p>
       </div>
     </div>
@@ -161,49 +182,165 @@
 <script setup>
 import { trackOutboundClick } from '../composables/useAnalytics';
 
-const imgCamiseta2026 = new URL('../assets/Indumentaria/Camiseta 2026.jpeg', import.meta.url).href
-const imgCamiseta2025 = new URL('../assets/Indumentaria/Camiseta 2025 Frente.jpg', import.meta.url).href
-const imgArquera = new URL('../assets/Indumentaria/Camiseta Arquera 2025.jpg', import.meta.url).href
-const imgCortavientos = new URL('../assets/Indumentaria/Cortavientos 2025.jpg', import.meta.url).href
-const imgPoleron = new URL('../assets/Indumentaria/Poleron Canguro Morado.jpg', import.meta.url).href
-const imgCamiseta2024 = new URL('../assets/Indumentaria/Camiseta 2024.jpg', import.meta.url).href
+const imgCamiseta2026 = new URL('../assets/Indumentaria/Camiseta2026.jpeg', import.meta.url).href
+const imgArquera2025 = new URL('../assets/Indumentaria/CamisetaArquera2025.jpg', import.meta.url).href
+const imgCamisetaClaraEspalda = new URL('../assets/Indumentaria/CamisetaClara2025Espalda.jpg', import.meta.url).href
+const imgCamisetaClaraFrente = new URL('../assets/Indumentaria/CamisetaClara2025Frente.jpg', import.meta.url).href
+const imgCamisetaArqueras = new URL('../assets/Indumentaria/CamisetArqueras.png', import.meta.url).href
+const imgCamisetaTurquesa2024 = new URL('../assets/Indumentaria/CamisetaTurquesa2024.jpg', import.meta.url).href
+const imgCortavientos2025 = new URL('../assets/Indumentaria/Cortavientos2025.jpg', import.meta.url).href
+
+const imgHistoria = new URL('../assets/logoVk.png', import.meta.url).href
+
+const imgCuelloPolar = new URL('../assets/Indumentaria/CuelloPolar.png', import.meta.url).href
+const imgParkaVikingas = new URL('../assets/Indumentaria/Parka Vikingas.png', import.meta.url).href
+const imgPoleraVerde = new URL('../assets/Indumentaria/PoleraVerde.png', import.meta.url).href
+const imgShort = new URL('../assets/Indumentaria/short.PNG', import.meta.url).href
+const indumentariaCompleta = new URL('../assets/Indumentaria/indumentariaCompleta.jpeg', import.meta.url).href
+
+const pageContent = {
+  hero: {
+    kicker: 'Más que una camiseta',
+    titleStroke: 'Nuestra',
+    titleFill: 'Indumentaria',
+    description: 'Cada prenda de Vks es parte de nuestra historia, armadas con cariño e identidad para todo el Club.',
+    badge: 'Catálogo actualizado',
+    caption: 'Indumentarias 2026 Oficiales Vks',
+    image: imgCamiseta2026,
+    imageAlt: 'Camiseta oficial Vikingas 2026'
+  },
+  identity: {
+    kicker: 'Identidad en cada tela',
+    title: 'Colores de barrio, fuerza de equipo',
+    paragraphs: [
+      'Cada prenda de Vikingas nace del mismo lugar que el club: de la calle, del esfuerzo colectivo y de la convicción de que las mujeres merecemos un espacio propio en el fútbol.',
+    ]
+  },
+  catalog: {
+    kicker: 'Catálogo Vikingas',
+    title: 'Todas las prendas Vks',
+    description: 'Desde la camiseta oficial de cada temporada hasta la parka para entrenar en invierno...'
+  },
+  story: {
+    kicker: 'Amor a la camiseta',
+    titleTop: 'La camiseta',
+    titleBottom: 'se transpira',
+    paragraphs: [
+      'Esta camiseta tiene historia. La de cada una que llegó sin conocer a nadie y hoy no se imagina un fin de semana sin cancha.',
+      'Venimos de la cancha de cemento, de la falta de espacios y de hacernos un lugar entre la vida cotidiana para volver a jugar.',
+      'Por eso la indumentaria no es adorno: es memoria, presencia y orgullo de Club.'
+    ],
+    image: imgHistoria,
+    imageAlt: 'Cortavientos oficial Vikingas 2025'
+  },
+  cta: {
+    kicker: '¿Quieres pedir algo?',
+    title: 'Consulta por tu prenda',
+    description: 'Hablanos por Instagram o directamente con la Profe Yesi para anotarte en el próximo pedido.',
+    buttonText: 'Escribir por Instagram',
+    link: 'https://instagram.com/cdvikingas',
+    analyticsLabel: 'Instagram indumentaria'
+  },
+  closingQuote: 'No es merch. Es la piel de un club que se armó desde abajo, con barrio, con garra y con el orgullo de ser mujeres futbolistas que no le deben nada a nadie.'
+}
 
 const prendas = [
   {
     nombre: 'Camiseta 2026',
-    desc: 'La nueva piel del club. Diseño que honra la historia y mira pa\' adelante.',
+    subtitulo: 'OPCIONAL LOGO PRO $17.490',
+    valor: '14.990',
+    desc: 'Diseño principal de la temporada 2026.',
     image: imgCamiseta2026,
-    tag: 'Nueva'
+    tag: 'Nueva',
+    categoria: 'Cancha'
   },
   {
-    nombre: 'Camiseta 2025',
-    desc: 'Temporada de consagración. La camiseta que nos vio campeonas.',
-    image: imgCamiseta2025,
-    tag: null
+    nombre: 'Camiseta arquera 2025',
+    subtitulo: 'OPCIONAL LOGO PRO $17.490',
+    valor: '14.990',
+    desc: 'La camiseta de arquera. Opcional, manga larga.',
+    image: imgArquera2025,
+    tag: 'Arquera',
+    categoria: 'Portería'
   },
   {
-    nombre: 'Camiseta Arquera',
-    desc: 'Para las que cuidan el arco y sostienen al equipo desde atrás.',
-    image: imgArquera,
-    tag: null
+    nombre: 'Camiseta clara 2025',
+    subtitulo: 'OPCIONAL LOGO PRO $17.490',
+    valor: '14.990',
+    desc: 'Registro de la camiseta clara con dorsal, nombre y sponsor.',
+    image: imgCamisetaClaraEspalda,
+    tag: 'Espalda',
+    categoria: 'Cancha'
   },
   {
-    nombre: 'Cortavientos Oficial',
-    desc: 'Pa\' los días helados de cancha. Abrigo con actitud vikinga.',
-    image: imgCortavientos,
-    tag: null
+    nombre: 'Camiseta clara 2025 frente',
+    subtitulo: 'OPCIONAL LOGO PRO $17.490',
+    valor: '14.990',
+    desc: 'Foto frontal de la camiseta clara 2025.',
+    image: imgCamisetaClaraFrente,
+    tag: null,
+    categoria: 'Cancha'
   },
   {
-    nombre: 'Polerón Canguro',
-    desc: 'Comodidad de barrio, estilo de club. Pa\' dentro y fuera de la cancha.',
-    image: imgPoleron,
-    tag: null
+    nombre: 'Camiseta arqueras 2026',
+    subtitulo: 'OPCIONAL LOGO PRO $17.490',
+    valor: '14.990',
+    desc: 'Camiseta arqueras 2026.',
+    image: imgCamisetaArqueras,
+    tag: 'Set',
+    categoria: 'Portería'
   },
   {
-    nombre: 'Camiseta 2024',
-    desc: 'La primera camiseta que marcó una era. Clásica e irrepetible.',
-    image: imgCamiseta2024,
-    tag: 'Clásica'
+    nombre: 'Camiseta turquesa 2024',
+    subtitulo: 'Modelo clásico de cancha',
+    valor: '14.990',
+    desc: 'Camiseta temporada 2024',
+    image: imgCamisetaTurquesa2024,
+    tag: 'Clásica',
+    categoria: 'Cancha'
+  },
+  {
+    nombre: 'Cortavientos 2025',
+    valor: '18.000',
+    desc: 'Ideal para entrenar en días de viento o lluvia. A prueba de agua.',
+    image: imgCortavientos2025,
+    tag: 'Abrigo',
+    categoria: 'Invierno'
+  },
+  {
+    nombre: 'Cuello polar',
+    valor: '3.500',
+    desc: 'Complemento de invierno para los días más fríos, simple y funcional para entrenamientos nocturnos.',
+    image: imgCuelloPolar,
+    tag: null,
+    categoria: 'Accesorios'
+  },
+  {
+    nombre: 'Parka Vikingas',
+    subtitulo: 'Abrigo grueso de temporada',
+    valor: '40.000',
+    desc: 'Parka acolchada con insignia Vikingas, ideal para el frío. Se puede agregar número.',
+    image: imgParkaVikingas,
+    tag: 'Invierno',
+    categoria: 'Abrigo'
+  },
+  {
+    nombre: 'Polera alternativa Verde',
+    subtitulo: 'OPCIONAL LOGO PRO $17.490',
+    valor: '14.990',
+    desc: 'Polera alternativa 2026. Insignia, nombre y número.',
+    image: imgPoleraVerde,
+    tag: null,
+    categoria: 'Casual'
+  },
+  {
+    nombre: 'Camiseta 2024/2025/2026 + short oficial',
+    subtitulo: 'Indumentaria completa, Logo pro opcional',
+    valor: '20.990',
+    desc: 'Short negro con detalles turquesa y numeración visible, y camiseta oficial 2024/2025/2026.',
+    image: indumentariaCompleta,
+    tag: 'Uniforme',
+    categoria: 'Cancha'
   }
 ]
 </script>
