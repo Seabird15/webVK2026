@@ -180,7 +180,9 @@
 </template>
 
 <script setup>
+import { nextTick, onBeforeUnmount, onMounted } from 'vue';
 import { trackOutboundClick } from '../composables/useAnalytics';
+import { useLoader } from '../composables/useLoader.js';
 
 const imgCamiseta2026 = new URL('../assets/Indumentaria/Camiseta2026.jpeg', import.meta.url).href
 const imgHero = new URL('../assets/Indumentaria/Polera2026.png', import.meta.url).href
@@ -198,6 +200,9 @@ const imgParkaVikingas = new URL('../assets/Indumentaria/Parka Vikingas.png', im
 const imgPoleraVerde = new URL('../assets/Indumentaria/PoleraVerde.png', import.meta.url).href
 const imgShort = new URL('../assets/Indumentaria/short.PNG', import.meta.url).href
 const indumentariaCompleta = new URL('../assets/Indumentaria/indumentariaCompleta.jpeg', import.meta.url).href
+
+const { show, hide } = useLoader()
+const LOADER_MIN_DURATION = 600
 
 const pageContent = {
   hero: {
@@ -344,6 +349,58 @@ const prendas = [
     categoria: 'Cancha'
   }
 ]
+
+const preloadImage = (src) => new Promise((resolve) => {
+  const image = new Image()
+
+  image.onload = () => resolve(src)
+  image.onerror = () => resolve(src)
+  image.src = src
+
+  if (image.complete) {
+    resolve(src)
+  }
+})
+
+const preloadIndumentariaImages = async () => {
+  const sources = [
+    pageContent.hero.image,
+    pageContent.story.image,
+    ...prendas.map((item) => item.image)
+  ]
+
+  const uniqueSources = [...new Set(sources.filter(Boolean))]
+  await Promise.allSettled(uniqueSources.map(preloadImage))
+}
+
+const waitForPaint = async () => {
+  await nextTick()
+  await new Promise((resolve) => requestAnimationFrame(() => resolve()))
+}
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+onMounted(async () => {
+  show('Cargando indumentaria...')
+  const startedAt = Date.now()
+
+  try {
+    await waitForPaint()
+    await preloadIndumentariaImages()
+  } finally {
+    const elapsed = Date.now() - startedAt
+
+    if (elapsed < LOADER_MIN_DURATION) {
+      await wait(LOADER_MIN_DURATION - elapsed)
+    }
+
+    hide()
+  }
+})
+
+onBeforeUnmount(() => {
+  hide()
+})
 </script>
 
 <style scoped>
