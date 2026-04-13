@@ -2,19 +2,19 @@
   <section class="indumentaria-page overflow-hidden bg-(--indu-bg) text-(--indu-text)">
 
     <!-- Hero -->
-    <div class="relative isolate">
+    <div class="relative isolate overflow-hidden">
       <div class="absolute inset-0" aria-hidden="true">
         <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,17,18,0.18)_0%,rgba(11,17,18,0.78)_55%,rgba(11,17,18,0.98)_100%)]"></div>
-        <div class="absolute left-[-6%] top-16 h-56 w-56 rounded-full bg-(--indu-primary)/14 blur-3xl"></div>
-        <div class="absolute right-[-8%] top-0 h-64 w-64 rounded-full bg-(--indu-accent)/10 blur-3xl"></div>
+        <div class="absolute left-[-18%] top-16 h-44 w-44 rounded-full bg-(--indu-primary)/14 blur-3xl sm:left-[-10%] sm:h-52 sm:w-52 lg:left-[-6%] lg:h-56 lg:w-56"></div>
+        <div class="absolute right-[-14%] top-0 h-48 w-48 rounded-full bg-(--indu-accent)/10 blur-3xl sm:right-[-10%] sm:h-56 sm:w-56 lg:right-[-8%] lg:h-64 lg:w-64"></div>
       </div>
 
       <div class="mx-auto grid min-h-100 max-w-7xl items-end gap-8 px-4 pb-12 pt-14 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.9fr)] lg:px-8 lg:pb-16 lg:pt-18">
-        <div class="relative z-10 max-w-2xl">
+        <div class="relative z-10 min-w-0 max-w-2xl">
           <p class="indu-fade text-sm font-semibold italic text-white/70 sm:text-base">
             {{ pageContent.hero.kicker }}
           </p>
-          <h1 class="indu-fade mt-4 uppercase leading-[0.88]" style="font-family: 'Gobold High', sans-serif; font-size: clamp(3.5rem, 12vw, 7.5rem);">
+          <h1 class="indu-fade mt-4 max-w-[8.5ch] text-balance uppercase leading-[0.92] sm:leading-[0.9] lg:leading-[0.88]" style="font-family: 'Gobold High', sans-serif; font-size: clamp(1.95rem, 6.4vw, 4.9rem);">
             <span class="block text-transparent [-webkit-text-stroke:1.5px_rgba(247,255,253,0.85)]">{{ pageContent.hero.titleStroke }}</span>
             <span class="block text-white">{{ pageContent.hero.titleFill }}</span>
           </h1>
@@ -23,7 +23,7 @@
           </p>
         </div>
 
-        <div class="indu-fade relative z-10 lg:justify-self-end">
+        <div class="indu-fade relative z-10 min-w-0 lg:justify-self-end">
           <div class="relative overflow-hidden rounded-[2.2rem] border border-white/10 bg-white/6 p-3 shadow-[0_24px_60px_rgba(0,0,0,0.22)] backdrop-blur-sm">
             <img
               :src="pageContent.hero.image"
@@ -52,7 +52,7 @@
             </h2>
           </div>
 
-          <div class="space-y-4 text-[1rem] leading-8 text-(--indu-muted) sm:text-[1.05rem]">
+          <div class="space-y-4 my-auto text-[1rem] leading-8 text-(--indu-muted) sm:text-[1.05rem]">
             <p v-for="paragraph in pageContent.identity.paragraphs" :key="paragraph">
               {{ paragraph }}
             </p>
@@ -61,7 +61,7 @@
       </div>
 
       <!-- Prendas destacadas -->
-      <div class="mt-10 flex items-end justify-between gap-4 lg:mt-14">
+      <div class="mt-10 flex flex-col items-start gap-4 lg:mt-14 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--indu-primary)">{{ pageContent.catalog.kicker }}</p>
           <h2 class="mt-3 text-[clamp(1.8rem,4vw,3rem)] font-black uppercase leading-[0.95] text-white" style="font-family: 'Gobold High', sans-serif;">
@@ -85,7 +85,7 @@
             <img
               :src="item.image"
               :alt="item.nombre"
-              class="h-80 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              class="h-72 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] sm:h-80"
               loading="lazy"
             >
             <div class="absolute inset-x-0 bottom-0 h-24 bg-[linear-gradient(to_top,rgba(11,17,18,0.9),transparent)]"></div>
@@ -97,21 +97,21 @@
             </span>
             <span
               v-if="item.valor"
-              class="absolute bottom-4 right-4 rounded-full border border-white/15 bg-[rgba(8,18,19,0.8)] px-3 py-1 text-xl font-black uppercase tracking-[0.12em] text-white backdrop-blur-sm"
+              class="absolute bottom-4 right-4 rounded-full border border-white/15 bg-[rgba(8,18,19,0.8)] px-3 py-1 text-sm font-black uppercase tracking-[0.08em] text-white backdrop-blur-sm sm:text-xl sm:tracking-[0.12em]"
             >
               {{ item.valor }}
             </span>
           </div>
           <div class="px-5 pb-5 pt-4">
-            <div class="flex items-start justify-between gap-4">
-              <h3 class="text-2xl font-400 uppercase tracking-widest text-white" style="font-family: 'Gobold High', sans-serif;">
+            <div class="flex flex-col items-start gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+              <h3 class="min-w-0 text-xl leading-tight font-normal uppercase tracking-[0.12em] text-white sm:text-2xl sm:tracking-widest" style="font-family: 'Gobold High', sans-serif;">
                 {{ item.nombre }}
               </h3>
-              <p v-if="item.categoria" class="shrink-0 text-[0.72rem] font-black uppercase tracking-[0.16em] text-(--indu-primary)">
+              <p v-if="item.categoria" class="rounded-full border border-(--indu-primary)/25 px-2 py-1 text-[0.68rem] font-black uppercase tracking-[0.14em] text-(--indu-primary) sm:shrink-0 sm:border-0 sm:px-0 sm:py-0 sm:text-[0.72rem] sm:tracking-[0.16em]">
                 {{ item.categoria }}
               </p>
             </div>
-            <p class="mt-3 text-sm font-semibold uppercase tracking-[0.08em] text-white/82">{{ item.subtitulo }}</p>
+            <p v-if="item.subtitulo" class="mt-3 text-sm font-semibold uppercase tracking-[0.08em] text-white/82">{{ item.subtitulo }}</p>
             <p class="mt-2 text-sm leading-relaxed text-white/60">{{ item.desc }}</p>
           </div>
         </article>
@@ -138,7 +138,7 @@
             <img
               :src="pageContent.story.image"
               :alt="pageContent.story.imageAlt"
-              class="relative h-80 w-full rounded-4xl object-contain shadow-[0_22px_56px_rgba(0,0,0,0.22)] sm:h-96"
+              class="relative h-72 w-full rounded-4xl object-contain shadow-[0_22px_56px_rgba(0,0,0,0.22)] sm:h-96"
             >
           </div>
         </div>
@@ -183,6 +183,7 @@
 import { trackOutboundClick } from '../composables/useAnalytics';
 
 const imgCamiseta2026 = new URL('../assets/Indumentaria/Camiseta2026.jpeg', import.meta.url).href
+const imgHero = new URL('../assets/Indumentaria/Polera2026.png', import.meta.url).href
 const imgArquera2025 = new URL('../assets/Indumentaria/CamisetaArquera2025.jpg', import.meta.url).href
 const imgCamisetaClaraEspalda = new URL('../assets/Indumentaria/CamisetaClara2025Espalda.jpg', import.meta.url).href
 const imgCamisetaClaraFrente = new URL('../assets/Indumentaria/CamisetaClara2025Frente.jpg', import.meta.url).href
@@ -206,7 +207,7 @@ const pageContent = {
     description: 'Cada prenda de Vks es parte de nuestra historia, armadas con cariño e identidad para todo el Club.',
     badge: 'Catálogo actualizado',
     caption: 'Indumentarias 2026 Oficiales Vks',
-    image: imgCamiseta2026,
+    image: imgHero,
     imageAlt: 'Camiseta oficial Vikingas 2026'
   },
   identity: {
@@ -219,7 +220,7 @@ const pageContent = {
   catalog: {
     kicker: 'Catálogo Vikingas',
     title: 'Todas las prendas Vks',
-    description: 'Desde la camiseta oficial de cada temporada hasta la parka para entrenar en invierno...'
+    description: 'Desde la camiseta oficial de cada temporada hasta la parka para entrenar en invierno... Confeccionado por SPIRIT SPORT'
   },
   story: {
     kicker: 'Amor a la camiseta',
@@ -331,7 +332,7 @@ const prendas = [
     desc: 'Polera alternativa 2026. Insignia, nombre y número.',
     image: imgPoleraVerde,
     tag: null,
-    categoria: 'Casual'
+    categoria: 'Cancha'
   },
   {
     nombre: 'Camiseta 2024/2025/2026 + short oficial',
