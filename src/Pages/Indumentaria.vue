@@ -99,7 +99,7 @@
               v-if="item.valor"
               class="absolute bottom-4 right-4 rounded-full border border-white/15 bg-[rgba(8,18,19,0.8)] px-3 py-1 text-sm font-black uppercase tracking-[0.08em] text-white backdrop-blur-sm sm:text-xl sm:tracking-[0.12em]"
             >
-              {{ item.valor }}
+              ${{ item.valor }}
             </span>
           </div>
           <div class="px-5 pb-5 pt-4">
@@ -199,7 +199,11 @@ const imgCuelloPolar = new URL('../assets/Indumentaria/CuelloPolar.png', import.
 const imgParkaVikingas = new URL('../assets/Indumentaria/Parka Vikingas.png', import.meta.url).href
 const imgPoleraVerde = new URL('../assets/Indumentaria/PoleraVerde.png', import.meta.url).href
 const imgShort = new URL('../assets/Indumentaria/short.PNG', import.meta.url).href
+const poleronNegro = new URL('../assets/Indumentaria/PoleronNegro.png', import.meta.url).href
+const poleronMorado = new URL('../assets/Indumentaria/PoleronCanguroMoradoInsigniaPro.jpg', import.meta.url).href
 const indumentariaCompleta = new URL('../assets/Indumentaria/indumentariaCompleta.jpeg', import.meta.url).href
+const pantalonBuzo = new URL('../assets/Indumentaria/Pantalonbuzo.png', import.meta.url).href
+const buzoCompleto = new URL('../assets/Indumentaria/buzocompleto.png', import.meta.url).href
 
 const { show, hide } = useLoader()
 const LOADER_MIN_DURATION = 600
@@ -260,6 +264,24 @@ const prendas = [
     tag: 'Nueva',
     categoria: 'Cancha'
   },
+    {
+    nombre: 'Polera alternativa Verde 2026',
+    subtitulo: 'OPCIONAL LOGO PRO $17.490',
+    valor: '14.990',
+    desc: 'Polera alternativa 2026. Insignia, nombre y número.',
+    image: imgPoleraVerde,
+    tag: null,
+    categoria: 'Cancha'
+  },
+   {
+    nombre: 'Camiseta arqueras 2026',
+    subtitulo: 'OPCIONAL LOGO PRO $17.490',
+    valor: '14.990',
+    desc: 'Camiseta arqueras 2026.',
+    image: imgCamisetaArqueras,
+    tag: 'Set',
+    categoria: 'Portería'
+  },
   {
     nombre: 'Camiseta arquera 2025',
     subtitulo: 'OPCIONAL LOGO PRO $17.490',
@@ -287,15 +309,7 @@ const prendas = [
     tag: null,
     categoria: 'Cancha'
   },
-  {
-    nombre: 'Camiseta arqueras 2026',
-    subtitulo: 'OPCIONAL LOGO PRO $17.490',
-    valor: '14.990',
-    desc: 'Camiseta arqueras 2026.',
-    image: imgCamisetaArqueras,
-    tag: 'Set',
-    categoria: 'Portería'
-  },
+ 
   {
     nombre: 'Camiseta turquesa 2024',
     subtitulo: 'Modelo clásico de cancha',
@@ -330,15 +344,7 @@ const prendas = [
     tag: 'Invierno',
     categoria: 'Abrigo'
   },
-  {
-    nombre: 'Polera alternativa Verde',
-    subtitulo: 'OPCIONAL LOGO PRO $17.490',
-    valor: '14.990',
-    desc: 'Polera alternativa 2026. Insignia, nombre y número.',
-    image: imgPoleraVerde,
-    tag: null,
-    categoria: 'Cancha'
-  },
+
   {
     nombre: 'Camiseta 2024/2025/2026 + short oficial',
     subtitulo: 'Indumentaria completa, Logo pro opcional',
@@ -347,6 +353,42 @@ const prendas = [
     image: indumentariaCompleta,
     tag: 'Uniforme',
     categoria: 'Cancha'
+  },
+   {
+    nombre: 'Poleron Negro + logo PRO',
+    subtitulo: 'Polerón de algodon version negro con logo pro',
+    valor: '18.000',
+    desc: 'Polerón negro de algodón con logo PRO, ideal para el invierno.',
+    image: poleronNegro,
+    tag: 'Polerón',
+    categoria: 'Invierno'
+  },
+     {
+    nombre: 'Poleron Morado + logo PRO',
+    subtitulo: 'Polerón de algodon versión morado con logo pro',
+    valor: '18.000',
+    desc: 'Polerón morado de algodón con logo PRO, ideal para el invierno.',
+    image: poleronMorado,
+    tag: 'Polerón',
+    categoria: 'Invierno'
+  },
+       {
+    nombre: 'Pantalón de Buzo',
+    subtitulo: 'Número opcional',
+    valor: '14.000',
+    desc: 'Pantalón de buzo de algodón con logo PRO, ideal para el invierno.',
+    image: pantalonBuzo,
+    tag: 'Pantalón',
+    categoria: 'Invierno'
+  },
+         {
+    nombre: 'Buzo completo ',
+    subtitulo: 'Número opcional, polerón + pantalón',
+    valor: '28.000',
+    desc: 'Pantalón de buzo de algodón con logo PRO, ideal para el invierno. (Polerón negro o morado)',
+    image: buzoCompleto,
+    tag: 'Pantalón',
+    categoria: 'Invierno'
   }
 ]
 
