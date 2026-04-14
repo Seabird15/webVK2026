@@ -256,7 +256,7 @@ const pageContent = {
 
 const prendas = [
   {
-    nombre: 'Camiseta 2026',
+    nombre: 'Camiseta 2026, IMAGEN REFERENCIAL',
     subtitulo: 'OPCIONAL LOGO PRO $17.490',
     valor: '14.990',
     desc: 'Diseño principal de la temporada 2026.',
@@ -265,7 +265,7 @@ const prendas = [
     categoria: 'Cancha'
   },
     {
-    nombre: 'Polera alternativa Verde 2026',
+    nombre: 'Polera alternativa Verde 2026, IMAGEN REFERENCIAL',
     subtitulo: 'OPCIONAL LOGO PRO $17.490',
     valor: '14.990',
     desc: 'Polera alternativa 2026. Insignia, nombre y número.',
@@ -310,15 +310,15 @@ const prendas = [
     categoria: 'Cancha'
   },
  
-  {
-    nombre: 'Camiseta turquesa 2024',
-    subtitulo: 'Modelo clásico de cancha',
-    valor: '14.990',
-    desc: 'Camiseta temporada 2024',
-    image: imgCamisetaTurquesa2024,
-    tag: 'Clásica',
-    categoria: 'Cancha'
-  },
+  // {
+  //   nombre: 'Camiseta turquesa 2024',
+  //   subtitulo: 'Modelo clásico de cancha',
+  //   valor: '14.990',
+  //   desc: 'Camiseta temporada 2024',
+  //   image: imgCamisetaTurquesa2024,
+  //   tag: 'Clásica',
+  //   categoria: 'Cancha'
+  // },
   {
     nombre: 'Cortavientos 2025',
     valor: '18.000',
@@ -355,7 +355,7 @@ const prendas = [
     categoria: 'Cancha'
   },
    {
-    nombre: 'Poleron Negro + logo PRO',
+    nombre: 'Poleron Negro + logo PRO, IMAGEN REFERENCIAL',
     subtitulo: 'Polerón de algodon version negro con logo pro',
     valor: '18.000',
     desc: 'Polerón negro de algodón con logo PRO, ideal para el invierno.',
@@ -373,19 +373,19 @@ const prendas = [
     categoria: 'Invierno'
   },
        {
-    nombre: 'Pantalón de Buzo',
+    nombre: 'Pantalón de Buzo, IMAGEN REFERENCIAL',
     subtitulo: 'Número opcional',
     valor: '14.000',
-    desc: 'Pantalón de buzo de algodón con logo PRO, ideal para el invierno.',
+    desc: 'Pantalón de buzo de algodón ideal para el invierno.',
     image: pantalonBuzo,
     tag: 'Pantalón',
     categoria: 'Invierno'
   },
          {
-    nombre: 'Buzo completo ',
+    nombre: 'Buzo completo, IMAGEN REFERENCIAL',
     subtitulo: 'Número opcional, polerón + pantalón',
     valor: '28.000',
-    desc: 'Pantalón de buzo de algodón con logo PRO, ideal para el invierno. (Polerón negro o morado)',
+    desc: 'Pantalón de buzo de algodón ideal para el invierno. (Polerón negro o morado)',
     image: buzoCompleto,
     tag: 'Pantalón',
     categoria: 'Invierno'
