@@ -202,7 +202,7 @@ const imgShort = new URL('../assets/Indumentaria/short.PNG', import.meta.url).hr
 const poleronNegro = new URL('../assets/Indumentaria/PoleronNegro.png', import.meta.url).href
 const poleronMorado = new URL('../assets/Indumentaria/PoleronCanguroMoradoInsigniaPro.jpg', import.meta.url).href
 const indumentariaCompleta = new URL('../assets/Indumentaria/indumentariaCompleta.jpeg', import.meta.url).href
-const pantalonBuzo = new URL('../assets/Indumentaria/Pantalonbuzo.png', import.meta.url).href
+const pantalonBuzo = new URL('../assets/Indumentaria/pantalonbuzo.png', import.meta.url).href
 const buzoCompleto = new URL('../assets/Indumentaria/buzocompleto.png', import.meta.url).href
 
 const { show, hide } = useLoader()
