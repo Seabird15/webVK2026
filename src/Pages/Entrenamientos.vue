@@ -234,9 +234,9 @@
         </div>
 
         <!-- FILA ESTADÍSTICAS: Asistencia % y Goles/Asistencias -->
-        <div v-if="estadisticasJugadora" class="grid grid-cols-3 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
+        <div v-if="estadisticasJugadora" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
           <!-- Asistencia % -->
-          <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200 shadow-sm">
+          <div class="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200 shadow-sm">
             <div class="flex items-center gap-2 mb-2">
               <PercentBadgeIcon class="w-4 h-4 text-blue-600" />
               <p class="text-[11px] uppercase tracking-wide font-bold text-blue-600">Asistencia entrenamientos</p>
