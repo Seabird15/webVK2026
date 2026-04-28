@@ -66,181 +66,491 @@
         <div class="lg:col-span-3">
           <!-- Home/Dashboard -->
           <div v-if="activeTab === 'home'" class="space-y-6">
-            <!-- Tarjeta de bienvenida -->
-            <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-100">
-              <div class="flex items-center gap-4 mb-8">
-                <div class="w-16 h-16 bg-linear-to-br from-primary to-primary-dark rounded-2xl flex items-center justify-center shadow-lg">
-                  <UsersIcon class="w-9 h-9 text-white" />
-                </div>
-                <div>
-                  <h2 class="lg:text-3xl text-xl font-black text-gray-900">¡Bienvenida DT Yesi!</h2>
-                  <p class="text-sm text-gray-500 mt-1">Gestiona tu equipo desde un solo lugar</p>
-                </div>
-              </div>
-              
-              <!-- Estadísticas Rápidas -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                <!-- Próximo Entrenamiento -->
-                <div class="bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] cursor-pointer group">
-                  <div class="flex items-start justify-between mb-4">
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
-                      <CalendarIcon class="w-6 h-6" />
-                    </div>
-                  </div>
-                  <p class="text-sm font-medium opacity-90 mb-1">Próximo Entrenamiento</p>
-                  <div v-if="proximoEntrenamiento">
-                    <p class="text-sm lg:text-xl font-black mb-2 line-clamp-1">{{ proximoEntrenamiento.nombre }}</p>
-                    <div class="space-y-1 text-xs opacity-90">
-                      <p>📅 En {{ proximoEntrenamiento.diasRestantes }} {{ proximoEntrenamiento.diasRestantes === 1 ? 'día' : 'días' }}</p>
-                      <p>✓ {{ proximoEntrenamiento.inscripciones.confirmadas }} confirmadas</p>
-                      <p>⏳ {{ proximoEntrenamiento.inscripciones.pendientes }} pendientes</p>
-                    </div>
-                  </div>
-                  <p v-else class="text-xl font-black">No hay próximos</p>
-                </div>
-                
-                <!-- Total de Jugadoras Activas -->
-                <div class="bg-linear-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] cursor-pointer group">
-                  <div class="flex items-start justify-between mb-4">
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
-                      <UsersIcon class="w-6 h-6" />
-                    </div>
-                  </div>
-                  <p class="text-sm font-medium opacity-90 mb-1">Total Jugadoras</p>
-                  <div class="flex items-baseline gap-2 mb-3">
-                    <p class="text-5xl font-black">{{ jugadorasPorEquipo.total }}</p>
-                    <span class="text-xl font-bold opacity-90">activas</span>
-                  </div>
-                  <div class="space-y-1">
-                    <div class="flex items-center justify-between text-xs">
-                      <span class="opacity-90 flex items-center gap-1">
-                        <span class="w-2 h-2 bg-white rounded-full"></span>
-                        Ascenso
-                      </span>
-                      <span class="font-bold">{{ jugadorasPorEquipo.ascenso }}</span>
-                    </div>
-                    <div class="flex items-center justify-between text-xs">
-                      <span class="opacity-90 flex items-center gap-1">
-                        <span class="w-2 h-2 bg-white rounded-full"></span>
-                        Escuela
-                      </span>
-                      <span class="font-bold">{{ jugadorasPorEquipo.escuela }}</span>
-                    </div>
-                    <div class="flex items-center justify-between text-xs">
-                      <span class="opacity-90 flex items-center gap-1">
-                        <span class="w-2 h-2 bg-white rounded-full"></span>
-                        Ambos
-                      </span>
-                      <span class="font-bold">{{ jugadorasPorEquipo.ambos }}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- Tasa de Asistencia -->
-                <div class="bg-linear-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] cursor-pointer group">
-                  <div class="flex items-start justify-between mb-4">
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
-                      <ChartBarIcon class="w-6 h-6" />
-                    </div>
-                  </div>
-                  <p class="text-sm font-medium opacity-90 mb-1">Tasa de Asistencia</p>
-                  <div class="flex items-baseline gap-2">
-                    <p class="text-5xl font-black">{{ tasaAsistenciaPromedio }}</p>
-                    <span class="text-2xl font-bold opacity-90">%</span>
-                  </div>
-                  <p class="text-xs opacity-75 mt-2">Promedio de entrenamientos finalizados</p>
-                </div>
-              </div>
-
-              <div
-                v-if="esAdmin && alertasSalud.nuevas > 0"
-                class="mb-6 rounded-2xl border-2 border-red-200 bg-linear-to-r from-red-50 to-rose-50 p-5 shadow-md"
-              >
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div>
-                    <p class="text-xs font-black uppercase tracking-wide text-red-600">Notificación de salud semanal</p>
-                    <p class="text-lg font-black text-red-700 mt-1">Hay {{ alertasSalud.nuevas }} respuesta{{ alertasSalud.nuevas === 1 ? '' : 's' }} nueva{{ alertasSalud.nuevas === 1 ? '' : 's' }} para revisar</p>
-                    <p class="text-sm text-red-600 mt-1">Pendientes totales de revisión: {{ alertasSalud.pendientesRevision }}</p>
-                  </div>
-                  <button
-                    @click="activeTab = 'salud-semanal'"
-                    class="px-4 py-2.5 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 cursor-pointer"
-                  >
-                    Ver respuestas
-                  </button>
-                </div>
-              </div>
-
-              <!-- Próximo Cumpleaños -->
-              <div v-if="proximoCumpleanios" class="bg-linear-to-r from-pink-50 via-purple-50 to-pink-50 border-2 border-pink-200 rounded-2xl p-6 mb-6 shadow-md hover:shadow-lg transition-all">
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                  <div class="w-20 h-20 bg-linear-to-br from-pink-400 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white shadow-xl shrink-0 animate-pulse">
-                    <GiftIcon class="w-10 h-10" />
-                  </div>
-                  <div class="flex-1 text-center sm:text-left">
-                    <h3 class="text-xl font-black text-transparent bg-clip-text bg-linear-to-r from-pink-600 to-purple-600">Próximo Cumpleaños</h3>
-                    <p class="text-gray-900 mt-2 text-lg">
-                      <span class="font-black text-purple-700">{{ proximoCumpleanios.nombre }}</span>
-                    </p>
-                    <div class="flex items-center justify-center sm:justify-start gap-2 mt-2">
-                      <CalendarIcon class="w-4 h-4 text-gray-500" />
-                      <p class="text-sm text-gray-600">
-                        {{ proximoCumpleanios.fechaFormateada }}
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
+              <div class="grid grid-cols-1  gap-6">
+                <section class="rounded-[28px] border border-blue-200 bg-linear-to-br from-blue-50 via-white to-cyan-50 p-6 sm:p-7 shadow-[0_18px_40px_rgba(37,99,235,0.08)]">
+                  <div class="flex flex-col xl:flex-row  gap-5 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <p class="text-[11px] font-black uppercase tracking-[0.24em] text-primary/70">Centro de control</p>
+                      <h2 class="mt-2 text-2xl sm:text-3xl font-black text-gray-900">Pulso operativo del plantel</h2>
+                      <p class="mt-2 max-w-2xl text-sm sm:text-base leading-relaxed text-gray-600">
+                        Prioriza revisión de salud, seguimiento del feedback y preparación de la semana desde un solo panel.
                       </p>
                     </div>
-                    <div class="mt-3">
-                      <span v-if="proximoCumpleanios.diasRestantes === 0" class="inline-block px-4 py-2 bg-pink-500 text-white font-bold rounded-xl shadow-md">¡Hoy es su cumpleaños! 🎉</span>
-                      <span v-else-if="proximoCumpleanios.diasRestantes === 1" class="inline-block px-4 py-2 bg-pink-500 text-white font-bold rounded-xl shadow-md">¡Mañana cumple años! 🎈</span>
-                      <span v-else class="inline-block px-4 py-2 bg-purple-100 text-purple-700 font-bold rounded-xl">Faltan {{ proximoCumpleanios.diasRestantes }} días</span>
+
+                    <div class="grid grid-cols-1 gap-3 sm:min-w-[16rem]">
+                      <div class="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3">
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Plantel</p>
+                        <p class="mt-2 text-2xl font-black text-blue-900">{{ jugadorasPorEquipo.total }}</p>
+                        <p class="text-xs font-semibold text-blue-700">jugadoras activas</p>
+                      </div>
+                      <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-700">Semana</p>
+                        <p class="mt-2 text-2xl font-black text-emerald-900">{{ resumenSemana.total }}</p>
+                        <p class="text-xs font-semibold text-emerald-700">eventos programados</p>
+                      </div>
                     </div>
                   </div>
-                </div>
+
+                  <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <article class="rounded-2xl border border-blue-200 bg-linear-to-br from-blue-50 to-white p-5 shadow-sm">
+                      <div class="flex items-center justify-between gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center">
+                          <CalendarIcon class="w-6 h-6 text-blue-700" />
+                        </div>
+                        <span class="text-[11px] font-black uppercase tracking-wide text-blue-700">Siguiente foco</span>
+                      </div>
+                      <div v-if="proximoEntrenamiento" class="mt-4">
+                        <p class="text-lg font-black text-gray-900 line-clamp-2">{{ proximoEntrenamiento.nombre }}</p>
+                        <p class="mt-1 text-sm text-gray-600">
+                          {{ proximoEntrenamiento.diasRestantes <= 0 ? 'Hoy' : proximoEntrenamiento.diasRestantes === 1 ? 'Mañana' : `En ${proximoEntrenamiento.diasRestantes} días` }}
+                        </p>
+                        <div class="mt-3 flex flex-wrap gap-2 text-xs font-bold text-gray-700">
+                          <span class="rounded-full bg-emerald-50 text-emerald-700 px-3 py-1">{{ proximoEntrenamiento.inscripciones.confirmadas }} confirmadas</span>
+                          <span class="rounded-full bg-amber-50 text-amber-700 px-3 py-1">{{ proximoEntrenamiento.inscripciones.pendientes }} pendientes</span>
+                        </div>
+                      </div>
+                      <p v-else class="mt-4 text-sm font-semibold text-gray-500">No hay eventos próximos cargados.</p>
+                    </article>
+
+                    <article class="rounded-2xl border border-violet-200 bg-linear-to-br from-violet-50 to-white p-5 shadow-sm">
+                      <div class="flex items-center justify-between gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-violet-100 flex items-center justify-center">
+                          <ChartBarIcon class="w-6 h-6 text-violet-700" />
+                        </div>
+                        <span class="text-[11px] font-black uppercase tracking-wide text-violet-700">Asistencia</span>
+                      </div>
+                      <p class="mt-4 text-4xl font-black text-gray-900">{{ tasaAsistenciaPromedio }}%</p>
+                      <p class="mt-2 text-sm text-gray-600">Promedio de confirmación en entrenamientos finalizados.</p>
+                    </article>
+
+                    <article class="rounded-2xl border border-rose-200 bg-linear-to-br from-rose-50 to-white p-5 shadow-sm">
+                      <div class="flex items-center justify-between gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-rose-100 flex items-center justify-center">
+                          <GiftIcon class="w-6 h-6 text-rose-700" />
+                        </div>
+                        <span class="text-[11px] font-black uppercase tracking-wide text-rose-700">Cumpleaños</span>
+                      </div>
+                      <div v-if="proximoCumpleanios" class="mt-4">
+                        <p class="text-lg font-black text-gray-900">{{ proximoCumpleanios.nombre }}</p>
+                        <p class="mt-1 text-sm text-gray-600">{{ proximoCumpleanios.fechaFormateada }}</p>
+                        <p class="mt-3 inline-flex rounded-full bg-rose-50 px-3 py-1 text-xs font-bold text-rose-700">
+                          {{ proximoCumpleanios.diasRestantes === 0 ? 'Es hoy' : proximoCumpleanios.diasRestantes === 1 ? 'Es mañana' : `Faltan ${proximoCumpleanios.diasRestantes} días` }}
+                        </p>
+                      </div>
+                      <p v-else class="mt-4 text-sm font-semibold text-gray-500">No hay cumpleaños próximos cargados.</p>
+                    </article>
+                  </div>
+                </section>
+
+                <aside class="space-y-4">
+                  <div class="rounded-[28px] border border-amber-200 bg-linear-to-br from-amber-50 via-white to-orange-50 p-5 sm:p-6 shadow-[0_18px_40px_rgba(245,158,11,0.08)]">
+                    <p class="text-[11px] font-black uppercase tracking-[0.24em] text-slate-500">Prioridades</p>
+                    <h3 class="mt-2 text-xl font-black text-gray-900">Revisión inmediata</h3>
+                    <div class="mt-5 space-y-3">
+                      <button
+                        @click="activeTab = 'salud-semanal'"
+                        class="w-full rounded-2xl border border-red-200 bg-linear-to-r from-red-50 to-white px-4 py-4 text-left transition hover:border-red-300 hover:shadow-sm cursor-pointer"
+                      >
+                        <div class="flex items-center justify-between gap-3">
+                          <div>
+                            <p class="text-sm font-black text-gray-900">Salud semanal</p>
+                            <p class="mt-1 text-xs text-gray-600">{{ alertasSalud.pendientesRevision }} pendientes de revisión</p>
+                          </div>
+                          <span class="rounded-full bg-red-50 px-3 py-1 text-xs font-black text-red-700">{{ alertasSalud.nuevas }} nuevas</span>
+                        </div>
+                      </button>
+
+                      <button
+                        @click="activeTab = 'feedback'"
+                        class="w-full rounded-2xl border border-amber-200 bg-linear-to-r from-amber-50 to-white px-4 py-4 text-left transition hover:border-amber-300 hover:shadow-sm cursor-pointer"
+                      >
+                        <div class="flex items-center justify-between gap-3">
+                          <div>
+                            <p class="text-sm font-black text-gray-900">Feedback a jugadoras</p>
+                            <p class="mt-1 text-xs text-gray-600">{{ estadisticasFeedback.pendientes }} mensajes sin reacción</p>
+                          </div>
+                          <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-black text-amber-700">{{ estadisticasFeedback.tasaRespuesta }}% respuesta</span>
+                        </div>
+                      </button>
+
+                      <button
+                        @click="activeTab = 'entrenamientos'"
+                        class="w-full rounded-2xl border border-blue-200 bg-linear-to-r from-blue-50 to-white px-4 py-4 text-left transition hover:border-blue-300 hover:shadow-sm cursor-pointer"
+                      >
+                        <div class="flex items-center justify-between gap-3">
+                          <div>
+                            <p class="text-sm font-black text-gray-900">Confirmaciones de la semana</p>
+                            <p class="mt-1 text-xs text-gray-600">{{ resumenSemana.pendientes }} respuestas pendientes en eventos semanales</p>
+                          </div>
+                          <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">{{ resumenSemana.confirmadas }} confirmadas</span>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="hidden lg:block rounded-[28px] border border-violet-200 bg-linear-to-br from-violet-50 via-white to-fuchsia-50 p-5 sm:p-6 shadow-[0_18px_40px_rgba(139,92,246,0.08)]">
+                    <p class="text-[11px] font-black uppercase tracking-[0.24em] text-slate-500">Distribución</p>
+                    <h3 class="mt-2 text-xl font-black text-gray-900">Plantel activo</h3>
+                    <div class="mt-5 space-y-3">
+                      <div class="flex items-center justify-between rounded-2xl border border-blue-200 bg-blue-50/80 px-4 py-3">
+                        <span class="text-sm font-bold text-gray-700">Ascenso</span>
+                        <span class="text-lg font-black text-gray-900">{{ jugadorasPorEquipo.ascenso }}</span>
+                      </div>
+                      <div class="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3">
+                        <span class="text-sm font-bold text-gray-700">Escuela</span>
+                        <span class="text-lg font-black text-gray-900">{{ jugadorasPorEquipo.escuela }}</span>
+                      </div>
+                      <div class="flex items-center justify-between rounded-2xl border border-purple-200 bg-purple-50/80 px-4 py-3">
+                        <span class="text-sm font-bold text-gray-700">Serie C</span>
+                        <span class="text-lg font-black text-gray-900">{{ jugadorasPorEquipo.serieC }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </aside>
               </div>
 
-              <!-- Acceso Rápido -->
-              <div>
-                <div class="flex items-center gap-2 mb-5">
-                  <div class="w-2 h-8 bg-primary rounded-full"></div>
-                  <h3 class="text-xl font-black text-gray-900">Acceso Rápido</h3>
-                </div>
-                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                  <button
-                    @click="activeTab = 'entrenamientos'"
-                    class="group p-5 bg-linear-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 border-2 border-blue-200 hover:border-blue-400 rounded-2xl transition-all cursor-pointer text-center hover:scale-105 hover:shadow-xl active:scale-95"
-                  >
-                    <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform shadow-lg">
-                      <CalendarIcon class="w-6 h-6 text-white" />
+              <div class="mt-6 lg:hidden space-y-4">
+                <details class="group rounded-3xl border border-violet-200 bg-linear-to-br from-violet-50 via-white to-fuchsia-50 p-4 shadow-sm">
+                  <summary class="flex list-none cursor-pointer items-center justify-between gap-3">
+                    <div>
+                      <p class="text-[11px] font-black uppercase tracking-[0.2em] text-violet-700">Plantel activo</p>
+                      <p class="mt-1 text-sm font-bold text-gray-900">Distribución por equipo</p>
                     </div>
-                    <div class="text-sm truncate font-black text-blue-700">Entrenamientos</div>
-                  </button>
-                  <button
-                    @click="activeTab = 'jugadoras'"
-                    class="group p-5 bg-linear-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 border-2 border-green-200 hover:border-green-400 rounded-2xl transition-all cursor-pointer text-center hover:scale-105 hover:shadow-xl active:scale-95"
-                  >
-                    <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform shadow-lg">
-                      <UsersIcon class="w-6 h-6 text-white" />
+                    <span class="text-xs font-black text-violet-700 transition-transform group-open:rotate-180">▼</span>
+                  </summary>
+                  <div class="mt-4 space-y-3">
+                    <div class="flex items-center justify-between rounded-2xl border border-blue-200 bg-blue-50/80 px-4 py-3">
+                      <span class="text-sm font-bold text-gray-700">Ascenso</span>
+                      <span class="text-lg font-black text-gray-900">{{ jugadorasPorEquipo.ascenso }}</span>
                     </div>
-                    <div class="text-sm font-black text-green-700">Jugadoras</div>
-                  </button>
-                  <button
-                    @click="activeTab = 'historial'"
-                    class="group p-5 bg-linear-to-br from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 border-2 border-purple-200 hover:border-purple-400 rounded-2xl transition-all cursor-pointer text-center hover:scale-105 hover:shadow-xl active:scale-95"
-                  >
-                    <div class="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform shadow-lg">
-                      <ChartBarIcon class="w-6 h-6 text-white" />
+                    <div class="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3">
+                      <span class="text-sm font-bold text-gray-700">Escuela</span>
+                      <span class="text-lg font-black text-gray-900">{{ jugadorasPorEquipo.escuela }}</span>
                     </div>
-                    <div class="text-sm font-black text-purple-700">Historial</div>
-                  </button>
-                  <button
-                    @click="activeTab = 'galeria'"
-                    class="group p-5 bg-linear-to-br from-yellow-50 to-yellow-100 hover:from-yellow-100 hover:to-yellow-200 border-2 border-yellow-200 hover:border-yellow-400 rounded-2xl transition-all cursor-pointer text-center hover:scale-105 hover:shadow-xl active:scale-95"
-                  >
-                    <div class="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform shadow-lg">
-                      <CameraIcon class="w-6 h-6 text-white" />
+                    <div class="flex items-center justify-between rounded-2xl border border-purple-200 bg-purple-50/80 px-4 py-3">
+                      <span class="text-sm font-bold text-gray-700">Serie C</span>
+                      <span class="text-lg font-black text-gray-900">{{ jugadorasPorEquipo.serieC }}</span>
                     </div>
-                    <div class="text-sm font-black text-yellow-700">Galería</div>
-                  </button>
-                </div>
+                  </div>
+                </details>
+
+                <details class="group rounded-3xl border border-emerald-200 bg-linear-to-br from-emerald-50 via-white to-teal-50 p-4 shadow-sm">
+                  <summary class="flex list-none cursor-pointer items-center justify-between gap-3">
+                    <div>
+                      <p class="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-700">Semana actual</p>
+                      <p class="mt-1 text-sm font-bold text-gray-900">Carga y seguimiento</p>
+                    </div>
+                    <span class="text-xs font-black text-emerald-700 transition-transform group-open:rotate-180">▼</span>
+                  </summary>
+                  <div class="mt-4 grid grid-cols-2 gap-3">
+                    <div class="rounded-2xl border border-sky-200 bg-sky-50/80 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-slate-500">Total</p>
+                      <p class="mt-2 text-3xl font-black text-gray-900">{{ resumenSemana.total }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide  text-slate-500">Entrenamientos</p>
+                      <p class="mt-2 text-3xl font-black text-gray-900">{{ resumenSemana.entrenamientos }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-rose-200 bg-rose-50/80 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-slate-500">Partidos</p>
+                      <p class="mt-2 text-3xl font-black text-gray-900">{{ resumenSemana.partidos }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-amber-200 bg-amber-50/80 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-slate-500">Pendientes</p>
+                      <p class="mt-2 text-3xl font-black text-gray-900">{{ resumenSemana.pendientes }}</p>
+                    </div>
+                  </div>
+                  <p class="mt-4 text-sm text-gray-600">{{ resumenSemana.texto }}</p>
+                </details>
+
+                <details class="group rounded-3xl border border-cyan-200 bg-linear-to-br from-cyan-50 via-white to-blue-50 p-4 shadow-sm">
+                  <summary class="flex list-none cursor-pointer items-center justify-between gap-3">
+                    <div>
+                      <p class="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-700">Atajos</p>
+                      <p class="mt-1 text-sm font-bold text-gray-900">Gestión rápida</p>
+                    </div>
+                    <span class="text-xs font-black text-cyan-700 transition-transform group-open:rotate-180">▼</span>
+                  </summary>
+                  <div class="mt-4 grid grid-cols-2 gap-3">
+                    <button @click="activeTab = 'entrenamientos'" class="group rounded-2xl border border-blue-200 bg-blue-50 p-4 text-left transition hover:border-blue-300 hover:shadow-sm cursor-pointer">
+                      <CalendarIcon class="w-6 h-6 text-blue-700 mb-3 group-hover:scale-110 transition-transform" />
+                      <div class="text-sm font-black text-blue-800 ">Entrenamientos</div>
+                    </button>
+                    <button @click="activeTab = 'jugadoras'" class="group rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-left transition hover:border-emerald-300 hover:shadow-sm cursor-pointer">
+                      <UsersIcon class="w-6 h-6 text-emerald-700 mb-3 group-hover:scale-110 transition-transform" />
+                      <div class="text-sm font-black text-emerald-800 truncate">Jugadoras</div>
+                    </button>
+                    <button @click="activeTab = 'feedback'" class="group rounded-2xl border border-amber-200 bg-amber-50 p-4 text-left transition hover:border-amber-300 hover:shadow-sm cursor-pointer">
+                      <BellAlertIcon class="w-6 h-6 text-amber-700 mb-3 group-hover:scale-110 transition-transform" />
+                      <div class="text-sm font-black text-amber-800">Feedback</div>
+                    </button>
+                    <button @click="activeTab = 'historial'" class="group rounded-2xl border border-violet-200 bg-violet-50 p-4 text-left transition hover:border-violet-300 hover:shadow-sm cursor-pointer">
+                      <ChartBarIcon class="w-6 h-6 text-violet-700 mb-3 group-hover:scale-110 transition-transform" />
+                      <div class="text-sm font-black text-violet-800">Historial</div>
+                    </button>
+                  </div>
+                </details>
+
+                <details class="group rounded-3xl border border-red-200 bg-linear-to-br from-red-50 via-white to-orange-50 p-4 shadow-sm">
+                  <summary class="flex list-none cursor-pointer items-center justify-between gap-3">
+                    <div>
+                      <p class="text-[11px] font-black uppercase tracking-[0.2em] text-red-700">Salud semanal</p>
+                      <p class="mt-1 text-sm font-bold text-gray-900">Señales de riesgo alto</p>
+                    </div>
+                    <span class="text-xs font-black text-red-700 transition-transform group-open:rotate-180">▼</span>
+                  </summary>
+                  <div class="mt-4 grid grid-cols-2 gap-3">
+                    <div class="rounded-2xl border border-red-200 bg-red-50 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-red-600">Casos de riesgo alto</p>
+                      <p class="mt-2 text-3xl font-black text-red-700">{{ resumenSaludSemanal.riesgoAlto }}</p>
+                      <p class="mt-1 text-[11px] font-semibold text-red-600">Clasificación global crítica</p>
+                    </div>
+                    <div class="rounded-2xl border border-orange-200 bg-orange-50 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-orange-600">Dolor 4-5</p>
+                      <p class="mt-2 text-3xl font-black text-orange-700">{{ resumenSaludSemanal.dolorAlto }}</p>
+                      <p class="mt-1 text-[11px] font-semibold text-orange-600">Molestia corporal alta o muy alta</p>
+                    </div>
+                    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-amber-600">Fatiga 4-5</p>
+                      <p class="mt-2 text-3xl font-black text-amber-700">{{ resumenSaludSemanal.fatigaAlta }}</p>
+                      <p class="mt-1 text-[11px] font-semibold text-amber-600">Cansancio alto o muy alto</p>
+                    </div>
+                    <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-indigo-600">Sueño 1-2</p>
+                      <p class="mt-2 text-3xl font-black text-indigo-700">{{ resumenSaludSemanal.suenoBajo }}</p>
+                      <p class="mt-1 text-[11px] font-semibold text-indigo-600">Descanso malo o muy malo</p>
+                    </div>
+                  </div>
+                  <p class="mt-4 text-sm text-gray-600">{{ resumenSaludSemanal.total }} respuestas registradas en la semana actual.</p>
+                </details>
+
+                <details class="group rounded-3xl border border-amber-200 bg-linear-to-br from-amber-50 via-white to-yellow-50 p-4 shadow-sm">
+                  <summary class="flex list-none cursor-pointer items-center justify-between gap-3">
+                    <div>
+                      <p class="text-[11px] font-black uppercase tracking-[0.2em] text-amber-700">Pendientes por evento</p>
+                      <p class="mt-1 text-sm font-bold text-gray-900">Ranking operativo</p>
+                    </div>
+                    <span class="text-xs font-black text-amber-700 transition-transform group-open:rotate-180">▼</span>
+                  </summary>
+                  <div v-if="rankingPendientesEventos.length === 0" class="mt-4 rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-gray-500">No hay eventos futuros con respuestas pendientes.</div>
+                  <div v-else class="mt-4 space-y-3">
+                    <button
+                      v-for="(evento, index) in rankingPendientesEventos"
+                      :key="`pendientes-mobile-${evento.id}`"
+                      type="button"
+                      @click="verDetalles(evento)"
+                      class="w-full rounded-2xl border border-amber-200 bg-linear-to-r from-amber-50 to-white px-4 py-3 text-left transition hover:border-amber-300 hover:from-amber-100 hover:to-yellow-50 hover:shadow-sm focus:outline-hidden focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 cursor-pointer"
+                      :aria-label="`Abrir entrenamiento ${evento.nombre}`"
+                    >
+                      <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                          <p class="text-sm font-black text-gray-900 line-clamp-1">{{ index + 1 }}. {{ evento.nombre }}</p>
+                          <p class="mt-1 text-xs text-gray-600 capitalize">{{ evento.equipo }} · {{ formatearFecha(evento.fecha) }}</p>
+                        </div>
+                        <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-700 shrink-0">{{ evento.inscripciones.pendientes }}</span>
+                      </div>
+                    </button>
+                  </div>
+                </details>
+
+                <details class="group rounded-3xl border border-emerald-200 bg-linear-to-br from-emerald-50 via-white to-lime-50 p-4 shadow-sm">
+                  <summary class="flex list-none cursor-pointer items-center justify-between gap-3">
+                    <div>
+                      <p class="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-700">Confirmación por equipo</p>
+                      <p class="mt-1 text-sm font-bold text-gray-900">Promedio histórico</p>
+                    </div>
+                    <span class="text-xs font-black text-emerald-700 transition-transform group-open:rotate-180">▼</span>
+                  </summary>
+                  <div class="mt-4 space-y-3">
+                    <div v-for="equipo in confirmacionPromedioPorEquipo" :key="`promedio-mobile-${equipo.equipo}`" class="rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3">
+                      <div class="flex items-center justify-between gap-3">
+                        <div>
+                          <p class="text-sm font-black text-gray-900">{{ equipo.label }}</p>
+                          <p class="mt-1 text-xs text-gray-500">{{ equipo.eventos }} entrenamiento{{ equipo.eventos === 1 ? '' : 's' }} cerrados</p>
+                        </div>
+                        <span class="text-2xl font-black text-gray-900">{{ equipo.promedio }}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </details>
+              </div>
+
+              <div class="mt-6 hidden lg:grid grid-cols-1 2xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] gap-6">
+                <section class="rounded-[28px] border border-emerald-200 bg-linear-to-br from-emerald-50 via-white to-teal-50 p-5 sm:p-6 shadow-[0_18px_40px_rgba(16,185,129,0.08)]">
+                  <div class="flex items-center justify-between gap-3 mb-5">
+                    <div>
+                      <p class="text-[11px] font-black uppercase tracking-[0.24em] text-slate-500">Semana actual</p>
+                      <h3 class="mt-2 text-xl font-black text-gray-900">Carga y seguimiento</h3>
+                    </div>
+                    <div class="rounded-2xl bg-primary/10 p-3">
+                      <CalendarIcon class="w-6 h-6 text-primary" />
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="rounded-2xl border border-sky-200 bg-sky-50/80 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-slate-500">Total</p>
+                      <p class="mt-2 text-3xl font-black text-gray-900">{{ resumenSemana.total }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-slate-500 truncate">Entrenamientos</p>
+                      <p class="mt-2 text-3xl font-black text-gray-900">{{ resumenSemana.entrenamientos }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-rose-200 bg-rose-50/80 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-slate-500">Partidos</p>
+                      <p class="mt-2 text-3xl font-black text-gray-900">{{ resumenSemana.partidos }}</p>
+                    </div>
+                    <div class="rounded-2xl border border-amber-200 bg-amber-50/80 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-slate-500">Pendientes</p>
+                      <p class="mt-2 text-3xl font-black text-gray-900">{{ resumenSemana.pendientes }}</p>
+                    </div>
+                  </div>
+
+                  <p class="mt-4 text-sm text-gray-600">{{ resumenSemana.texto }}</p>
+                </section>
+
+                <section class="rounded-[28px] border border-cyan-200 bg-linear-to-br from-cyan-50 via-white to-blue-50 p-5 sm:p-6 shadow-[0_18px_40px_rgba(14,165,233,0.08)]">
+                  <div class="flex items-center gap-2 mb-5">
+                    <div class="w-2 h-8 rounded-full bg-primary"></div>
+                    <h3 class="text-xl font-black text-gray-900">Atajos de gestión</h3>
+                  </div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <button
+                      @click="activeTab = 'entrenamientos'"
+                      class="group rounded-2xl border border-blue-200 bg-blue-50 p-4 text-left transition hover:border-blue-300 hover:shadow-sm cursor-pointer"
+                    >
+                      <CalendarIcon class="w-6 h-6 text-blue-700 mb-3 group-hover:scale-110 transition-transform" />
+                      <div class="text-sm font-black text-blue-800 truncate">Entrenamientos</div>
+                    </button>
+                    <button
+                      @click="activeTab = 'jugadoras'"
+                      class="group rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-left transition hover:border-emerald-300 hover:shadow-sm cursor-pointer"
+                    >
+                      <UsersIcon class="w-6 h-6 text-emerald-700 mb-3 group-hover:scale-110 transition-transform" />
+                      <div class="text-sm font-black text-emerald-800">Jugadoras</div>
+                    </button>
+                    <button
+                      @click="activeTab = 'feedback'"
+                      class="group rounded-2xl border border-amber-200 bg-amber-50 p-4 text-left transition hover:border-amber-300 hover:shadow-sm cursor-pointer"
+                    >
+                      <BellAlertIcon class="w-6 h-6 text-amber-700 mb-3 group-hover:scale-110 transition-transform" />
+                      <div class="text-sm font-black text-amber-800">Feedback</div>
+                    </button>
+                    <button
+                      @click="activeTab = 'historial'"
+                      class="group rounded-2xl border border-violet-200 bg-violet-50 p-4 text-left transition hover:border-violet-300 hover:shadow-sm cursor-pointer"
+                    >
+                      <ChartBarIcon class="w-6 h-6 text-violet-700 mb-3 group-hover:scale-110 transition-transform" />
+                      <div class="text-sm font-black text-violet-800">Historial</div>
+                    </button>
+                  </div>
+                </section>
+              </div>
+
+              <div class="mt-6 hidden lg:grid grid-cols-1 2xl:grid-cols-2 gap-6">
+                <section class="rounded-[28px] border border-red-200 bg-linear-to-br from-red-50 via-white to-orange-50 p-5 sm:p-6 shadow-[0_18px_40px_rgba(239,68,68,0.08)]">
+                  <div class="flex items-center justify-between gap-3 mb-5">
+                    <div>
+                      <p class="text-[11px] font-black uppercase tracking-[0.24em] text-slate-500">Salud semanal</p>
+                      <h3 class="mt-2 text-xl font-black text-gray-900">Señales de riesgo alto</h3>
+                      <p class="mt-1 text-xs text-gray-500">Lectura rápida de respuestas con umbrales críticos esta semana.</p>
+                    </div>
+                    <div class="rounded-2xl bg-red-50 p-3">
+                      <ExclamationCircleIcon class="w-6 h-6 text-red-600" />
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3">
+                    <div class="rounded-2xl border border-red-200 bg-red-50 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-red-600">Casos de riesgo alto</p>
+                      <p class="mt-2 text-3xl font-black text-red-700">{{ resumenSaludSemanal.riesgoAlto }}</p>
+                      <p class="mt-1 text-[11px] font-semibold text-red-600">Clasificación global crítica</p>
+                    </div>
+                    <div class="rounded-2xl border border-orange-200 bg-orange-50 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-orange-600">Dolor 4-5</p>
+                      <p class="mt-2 text-3xl font-black text-orange-700">{{ resumenSaludSemanal.dolorAlto }}</p>
+                      <p class="mt-1 text-[11px] font-semibold text-orange-600">Molestia corporal alta o muy alta</p>
+                    </div>
+                    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-amber-600">Fatiga 4-5</p>
+                      <p class="mt-2 text-3xl font-black text-amber-700">{{ resumenSaludSemanal.fatigaAlta }}</p>
+                      <p class="mt-1 text-[11px] font-semibold text-amber-600">Cansancio alto o muy alto</p>
+                    </div>
+                    <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
+                      <p class="text-[10px] font-black uppercase tracking-wide text-indigo-600">Sueño 1-2</p>
+                      <p class="mt-2 text-3xl font-black text-indigo-700">{{ resumenSaludSemanal.suenoBajo }}</p>
+                      <p class="mt-1 text-[11px] font-semibold text-indigo-600">Descanso malo o muy malo</p>
+                    </div>
+                  </div>
+
+                  <p class="mt-4 text-sm text-gray-600">{{ resumenSaludSemanal.total }} respuestas registradas en la semana actual. Los tres indicadores laterales muestran solo valores en rango crítico.</p>
+                </section>
+
+                <section class="rounded-[28px] border border-amber-200 bg-linear-to-br from-amber-50 via-white to-yellow-50 p-5 sm:p-6 shadow-[0_18px_40px_rgba(245,158,11,0.08)] h-full">
+                  <div class="flex items-center justify-between gap-3 mb-5">
+                    <div>
+                      <p class="text-[11px] font-black uppercase tracking-[0.24em] text-slate-500">Pendientes por evento</p>
+                      <h3 class="mt-2 text-xl font-black text-gray-900">Ranking operativo</h3>
+                    </div>
+                    <div class="rounded-2xl bg-amber-50 p-3">
+                      <QuestionMarkCircleIcon class="w-6 h-6 text-amber-600" />
+                    </div>
+                  </div>
+
+                  <div v-if="rankingPendientesEventos.length === 0" class="rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-gray-500">
+                    No hay eventos futuros con respuestas pendientes.
+                  </div>
+                  <div v-else class="space-y-3">
+                    <button
+                      v-for="(evento, index) in rankingPendientesEventos"
+                      :key="`pendientes-${evento.id}`"
+                      type="button"
+                      @click="verDetalles(evento)"
+                      class="w-full rounded-2xl border border-amber-200 bg-linear-to-r from-amber-50 to-white px-4 py-3 text-left transition hover:border-amber-300 hover:from-amber-100 hover:to-yellow-50 hover:shadow-sm focus:outline-hidden focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 cursor-pointer"
+                      :aria-label="`Abrir entrenamiento ${evento.nombre}`"
+                    >
+                      <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                          <p class="text-sm font-black text-gray-900 line-clamp-1">{{ index + 1 }}. {{ evento.nombre }}</p>
+                          <p class="mt-1 text-xs text-gray-600 capitalize">{{ evento.equipo }} · {{ formatearFecha(evento.fecha) }}</p>
+                        </div>
+                        <div class="shrink-0 flex items-center gap-2">
+                          <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-700">{{ evento.inscripciones.pendientes }} pendientes</span>
+                          <ArrowTrendingUpIcon class="w-4 h-4 text-amber-700" />
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                </section>
+
+                <section class="rounded-[28px] border border-emerald-200 bg-linear-to-br from-emerald-50 via-white to-lime-50 p-5 sm:p-6 shadow-[0_18px_40px_rgba(34,197,94,0.08)] h-full">
+                  <div class="flex items-center justify-between gap-3 mb-5">
+                    <div>
+                      <p class="text-[11px] font-black uppercase tracking-[0.24em] text-slate-500">Confirmación por equipo</p>
+                      <h3 class="mt-2 text-xl font-black text-gray-900">Promedio histórico</h3>
+                    </div>
+                    <div class="rounded-2xl bg-emerald-50 p-3">
+                      <CheckCircleIcon class="w-6 h-6 text-emerald-600" />
+                    </div>
+                  </div>
+
+                  <div class="space-y-3">
+                    <div
+                      v-for="equipo in confirmacionPromedioPorEquipo"
+                      :key="`promedio-${equipo.equipo}`"
+                      class="rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3"
+                    >
+                      <div class="flex items-center justify-between gap-3">
+                        <div>
+                          <p class="text-sm font-black text-gray-900">{{ equipo.label }}</p>
+                          <p class="mt-1 text-xs text-gray-500">{{ equipo.eventos }} entrenamiento{{ equipo.eventos === 1 ? '' : 's' }} cerrados</p>
+                        </div>
+                        <span class="text-2xl font-black text-gray-900">{{ equipo.promedio }}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </section>
               </div>
             </div>
           </div>
@@ -716,7 +1026,8 @@ import ListadoJugadorasAdmin from '../components/ListadoJugadorasAdmin.vue';
 import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
-import { escucharAlertasSaludSemanalAdmin, limpiarSaludSemanalAntiguaS } from '../firebase/saludSemanal';
+import { obtenerEquiposJugadoraDesdeDatos } from '../firebase/jugadorasAuth';
+import { escucharAlertasSaludSemanalAdmin, escucharRespuestasSaludSemanal, limpiarSaludSemanalAntiguaS, obtenerSemanaClave } from '../firebase/saludSemanal';
 import { crearFeedback, obtenerTodosFeedbacks, limpiarFeedbacksAntiguos, escucharTodosFeedbacks } from '../firebase/feedback';
 
 const router = useRouter();
@@ -724,8 +1035,9 @@ const route = useRoute();
 const activeTab = ref('home');
 const proximoCumpleanios = ref(null);
 const inscripcionesPorEntrenamiento = ref({});
-const jugadorasPorEquipo = ref({ ascenso: 0, escuela: 0, ambos: 0, total: 0 });
+const jugadorasPorEquipo = ref({ ascenso: 0, escuela: 0, serieC: 0, total: 0 });
 const alertasSalud = ref({ nuevas: 0, pendientesRevision: 0, ultimas: [] });
+const respuestasSalud = ref([]);
 const todasJugadoras = ref([]);
 const jugadoraSeleccionadaFeedback = ref(null);
 const mensajeFeedback = ref('');
@@ -735,6 +1047,7 @@ const todosFeedbacks = ref([]);
 const isLoadingFeedbacks = ref(false);
 let unsubscribeAlertasSalud = null;
 let unsubscribeFeedbacks = null;
+let unsubscribeRespuestasSalud = null;
 
 const userGreeting = computed(() => {
   if (authUser.value) {
@@ -971,6 +1284,17 @@ const entrenamientosFuturos = computed(() => {
 
 const totalEntrenamientos = computed(() => entrenamientos.value.length);
 
+const calcularDiasCalendarioRestantes = (fechaMs) => {
+  if (!fechaMs) return 0;
+
+  const hoy = new Date();
+  const fechaEvento = new Date(fechaMs);
+  const inicioHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()).getTime();
+  const inicioEvento = new Date(fechaEvento.getFullYear(), fechaEvento.getMonth(), fechaEvento.getDate()).getTime();
+
+  return Math.round((inicioEvento - inicioHoy) / (1000 * 60 * 60 * 24));
+};
+
 // Próximo entrenamiento con datos
 const proximoEntrenamiento = computed(() => {
   const futuros = entrenamientosFuturos.value;
@@ -979,12 +1303,124 @@ const proximoEntrenamiento = computed(() => {
   const proximo = futuros[0];
   const inscripciones = inscripcionesPorEntrenamiento.value[proximo.id] || { confirmadas: 0, bajas: 0, pendientes: 0 };
   const fechaMs = getFechaHoraMs(proximo);
-  const diasRestantes = fechaMs ? Math.ceil((fechaMs - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
+  const diasRestantes = calcularDiasCalendarioRestantes(fechaMs);
   
   return {
     ...proximo,
     diasRestantes,
     inscripciones
+  };
+});
+
+const resumenSemana = computed(() => {
+  const hoy = new Date();
+  const inicioSemana = new Date(hoy);
+  const diaSemana = inicioSemana.getDay();
+  const diasDesdeLunes = (diaSemana + 6) % 7;
+
+  inicioSemana.setDate(inicioSemana.getDate() - diasDesdeLunes);
+  inicioSemana.setHours(0, 0, 0, 0);
+
+  const finSemana = new Date(inicioSemana);
+  finSemana.setDate(finSemana.getDate() + 7);
+
+  const eventosSemana = entrenamientos.value.filter((entrenamiento) => {
+    const fechaMs = getFechaHoraMs(entrenamiento);
+    return fechaMs != null && fechaMs >= inicioSemana.getTime() && fechaMs < finSemana.getTime();
+  });
+
+  const entrenamientosSemana = eventosSemana.filter((entrenamiento) => !esPartidoOAmistoso(entrenamiento)).length;
+  const partidosSemana = eventosSemana.filter((entrenamiento) => esPartidoOAmistoso(entrenamiento)).length;
+
+  const confirmadas = eventosSemana.reduce((total, entrenamiento) => {
+    const inscripciones = inscripcionesPorEntrenamiento.value[entrenamiento.id] || {};
+    return total + (inscripciones.confirmadas || 0);
+  }, 0);
+
+  const pendientes = eventosSemana.reduce((total, entrenamiento) => {
+    const inscripciones = inscripcionesPorEntrenamiento.value[entrenamiento.id] || {};
+    return total + (inscripciones.pendientes || 0);
+  }, 0);
+
+  let texto = 'No hay eventos programados para esta semana.';
+  if (eventosSemana.length > 0) {
+    const partes = [];
+    if (entrenamientosSemana > 0) {
+      partes.push(`${entrenamientosSemana} entrenamiento${entrenamientosSemana === 1 ? '' : 's'}`);
+    }
+    if (partidosSemana > 0) {
+      partes.push(`${partidosSemana} partido${partidosSemana === 1 ? '' : 's'}`);
+    }
+    texto = `Semana activa con ${partes.join(' y ')}. Hay ${confirmadas} confirmadas y ${pendientes} respuestas pendientes.`;
+  }
+
+  return {
+    total: eventosSemana.length,
+    entrenamientos: entrenamientosSemana,
+    partidos: partidosSemana,
+    confirmadas,
+    pendientes,
+    texto
+  };
+});
+
+const rankingPendientesEventos = computed(() => {
+  return entrenamientosFuturos.value
+    .map((entrenamiento) => {
+      const inscripciones = inscripcionesPorEntrenamiento.value[entrenamiento.id] || { confirmadas: 0, bajas: 0, pendientes: 0 };
+      return {
+        ...entrenamiento,
+        inscripciones
+      };
+    })
+    .filter((entrenamiento) => entrenamiento.inscripciones.pendientes > 0)
+    .sort((a, b) => b.inscripciones.pendientes - a.inscripciones.pendientes)
+    .slice(0, 5);
+});
+
+const confirmacionPromedioPorEquipo = computed(() => {
+  const equipos = ['ascenso', 'escuela', 'serieC'];
+
+  return equipos.map((equipo) => {
+    const eventosEquipo = historialEntrenamientos.value.filter(
+      (entrenamiento) => entrenamiento.equipo === equipo && !esPartidoOAmistoso(entrenamiento) && inscripcionesPorEntrenamiento.value[entrenamiento.id]
+    );
+
+    if (eventosEquipo.length === 0) {
+      return {
+        equipo,
+        label: equipo === 'serieC' ? 'Serie C' : equipo.charAt(0).toUpperCase() + equipo.slice(1),
+        promedio: 0,
+        eventos: 0
+      };
+    }
+
+    const promedio = eventosEquipo.reduce((acc, entrenamiento) => {
+      const inscripciones = inscripcionesPorEntrenamiento.value[entrenamiento.id] || {};
+      const total = (inscripciones.confirmadas || 0) + (inscripciones.bajas || 0) + (inscripciones.pendientes || 0);
+      const tasa = total > 0 ? ((inscripciones.confirmadas || 0) / total) * 100 : 0;
+      return acc + tasa;
+    }, 0) / eventosEquipo.length;
+
+    return {
+      equipo,
+      label: equipo === 'serieC' ? 'Serie C' : equipo.charAt(0).toUpperCase() + equipo.slice(1),
+      promedio: Math.round(promedio),
+      eventos: eventosEquipo.length
+    };
+  });
+});
+
+const resumenSaludSemanal = computed(() => {
+  const semanaActual = obtenerSemanaClave();
+  const respuestasSemana = respuestasSalud.value.filter((respuesta) => respuesta.semanaClave === semanaActual);
+
+  return {
+    total: respuestasSemana.length,
+    riesgoAlto: respuestasSemana.filter((respuesta) => respuesta.riesgo === 'alto').length,
+    dolorAlto: respuestasSemana.filter((respuesta) => Number(respuesta.dolor) >= 4).length,
+    fatigaAlta: respuestasSemana.filter((respuesta) => Number(respuesta.fatiga) >= 4).length,
+    suenoBajo: respuestasSemana.filter((respuesta) => Number(respuesta.sueno) <= 2).length
   };
 });
 
@@ -1105,17 +1541,22 @@ const cargarInscripcionesEntrenamientos = async () => {
 const cargarJugadorasPorEquipo = async () => {
   try {
     const snapshot = await getDocs(collection(db, 'jugadoraRegistro'));
-    const conteo = { ascenso: 0, escuela: 0, ambos: 0, total: 0 };
+    const conteo = { ascenso: 0, escuela: 0, serieC: 0, total: 0 };
     
     snapshot.forEach(doc => {
       const data = doc.data();
-      if (data.equipo === 'ascenso') {
+      const equipos = obtenerEquiposJugadoraDesdeDatos(data);
+
+      if (equipos.includes('ascenso')) {
         conteo.ascenso++;
-      } else if (data.equipo === 'escuela') {
-        conteo.escuela++;
-      } else if (data.equipo === 'ambos') {
-        conteo.ambos++;
       }
+      if (equipos.includes('escuela')) {
+        conteo.escuela++;
+      }
+      if (equipos.includes('serieC')) {
+        conteo.serieC++;
+      }
+
       conteo.total++;
     });
     
@@ -1157,6 +1598,12 @@ const iniciarListenerFeedbacks = async () => {
   }
 };
 
+const iniciarListenerRespuestasSalud = () => {
+  unsubscribeRespuestasSalud = escucharRespuestasSaludSemanal((items) => {
+    respuestasSalud.value = items;
+  });
+};
+
 // Función para enviar feedback
 const enviarFeedback = async () => {
   if (!jugadoraSeleccionadaFeedback.value || !mensajeFeedback.value.trim()) {
@@ -1194,6 +1641,7 @@ onMounted(async () => {
   await cargarJugadorasPorEquipo();
   await cargarTodasJugadoras();
   await iniciarListenerFeedbacks();
+  iniciarListenerRespuestasSalud();
 
   if (esAdmin.value) {
     // Limpiar salud semanal más antigua de 1 semana
@@ -1210,6 +1658,9 @@ onUnmounted(() => {
   }
   if (typeof unsubscribeFeedbacks === 'function') {
     unsubscribeFeedbacks();
+  }
+  if (typeof unsubscribeRespuestasSalud === 'function') {
+    unsubscribeRespuestasSalud();
   }
 });
 

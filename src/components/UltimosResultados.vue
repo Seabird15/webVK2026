@@ -4,7 +4,7 @@
       <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
         <div>
           <p class="text-primary font-black uppercase tracking-[0.3em] text-xs mb-2">Resumen reciente</p>
-          <h2 class="text-3xl md:text-5xl font-black text-white" style="font-family: 'Gobold High', sans-serif;">ULTIMOS RESULTADOS</h2>
+          <h2 class="text-3xl md:text-5xl font-black text-white" style="font-family: 'Gobold High', sans-serif;">ÚLTIMOS RESULTADOS</h2>
         </div>
         <p class="text-white/65 text-sm md:max-w-sm">
          

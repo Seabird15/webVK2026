@@ -39,30 +39,7 @@
       </div>
     </div>
 
-    <div class="max-w-6xl mx-auto px-6 mt-3">
-      <div class="rounded-[28px] border border-white/10 bg-white/6 backdrop-blur-md p-4 sm:p-6 shadow-[0_18px_50px_rgba(0,0,0,0.28)] overflow-hidden relative">
-        <div class="absolute inset-y-0 right-0 w-40 bg-linear-to-l from-cyan-300/10 to-transparent"></div>
-        <div class="relative flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
-          <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-white/95 p-1 shadow-lg shrink-0 flex items-center justify-center overflow-hidden">
-            <img :src="kinesioLogo" alt="Kinesiosport" class="w-full h-full object-contain scale-175" />
-          </div>
-          <div class="flex-1 text-center sm:text-left">
-            <p class="inline-flex items-center rounded-full border border-cyan-200/20 bg-cyan-300/8 px-3 py-1 text-[11px] sm:text-xs font-bold uppercase tracking-[0.22em] text-cyan-100/85">Convenio Kinesiologia</p>
-            <p class="text-white text-xl sm:text-2xl leading-none mt-3 tracking-widest" style="font-family: 'Gobold High', sans-serif;">Kinesiosport</p>
-            <p class="text-white/88 text-sm sm:text-base font-semibold leading-snug mt-2">Recuerda que tenemos convenio con su centro especializado en recuperacion deportiva.</p>
-            <p class="text-cyan-100/70 text-sm sm:text-[15px] mt-1.5">Precio especial por las 10 sesiones para jugadoras Vks</p >
-          </div>
-          <a
-            href="https://www.instagram.com/kinesiosportchile/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="shrink-0 inline-flex items-center justify-center rounded-full border border-cyan-200/20 bg-white text-slate-900 px-5 py-3 font-bold text-sm hover:bg-cyan-50 transition-colors shadow-lg"
-          >
-            Ir a Instagram
-          </a>
-        </div>
-      </div>
-    </div>
+ 
 
     <div class="max-w-6xl mx-auto px-6 mt-4">
       <CuestionarioSaludSemanal
@@ -78,29 +55,23 @@
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div class="text-center lg:text-left">
             <p class="inline-flex items-center justify-center lg:justify-start rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.2em] text-primary">
-              Competencia activa
+              Temporada 2026
             </p>
-            <h3 class="text-white text-lg sm:text-xl font-black mt-3">Sigue la competencia de Vikingas</h3>
+            <h3 class="text-white text-lg sm:text-xl font-black mt-3">Revisa las estadisticas del semestre</h3>
             <p class="text-white/80 text-sm sm:text-base mt-1.5">
-              Revisa el avance del semestre, sigue cada fecha y recuerda que los resultados en tiempo real tambien los puedes ver desde el inicio.
+              Consulta el rendimiento de tu equipo en la competencia actual, estadísticas individuales y resultados..
             </p>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:min-w-90">
             <router-link
               to="/competencias"
-              class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-black text-black transition hover:bg-primary/90"
+              class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs uppercase font-black text-white tracking-widest transition hover:bg-primary/90"
             >
               Ver competencia
               <ChevronRightIcon class="w-4 h-4" />
             </router-link>
-            <router-link
-              to="/home"
-              class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/8 px-4 py-3 text-sm font-black text-white transition hover:bg-white/12"
-            >
-              Ver resultados en vivo
-              <HomeIcon class="w-4 h-4" />
-            </router-link>
+       
           </div>
         </div>
       </div>
@@ -144,62 +115,45 @@
         </div>
       </div>
 
-      <!-- Información de jugadora - MEJORADO: 2 columnas -->
-      <div v-if="jugadoraData" class="mb-8 p-6 md:p-8 bg-linear-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-white/60">
+      <!-- Información de jugadora compacta -->
+      <div v-if="jugadoraData" class="mb-8 rounded-2xl border border-white/60 bg-linear-to-br from-white to-gray-50 p-4 shadow-xl md:p-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- COLUMNA 1: Foto y datos básicos -->
-          <div class="flex flex-col items-center text-center md:items-start md:text-left">
-            <div v-if="jugadoraData.fotoPerfil" class="w-44 h-44 rounded-2xl overflow-hidden bg-gray-100 ring-4 ring-primary/10 shadow-lg mb-6">
-              <img :src="jugadoraData.fotoPerfil" alt="Perfil" class="w-full h-full object-cover" />
-            </div>
-            <div class="w-full">
-              <h2 class="text-2xl md:text-3xl font-black text-gray-900 leading-tight">
-                {{ jugadoraData.nombre }}
-              </h2>
-              <p class="text-gray-600 font-bold text-lg mt-1">{{ jugadoraData.apellido }}</p>
-              <div class="h-1 w-12 md:w-16 bg-gradient-to-r from-primary to-primary-dark rounded-full mt-3 mx-auto md:mx-0"></div>
-            </div>
-          </div>
+          <div class="md:col-span-2">
+            <div class="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                <div v-if="jugadoraData.fotoPerfil" class="w-58 h-58 mx-auto shrink-0 overflow-hidden rounded-xl bg-gray-100 ring-2 ring-primary/10">
+                  <img :src="jugadoraData.fotoPerfil" alt="Perfil" class="h-full w-full object-cover" />
+                </div>
+              <div class="flex items-center gap-3 min-w-0">
+              
+                <div class="min-w-0">
+                  <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Ficha jugadora</p>
+                  <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm sm:text-[15px]">
+                    <span class="font-black text-gray-900 truncate max-w-full">{{ jugadoraData.nombre }} {{ jugadoraData.apellido }}</span>
+                    <span class="text-gray-300 font-bold">|</span>
+                    <span class="font-semibold text-gray-600">{{ jugadoraData.posicion || 'Sin posición' }}</span>
+                    <span class="text-gray-300 font-bold">|</span>
+                    <span class="font-black text-primary">#{{ jugadoraData.dorsal || '--' }}</span>
+                    <span class="text-gray-300 font-bold">|</span>
+                    <span :class="[
+                      'font-bold',
+                      jugadoraData.estadoSalud === 'lesionada' ? 'text-red-700' :
+                      jugadoraData.estadoSalud === 'recuperacion' ? 'text-yellow-700' :
+                      jugadoraData.estadoSalud === 'no_disponible' ? 'text-gray-700' :
+                      'text-green-700'
+                    ]">
+                      {{ formatearEstadoSalud(jugadoraData.estadoSalud) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-          <!-- COLUMNA 2: Posición, dorsal, estado -->
-          <div class="flex flex-col justify-center gap-4">
-            <!-- Posición y Dorsal -->
-            <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-              <p class="text-[11px] uppercase tracking-wide font-bold text-gray-500 mb-2">Posición</p>
-              <p class="text-xl font-bold text-gray-900">{{ jugadoraData.posicion }}</p>
-            </div>
-            
-            <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-              <p class="text-[11px] uppercase tracking-wide font-bold text-gray-500 mb-2">Dorsal</p>
-              <p class="text-3xl font-black text-primary">#{{ jugadoraData.dorsal }}</p>
-            </div>
-
-            <!-- Estado de Salud -->
-            <div :class="[
-              'rounded-xl p-4 border-2',
-              jugadoraData.estadoSalud === 'lesionada'
-                ? 'bg-red-50 border-red-200'
-                : jugadoraData.estadoSalud === 'recuperacion'
-                ? 'bg-yellow-50 border-yellow-200'
-                : jugadoraData.estadoSalud === 'no_disponible'
-                ? 'bg-gray-100 border-gray-200'
-                : 'bg-green-50 border-green-200'
-            ]">
-              <p class="text-[11px] uppercase tracking-wide font-bold mb-2" :class="[
-                jugadoraData.estadoSalud === 'lesionada' ? 'text-red-700' :
-                jugadoraData.estadoSalud === 'recuperacion' ? 'text-yellow-700' :
-                jugadoraData.estadoSalud === 'no_disponible' ? 'text-gray-700' :
-                'text-green-700'
-              ]">Estado Salud</p>
-              <p :class="[
-                'font-bold text-lg',
-                jugadoraData.estadoSalud === 'lesionada' ? 'text-red-700' :
-                jugadoraData.estadoSalud === 'recuperacion' ? 'text-yellow-700' :
-                jugadoraData.estadoSalud === 'no_disponible' ? 'text-gray-700' :
-                'text-green-700'
-              ]">
-                {{ formatearEstadoSalud(jugadoraData.estadoSalud) }}
-              </p>
+              <router-link
+                to="/perfil"
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-primary-dark to-primary px-4 py-2.5 text-sm font-bold text-white transition-all hover:shadow-md sm:shrink-0"
+              >
+                <PencilIcon class="w-4 h-4" />
+                Editar perfil
+              </router-link>
             </div>
           </div>
 
@@ -209,7 +163,7 @@
             <div v-if="rachaReciente" class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-[10px] uppercase tracking-wide font-black text-gray-500">Racha Reciente</p>
+                  <p class="text-[10px] uppercase tracking-wide font-black text-gray-500">Racha Reciente entrenamientos</p>
                   <p :class="[
                     'text-lg font-black mt-1.5',
                     rachaReciente.estado === 'confirmada' ? 'text-green-700' : 'text-red-700'
@@ -234,6 +188,15 @@
                 <div>
                   <p class="text-[10px] uppercase tracking-wide font-black">¡HOY!</p>
                   <p class="text-sm font-black mt-1">Cumpleaños</p>
+                  <div class="mt-2 space-y-1">
+                    <p
+                      v-for="cumple in cumpleaniosHoy"
+                      :key="cumple.nombre"
+                      class="text-sm font-semibold text-white/95"
+                    >
+                      {{ cumple.nombre }}
+                    </p>
+                  </div>
                 </div>
                 <CakeIcon class="w-6 h-6" />
               </div>
@@ -256,16 +219,6 @@
                 </p>
               </div>
             </div>
-
-            <!-- Botón Editar Perfil -->
-            <router-link
-              to="/perfil"
-              class="bg-gradient-to-r from-primary-dark to-primary text-white rounded-xl p-4 font-bold hover:shadow-lg transition-all text-center cursor-pointer hover:scale-105 transform duration-200 flex items-center justify-center gap-2"
-            >
-              <PencilIcon class="w-5 h-5" />
-              Editar Mi Perfil
-            </router-link>
-
             <!-- Camiseta 2026 -->
             <div
               aria-disabled="true"
@@ -281,12 +234,12 @@
         </div>
 
         <!-- FILA ESTADÍSTICAS: Asistencia % y Goles/Asistencias -->
-        <div v-if="estadisticasJugadora" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
+        <div v-if="estadisticasJugadora" class="grid grid-cols-3 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
           <!-- Asistencia % -->
           <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200 shadow-sm">
             <div class="flex items-center gap-2 mb-2">
               <PercentBadgeIcon class="w-4 h-4 text-blue-600" />
-              <p class="text-[11px] uppercase tracking-wide font-bold text-blue-600">Asistencia Temporada</p>
+              <p class="text-[11px] uppercase tracking-wide font-bold text-blue-600">Asistencia entrenamientos</p>
             </div>
             <p class="text-3xl font-black text-blue-700">{{ porcentajeAsistencia }}%</p>
             <p class="text-xs text-blue-600 mt-1">{{ estadisticasJugadora.confirmadas }}/{{ estadisticasJugadora.total }}</p>
@@ -448,6 +401,13 @@
 
           <!-- Card Body -->
           <div class="p-6 flex flex-col flex-grow">
+            <div class="mb-4 flex items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
+                <UserGroupIcon class="w-3.5 h-3.5" />
+                {{ contarConfirmadas(entrenamiento.id) }} confirmada{{ contarConfirmadas(entrenamiento.id) === 1 ? '' : 's' }}
+              </span>
+            </div>
+
             <!-- Título -->
             <h3 class="text-lg font-bold text-gray-900 mb-4 line-clamp-2">{{ entrenamiento.nombre }}</h3>
 
@@ -510,7 +470,7 @@
                   class="flex-1 px-3 py-2.5 rounded-lg font-bold transition-all text-sm cursor-pointer flex items-center justify-center gap-1 bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ArrowPathIcon class="w-4 h-4" />
-                  Cambiar
+                  Cambiar estado
                 </button>
                 <!-- Cuando está de baja - botón para cambiar a confirmada -->
                 <button
@@ -520,7 +480,7 @@
                   class="flex-1 px-3 py-2.5 rounded-lg font-bold transition-all text-sm cursor-pointer flex items-center justify-center gap-1 bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ArrowPathIcon class="w-4 h-4" />
-                  Cambiar
+                  Cambiar estado
                 </button>
                 <!-- Botones cuando no ha respondido -->
                 <button
@@ -547,7 +507,7 @@
                 class="w-full px-3 py-2.5 border-2 border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-all text-sm cursor-pointer flex items-center justify-center gap-1"
               >
                 <ClipboardDocumentListIcon class="w-4 h-4" />
-                Detalles
+               Ver Detalles
               </button>
             </div>
           </div>
@@ -1281,6 +1241,32 @@
       </div>
     </div>
   </div>
+
+  
+     <div class="max-w-6xl mx-auto px-6 mt-3">
+      <div class="rounded-[28px] border border-white/10 bg-white/6 backdrop-blur-md p-4 sm:p-6 shadow-[0_18px_50px_rgba(0,0,0,0.28)] overflow-hidden relative">
+        <div class="absolute inset-y-0 right-0 w-40 bg-linear-to-l from-cyan-300/10 to-transparent"></div>
+        <div class="relative flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
+          <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-white/95 p-1 shadow-lg shrink-0 flex items-center justify-center overflow-hidden">
+            <img :src="kinesioLogo" alt="Kinesiosport" class="w-full h-full object-contain scale-175" />
+          </div>
+          <div class="flex-1 text-center sm:text-left">
+            <p class="inline-flex items-center rounded-full border border-cyan-200/20 bg-cyan-300/8 px-3 py-1 text-[11px] sm:text-xs font-bold uppercase tracking-[0.22em] text-cyan-100/85">Convenio Kinesiologia</p>
+            <p class="text-white text-xl sm:text-2xl leading-none mt-3 tracking-widest" style="font-family: 'Gobold High', sans-serif;">Kinesiosport</p>
+            <p class="text-white/88 text-sm sm:text-base font-semibold leading-snug mt-2">Recuerda que tenemos convenio con su centro especializado en recuperacion deportiva.</p>
+            <p class="text-cyan-100/70 text-sm sm:text-[15px] mt-1.5">Precio especial por las 10 sesiones para jugadoras Vks</p >
+          </div>
+          <a
+            href="https://www.instagram.com/kinesiosportchile/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="shrink-0 inline-flex items-center justify-center rounded-full border border-cyan-200/20 bg-white text-slate-900 px-5 py-3 font-bold text-sm hover:bg-cyan-50 transition-colors shadow-lg"
+          >
+            Ir a Instagram
+          </a>
+        </div>
+      </div>
+    </div>
 </template>
 
 <script setup>
@@ -1391,6 +1377,7 @@ const inscritasEntrenamiento = ref([]);
 const todasInscritasOrganizadas = ref({});
 const estadoInscripcion = ref({});
 const conteoInscritas = ref({}); // NUEVO: Mapeo de conteos por entrenamiento
+const unsubConteosEntrenamientos = ref({});
 const toastMensaje = ref(null);
 const toastTipo = ref('success');
 const mensajeDetalle = ref('');
@@ -1907,14 +1894,18 @@ const rachaReciente = computed(() => {
   };
 });
 
+const esEntrenamientoContabilizable = (entrenamiento) => {
+  if (!entrenamiento || entrenamiento.equipo !== equipoSeleccionado.value) return false;
+  return !esPartidoOAmistoso(entrenamiento);
+};
+
 const estadisticasJugadora = computed(() => {
-  // Contar entrenamientos confirmados vs total
   const entrenamientosTemporada = entrenamientos.value.filter(
-    e => e.equipo === equipoSeleccionado.value
+    (entrenamiento) => esEntrenamientoContabilizable(entrenamiento)
   );
   
   const confirmadas = entrenamientosTemporada.filter(
-    e => estadoInscripcion.value[e.id] === 'confirmada'
+    (entrenamiento) => estadoInscripcion.value[entrenamiento.id] === 'confirmada'
   ).length;
   
   const total = entrenamientosTemporada.length;
@@ -2010,6 +2001,50 @@ const contarInscritas = (entrenamientoId) => {
   const conteo = conteoInscritas.value[entrenamientoId];
   if (!conteo) return 0;
   return conteo.confirmadas + conteo.bajas + conteo.pendientes;
+};
+
+const contarConfirmadas = (entrenamientoId) => {
+  return conteoInscritas.value[entrenamientoId]?.confirmadas || 0;
+};
+
+const limpiarListenersConteoEntrenamientos = (idsMantener = []) => {
+  const idsPermitidos = new Set(idsMantener);
+
+  Object.entries(unsubConteosEntrenamientos.value).forEach(([entrenamientoId, unsubscribe]) => {
+    if (idsPermitidos.has(entrenamientoId)) return;
+
+    if (typeof unsubscribe === 'function') {
+      unsubscribe();
+    }
+
+    delete unsubConteosEntrenamientos.value[entrenamientoId];
+  });
+};
+
+const sincronizarConteosEntrenamientosVisibles = () => {
+  const entrenamientosVisibles = entrenamientosFiltered.value;
+  const idsVisibles = entrenamientosVisibles.map((entrenamiento) => entrenamiento.id);
+
+  limpiarListenersConteoEntrenamientos(idsVisibles);
+
+  entrenamientosVisibles.forEach((entrenamiento) => {
+    if (unsubConteosEntrenamientos.value[entrenamiento.id]) return;
+
+    unsubConteosEntrenamientos.value[entrenamiento.id] = escucharInscripcionesEntrenamiento(
+      entrenamiento.id,
+      (organizadas) => {
+        conteoInscritas.value = {
+          ...conteoInscritas.value,
+          [entrenamiento.id]: {
+            confirmadas: organizadas.confirmadas.length,
+            bajas: organizadas.bajas.length,
+            pendientes: organizadas.pendientes.length
+          }
+        };
+      },
+      () => entrenamientos.value.find((item) => item.id === entrenamiento.id)
+    );
+  });
 };
 
 const estaInscrita = (entrenamientoId) => {
@@ -2469,6 +2504,14 @@ watch(
 );
 
 watch(
+  () => entrenamientosFiltered.value.map((entrenamiento) => entrenamiento.id).join('|'),
+  () => {
+    sincronizarConteosEntrenamientosVisibles();
+  },
+  { immediate: true }
+);
+
+watch(
   () => jugadoraAuthUser.value?.uid,
   (uid) => {
     
@@ -2535,6 +2578,7 @@ onUnmounted(() => {
   }
 
   limpiarListenerInscripcionesDetalle();
+  limpiarListenersConteoEntrenamientos();
 });
 </script>
 

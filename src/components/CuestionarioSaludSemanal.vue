@@ -47,109 +47,155 @@
         <p class="text-sm text-green-800 mt-1">Contestaste este chequeo el {{ fechaRespuestaTexto }}.</p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="rounded-2xl border border-gray-200 p-4 bg-gray-50">
-          <p class="text-sm font-bold text-gray-700 mb-1">Dolor corporal o molestia física</p>
-          <p class="text-xs text-gray-500 mb-3">1 bajo, 5 alto</p>
-          <div class="flex gap-2 flex-wrap">
-            <button
-              v-for="n in 5"
-              :key="`dolor-${n}`"
-              type="button"
-              @click="form.dolor = n"
-              class="w-9 h-9 rounded-lg text-sm font-bold border cursor-pointer"
-              :disabled="yaRespondido"
-              :class="form.dolor === n ? 'bg-primary text-white border-primary' : 'bg-white text-gray-700 border-gray-200'"
-            >
-              {{ n }}
-            </button>
+      <div class="rounded-3xl border border-slate-200 bg-linear-to-br from-slate-50 to-white p-4 sm:p-5 shadow-sm">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <p class="text-[11px] font-black uppercase tracking-[0.22em] text-primary/75">Paso {{ slideActual + 1 }} de {{ totalSlides }}</p>
+            <h4 class="mt-1 text-base font-black text-gray-900 sm:text-lg">{{ slideActualMeta.titulo }}</h4>
+            <p class="mt-1 text-xs sm:text-sm text-gray-500">{{ slideActualMeta.descripcion }}</p>
           </div>
-          <p class="text-xs font-semibold text-gray-600 mt-3">{{ dolorTexto }}</p>
+          <div class="flex items-center gap-1.5">
+            <span
+              v-for="(_, index) in slideSteps"
+              :key="`slide-dot-${index}`"
+              class="h-2.5 rounded-full transition-all duration-200"
+              :class="index === slideActual ? 'w-7 bg-primary' : 'w-2.5 bg-gray-300'"
+            ></span>
+          </div>
         </div>
 
-        <div class="rounded-2xl border border-gray-200 p-4 bg-gray-50">
-          <p class="text-sm font-bold text-gray-700 mb-1">Fatiga o sensación de cansancio</p>
-          <p class="text-xs text-gray-500 mb-3">1 baja, 5 alta</p>
-          <div class="flex gap-2 flex-wrap">
-            <button
-              v-for="n in 5"
-              :key="`fatiga-${n}`"
-              type="button"
-              @click="form.fatiga = n"
-              class="w-9 h-9 rounded-lg text-sm font-bold border cursor-pointer"
-              :disabled="yaRespondido"
-              :class="form.fatiga === n ? 'bg-primary text-white border-primary' : 'bg-white text-gray-700 border-gray-200'"
-            >
-              {{ n }}
-            </button>
-          </div>
-          <p class="text-xs font-semibold text-gray-600 mt-3">{{ fatigaTexto }}</p>
+        <div class="mt-4 overflow-hidden">
+          <Transition name="question-slide" mode="out-in">
+            <div :key="slideActual" class="min-h-60 rounded-3xl border border-gray-200 bg-white p-4 sm:min-h-64 sm:p-5">
+              <div v-if="slideActual === 0" class="flex h-full flex-col justify-between">
+                <div>
+                  <p class="text-sm font-bold text-gray-700">Dolor corporal o molestia física</p>
+                  <p class="mt-1 text-xs text-gray-500">1 bajo, 5 alto</p>
+                </div>
+                <div class="mt-5 flex flex-wrap gap-2">
+                  <button
+                    v-for="n in 5"
+                    :key="`dolor-${n}`"
+                    type="button"
+                    @click="form.dolor = n"
+                    class="h-11 w-11 rounded-xl text-sm font-black border cursor-pointer transition-colors"
+                    :disabled="yaRespondido"
+                    :class="form.dolor === n ? 'bg-primary text-white border-primary' : 'bg-white text-gray-700 border-gray-200 hover:border-primary/35'"
+                  >
+                    {{ n }}
+                  </button>
+                </div>
+                <p class="mt-4 text-sm font-semibold text-gray-600">{{ dolorTexto }}</p>
+              </div>
+
+              <div v-else-if="slideActual === 1" class="flex h-full flex-col justify-between">
+                <div>
+                  <p class="text-sm font-bold text-gray-700">Fatiga o sensación de cansancio</p>
+                  <p class="mt-1 text-xs text-gray-500">1 baja, 5 alta</p>
+                </div>
+                <div class="mt-5 flex flex-wrap gap-2">
+                  <button
+                    v-for="n in 5"
+                    :key="`fatiga-${n}`"
+                    type="button"
+                    @click="form.fatiga = n"
+                    class="h-11 w-11 rounded-xl text-sm font-black border cursor-pointer transition-colors"
+                    :disabled="yaRespondido"
+                    :class="form.fatiga === n ? 'bg-primary text-white border-primary' : 'bg-white text-gray-700 border-gray-200 hover:border-primary/35'"
+                  >
+                    {{ n }}
+                  </button>
+                </div>
+                <p class="mt-4 text-sm font-semibold text-gray-600">{{ fatigaTexto }}</p>
+              </div>
+
+              <div v-else-if="slideActual === 2" class="flex h-full flex-col justify-between">
+                <div>
+                  <p class="text-sm font-bold text-gray-700">Calidad del sueño y recuperación</p>
+                  <p class="mt-1 text-xs text-gray-500">1 mala, 5 muy buena</p>
+                </div>
+                <div class="mt-5 flex flex-wrap gap-2">
+                  <button
+                    v-for="n in 5"
+                    :key="`sueno-${n}`"
+                    type="button"
+                    @click="form.sueno = n"
+                    class="h-11 w-11 rounded-xl text-sm font-black border cursor-pointer transition-colors"
+                    :disabled="yaRespondido"
+                    :class="form.sueno === n ? 'bg-primary text-white border-primary' : 'bg-white text-gray-700 border-gray-200 hover:border-primary/35'"
+                  >
+                    {{ n }}
+                  </button>
+                </div>
+                <p class="mt-4 text-sm font-semibold text-gray-600">{{ suenoTexto }}</p>
+              </div>
+
+              <div v-else-if="slideActual === 3" class="flex h-full flex-col justify-between">
+                <div>
+                  <p class="text-sm font-bold text-gray-700">¿Estás en tu período esta semana?</p>
+                  <p class="mt-1 text-xs text-gray-500">Nos permite ajustar mejor la carga, cuidar la recuperación y reducir riesgo de molestias o lesiones.</p>
+                </div>
+                <div class="mt-5 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    @click="form.enPeriodo = true"
+                    :disabled="yaRespondido"
+                    class="min-h-11 px-4 py-2 rounded-xl text-sm font-bold border cursor-pointer transition-colors"
+                    :class="form.enPeriodo === true ? 'bg-rose-600 text-white border-rose-600' : 'bg-white text-gray-700 border-gray-200 hover:border-rose-300'"
+                  >Sí</button>
+                  <button
+                    type="button"
+                    @click="form.enPeriodo = false"
+                    :disabled="yaRespondido"
+                    class="min-h-11 px-4 py-2 rounded-xl text-sm font-bold border cursor-pointer transition-colors"
+                    :class="form.enPeriodo === false ? 'bg-slate-700 text-white border-slate-700' : 'bg-white text-gray-700 border-gray-200 hover:border-slate-300'"
+                  >No</button>
+                </div>
+                <p class="mt-4 text-sm font-semibold text-gray-600">{{ periodoTexto }}</p>
+              </div>
+
+              <div v-else class="flex h-full flex-col justify-between">
+                <div>
+                  <label class="block text-sm font-bold text-gray-700">Comentario opcional</label>
+                  <p class="mt-1 text-xs text-gray-500">Úsalo si quieres dejar contexto adicional para el staff.</p>
+                </div>
+                <textarea
+                  v-model="form.comentarios"
+                  rows="4"
+                  :disabled="yaRespondido"
+                  class="mt-5 w-full rounded-2xl border border-gray-200 px-3 py-3 text-sm focus:outline-hidden focus:border-primary"
+                  placeholder="Ej: molestia en rodilla, dormí poco, etc."
+                ></textarea>
+                <p class="mt-4 text-sm font-semibold text-gray-500">Puedes dejarlo vacío si no tienes nada que agregar.</p>
+              </div>
+            </div>
+          </Transition>
         </div>
 
-        <div class="rounded-2xl border border-gray-200 p-4 bg-gray-50">
-          <p class="text-sm font-bold text-gray-700 mb-1">Calidad del sueño y recuperación</p>
-          <p class="text-xs text-gray-500 mb-3">1 mala, 5 muy buena</p>
-          <div class="flex gap-2 flex-wrap">
-            <button
-              v-for="n in 5"
-              :key="`sueno-${n}`"
-              type="button"
-              @click="form.sueno = n"
-              class="w-9 h-9 rounded-lg text-sm font-bold border cursor-pointer"
-              :disabled="yaRespondido"
-              :class="form.sueno === n ? 'bg-primary text-white border-primary' : 'bg-white text-gray-700 border-gray-200'"
-            >
-              {{ n }}
-            </button>
-          </div>
-          <p class="text-xs font-semibold text-gray-600 mt-3">{{ suenoTexto }}</p>
-        </div>
-      </div>
-
-      <div class="rounded-2xl border border-rose-200 p-4 bg-white">
-        <p class="text-sm font-bold text-gray-700 mb-1">¿Estás en tu período esta semana?</p>
-        <p class="text-xs text-gray-500 mb-3">Nos permite ajustar mejor la carga, cuidar la recuperación y reducir riesgo de molestias o lesiones.</p>
-        <div class="flex flex-wrap gap-2">
+        <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"
-            @click="form.enPeriodo = true"
-            :disabled="yaRespondido"
-            class="px-4 py-2 rounded-xl text-sm font-bold border cursor-pointer"
-            :class="form.enPeriodo === true ? 'bg-rose-600 text-white border-rose-600' : 'bg-white text-gray-700 border-gray-200'"
-          >Sí</button>
-          <button
-            type="button"
-            @click="form.enPeriodo = false"
-            :disabled="yaRespondido"
-            class="px-4 py-2 rounded-xl text-sm font-bold border cursor-pointer"
-            :class="form.enPeriodo === false ? 'bg-slate-700 text-white border-slate-700' : 'bg-white text-gray-700 border-gray-200'"
-          >No</button>
-        </div>
-        <p class="text-xs font-semibold text-gray-600 mt-3">{{ periodoTexto }}</p>
-      </div>
+            @click="irSlideAnterior"
+            :disabled="slideActual === 0"
+            class="min-h-11 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-bold text-gray-700 transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:bg-gray-50"
+          >Anterior</button>
 
-      <div>
-        <label class="text-sm font-bold text-gray-700 mb-2 block">Comentario opcional</label>
-        <textarea
-          v-model="form.comentarios"
-          rows="2"
-          :disabled="yaRespondido"
-          class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-hidden focus:border-primary"
-          placeholder="Ej: molestia en rodilla, dormí poco, etc."
-        ></textarea>
+          <button
+            v-if="!yaRespondido"
+            type="button"
+            @click="handleAccionPrincipal"
+            :disabled="guardando || (!puedeAvanzarSlide && !esUltimoSlide)"
+            class="min-h-11 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {{ guardando ? 'Guardando...' : esUltimoSlide ? 'Enviar respuesta semanal' : 'Siguiente' }}
+          </button>
+
+          <div v-else class="text-sm font-semibold text-green-700">Ya registraste tu chequeo de esta semana.</div>
+        </div>
       </div>
 
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <p v-if="mensaje" class="text-sm font-semibold" :class="tipoMensaje === 'ok' ? 'text-green-600' : 'text-red-600'">{{ mensaje }}</p>
-        <button
-          v-if="!yaRespondido"
-          @click="guardar"
-          :disabled="guardando"
-          class="px-4 py-2.5 rounded-xl bg-primary text-white font-bold hover:bg-primary-dark disabled:opacity-60 cursor-pointer"
-        >
-          {{ guardando ? 'Guardando...' : 'Enviar respuesta semanal' }}
-        </button>
-        <div v-else class="text-sm font-semibold text-green-700">Ya registraste tu chequeo de esta semana.</div>
       </div>
     </div>
 
@@ -186,6 +232,7 @@ const mensaje = ref('');
 const tipoMensaje = ref('ok');
 const expandido = ref(false);
 const fechaRespuesta = ref(null);
+const slideActual = ref(0);
 
 const form = reactive({
   dolor: 1,
@@ -226,6 +273,43 @@ const periodoTexto = computed(() => {
   if (form.enPeriodo === true) return 'Se considerará en la planificación de la semana.';
   if (form.enPeriodo === false) return 'Quedará registrado para esta semana.';
   return 'Selecciona una opción.';
+});
+
+const slideSteps = [
+  {
+    titulo: 'Dolor corporal',
+    descripcion: 'Indica tu nivel actual de molestia física.'
+  },
+  {
+    titulo: 'Fatiga',
+    descripcion: 'Marca cómo se siente tu nivel de cansancio.'
+  },
+  {
+    titulo: 'Sueño y recuperación',
+    descripcion: 'Resume cómo descansaste y te recuperaste.'
+  },
+  {
+    titulo: 'Período semanal',
+    descripcion: 'Dato privado para ajustar mejor la carga.'
+  },
+  {
+    titulo: 'Comentario final',
+    descripcion: 'Espacio corto para agregar contexto adicional.'
+  }
+];
+
+const totalSlides = slideSteps.length;
+
+const slideActualMeta = computed(() => {
+  return slideSteps[slideActual.value] || slideSteps[0];
+});
+
+const esUltimoSlide = computed(() => slideActual.value === totalSlides - 1);
+
+const puedeAvanzarSlide = computed(() => {
+  if (yaRespondido.value) return true;
+  if (slideActual.value === 3) return form.enPeriodo !== null;
+  return true;
 });
 
 const fechaRespuestaTexto = computed(() => {
@@ -272,6 +356,7 @@ const cargarRespuesta = async () => {
 const guardar = async () => {
   if (yaRespondido.value) return;
   if (form.enPeriodo === null) {
+    slideActual.value = 3;
     tipoMensaje.value = 'error';
     mensaje.value = 'Indica si estás en tu período esta semana antes de enviar.';
     return;
@@ -295,6 +380,7 @@ const guardar = async () => {
     yaRespondido.value = true;
     tipoMensaje.value = 'ok';
     mensaje.value = 'Respuesta semanal registrada correctamente.';
+    slideActual.value = 0;
     expandido.value = false;
   } catch (error) {
     tipoMensaje.value = 'error';
@@ -304,8 +390,45 @@ const guardar = async () => {
   }
 };
 
+const irSlideAnterior = () => {
+  if (slideActual.value === 0) return;
+  slideActual.value -= 1;
+};
+
+const irSlideSiguiente = () => {
+  if (esUltimoSlide.value || !puedeAvanzarSlide.value) return;
+  slideActual.value += 1;
+};
+
+const handleAccionPrincipal = () => {
+  if (esUltimoSlide.value) {
+    guardar();
+    return;
+  }
+
+  irSlideSiguiente();
+};
+
 onMounted(async () => {
   await cargarRespuesta();
   expandido.value = !yaRespondido.value;
+  slideActual.value = 0;
 });
 </script>
+
+<style scoped>
+.question-slide-enter-active,
+.question-slide-leave-active {
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.question-slide-enter-from {
+  opacity: 0;
+  transform: translateX(18px);
+}
+
+.question-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-18px);
+}
+</style>
