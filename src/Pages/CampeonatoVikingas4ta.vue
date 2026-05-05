@@ -1,414 +1,382 @@
 <template>
-  <section class="relative min-h-screen overflow-hidden bg-[#edf9f7] text-[#172126]">
-    <div class="absolute inset-0" aria-hidden="true">
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(201,168,76,0.16),transparent_22%),linear-gradient(180deg,rgba(237,249,247,0.98),rgba(237,249,247,1))]"></div>
-      <div class="absolute left-[-8%] top-10 h-72 w-72 rounded-full bg-[#c9a84c]/20 blur-3xl"></div>
-      <div class="absolute right-[-6%] top-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl"></div>
-    </div>
+  <main class="bg-[#f3fbf8] text-[#152227]">
+    <section class="relative overflow-hidden border-b border-[#d7ebe5] bg-[radial-gradient(circle_at_top_left,rgba(44,207,191,0.18),transparent_34%),linear-gradient(180deg,#f7fcfa_0%,#eef8f5_100%)]">
+      <div class="absolute inset-x-0 top-0 h-32 bg-[linear-gradient(180deg,rgba(255,255,255,0.75),rgba(255,255,255,0))]"></div>
+      <div class="absolute -right-12 top-20 h-48 w-48 rounded-full bg-primary/10 blur-3xl sm:h-64 sm:w-64"></div>
+      <div class="absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-[#d8b45d]/20 blur-3xl sm:h-56 sm:w-56"></div>
 
-    <div class="relative z-10">
-      <section class="mx-auto max-w-7xl px-4 pb-12 pt-12 sm:px-6 lg:px-8 lg:pb-16 lg:pt-16">
-        <div class="overflow-hidden rounded-4xl border border-[#cfe9e4] bg-white shadow-[0_30px_80px_rgba(27,87,79,0.10)]">
-          <div class="grid gap-0 lg:grid-cols-[1.05fr_0.95fr]">
-            <div class="p-6 sm:p-8 lg:p-10">
-              <div class="inline-flex items-center gap-3 rounded-full border border-[#cfe9e4] bg-[#f4fcfa] px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-[#31756d]">
-                <img :src="logoVikingas" alt="Vikingas" class="h-6 w-6 object-contain">
-                Campeonato solidario Vikingas
+      <div class="relative mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-center lg:px-8 lg:py-16 xl:gap-14">
+        <div class="max-w-3xl">
+          <p class="text-[0.72rem] font-black uppercase tracking-[0.24em] text-primary">Campeonato Vikingas 4ta versión</p>
+          <h1 class="mt-4 text-[clamp(2.4rem,8vw,5.8rem)] font-black uppercase leading-[0.88] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
+            Fútbol formativo
+            <span class="block text-primary">Un espacio real</span>
+          </h1>
+          <p class="mt-5 max-w-2xl text-[1rem] leading-7 text-[#546267] sm:text-[1.08rem] sm:leading-8">
+            Una jornada pensada para equipos formativos reales, con jugadoras de poca o nula experiencia que merecen vivir la competencia en un entorno cuidado, claro y coherente con su etapa.
+          </p>
+
+          <div class="mt-7 grid gap-3 sm:grid-cols-3">
+            <article class="rounded-[1.8rem] border border-[#d6ebe5] bg-white/88 px-4 py-4 shadow-[0_18px_40px_rgba(21,34,39,0.06)] backdrop-blur-sm">
+              <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Fecha</p>
+              <p class="mt-2 text-lg font-black uppercase text-[#152227]">16 de mayo</p>
+            </article>
+            <article class="rounded-[1.8rem] border border-[#d6ebe5] bg-white/88 px-4 py-4 shadow-[0_18px_40px_rgba(21,34,39,0.06)] backdrop-blur-sm">
+              <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Horario</p>
+              <p class="mt-2 text-lg font-black uppercase text-[#152227]">Desde 16:00</p>
+            </article>
+            <article class="rounded-[1.8rem] border border-[#d6ebe5] bg-white/88 px-4 py-4 shadow-[0_18px_40px_rgba(21,34,39,0.06)] backdrop-blur-sm sm:col-span-3 lg:col-span-1">
+              <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Lugar</p>
+              <p class="mt-2 text-lg font-black uppercase text-[#152227]">Domingo Tocornal</p>
+            </article>
+          </div>
+
+          <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+            <a
+              href="#equipos"
+              class="inline-flex min-h-12 items-center justify-center rounded-[1.2rem] bg-[#152227] px-6 py-3 text-sm font-black uppercase tracking-[0.14em] text-white transition-transform duration-200 hover:-translate-y-1"
+            >
+              Ver equipos
+            </a>
+            <a
+              href="#formato"
+              class="inline-flex min-h-12 items-center justify-center rounded-[1.2rem] border border-[#cfe5de] bg-white px-6 py-3 text-sm font-black uppercase tracking-[0.14em] text-[#152227] transition-transform duration-200 hover:-translate-y-1"
+            >
+              Cómo funciona
+            </a>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="absolute inset-0 translate-x-2 translate-y-3 rounded-[2.25rem] bg-[#d8b45d]/18 blur-2xl"></div>
+          <div class="relative overflow-hidden rounded-[2.25rem] border border-white/70 bg-white p-3 shadow-[0_28px_80px_rgba(21,34,39,0.12)] sm:p-4">
+            <img
+              src="../assets/seriec/eve.jpg"
+              alt="Jugadoras Vikingas en jornada de campeonato"
+              class=" h-96  w-full rounded-[1.75rem] object-cover object-top sm:h-70 lg:h-105"
+            >
+            <div class="mt-4 grid gap-3 sm:grid-cols-[auto_1fr] sm:items-center">
+              <div class="mx-auto flex h-20 w-20 items-center justify-center   sm:mx-0 sm:h-24 sm:w-24">
+                <img :src="logoVikingas" alt="Logo Vikingas Formativo" class="h-12 w-12 object-contain sm:h-14 sm:w-14">
               </div>
-
-              <h1 class="mt-6 uppercase leading-[0.86] text-[#122126]" style="font-family: 'Gobold High', sans-serif; font-size: clamp(3rem, 8vw, 6.6rem);">
-                <span class="block text-[#8b6a2f]">Campeonato</span>
-                <span class="block">Vikingas</span>
-                <span class="block text-primary">4ta versión</span>
-              </h1>
-
-              <p class="mt-6 max-w-2xl text-[clamp(1rem,2.2vw,1.24rem)] leading-relaxed text-[#415059]">
-                Relámpago de un día para recaudar fondos, enfocado exclusivamente en equipos de categoría C formativa. Una propuesta clara, justa y pensada para el contexto real del torneo.
-              </p>
-
-              <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <div class="rounded-full bg-[#152227] px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-white">
-                  16 de mayo · desde las 16 hrs
-                </div>
-                <div class="rounded-full border border-[#cfe9e4] bg-[#f4fcfa] px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-[#31756d]">
-                  Canchas Domingo Tocornal
-                </div>
-                <div class="rounded-full border border-primary/25 bg-primary/10 px-5 py-3 text-sm font-black uppercase tracking-[0.16em] text-primary">
-                  5 equipos participantes
-                </div>
-              </div>
-
-              <div class="mt-10 max-w-3xl border-l-4 border-primary pl-5 sm:pl-6">
-                <p class="text-[0.72rem] font-black uppercase tracking-[0.24em] text-primary">Condición obligatoria</p>
-                <p class="mt-3 text-[clamp(1.35rem,3.1vw,2.45rem)] font-black leading-[1.08] text-[#152227]">
-                  Solo categoría C formativa.
-                  <span class="text-[#5b696f]"> No se aceptan jugadoras de primera división, serie B+, federadas ni ex federadas.</span>
+              <div class="rounded-[1.6rem] border border-[#d8ebe5] bg-[#f5fbf9] px-4 py-4">
+                <p class="text-[0.68rem] font-black uppercase tracking-[0.2em] text-primary">Objetivo</p>
+                <p class="mt-2 text-sm leading-7 text-[#4f5d63] sm:text-[0.98rem]">
+                  Abrir un espacio competitivo para mujeres que están dando sus primeros pasos, con clubes que se toman en serio el trabajo formativo y el cuidado del entorno.
                 </p>
               </div>
             </div>
-
-            <div class="relative min-h-88 border-t border-[#d7ede8] bg-[#dff4f0] lg:border-l lg:border-t-0">
-              <img
-                :src="bannerEquipos"
-                alt="Ambiente Vikingas"
-                class="h-full w-full object-cover"
-              >
-              <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(237,249,247,0.12),rgba(237,249,247,0.68)_65%,rgba(237,249,247,0.92))]"></div>
-              <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
-                <div class="max-w-md rounded-[1.75rem] border border-white/60 bg-white/80 p-5 shadow-[0_20px_50px_rgba(89,66,24,0.12)] backdrop-blur-sm">
-                  <p class="text-[0.68rem] font-black uppercase tracking-[0.22em] text-[#8a6b2d]">Objetivo de la jornada</p>
-                  <p class="mt-3 text-lg font-black text-[#152227]">Abrir espacios reales para mujeres que recién comienzan.</p>
-                  <p class="mt-2 text-sm leading-7 text-[#546168]">
-                    Queremos que mujeres con poca o nada de experiencia también puedan vivir una competencia en un ambiente seguro, sano y formativo. Hoy existen muy pocos espacios pensados para este perfil de jugadora.
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
-        <div class="grid gap-4 md:grid-cols-3">
-          <article class="rounded-[1.8rem] border border-[#d7ede8] bg-white px-5 py-6 shadow-[0_20px_55px_rgba(27,87,79,0.08)]">
-            <p class="text-[0.68rem] font-black uppercase tracking-[0.22em] text-[#8a6b2d]">Fecha</p>
-            <p class="mt-3 text-2xl font-black text-[#152227]">Viernes 16 de mayo</p>
-            <p class="mt-2 text-sm leading-7 text-[#5b696f]">Inicio desde las 16:00 hrs.</p>
-          </article>
-          <article class="rounded-[1.8rem] border border-[#d7ede8] bg-white px-5 py-6 shadow-[0_20px_55px_rgba(27,87,79,0.08)]">
-            <p class="text-[0.68rem] font-black uppercase tracking-[0.22em] text-[#8a6b2d]">Sede</p>
-            <p class="mt-3 text-2xl font-black text-[#152227]">Domingo Tocornal</p>
-            <p class="mt-2 text-sm leading-7 text-[#5b696f]">Canchas del campeonato y jornada completa por anunciar.</p>
-          </article>
-          <article class="rounded-[1.8rem] border border-[#d7eee9] bg-[#f3fbf9] px-5 py-6 shadow-[0_20px_55px_rgba(34,134,120,0.08)]">
-            <p class="text-[0.68rem] font-black uppercase tracking-[0.22em] text-primary">Formato</p>
-            <p class="mt-3 text-2xl font-black text-[#152227]">Campeonato relámpago</p>
-            <p class="mt-2 text-sm leading-7 text-[#5b696f]">Cinco equipos, un día, tabla de posiciones y jornada solidaria.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
-        <div class="grid gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
-          <div>
-            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-primary">Sobre el torneo</p>
-            <h2 class="mt-4 xl:leading-18 text-[clamp(2rem,4.5vw,4rem)] font-black uppercase leading-[0.92] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
-              Una jornada pensada para competir con reglas claras
-            </h2>
-            <div class="mt-6 max-w-3xl space-y-5 text-[1rem] leading-8 text-[#526067] sm:text-[1.05rem]">
-              <p>
-                Este campeonato quiere defender algo que hoy cuesta mucho encontrar: un espacio realmente pensado para equipos formativos de verdad, con <strong class="font-black text-[#152227]">jugadoras que recién están empezando</strong> o que todavía tienen poca experiencia competitiva.
-              </p>
-              <p>
-                La intención no es mezclar niveles ni abrir una convocatoria ambigua. Queremos reunir a clubes organizados que también estén haciendo el trabajo de abrir cancha a nuevas jugadoras, sostener procesos iniciales y ofrecer experiencias sanas de competencia a mujeres que muchas veces quedan fuera de otros torneos.
-              </p>
-              <p>
-                Por eso el foco está puesto en <strong class="font-black text-[#152227]">categoría C formativa real</strong>: equipos que buscan crecer con seriedad, cuidar el entorno y darles un lugar a futbolistas conpoca o nada de experiencia para que también puedan vivir el torneo desde un <strong class="font-black text-[#152227]">contexto seguro</strong> y coherente con su etapa.
-              </p>
-            </div>
-          </div>
-
-          <aside class="rounded-4xl border border-[#d6ece7] bg-[#f7fcfb] p-6 shadow-[0_22px_60px_rgba(27,87,79,0.08)] sm:p-7">
-            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#8a6b2d]">Sin excepciones</p>
-            <h3 class="mt-3 text-3xl font-black uppercase leading-[0.94] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
-              Restricciones
-            </h3>
-            <ul class="mt-6 space-y-4 text-sm leading-7 text-[#55626a] sm:text-[0.98rem]">
-              <li class="border-b border-[#e0f1ee] pb-4">No se aceptan jugadoras de primera división.</li>
-              <li class="border-b border-[#e0f1ee] pb-4">No se aceptan jugadoras de serie B+.</li>
-              <li class="border-b border-[#e0f1ee] pb-4">No se aceptan jugadoras federadas.</li>
-              <li>No se aceptan ex federadas.</li>
-            </ul>
-          </aside>
-        </div>
-      </section>
-
-      <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
-        <div class="rounded-4xl border border-[#e8dcc5] bg-white p-6 shadow-[0_28px_70px_rgba(89,66,24,0.08)] sm:p-8">
-          <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-primary">Equipos participantes</p>
-              <h2 class="mt-3 text-[clamp(2rem,4vw,3.3rem)] font-black uppercase leading-[0.92] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
-                Cinco equipos para una sola tarde
-              </h2>
-            </div>
-            <p class="max-w-xl text-sm leading-7 text-[#5a686e]">
-              Vikingas Formativo ocupa uno de los cupos y los otros cuatro se muestran como equipos invitados hasta confirmar participación oficial.
+    <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <div class="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.95fr)] lg:items-start">
+        <article class="rounded-4xl border border-[#d8ebe5] bg-white px-5 py-6 shadow-[0_18px_60px_rgba(21,34,39,0.07)] sm:px-7 sm:py-8">
+          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-primary">Sobre el torneo</p>
+          <h2 class="mt-4 text-[clamp(2rem,5vw,4rem)] font-black uppercase leading-18 text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
+            Un espacio para jugadoras que quieren competir por primera vez
+          </h2>
+          <div class="mt-6 space-y-5 text-[1rem] leading-8 text-[#55646a] sm:text-[1.04rem]">
+            <p>
+              Este campeonato nace para defender un espacio real para equipos formativos, con jugadoras que recién comienzan o que todavía tienen poca experiencia competitiva.
+            </p>
+            <p>
+              La idea es reunir a clubes organizados que sí están abriendo lugar a nuevas jugadoras, sin mezclar niveles que terminen rompiendo el sentido del torneo.
+            </p>
+            <p>
+              El foco está puesto en que cada partido se viva desde un contexto seguro, sano y coherente con la etapa formativa de las futbolistas que participan.
             </p>
           </div>
+        </article>
 
-          <div class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-            <article
-              v-for="equipo in equiposParticipantes"
-              :key="equipo.nombre"
-              class="flex flex-col items-center rounded-[1.6rem] border border-[#ece1cb] bg-[#fcfaf5] px-4 py-5 text-center"
+        <aside class="rounded-4xl border border-[#d8b45d]/35 bg-[linear-gradient(180deg,#fffaf0_0%,#fff3d8_100%)] px-5 py-6 shadow-[0_22px_70px_rgba(138,107,45,0.16)] sm:px-7 sm:py-8">
+          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#8a6b2d]">Sin excepciones</p>
+          <h3 class="mt-3 text-[clamp(1.8rem,5vw,2.8rem)] font-black uppercase leading-[0.95] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
+            Restricciones
+          </h3>
+          <p class="mt-4 max-w-md text-sm leading-7 text-[#6f5a28] sm:text-[0.98rem]">
+            El campeonato está reservado para procesos formativos reales. Estas condiciones se aplican a todos los equipos invitados.
+          </p>
+          <ul class="mt-6 space-y-4 text-sm leading-7 text-[#4e4330] sm:text-[1rem]">
+            <li class="flex items-start gap-3 rounded-[1.35rem] border border-[#e4c985] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(138,107,45,0.1)]">
+              <span class="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#8a6b2d] text-[0.72rem] font-black text-white">1</span>
+              <span class="font-semibold">No se aceptan jugadoras de primera división.</span>
+            </li>
+            <li class="flex items-start gap-3 rounded-[1.35rem] border border-[#e4c985] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(138,107,45,0.1)]">
+              <span class="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#8a6b2d] text-[0.72rem] font-black text-white">2</span>
+              <span class="font-semibold">No se aceptan jugadoras de serie B+.</span>
+            </li>
+            <li class="flex items-start gap-3 rounded-[1.35rem] border border-[#e4c985] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(138,107,45,0.1)]">
+              <span class="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#8a6b2d] text-[0.72rem] font-black text-white">3</span>
+              <span class="font-semibold">No se aceptan jugadoras federadas.</span>
+            </li>
+            <li class="flex items-start gap-3 rounded-[1.35rem] border border-[#e4c985] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(138,107,45,0.1)]">
+              <span class="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#8a6b2d] text-[0.72rem] font-black text-white">4</span>
+              <span class="font-semibold">No se aceptan ex federadas.</span>
+            </li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section id="equipos" class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-primary">Equipos participantes</p>
+          <h2 class="mt-3 text-[clamp(2rem,5vw,3.6rem)] font-black uppercase leading-18 text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
+            Cinco equipos en jornada todos contra todos
+          </h2>
+        </div>
+        <p class="max-w-xl text-sm leading-7 text-[#56666b] sm:text-right sm:text-[0.98rem]">
+            Vikingas Formativo participa junto a cuatro equipos invitados que comparten el enfoque de abrir competencia para nuevas jugadoras.
+        </p>
+      </div>
+
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <article
+          v-for="equipo in equiposParticipantes"
+          :key="equipo.nombre"
+          class="group rounded-[1.9rem] border border-[#d6ebe5] bg-white px-5 py-5 shadow-[0_18px_40px_rgba(21,34,39,0.06)] transition-transform duration-200 hover:-translate-y-1"
+        >
+          <div class="flex flex-col gap-4" :class="equipo.esLocal ? 'items-center text-center' : 'items-start'">
+            <div
+              class="flex w-24 mx-auto shrink-0 items-center justify-center rounded-[1.35rem] "
             >
-              <div class="flex h-24 w-24 items-center justify-center rounded-full border border-[#e7d8b7] bg-white shadow-[0_12px_30px_rgba(89,66,24,0.08)]">
-                <img
-                  v-if="equipo.logo"
-                  :src="equipo.logo"
-                  :alt="equipo.nombre"
-                  class="h-16 w-16 object-contain"
-                >
-                <div
-                  v-else
-                  class="flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-[#152227] to-primary text-lg font-black uppercase tracking-[0.14em] text-white"
-                >
-                  {{ equipo.sigla }}
-                </div>
-              </div>
-              <p class="mt-4 text-sm font-black uppercase tracking-[0.08em] text-[#152227]">{{ equipo.nombre }}</p>
-              <p class="mt-2 text-xs leading-6 text-[#67757b]">{{ equipo.estado }}</p>
-            </article>
-          </div>
-        </div>
-      </section>
+              <img v-if="equipo.logo" :src="equipo.logo" :alt="`Logo ${equipo.nombre}`" class=" rounded-full object-cover">
+              <span v-else class="text-xs font-black uppercase tracking-[0.14em] py-7 ">Por confirmar</span>
+            </div>
 
-      <section class="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8 lg:pb-16">
-        <div class="overflow-hidden rounded-4xl border border-[#d9ece8] bg-[#f7fbfa] shadow-[0_24px_60px_rgba(34,134,120,0.08)]">
-          <div class="border-b border-[#dceeea] px-6 py-6 sm:px-8">
+            <div class="min-w-0 flex flex-col item-center mx-auto justify-center " :class="equipo.esLocal ? 'w-full' : ''">
+              <p class="text-[0.68rem] text-center font-black uppercase tracking-[0.2em]" :class="equipo.esLocal ? 'text-primary' : 'text-[#8a6b2d]'">
+                {{ equipo.etiqueta }}
+              </p>
+              <h3 class="mt-2 text-xl text-center font-black uppercase leading-tight text-[#152227]">
+                {{ equipo.nombre }}
+              </h3>
+            </div>
+          </div>
+        
+        </article>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <div class="grid gap-8 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
+        <article class="overflow-hidden rounded-4xl border border-[#d8ebe5] bg-white shadow-[0_18px_60px_rgba(21,34,39,0.07)]">
+          <div class="border-b border-[#e2efeb] px-5 py-5 sm:px-7">
             <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-primary">Tabla de posiciones</p>
-            <h2 class="mt-3 text-[clamp(2rem,4vw,3.1rem)] font-black uppercase leading-[0.92] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
-              Cómo se verá la tabla del torneo
+            <h2 class="mt-3 text-[clamp(1.9rem,5vw,3.2rem)] font-black uppercase leading-[0.95] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
+              CAMPEONATO VK
             </h2>
-            <p class="mt-3 max-w-3xl text-sm leading-7 text-[#5a686e]">
-              Vista preliminar de la tabla de posiciones para mostrar el formato del campeonato mientras se definen los equipos y resultados oficiales.
-            </p>
           </div>
 
           <div class="overflow-x-auto">
-            <table class="min-w-full text-left">
-              <thead>
-                <tr class="border-b border-[#dceeea] bg-white/70 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#5e6b72]">
-                  <th class="px-6 py-4 sm:px-8">Pos</th>
-                  <th class="px-6 py-4 sm:px-8">Equipo</th>
-                  <th class="px-4 py-4 text-center">PJ</th>
-                  <th class="px-4 py-4 text-center">G</th>
-                  <th class="px-4 py-4 text-center">E</th>
-                  <th class="px-4 py-4 text-center">P</th>
-                  <th class="px-4 py-4 text-center">DG</th>
-                  <th class="px-6 py-4 text-center sm:px-8">Pts</th>
+            <table class="min-w-full text-left text-sm text-[#425158]">
+              <thead class="bg-[#f4faf8] text-[0.7rem] font-black uppercase tracking-[0.16em] text-[#55727a]">
+                <tr>
+                  <th scope="col" class="px-4 py-4 sm:px-6">Equipo</th>
+                  <th scope="col" class="px-3 py-4 text-center">PJ</th>
+                  <th scope="col" class="px-3 py-4 text-center">PG</th>
+                  <th scope="col" class="px-3 py-4 text-center">PE</th>
+                  <th scope="col" class="px-3 py-4 text-center">PP</th>
+                  <th scope="col" class="px-3 py-4 text-center">GF</th>
+                  <th scope="col" class="px-3 py-4 text-center">GC</th>
+                  <th scope="col" class="px-4 py-4 text-center sm:px-6">Pts</th>
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="fila in tablaPosiciones"
-                  :key="fila.posicion"
-                  class="border-b border-[#e3f0ed] text-sm text-[#203037] last:border-b-0"
-                >
-                  <td class="px-6 py-4 font-black sm:px-8">{{ fila.posicion }}</td>
-                  <td class="px-6 py-4 sm:px-8">
-                    <div class="flex items-center gap-3">
-                      <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-[#d6e9e4] bg-white">
-                        <img
-                          v-if="fila.logo"
-                          :src="fila.logo"
-                          :alt="fila.equipo"
-                          class="h-7 w-7 object-contain"
-                        >
-                        <div
-                          v-else
-                          class="flex h-7 w-7 items-center justify-center rounded-full bg-linear-to-br from-[#152227] to-primary text-[11px] font-black uppercase text-white"
-                        >
-                          {{ fila.sigla }}
-                        </div>
-                      </div>
-                      <span class="font-bold">{{ fila.equipo }}</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-4 text-center font-semibold">{{ fila.pj }}</td>
-                  <td class="px-4 py-4 text-center font-semibold">{{ fila.g }}</td>
-                  <td class="px-4 py-4 text-center font-semibold">{{ fila.e }}</td>
-                  <td class="px-4 py-4 text-center font-semibold">{{ fila.p }}</td>
-                  <td class="px-4 py-4 text-center font-semibold">{{ fila.dg }}</td>
-                  <td class="px-6 py-4 text-center font-black text-primary sm:px-8">{{ fila.pts }}</td>
+                <tr v-for="fila in tablaPosiciones" :key="fila.equipo" class="border-t border-[#e5f0ed]">
+                  <th scope="row" class="px-4 py-4 text-sm font-black uppercase text-[#152227] sm:px-6">{{ fila.equipo }}</th>
+                  <td class="px-3 py-4 text-center">{{ fila.pj }}</td>
+                  <td class="px-3 py-4 text-center">{{ fila.pg }}</td>
+                  <td class="px-3 py-4 text-center">{{ fila.pe }}</td>
+                  <td class="px-3 py-4 text-center">{{ fila.pp }}</td>
+                  <td class="px-3 py-4 text-center">{{ fila.gf }}</td>
+                  <td class="px-3 py-4 text-center">{{ fila.gc }}</td>
+                  <td class="px-4 py-4 text-center font-black sm:px-6">{{ fila.pts }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </div>
-      </section>
+        </article>
 
-      <section class="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8 lg:pb-16">
-        <div class="rounded-4xl border border-[#d6ebe7] bg-white p-6 shadow-[0_24px_60px_rgba(34,134,120,0.08)] sm:p-8">
-          <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-primary">Cruces del campeonato</p>
-              <h2 class="mt-3 text-[clamp(2rem,4vw,3.1rem)] font-black uppercase leading-[0.92] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
-                Formato todos contra todos
-              </h2>
-            </div>
-            <p class="max-w-2xl text-sm leading-7 text-[#5a686e]">
-              Los cinco equipos jugarán en modalidad todos contra todos. Las campeonas y los puestos de segundo y tercer lugar se definirán directamente por tabla de posiciones.
-            </p>
-          </div>
+        <article id="formato" class="rounded-4xl border border-[#d8ebe5] bg-[linear-gradient(180deg,#ffffff_0%,#f5faf8_100%)] px-5 py-6 shadow-[0_18px_60px_rgba(21,34,39,0.07)] sm:px-7 sm:py-8">
+          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-primary">Formato</p>
+          <h2 class="mt-3 text-[clamp(1.9rem,5vw,3rem)] font-black uppercase leading-[0.95] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
+            Fácil de entender
+          </h2>
 
-          <div class="mt-8 grid gap-4 lg:grid-cols-3">
-            <article class="rounded-[1.6rem] border border-[#dff0ec] bg-[#f7fcfb] px-5 py-5">
+          <div class="mt-6 space-y-4">
+            <article class="rounded-[1.4rem] border border-[#deece7] bg-white px-4 py-4">
               <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Paso 1</p>
-              <h3 class="mt-3 text-lg font-black text-[#152227]">Todos contra todos</h3>
-              <p class="mt-2 text-sm leading-7 text-[#5c6a70]">
-                Cada equipo juega contra los demás durante la misma jornada.
-              </p>
+              <p class="mt-2 text-sm leading-7 text-[#55636a]">Los cinco equipos juegan una fase todos contra todos durante la jornada.</p>
             </article>
-
-            <article class="rounded-[1.6rem] border border-[#dff0ec] bg-[#f7fcfb] px-5 py-5">
+            <article class="rounded-[1.4rem] border border-[#deece7] bg-white px-4 py-4">
               <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Paso 2</p>
-              <h3 class="mt-3 text-lg font-black text-[#152227]">Se ordena la tabla</h3>
-              <p class="mt-2 text-sm leading-7 text-[#5c6a70]">
-                La ubicación final se define por puntos y diferencia de gol en la tabla general.
-              </p>
+              <p class="mt-2 text-sm leading-7 text-[#55636a]">La tabla define a las campeonas y también el orden del segundo y tercer lugar.</p>
             </article>
-
-            <article class="rounded-[1.6rem] border border-[#dff0ec] bg-[#f7fcfb] px-5 py-5">
+            <article class="rounded-[1.4rem] border border-[#deece7] bg-white px-4 py-4">
               <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Paso 3</p>
-              <h3 class="mt-3 text-lg font-black text-[#152227]">Se premian los lugares</h3>
-              <p class="mt-2 text-sm leading-7 text-[#5c6a70]">
-                Campeonas, segundo y tercer lugar se definen directamente por la tabla de posiciones.
-              </p>
+              <p class="mt-2 text-sm leading-7 text-[#55636a]">Lo importante no es solo competir: también sostener un ambiente seguro para procesos iniciales.</p>
             </article>
           </div>
+        </article>
+      </div>
+    </section>
 
-          <div class="mt-8 grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
-            <article
-              v-for="cruce in crucesDummy"
-              :key="cruce.id"
-              class="rounded-[1.6rem] border border-[#e2f0ed] bg-[#f8fcfb] p-5"
-            >
-              <div class="flex items-center justify-between gap-3">
-                <div>
-                  <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">{{ cruce.fecha }}</p>
-                  <p class="mt-2 text-sm font-semibold text-[#627177]">{{ cruce.hora }} · {{ cruce.cancha }}</p>
-                </div>
-                <span class="rounded-full border border-[#d6ebe7] bg-white px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-[#627177]">
-                  {{ cruce.ronda }}
-                </span>
-              </div>
-
-              <div class="mt-5 space-y-3">
-                <div class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 rounded-2xl bg-white px-4 py-3">
-                  <span class="text-center text-[0.95rem] font-black leading-5 text-[#152227] wrap-break-word">{{ cruce.local }}</span>
-                  <span class="text-xs font-black uppercase tracking-[0.18em] text-[#6b7b80]">vs</span>
-                  <span class="text-center text-[0.95rem] font-black leading-5 text-[#152227] wrap-break-word">{{ cruce.visita }}</span>
-                </div>
-              </div>
-            </article>
+    <section class="mx-auto max-w-7xl px-4 pb-14 sm:px-6 lg:px-8 lg:pb-20">
+      <div class="rounded-[2.2rem] border border-[#d8ebe5] bg-[#152227] px-5 py-7 shadow-[0_24px_80px_rgba(21,34,39,0.18)] sm:px-7 sm:py-9 lg:px-9">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#d8b45d]">Cruces del campeonato</p>
+            <h2 class="mt-3 text-[clamp(2rem,5vw,3.6rem)] font-black uppercase leading-[0.94] text-white" style="font-family: 'Gobold High', sans-serif;">
+              Programación por definir
+            </h2>
           </div>
+ 
         </div>
-      </section>
 
-      <section class="mx-auto max-w-5xl px-4 pb-18 text-center sm:px-6 lg:px-8 lg:pb-24">
-        <p class="text-[0.72rem] font-black uppercase tracking-[0.24em] text-primary">Próximamente</p>
-        <h2 class="mt-4 text-[clamp(2.2rem,4.8vw,4.2rem)] font-black uppercase leading-[0.9] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
-          Más información muy pronto
-        </h2>
-        <p class="mx-auto mt-6 max-w-3xl text-[1rem] leading-8 text-[#5c696f] sm:text-[1.08rem]">
-          Publicaremos fixture, equipos confirmados, bases y detalles de inscripción para que toda la información oficial quede clara antes del campeonato.
-        </p>
-      </section>
-    </div>
-  </section>
+        <div class="mt-8 grid gap-4 lg:grid-cols-2">
+          <article
+            v-for="cruce in crucesDummy"
+            :key="cruce.id"
+            class="rounded-[1.7rem] border border-white/10 bg-white/6 px-4 py-4 backdrop-blur-sm sm:px-5"
+          >
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#d8b45d]">{{ cruce.etapa }}</p>
+                <p class="mt-1 text-sm leading-6 text-white/64">Por definir</p>
+              </div>
+              <span class="inline-flex w-fit rounded-full border border-white/12 px-3 py-1 text-[0.68rem] font-black uppercase tracking-[0.16em] text-white/70">
+                Próximamente
+              </span>
+            </div>
+
+            <div class="mt-4 grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+              <div class="rounded-[1.2rem] bg-white/8 px-4 py-4 text-center text-sm font-black uppercase leading-6 text-white">
+                {{ cruce.local }}
+              </div>
+              <div class="text-center text-[0.7rem] font-black uppercase tracking-[0.22em] text-[#9dc9c2]">vs</div>
+              <div class="rounded-[1.2rem] bg-white/8 px-4 py-4 text-center text-sm font-black uppercase leading-6 text-white">
+                {{ cruce.visita }}
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
 </template>
 
 <script setup>
-const logoVikingas = new URL('../assets/logoVk.png', import.meta.url).href;
-const bannerEquipos = new URL('../assets/bannerequipos.webp', import.meta.url).href;
+import bannerEquipos from '../assets/bannerequipos.webp'
+import logoVikingas from '../assets/logoVk.png'
+import logoZorzales from '../assets/logos/zorzaleslogo.webp'
 
 const equiposParticipantes = [
   {
     nombre: 'Vikingas Formativo',
+    etiqueta: 'Equipo anfitrión',
+    descripcion: 'Representa el trabajo formativo de Vikingas y el objetivo de abrir experiencias competitivas para nuevas jugadoras.',
+    esLocal: true,
     logo: logoVikingas,
-    sigla: 'VF',
-    estado: 'Cupo base del torneo'
   },
   {
-    nombre: 'Equipo Invitado',
-    logo: '',
-    sigla: 'E1',
-    estado: 'Cupo por confirmar'
+    nombre: 'Zorzales FC',
+    etiqueta: 'Equipo invitado',
+    descripcion: 'Club invitado para sumar una competencia ordenada, segura y ajustada a procesos iniciales.',
+    esLocal: false,
+    logo: logoZorzales,
   },
   {
-    nombre: 'Equipo Invitado',
-    logo: '',
-    sigla: 'E2',
-    estado: 'Cupo por confirmar'
-  },
-  {
-    nombre: 'Equipo Invitado',
-    logo: '',
-    sigla: 'E3',
-    estado: 'Cupo por confirmar'
-  },
-  {
-    nombre: 'Equipo Invitado',
-    logo: '',
-    sigla: 'E4',
-    estado: 'Cupo por confirmar'
-  }
-];
+    nombre: 'Equipo Invitado 2',
+    etiqueta: 'Equipo invitado',
+    descripcion: 'Participación orientada a dar rodaje a jugadoras con poca experiencia en un contexto formativo real.',
+    esLocal: false,
+    logo: null,
 
-const tablaPosiciones = [
-  { posicion: 1, equipo: 'Vikingas Formativo', logo: logoVikingas, sigla: 'VF', pj: 0, g: 0, e: 0, p: 0, dg: '0', pts: 0 },
-  { posicion: 2, equipo: 'Equipo Invitado', logo: '', sigla: 'E1', pj: 0, g: 0, e: 0, p: 0, dg: '0', pts: 0 },
-  { posicion: 3, equipo: 'Equipo Invitado', logo: '', sigla: 'E2', pj: 0, g: 0, e: 0, p: 0, dg: '0', pts: 0 },
-  { posicion: 4, equipo: 'Equipo Invitado', logo: '', sigla: 'E3', pj: 0, g: 0, e: 0, p: 0, dg: '0', pts: 0 },
-  { posicion: 5, equipo: 'Equipo Invitado', logo: '', sigla: 'E4', pj: 0, g: 0, e: 0, p: 0, dg: '0', pts: 0 }
-];
+  },
+  {
+    nombre: 'Equipo Invitado 3',
+    etiqueta: 'Equipo invitado',
+    descripcion: 'Proceso pensado para competir sin perder el foco en el aprendizaje y el cuidado deportivo.',
+    esLocal: false,
+    logo: null,
+
+  },
+  {
+    nombre: 'Equipo Invitado 4',
+    etiqueta: 'Equipo invitado',
+    descripcion: 'Invitado con enfoque de desarrollo para nuevas futbolistas y progresión competitiva responsable.',
+    esLocal: false,
+    logo: null,
+
+
+  },
+]
+
+const tablaPosiciones = equiposParticipantes.map(({ nombre }) => ({
+  equipo: nombre,
+  pj: 0,
+  pg: 0,
+  pe: 0,
+  pp: 0,
+  gf: 0,
+  gc: 0,
+  pts: 0,
+}))
 
 const crucesDummy = [
   {
-    id: 'r1-a',
-    ronda: 'Fecha 1',
-    fecha: '16 mayo',
-    hora: '16:00',
-    cancha: 'Cancha 1',
-    local: 'Vikingas Formativo',
-    visita: 'Equipo Invitado'
+    id: 1,
+    etapa: 'Fecha 1',
+    horario: '16:00 - Cancha 1',
+    local: 'Equipo',
+    visita: 'Equipo Invitado 1',
   },
   {
-    id: 'r1-b',
-    ronda: 'Fecha 1',
-    fecha: '16 mayo',
-    hora: '16:40',
-    cancha: 'Cancha 2',
-    local: 'Equipo Invitado',
-    visita: 'Equipo Invitado'
+    id: 2,
+    etapa: 'Fecha 1',
+    horario: '16:00 - Cancha 2',
+    local: 'Equipo Invitado 2',
+    visita: 'Equipo Invitado 3',
   },
   {
-    id: 'r2-a',
-    ronda: 'Fecha 2',
-    fecha: '16 mayo',
-    hora: '17:20',
-    cancha: 'Cancha 1',
-    local: 'Equipo Invitado',
-    visita: 'Vikingas Formativo'
+    id: 3,
+    etapa: 'Fecha 2',
+    horario: '16:40 - Cancha 1',
+    local: 'Equipo',
+    visita: 'Equipo Invitado 4',
   },
   {
-    id: 'r2-b',
-    ronda: 'Fecha 2',
-    fecha: '16 mayo',
-    hora: '18:00',
-    cancha: 'Cancha 2',
-    local: 'Equipo Invitado',
-    visita: 'Equipo Invitado'
+    id: 4,
+    etapa: 'Fecha 2',
+    horario: '16:40 - Cancha 2',
+    local: 'Equipo Invitado 1',
+    visita: 'Equipo Invitado 2',
   },
   {
-    id: 'r3-a',
-    ronda: 'Fecha 3',
-    fecha: '16 mayo',
-    hora: '18:40',
-    cancha: 'Cancha 1',
-    local: 'Vikingas Formativo',
-    visita: 'Equipo Invitado'
+    id: 5,
+    etapa: 'Fecha 3',
+    horario: '17:20 - Cancha 1',
+    local: 'Equipo Invitado 3',
+    visita: 'Equipo',
   },
   {
-    id: 'r3-b',
-    ronda: 'Fecha 3',
-    fecha: '16 mayo',
-    hora: '19:20',
-    cancha: 'Cancha 2',
-    local: 'Equipo Invitado',
-    visita: 'Equipo Invitado'
-  }
-];
+    id: 6,
+    etapa: 'Fecha 3',
+    horario: '17:20 - Cancha 2',
+    local: 'Equipo Invitado 4',
+    visita: 'Equipo Invitado 1',
+  },
+]
 </script>
+
+<style>
+
+html {
+    scroll-behavior: smooth;
+}
+</style>
