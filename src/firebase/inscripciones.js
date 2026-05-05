@@ -12,6 +12,12 @@ import {
   onSnapshot
 } from 'firebase/firestore';
 import { db } from './config';
+import {
+  esEventoConRestriccionSemanal,
+  jugadoraPuedeAsistirEntrenamiento,
+  normalizarEquipoDisponibilidad,
+  obtenerEquiposJugadoraDisponibilidad
+} from '../utils/disponibilidadEntrenamientos';
 
 export const inscripciones = ref([]);
 export const isLoadingInscripciones = ref(false);
@@ -243,6 +249,11 @@ export const escucharInscripcionesEntrenamiento = (entrenamientoId, callback, ge
 // Crear inscripciones pendientes para todas las jugadoras del equipo
 export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
   try {
+    const entrenamientoSnap = await getDoc(doc(db, 'entrenamientos', entrenamientoId));
+    const entrenamiento = entrenamientoSnap.exists()
+      ? { id: entrenamientoSnap.id, ...entrenamientoSnap.data() }
+      : null;
+
     // Importar la función para obtener jugadoras
     const { fetchJugadorasRegistradasPorEquipo } = await import('./jugadorasAuth');
     
@@ -257,6 +268,10 @@ export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
     // Crear inscripción pendiente para cada jugadora
     const batch = [];
     for (const jugadora of jugadoras) {
+      if (entrenamiento && esEventoConRestriccionSemanal(entrenamiento) && !jugadoraPuedeAsistirEntrenamiento(jugadora, entrenamiento)) {
+        continue;
+      }
+
       // Verificar si ya existe una inscripción
       const q = query(
         collection(db, 'inscripcionesEntrenamientos'),
@@ -283,6 +298,79 @@ export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
     return true;
   } catch (err) {
     // // console.error('Error creando inscripciones pendientes:', err);
+    return false;
+  }
+};
+
+export const sincronizarInscripcionesPorDisponibilidadJugadora = async (jugadora) => {
+  try {
+    const jugadoraId = (jugadora?.id || jugadora?.uid || '').toString().trim();
+    if (!jugadoraId) return false;
+
+    const nombreCompleto = `${jugadora?.nombre || ''} ${jugadora?.apellido || ''}`.trim() || jugadora?.jugadoraNombre || 'Sin nombre';
+    const equiposJugadora = obtenerEquiposJugadoraDisponibilidad(jugadora);
+
+    const [entrenamientosSnap, inscripcionesSnap] = await Promise.all([
+      getDocs(collection(db, 'entrenamientos')),
+      getDocs(query(
+        collection(db, 'inscripcionesEntrenamientos'),
+        where('jugadoraId', '==', jugadoraId)
+      ))
+    ]);
+
+    const entrenamientos = entrenamientosSnap.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    }));
+    const inscripcionesExistentes = inscripcionesSnap.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    }));
+    const inscripcionesPorEntrenamiento = new Map(
+      inscripcionesExistentes.map((inscripcion) => [inscripcion.entrenamientoId, inscripcion])
+    );
+
+    const promesas = [];
+
+    entrenamientos.forEach((entrenamiento) => {
+      if (!esEventoConRestriccionSemanal(entrenamiento)) {
+        return;
+      }
+
+      const equipoEntrenamiento = normalizarEquipoDisponibilidad(entrenamiento?.equipo);
+      const inscripcionExistente = inscripcionesPorEntrenamiento.get(entrenamiento.id);
+      const perteneceAlEquipo = equiposJugadora.includes(equipoEntrenamiento);
+      const estaHabilitada = perteneceAlEquipo && jugadoraPuedeAsistirEntrenamiento(jugadora, entrenamiento);
+
+      if (estaHabilitada && !inscripcionExistente) {
+        promesas.push(
+          addDoc(collection(db, 'inscripcionesEntrenamientos'), {
+            entrenamientoId: entrenamiento.id,
+            jugadoraId,
+            jugadoraNombre: nombreCompleto,
+            estado: 'pendiente',
+            createdAt: new Date(),
+            updatedAt: new Date()
+          })
+        );
+      }
+
+      if (!estaHabilitada && inscripcionExistente) {
+        promesas.push(deleteDoc(doc(db, 'inscripcionesEntrenamientos', inscripcionExistente.id)));
+      }
+
+      if (estaHabilitada && inscripcionExistente && inscripcionExistente.jugadoraNombre !== nombreCompleto) {
+        promesas.push(updateDoc(doc(db, 'inscripcionesEntrenamientos', inscripcionExistente.id), {
+          jugadoraNombre: nombreCompleto,
+          updatedAt: new Date()
+        }));
+      }
+    });
+
+    await Promise.all(promesas);
+    return true;
+  } catch (err) {
+    console.error('Error sincronizando inscripciones por disponibilidad:', err);
     return false;
   }
 };

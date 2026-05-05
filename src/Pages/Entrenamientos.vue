@@ -406,6 +406,12 @@
                 <UserGroupIcon class="w-3.5 h-3.5" />
                 {{ contarConfirmadas(entrenamiento.id) }} confirmada{{ contarConfirmadas(entrenamiento.id) === 1 ? '' : 's' }}
               </span>
+              <span
+                v-if="contarExcluidas(entrenamiento.id) > 0"
+                class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 border border-slate-200"
+              >
+                {{ contarExcluidas(entrenamiento.id) }} fuera del calculo
+              </span>
             </div>
 
             <!-- Título -->
@@ -693,6 +699,12 @@
                     <div class="text-yellow-700 text-[9px] font-bold uppercase">Pendientes</div>
                   </div>
                 </div>
+                <div
+                  v-if="inscritasExcluidas.length > 0"
+                  class="mt-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-sky-700 text-center"
+                >
+                  {{ inscritasExcluidas.length }} jugadora{{ inscritasExcluidas.length === 1 ? '' : 's' }} fuera del calculo de asistencia
+                </div>
               </div>
 
               <!-- Tabs -->
@@ -897,6 +909,34 @@
                     </div>
                     <div v-else class="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                       <span class="text-yellow-600 font-bold text-sm">⏳</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="inscritasExcluidas.length > 0" class="mt-4 rounded-xl border border-sky-200 bg-sky-50/80 p-3">
+                  <div class="flex items-center justify-between gap-3 mb-3">
+                    <div>
+                      <p class="text-[11px] text-sky-700">Ausencias definidas</p>
+                    </div>
+                    <span class="rounded-full bg-sky-600 px-2.5 py-1 text-[10px] font-black text-white">
+                      {{ inscritasExcluidas.length }}
+                    </span>
+                  </div>
+                  <div class="space-y-2">
+                    <div
+                      v-for="inscrita in inscritasExcluidas"
+                      :key="`excluida-${inscrita.id}`"
+                      class="flex items-center gap-3 rounded-lg border border-sky-100 bg-white px-3 py-2"
+                    >
+                      <div class="w-8 h-8 rounded-full bg-linear-to-br from-sky-500 to-cyan-600 flex items-center justify-center text-white font-black text-xs shadow-sm">
+                        {{ obtenerIniciales(inscrita.jugadoraNombre) }}
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-xs font-bold text-gray-900">{{ inscrita.jugadoraNombre }}</p>
+                        <p class="text-[10px] text-gray-500">
+                          {{ obtenerEtiquetaEstadoLista(inscrita.estadoLista) }}. Estado actual: {{ obtenerEstadoSaludExclusion(inscrita.estadoSalud) }}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1327,6 +1367,7 @@ import { obtenerTotalesEstadisticasJugadora } from '../firebase/estadisticas';
 import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
 import CuestionarioSaludSemanal from '../components/CuestionarioSaludSemanal.vue';
 import kinesioLogo from '../assets/sponsors/kinesio.png';
+import { jugadoraCuentaParaAsistencia, jugadoraPuedeAsistirEntrenamiento, particionarInscripcionesPorAsistencia } from '../utils/disponibilidadEntrenamientos';
 
 const router = useRouter();
 const route = useRoute();
@@ -1402,6 +1443,7 @@ const mvpGanadoraFotoSeleccionado = ref('');
 const mvpGanadoraFotoCargando = ref(false);
 const cacheFotosJugadoras = ref({});
 const jugadorasDisponiblesMvpSeleccionado = ref([]);
+const jugadorasRegistradasPorId = ref(new Map());
 const equiposDisponibles = computed(() => obtenerEquiposDisponibles());
 const mostrarSelectorEquipos = computed(() => equiposDisponibles.value.length > 1);
 const bannerMensualidad = ref({
@@ -1514,12 +1556,19 @@ const eventoVisibleEnHistorialAdmin = (entrenamiento) => {
 };
 
 // Computed para obtener inscripciones organizadas del entrenamiento seleccionado
-const inscritasOrganizadas = computed(() => {
+const inscritasOrganizadasRaw = computed(() => {
   if (!entrenamientoSeleccionadoId.value) {
     return { confirmadas: [], bajas: [], pendientes: [] };
   }
   return todasInscritasOrganizadas.value[entrenamientoSeleccionadoId.value] || { confirmadas: [], bajas: [], pendientes: [] };
 });
+
+const particionInscripcionesSeleccionadas = computed(() => {
+  return particionarInscripcionesPorAsistencia(inscritasOrganizadasRaw.value, jugadorasRegistradasPorId.value);
+});
+
+const inscritasOrganizadas = computed(() => particionInscripcionesSeleccionadas.value.visibles);
+const inscritasExcluidas = computed(() => particionInscripcionesSeleccionadas.value.excluidas);
 
 // Función auxiliar para obtener iniciales
 const obtenerIniciales = (nombre) => {
@@ -1529,6 +1578,35 @@ const obtenerIniciales = (nombre) => {
     return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
   }
   return nombre.substring(0, 2).toUpperCase();
+};
+
+const cargarJugadorasRegistradasMapa = async () => {
+  try {
+    const jugadoras = await fetchJugadorasRegistradasPorEquipo('ambos');
+    jugadorasRegistradasPorId.value = new Map(jugadoras.map((jugadora) => [jugadora.id, jugadora]));
+  } catch {
+    jugadorasRegistradasPorId.value = new Map();
+  }
+};
+
+const obtenerEstadoSaludExclusion = (estado) => {
+  const map = {
+    lesionada: 'Lesionada',
+    recuperacion: 'En recuperación',
+    vacaciones: 'De vacaciones'
+  };
+
+  return map[estado] || 'No disponible';
+};
+
+const obtenerEtiquetaEstadoLista = (estadoLista) => {
+  const map = {
+    confirmadas: 'Confirmada',
+    bajas: 'Baja',
+    pendientes: 'Pendiente'
+  };
+
+  return map[estadoLista] || 'Sin estado';
 };
 
 // Verificar autenticación
@@ -1542,6 +1620,10 @@ const entrenamientosFiltered = computed(() => {
     .filter(e => {
       // Filtrar por equipo
       if (e.equipo !== equipoSeleccionado.value) return false;
+
+      if (!esAdmin.value && jugadoraData.value && !jugadoraPuedeAsistirEntrenamiento(jugadoraData.value, e)) {
+        return false;
+      }
 
       // Mantener en listado según rol y tipo de evento
       return eventoVisibleEnListado(e);
@@ -1866,7 +1948,7 @@ const votarMvpSeleccionado = async (jugadoraNombre) => {
 
 const rachaReciente = computed(() => {
   const historialConRespuesta = entrenamientos.value
-    .filter(e => e.equipo === equipoSeleccionado.value)
+    .filter(e => e.equipo === equipoSeleccionado.value && (!jugadoraData.value || jugadoraPuedeAsistirEntrenamiento(jugadoraData.value, e)))
     .map(e => {
       const fecha = new Date(e.fecha?.seconds ? e.fecha.seconds * 1000 : e.fecha || 0);
       return {
@@ -1901,7 +1983,7 @@ const esEntrenamientoContabilizable = (entrenamiento) => {
 
 const estadisticasJugadora = computed(() => {
   const entrenamientosTemporada = entrenamientos.value.filter(
-    (entrenamiento) => esEntrenamientoContabilizable(entrenamiento)
+    (entrenamiento) => esEntrenamientoContabilizable(entrenamiento) && (!jugadoraData.value || jugadoraCuentaParaAsistencia(jugadoraData.value, entrenamiento))
   );
   
   const confirmadas = entrenamientosTemporada.filter(
@@ -2007,6 +2089,10 @@ const contarConfirmadas = (entrenamientoId) => {
   return conteoInscritas.value[entrenamientoId]?.confirmadas || 0;
 };
 
+const contarExcluidas = (entrenamientoId) => {
+  return conteoInscritas.value[entrenamientoId]?.excluidas || 0;
+};
+
 const limpiarListenersConteoEntrenamientos = (idsMantener = []) => {
   const idsPermitidos = new Set(idsMantener);
 
@@ -2033,12 +2119,14 @@ const sincronizarConteosEntrenamientosVisibles = () => {
     unsubConteosEntrenamientos.value[entrenamiento.id] = escucharInscripcionesEntrenamiento(
       entrenamiento.id,
       (organizadas) => {
+        const { visibles, excluidas } = particionarInscripcionesPorAsistencia(organizadas, jugadorasRegistradasPorId.value);
         conteoInscritas.value = {
           ...conteoInscritas.value,
           [entrenamiento.id]: {
-            confirmadas: organizadas.confirmadas.length,
-            bajas: organizadas.bajas.length,
-            pendientes: organizadas.pendientes.length
+            confirmadas: visibles.confirmadas.length,
+            bajas: visibles.bajas.length,
+            pendientes: visibles.pendientes.length,
+            excluidas: excluidas.length
           }
         };
       },
@@ -2078,10 +2166,12 @@ const suscribirInscripcionesDetalle = (entrenamientoId) => {
   };
 
   unsubInscripcionesDetalle.value = escucharInscripcionesEntrenamiento(entrenamientoId, (organizadas) => {
+    const { visibles, excluidas } = particionarInscripcionesPorAsistencia(organizadas, jugadorasRegistradasPorId.value);
     conteoInscritas.value[entrenamientoId] = {
-      confirmadas: organizadas.confirmadas.length,
-      bajas: organizadas.bajas.length,
-      pendientes: organizadas.pendientes.length
+      confirmadas: visibles.confirmadas.length,
+      bajas: visibles.bajas.length,
+      pendientes: visibles.pendientes.length,
+      excluidas: excluidas.length
     };
 
     todasInscritasOrganizadas.value[entrenamientoId] = organizadas;
@@ -2236,6 +2326,7 @@ const formatearEstadoSalud = (estado) => {
     disponible: 'Disponible',
     lesionada: 'Lesionada',
     recuperacion: 'En recuperación',
+    vacaciones: 'De vacaciones',
     no_disponible: 'No disponible'
   };
   return map[estado] || 'Disponible';
@@ -2463,7 +2554,7 @@ const handleLogout = async () => {
 };
 
 onMounted(() => {
-  
+  cargarJugadorasRegistradasMapa();
   cargarEntrenamientos();
   cargarBannerMensualidad();
   cargarProximoCumpleanios(); // Cargar el próximo cumpleaños

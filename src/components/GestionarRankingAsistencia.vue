@@ -114,40 +114,51 @@ import { ref, computed, onMounted } from 'vue';
 import { collection, getDocs } from 'firebase/firestore';
 import { ChartBarIcon } from '@heroicons/vue/24/outline';
 import { db } from '../firebase/config';
+import {
+  jugadoraCuentaParaAsistencia,
+  normalizarEquipoDisponibilidad,
+  obtenerEquiposJugadoraDisponibilidad
+} from '../utils/disponibilidadEntrenamientos';
 
 const isLoading = ref(true);
 const rankingPorTipo = ref({
   todos: {
     todos: [],
     ascenso: [],
-    escuela: []
+    escuela: [],
+    serieC: []
   },
   entrenamientos: {
     todos: [],
     ascenso: [],
-    escuela: []
+    escuela: [],
+    serieC: []
   },
   partidos: {
     todos: [],
     ascenso: [],
-    escuela: []
+    escuela: [],
+    serieC: []
   }
 });
 const eventosConsideradosPorTipo = ref({
   todos: {
     todos: 0,
     ascenso: 0,
-    escuela: 0
+    escuela: 0,
+    serieC: 0
   },
   entrenamientos: {
     todos: 0,
     ascenso: 0,
-    escuela: 0
+    escuela: 0,
+    serieC: 0
   },
   partidos: {
     todos: 0,
     ascenso: 0,
-    escuela: 0
+    escuela: 0,
+    serieC: 0
   }
 });
 const equipoSeleccionado = ref('todos');
@@ -156,7 +167,8 @@ const tipoEventoSeleccionado = ref('todos');
 const equiposFiltro = [
   { id: 'todos', label: 'Todos' },
   { id: 'ascenso', label: 'Ascenso' },
-  { id: 'escuela', label: 'Escuela' }
+  { id: 'escuela', label: 'Escuela' },
+  { id: 'serieC', label: 'Serie C' }
 ];
 
 const tiposEventoFiltro = [
@@ -165,27 +177,9 @@ const tiposEventoFiltro = [
   { id: 'partidos', label: 'Solo partidos' }
 ];
 
-const normalizarEquipo = (equipo) => {
-  const valor = (equipo || '').toString().trim().toLowerCase();
-  if (valor === 'ascenso' || valor === 'escuela' || valor === 'ambos') return valor;
-  return 'sin-equipo';
-};
+const normalizarEquipo = (equipo) => normalizarEquipoDisponibilidad(equipo) || 'sin-equipo';
 
-const obtenerEquiposJugadora = (jugadora = {}) => {
-  if (Array.isArray(jugadora.equipos) && jugadora.equipos.length > 0) {
-    const equipos = [...new Set(jugadora.equipos.map(normalizarEquipo))]
-      .filter((equipo) => equipo === 'ascenso' || equipo === 'escuela');
-
-    if (equipos.length > 0) {
-      return equipos;
-    }
-  }
-
-  const equipoLegacy = normalizarEquipo(jugadora.equipo);
-  if (equipoLegacy === 'ambos') return ['ascenso', 'escuela'];
-  if (equipoLegacy === 'ascenso' || equipoLegacy === 'escuela') return [equipoLegacy];
-  return [];
-};
+const obtenerEquiposJugadora = (jugadora = {}) => obtenerEquiposJugadoraDisponibilidad(jugadora);
 
 const obtenerNombreJugadora = (jugadora = {}) => {
   const nombreCompleto = `${jugadora.nombre || ''} ${jugadora.apellido || ''}`.trim();
@@ -278,7 +272,8 @@ const getFechaHoraMs = (ent) => {
 const crearAcumuladoBase = (jugadorasBase) => {
   const acumuladoPorEquipo = {
     ascenso: new Map(),
-    escuela: new Map()
+    escuela: new Map(),
+    serieC: new Map()
   };
 
   jugadorasBase.forEach((jugadora) => {
@@ -336,9 +331,10 @@ const ordenarLista = (listaBase) => {
 const construirRankingPorEquipo = (acumuladoPorEquipo) => {
   const rankingAscenso = ordenarLista(Array.from(acumuladoPorEquipo.ascenso.values()));
   const rankingEscuela = ordenarLista(Array.from(acumuladoPorEquipo.escuela.values()));
+  const rankingSerieC = ordenarLista(Array.from(acumuladoPorEquipo.serieC.values()));
 
   const acumuladoTodos = new Map();
-  [...rankingAscenso, ...rankingEscuela].forEach((item) => {
+  [...rankingAscenso, ...rankingEscuela, ...rankingSerieC].forEach((item) => {
     const existente = acumuladoTodos.get(item.jugadoraId);
     if (!existente) {
       acumuladoTodos.set(item.jugadoraId, {
@@ -367,6 +363,7 @@ const construirRankingPorEquipo = (acumuladoPorEquipo) => {
   return {
     ascenso: rankingAscenso,
     escuela: rankingEscuela,
+    serieC: rankingSerieC,
     todos: ordenarLista(Array.from(acumuladoTodos.values()))
   };
 };
@@ -406,17 +403,18 @@ const cargarRanking = async () => {
 
     const entrenamientosConsiderados = entrenamientosSnap.docs
       .map((documento) => ({ id: documento.id, ...documento.data() }));
+    const entrenamientosPorId = new Map(entrenamientosConsiderados.map((entrenamiento) => [entrenamiento.id, entrenamiento]));
 
     const idsFinalizadosPorTipo = {
-      todos: { ascenso: new Set(), escuela: new Set() },
-      entrenamientos: { ascenso: new Set(), escuela: new Set() },
-      partidos: { ascenso: new Set(), escuela: new Set() }
+      todos: { ascenso: new Set(), escuela: new Set(), serieC: new Set() },
+      entrenamientos: { ascenso: new Set(), escuela: new Set(), serieC: new Set() },
+      partidos: { ascenso: new Set(), escuela: new Set(), serieC: new Set() }
     };
 
     entrenamientosConsiderados.forEach((ent) => {
       const equipoEntrenamiento = normalizarEquipo(ent?.equipo);
       const tipoEvento = obtenerTipoFiltroEvento(ent);
-      if (equipoEntrenamiento === 'ascenso' || equipoEntrenamiento === 'escuela') {
+      if (equipoEntrenamiento === 'ascenso' || equipoEntrenamiento === 'escuela' || equipoEntrenamiento === 'serieC') {
         idsFinalizadosPorTipo.todos[equipoEntrenamiento].add(ent.id);
         idsFinalizadosPorTipo[tipoEvento][equipoEntrenamiento].add(ent.id);
       }
@@ -441,10 +439,16 @@ const cargarRanking = async () => {
       const equiposJugadora = jugadora?.equipos || [];
       if (equiposJugadora.length === 0) return;
 
+      const entrenamientoRelacionado = entrenamientosPorId.get(data.entrenamientoId);
+      if (!entrenamientoRelacionado) return;
+      if (jugadora && !jugadoraCuentaParaAsistencia(jugadora, entrenamientoRelacionado)) return;
+
       const esEventoAscensoEntrenamiento = idsFinalizadosPorTipo.entrenamientos.ascenso.has(data.entrenamientoId);
       const esEventoEscuelaEntrenamiento = idsFinalizadosPorTipo.entrenamientos.escuela.has(data.entrenamientoId);
+      const esEventoSerieCEntrenamiento = idsFinalizadosPorTipo.entrenamientos.serieC.has(data.entrenamientoId);
       const esEventoAscensoPartido = idsFinalizadosPorTipo.partidos.ascenso.has(data.entrenamientoId);
       const esEventoEscuelaPartido = idsFinalizadosPorTipo.partidos.escuela.has(data.entrenamientoId);
+      const esEventoSerieCPartido = idsFinalizadosPorTipo.partidos.serieC.has(data.entrenamientoId);
       const rankingJugadoraId = jugadora.id;
 
       if (equiposJugadora.includes('ascenso')) {
@@ -470,23 +474,38 @@ const cargarRanking = async () => {
           registrarInscripcion(acumuladosPorTipo.todos.escuela, rankingJugadoraId, data, 'escuela');
         }
       }
+
+      if (equiposJugadora.includes('serieC')) {
+        if (esEventoSerieCEntrenamiento) {
+          registrarInscripcion(acumuladosPorTipo.entrenamientos.serieC, rankingJugadoraId, data, 'serieC');
+          registrarInscripcion(acumuladosPorTipo.todos.serieC, rankingJugadoraId, data, 'serieC');
+        }
+
+        if (esEventoSerieCPartido) {
+          registrarInscripcion(acumuladosPorTipo.partidos.serieC, rankingJugadoraId, data, 'serieC');
+          registrarInscripcion(acumuladosPorTipo.todos.serieC, rankingJugadoraId, data, 'serieC');
+        }
+      }
     });
 
     eventosConsideradosPorTipo.value = {
       todos: {
         ascenso: idsFinalizadosPorTipo.todos.ascenso.size,
         escuela: idsFinalizadosPorTipo.todos.escuela.size,
-        todos: idsFinalizadosPorTipo.todos.ascenso.size + idsFinalizadosPorTipo.todos.escuela.size
+        serieC: idsFinalizadosPorTipo.todos.serieC.size,
+        todos: idsFinalizadosPorTipo.todos.ascenso.size + idsFinalizadosPorTipo.todos.escuela.size + idsFinalizadosPorTipo.todos.serieC.size
       },
       entrenamientos: {
         ascenso: idsFinalizadosPorTipo.entrenamientos.ascenso.size,
         escuela: idsFinalizadosPorTipo.entrenamientos.escuela.size,
-        todos: idsFinalizadosPorTipo.entrenamientos.ascenso.size + idsFinalizadosPorTipo.entrenamientos.escuela.size
+        serieC: idsFinalizadosPorTipo.entrenamientos.serieC.size,
+        todos: idsFinalizadosPorTipo.entrenamientos.ascenso.size + idsFinalizadosPorTipo.entrenamientos.escuela.size + idsFinalizadosPorTipo.entrenamientos.serieC.size
       },
       partidos: {
         ascenso: idsFinalizadosPorTipo.partidos.ascenso.size,
         escuela: idsFinalizadosPorTipo.partidos.escuela.size,
-        todos: idsFinalizadosPorTipo.partidos.ascenso.size + idsFinalizadosPorTipo.partidos.escuela.size
+        serieC: idsFinalizadosPorTipo.partidos.serieC.size,
+        todos: idsFinalizadosPorTipo.partidos.ascenso.size + idsFinalizadosPorTipo.partidos.escuela.size + idsFinalizadosPorTipo.partidos.serieC.size
       }
     };
 

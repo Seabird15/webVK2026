@@ -93,6 +93,22 @@
           />
         </div>
 
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Estado actual
+          </label>
+          <select
+            v-model="formulario.estadoSalud"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="disponible">Disponible</option>
+            <option value="lesionada">Lesionada</option>
+            <option value="recuperacion">En recuperación</option>
+            <option value="vacaciones">De vacaciones</option>
+            <option value="no_disponible">No disponible</option>
+          </select>
+        </div>
+
         <!-- Foto -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -176,6 +192,7 @@
             </h4>
             <p class="text-primary font-bold">{{ jugadora.posicion }}</p>
             <p class="text-gray-600 text-sm">Dorsal: {{ jugadora.numero }}</p>
+            <p class="text-gray-600 text-sm">Estado: {{ formatearEstadoSalud(jugadora.estadoSalud) }}</p>
 
             <!-- Acciones -->
             <div class="flex gap-2 mt-4">
@@ -240,10 +257,23 @@ const formulario = ref({
   apellido: '',
   posicion: '',
   numero: 0,
+  estadoSalud: 'disponible',
   fotoFile: null,
   fotoNombre: '',
   fotoPreview: null
 });
+
+const formatearEstadoSalud = (estado) => {
+  const map = {
+    disponible: 'Disponible',
+    lesionada: 'Lesionada',
+    recuperacion: 'En recuperación',
+    vacaciones: 'De vacaciones',
+    no_disponible: 'No disponible'
+  };
+
+  return map[estado] || 'Disponible';
+};
 
 const equipoActual = computed(() => 
   equipos.find(e => e.id === equipoSeleccionado.value)
@@ -293,6 +323,7 @@ const handleAgregarJugadora = async () => {
         apellido: formulario.value.apellido,
         posicion: formulario.value.posicion,
         numero: formulario.value.numero,
+        estadoSalud: formulario.value.estadoSalud,
         equipo: equipoSeleccionado.value
       },
       formulario.value.fotoFile
@@ -304,6 +335,7 @@ const handleAgregarJugadora = async () => {
       apellido: '',
       posicion: '',
       numero: 0,
+      estadoSalud: 'disponible',
       fotoFile: null,
       fotoNombre: '',
       fotoPreview: null

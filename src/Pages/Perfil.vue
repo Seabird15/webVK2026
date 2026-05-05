@@ -165,6 +165,7 @@
               <option value="disponible">Disponible</option>
               <option value="lesionada">Lesionada</option>
               <option value="recuperacion">En recuperación</option>
+              <option value="vacaciones">De vacaciones</option>
               <option value="no_disponible">No disponible</option>
             </select>
           </div>
@@ -341,6 +342,7 @@ const formatearEstadoSalud = (estado) => {
     disponible: 'Disponible',
     lesionada: 'Lesionada',
     recuperacion: 'En recuperación',
+    vacaciones: 'De vacaciones',
     no_disponible: 'No disponible'
   };
   return map[estado] || 'Disponible';

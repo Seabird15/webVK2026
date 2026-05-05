@@ -4,7 +4,7 @@ import Equipo from '../Pages/Equipo.vue';
 import Login from '../Pages/Login.vue';
 import Admin from '../Pages/Admin.vue';
 import { authUser, userRole, authReady } from '../firebase/auth';
-import { jugadoraAuthUser, authReady as jugadoraAuthReady } from '../firebase/jugadorasAuth';
+import { jugadoraAuthUser, authReady as jugadoraAuthReady, logoutJugadora, tieneAccesoAprobadoJugadora } from '../firebase/jugadorasAuth';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase/config';
 import { trackPageView } from '../composables/useAnalytics';
@@ -93,6 +93,15 @@ const routes = [
     meta: {
       title: 'Competencias y Resultados — CD Vikingas',
       description: 'Resultados, tablas de posiciones y competencias de CD Vikingas en Liga Dobleve. Fútbol femenino competitivo en Santiago.'
+    }
+  },
+  {
+    path: '/campeonato-vikingas-4ta',
+    name: 'CampeonatoVikingas4ta',
+    component: () => import('../Pages/CampeonatoVikingas4ta.vue'),
+    meta: {
+      title: 'Campeonato Vikingas 4ta Versión — CD Vikingas',
+      description: 'Campeonato relámpago solidario de Vikingas para categoría C formativa. 16 de mayo desde las 16:00 en canchas Domingo Tocornal. Pronto más información.'
     }
   },
   {
@@ -216,7 +225,14 @@ router.beforeEach(async (to, from, next) => {
     }
 
     if (jugadoraAuthUser.value) {
-      next();
+      const accesoAprobado = await tieneAccesoAprobadoJugadora(jugadoraAuthUser.value.uid);
+
+      if (accesoAprobado) {
+        next();
+      } else {
+        await logoutJugadora();
+        next('/login-jugadora');
+      }
     } else {
       next('/login-jugadora');
     }
@@ -225,7 +241,14 @@ router.beforeEach(async (to, from, next) => {
   else if (to.path === '/login' && authUser.value && (userRole.value === 'admin' || userRole.value === 'coach')) {
     next('/admin');
   } else if (to.path === '/login-jugadora' && jugadoraAuthUser.value) {
-    next('/entrenamientos'); // O a la ruta que consideres principal para jugadoras
+    const accesoAprobado = await tieneAccesoAprobadoJugadora(jugadoraAuthUser.value.uid);
+
+    if (accesoAprobado) {
+      next('/entrenamientos'); // O a la ruta que consideres principal para jugadoras
+    } else {
+      await logoutJugadora();
+      next();
+    }
   }
   // Permitir acceso a rutas públicas
   else {

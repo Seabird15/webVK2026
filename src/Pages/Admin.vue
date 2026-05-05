@@ -1029,6 +1029,7 @@ import { db } from '../firebase/config';
 import { obtenerEquiposJugadoraDesdeDatos } from '../firebase/jugadorasAuth';
 import { escucharAlertasSaludSemanalAdmin, escucharRespuestasSaludSemanal, limpiarSaludSemanalAntiguaS, obtenerSemanaClave } from '../firebase/saludSemanal';
 import { crearFeedback, obtenerTodosFeedbacks, limpiarFeedbacksAntiguos, escucharTodosFeedbacks } from '../firebase/feedback';
+import { jugadoraExcluidaDeAsistencia } from '../utils/disponibilidadEntrenamientos';
 
 const router = useRouter();
 const route = useRoute();
@@ -1070,8 +1071,8 @@ const tabs = computed(() => {
     { id: 'historial', label: 'Historial', icon: ChartBarIcon },
     { id: 'galeria', label: 'Galería', icon: CameraIcon },
     { id: 'estadisticas', label: 'Estadísticas', icon: ArrowTrendingUpIcon },
-    { id: 'resultados-partidos', label: 'Editar Resultados', icon: TrophyIcon },
-    { id: 'ultimos-resultados', label: 'Ultimos Resultados Home', icon: FlagIcon },
+    { id: 'resultados-partidos', label: 'Editar Resultados en tiempo real', icon: TrophyIcon },
+    { id: 'ultimos-resultados', label: 'Editar últimos resultados vista home', icon: FlagIcon },
   ];
 
   if (esAdmin.value) {
@@ -1507,12 +1508,28 @@ const cargarProximoCumpleanios = async () => {
 // Función para cargar inscripciones de todos los entrenamientos
 const cargarInscripcionesEntrenamientos = async () => {
   try {
-    const snapshot = await getDocs(collection(db, 'inscripcionesEntrenamientos'));
+    const [snapshot, jugadorasSnapshot, entrenamientosSnapshot] = await Promise.all([
+      getDocs(collection(db, 'inscripcionesEntrenamientos')),
+      getDocs(collection(db, 'jugadoraRegistro')),
+      getDocs(collection(db, 'entrenamientos'))
+    ]);
     const inscripcionesPorId = {};
+    const jugadorasPorId = new Map(
+      jugadorasSnapshot.docs.map((documento) => [documento.id, documento.data()])
+    );
+    const entrenamientosPorId = new Map(
+      entrenamientosSnapshot.docs.map((documento) => [documento.id, documento.data()])
+    );
     
     snapshot.forEach(doc => {
       const data = doc.data();
       const entrenamientoId = data.entrenamientoId;
+      const entrenamiento = entrenamientosPorId.get(entrenamientoId);
+      const jugadora = jugadorasPorId.get(data.jugadoraId);
+
+      if (entrenamiento && !esPartidoOAmistoso(entrenamiento) && jugadoraExcluidaDeAsistencia(jugadora)) {
+        return;
+      }
       
       if (!inscripcionesPorId[entrenamientoId]) {
         inscripcionesPorId[entrenamientoId] = {
@@ -1672,6 +1689,12 @@ watch(
     }
   }
 );
+
+watch(activeTab, async (tab) => {
+  if (tab === 'home' || tab === 'ranking-asistencia') {
+    await cargarInscripcionesEntrenamientos();
+  }
+});
 
 const verDetalles = (ent) => {
   if (!ent || !ent.id) return;

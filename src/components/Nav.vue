@@ -158,9 +158,10 @@ const navLinks = [
   { id: 2, label: 'Calendario', path: '/calendario', icon: CalendarIcon },
   { id: 3, label: 'Equipo', path: '/equipo', icon: UserGroupIcon },
   { id: 4, label: 'Competencias', path: '/competencias', icon: TrophyIcon },
-  { id: 5, label: 'Estadísticas', path: '/estadisticas', icon: ChartBarIcon },
-  { id: 6, label: 'Indumentaria', path: '/indumentaria', icon: PhotoIcon },
-  { id: 7, label: 'Fotos', path: '/fotos', icon: PhotoIcon },
-  { id: 8, label: 'Contacto', path: '/contacto', icon: EnvelopeIcon },
+  { id: 5, label: 'Campeonato 4ta', path: '/campeonato-vikingas-4ta', icon: TrophyIcon },
+  { id: 6, label: 'Estadísticas', path: '/estadisticas', icon: ChartBarIcon },
+  { id: 7, label: 'Indumentaria', path: '/indumentaria', icon: PhotoIcon },
+  { id: 8, label: 'Fotos', path: '/fotos', icon: PhotoIcon },
+  { id: 9, label: 'Contacto', path: '/contacto', icon: EnvelopeIcon },
 ];
 </script>

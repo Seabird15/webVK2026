@@ -32,6 +32,21 @@
           </div>
         </div>
 
+        <div class="space-y-2">
+          <label class="block text-sm font-bold text-gray-700">Estado actual</label>
+          <select
+            v-model="estadoSalud"
+            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="disponible">Disponible</option>
+            <option value="lesionada">Lesionada</option>
+            <option value="recuperacion">En recuperación</option>
+            <option value="vacaciones">De vacaciones</option>
+            <option value="no_disponible">No disponible</option>
+          </select>
+          <p class="text-xs text-gray-500">Lesionada, recuperación y vacaciones quedan fuera del cálculo de asistencia.</p>
+        </div>
+
         <!-- Sección de Equipos -->
         <div class="space-y-3">
           <label class="block text-sm font-bold text-gray-700">Equipos</label>
@@ -82,6 +97,59 @@
             </p>
           </div>
         </div>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm font-bold text-gray-700">Dias habilitados de entrenamiento</label>
+              <p class="text-xs text-gray-500 mt-1">Solo contará en asistencias y pendientes de los dias marcados para cada equipo.</p>
+            </div>
+
+            <div v-if="configuracionDiasPorEquipo.length === 0" class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-semibold text-amber-700">
+              Selecciona al menos un equipo para configurar los dias de entrenamiento.
+            </div>
+
+            <div v-else class="space-y-4">
+              <div
+                v-for="config in configuracionDiasPorEquipo"
+                :key="config.equipo"
+                class="rounded-xl border border-gray-200 bg-gray-50 p-4"
+              >
+                <div class="flex items-center justify-between gap-3 mb-3">
+                  <div>
+                    <p class="text-sm font-black text-gray-900">{{ config.label }}</p>
+                    <p class="text-xs text-gray-500">Dias oficiales del equipo</p>
+                  </div>
+                  <button
+                    type="button"
+                    @click="restablecerDiasEquipo(config.equipo)"
+                    class="text-xs font-bold text-primary hover:text-primary-dark cursor-pointer"
+                  >
+                    Restablecer
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    v-for="dia in config.opciones"
+                    :key="`${config.equipo}-${dia.value}`"
+                    type="button"
+                    @click="toggleDiaEquipo(config.equipo, dia.value)"
+                    :class="[
+                      'rounded-lg border px-3 py-3 text-left transition-colors cursor-pointer',
+                      (disponibilidadEditadaNormalizada[config.equipo] || []).includes(dia.value)
+                        ? 'border-primary bg-primary/10 text-primary-dark'
+                        : 'border-gray-200 bg-white text-gray-600 hover:border-primary/40'
+                    ]"
+                  >
+                    <span class="block text-sm font-bold">{{ dia.label }}</span>
+                    <span class="block text-[11px] mt-1 font-medium">
+                      {{ (disponibilidadEditadaNormalizada[config.equipo] || []).includes(dia.value) ? 'Contar asistencia' : 'Excluir de asistencia' }}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
         <!-- Sección de peligro: Eliminar -->
         <div class="border-t pt-6 border-gray-200">
@@ -135,6 +203,14 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { actualizarPerfilJugadora, eliminarJugadora } from '../firebase/jugadorasAuth';
+import { sincronizarInscripcionesPorDisponibilidadJugadora } from '../firebase/inscripciones';
+import {
+  normalizarDisponibilidadEntrenamientos,
+  obtenerDiasBasePorEquipo,
+  obtenerEtiquetasDiasSemana,
+  obtenerEquiposJugadoraDisponibilidad,
+  normalizarEquipoDisponibilidad
+} from '../utils/disponibilidadEntrenamientos';
 
 const props = defineProps({
   jugadora: {
@@ -152,44 +228,104 @@ const emit = defineEmits(['close', 'actualizado', 'eliminado']);
 const isLoading = ref(false);
 const error = ref(null);
 const equiposSeleccionados = ref([]);
+const disponibilidadEntrenamientos = ref({});
+const estadoSalud = ref('disponible');
+
+const etiquetasEquipo = {
+  ascenso: 'Ascenso',
+  escuela: 'Escuela',
+  serieC: 'Serie C'
+};
+
+const serializarEquipos = (equipos = []) => {
+  return [...equipos].sort().join(',');
+};
+
+const serializarDisponibilidad = (disponibilidad = {}) => {
+  return JSON.stringify(
+    Object.keys(disponibilidad)
+      .sort()
+      .reduce((acc, equipo) => {
+        acc[equipo] = [...(disponibilidad[equipo] || [])].sort((a, b) => a - b);
+        return acc;
+      }, {})
+  );
+};
+
+const disponibilidadActualNormalizada = computed(() => {
+  return normalizarDisponibilidadEntrenamientos(
+    props.jugadora?.disponibilidadEntrenamientos || {},
+    obtenerEquiposJugadoraDisponibilidad(props.jugadora)
+  );
+});
+
+const disponibilidadEditadaNormalizada = computed(() => {
+  return normalizarDisponibilidadEntrenamientos(
+    disponibilidadEntrenamientos.value,
+    equiposSeleccionados.value
+  );
+});
+
+const configuracionDiasPorEquipo = computed(() => {
+  return equiposSeleccionados.value.map((equipo) => ({
+    equipo,
+    label: etiquetasEquipo[equipo] || equipo,
+    opciones: obtenerEtiquetasDiasSemana(obtenerDiasBasePorEquipo(equipo)),
+    base: obtenerEtiquetasDiasSemana(obtenerDiasBasePorEquipo(equipo))
+  }));
+});
 
 // Inicializar equipos seleccionados basado en el equipo actual
 const inicializarEquipos = () => {
-  equiposSeleccionados.value = [];
-
-  // Soportar tanto el formato antiguo (equipo: string) como el nuevo (equipos: array)
-  if (Array.isArray(props.jugadora.equipos)) {
-    equiposSeleccionados.value = [...props.jugadora.equipos];
-  } else {
-    const equipo = (props.jugadora.equipo || '').toLowerCase();
-    if (equipo === 'ambos') {
-      equiposSeleccionados.value = ['ascenso', 'escuela'];
-    } else if (equipo === 'ascenso') {
-      equiposSeleccionados.value = ['ascenso'];
-    } else if (equipo === 'escuela') {
-      equiposSeleccionados.value = ['escuela'];
-    } else if (equipo === 'seriec') {
-      equiposSeleccionados.value = ['serieC'];
-    }
-  }
+  equiposSeleccionados.value = obtenerEquiposJugadoraDisponibilidad(props.jugadora);
+  disponibilidadEntrenamientos.value = normalizarDisponibilidadEntrenamientos(
+    props.jugadora?.disponibilidadEntrenamientos || {},
+    equiposSeleccionados.value
+  );
+  estadoSalud.value = props.jugadora?.estadoSalud || 'disponible';
 };
 
 // Detectar cambios
 const cambiosDetectados = computed(() => {
-  const equiposActuales = Array.isArray(props.jugadora.equipos) 
-    ? props.jugadora.equipos
-    : (props.jugadora.equipo === 'ambos' ? ['ascenso', 'escuela'] : [props.jugadora.equipo]);
-  
-  // Comparar arrays
-  const ordenAdos = equiposActuales.sort().join(',');
-  const ordenNew = equiposSeleccionados.value.sort().join(',');
-  return ordenAdos !== ordenNew;
+  const equiposActuales = obtenerEquiposJugadoraDisponibilidad(props.jugadora);
+  const huboCambioEquipos = serializarEquipos(equiposActuales) !== serializarEquipos(equiposSeleccionados.value);
+  const huboCambioDisponibilidad = serializarDisponibilidad(disponibilidadActualNormalizada.value) !== serializarDisponibilidad(disponibilidadEditadaNormalizada.value);
+  const huboCambioEstado = (props.jugadora?.estadoSalud || 'disponible') !== estadoSalud.value;
+
+  return huboCambioEquipos || huboCambioDisponibilidad || huboCambioEstado;
 });
 
 // Determinar el valor final del equipo basado en las selecciones
 const determinarEquipoFinal = () => {
   if (equiposSeleccionados.value.length === 0) return ['ascenso']; // Default
   return [...equiposSeleccionados.value];
+};
+
+const toggleDiaEquipo = (equipo, dia) => {
+  const equipoNormalizado = normalizarEquipoDisponibilidad(equipo);
+  const actuales = new Set(disponibilidadEntrenamientos.value[equipoNormalizado] || []);
+
+  if (actuales.has(dia)) {
+    if (actuales.size === 1) {
+      return;
+    }
+    actuales.delete(dia);
+  } else {
+    actuales.add(dia);
+  }
+
+  disponibilidadEntrenamientos.value = {
+    ...disponibilidadEntrenamientos.value,
+    [equipoNormalizado]: [...actuales].sort((a, b) => a - b)
+  };
+};
+
+const restablecerDiasEquipo = (equipo) => {
+  const equipoNormalizado = normalizarEquipoDisponibilidad(equipo);
+  disponibilidadEntrenamientos.value = {
+    ...disponibilidadEntrenamientos.value,
+    [equipoNormalizado]: obtenerDiasBasePorEquipo(equipoNormalizado)
+  };
 };
 
 const guardarCambios = async () => {
@@ -200,17 +336,41 @@ const guardarCambios = async () => {
 
   try {
     const equiposFinal = determinarEquipoFinal();
+    const disponibilidadFinal = normalizarDisponibilidadEntrenamientos(
+      disponibilidadEntrenamientos.value,
+      equiposFinal
+    );
     
     const actualizado = await actualizarPerfilJugadora(
       props.jugadora.id,
       {
         ...props.jugadora,
-        equipos: equiposFinal
+        equipos: equiposFinal,
+        disponibilidadEntrenamientos: disponibilidadFinal,
+        estadoSalud: estadoSalud.value
       }
     );
 
     if (actualizado) {
-      emit('actualizado', { ...props.jugadora, equipos: equiposFinal });
+      const jugadoraActualizada = {
+        ...props.jugadora,
+        equipos: equiposFinal,
+        disponibilidadEntrenamientos: disponibilidadFinal,
+        estadoSalud: estadoSalud.value
+      };
+
+      const sincronizado = await sincronizarInscripcionesPorDisponibilidadJugadora({
+        ...jugadoraActualizada,
+        id: props.jugadora.id,
+        uid: props.jugadora.uid || props.jugadora.id
+      });
+
+      if (!sincronizado) {
+        error.value = 'Se guardo la disponibilidad, pero no se pudo sincronizar las inscripciones automaticamente.';
+        return;
+      }
+
+      emit('actualizado', jugadoraActualizada);
       cerrar();
     } else {
       error.value = 'No se pudo guardar los cambios. Intenta de nuevo.';
@@ -262,6 +422,13 @@ watch(() => props.visible, (newVal) => {
     error.value = null;
   }
 });
+
+watch(equiposSeleccionados, (equipos) => {
+  disponibilidadEntrenamientos.value = normalizarDisponibilidadEntrenamientos(
+    disponibilidadEntrenamientos.value,
+    equipos
+  );
+}, { deep: true });
 </script>
 
 <style scoped>

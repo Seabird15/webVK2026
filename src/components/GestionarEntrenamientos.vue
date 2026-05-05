@@ -500,6 +500,13 @@
               </div>
             </div>
 
+            <div
+              v-if="contarExcluidas(entrenamiento.id) > 0"
+              class="mb-5 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-center text-[11px] font-bold uppercase tracking-wide text-sky-700"
+            >
+              {{ contarExcluidas(entrenamiento.id) }} fuera del calculo de asistencia
+            </div>
+
             <div class="space-y-2">
               <button
                 @click="verDetallesEntrenamiento(entrenamiento)"
@@ -813,6 +820,7 @@
                   inscritasOrganizadasAdmin.confirmadas.length === 0 &&
                   inscritasOrganizadasAdmin.bajas.length === 0 &&
                   inscritasOrganizadasAdmin.pendientes.length === 0 &&
+                  inscritasExcluidasAdmin.length === 0 &&
                   tabDetalleAdmin !== 'agregar'
                 "
                 class="text-center py-12 text-gray-400"
@@ -953,6 +961,33 @@
                     >
                       Ausente
                     </button>
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="inscritasExcluidasAdmin.length > 0" class="mt-4 rounded-xl border border-sky-200 bg-sky-50/80 p-4">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                  <div>
+                    <h4 class="text-xs font-black uppercase tracking-wide text-sky-800">No contabilizan asistencia</h4>
+                    <p class="text-xs text-sky-700">Quedan listadas aparte y no afectan los porcentajes.</p>
+                  </div>
+                  <span class="rounded-full bg-sky-600 px-3 py-1 text-xs font-black text-white">
+                    {{ inscritasExcluidasAdmin.length }}
+                  </span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div
+                    v-for="inscrita in inscritasExcluidasAdmin"
+                    :key="`admin-excluida-${inscrita.id}`"
+                    class="flex items-center gap-3 rounded-lg border border-sky-100 bg-white p-3"
+                  >
+                    <div class="w-12 h-12 bg-linear-to-br from-sky-500 to-cyan-600 rounded-full flex items-center justify-center text-white font-black shadow-md shrink-0">
+                      {{ obtenerIniciales(inscrita.jugadoraNombre) }}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="text-sm font-bold text-gray-900 wrap-break-word">{{ inscrita.jugadoraNombre }}</div>
+                      <div class="text-xs text-gray-500 mt-1">Estado actual: {{ obtenerEstadoSaludExclusion(inscrita.estadoSalud) }}</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1125,6 +1160,7 @@ import {
 import { escucharInscripcionesEntrenamiento, cambiarEstadoInscripcion, inscribirJugadoraManual, crearInscripcionesPendientes, sincronizarInscripcionesConvocatoria } from '../firebase/inscripciones';
 import { fetchJugadorasRegistradasPorEquipo } from '../firebase/jugadorasAuth';
 import { sendPushNotification } from '../firebase/notificaciones';
+import { particionarInscripcionesPorAsistencia } from '../utils/disponibilidadEntrenamientos';
 
 const mostrarFormulario = ref(false);
 const isLoading = ref(false);
@@ -1134,17 +1170,25 @@ const busqueda = ref('');
 const entrenamientoEditando = ref(null);
 const entrenamientoDetallado = ref(null);
 const tabDetalleAdmin = ref('confirmadas');
-const inscritasOrganizadasAdmin = ref({
+const inscritasOrganizadasAdminRaw = ref({
   confirmadas: [],
   bajas: [],
   pendientes: []
 });
+const jugadorasRegistradasPorId = ref(new Map());
 const unsubscribers = ref([]);
 const busquedaJugadora = ref('');
 const jugadorasDisponibles = ref([]);
 const isSendingNotification = ref(false);
 const notificationData = ref({ title: '', body: '' });
 const mapaCargandoAdmin = ref(false);
+
+const particionInscripcionesAdmin = computed(() => {
+  return particionarInscripcionesPorAsistencia(inscritasOrganizadasAdminRaw.value, jugadorasRegistradasPorId.value);
+});
+
+const inscritasOrganizadasAdmin = computed(() => particionInscripcionesAdmin.value.visibles);
+const inscritasExcluidasAdmin = computed(() => particionInscripcionesAdmin.value.excluidas);
 
 // Mapeo para contar inscritas por estado
 const conteoInscritas = ref({});
@@ -1363,13 +1407,15 @@ const verDetallesEntrenamiento = (entrenamiento) => {
 
   // Iniciar listener en tiempo real para este entrenamiento
   const unsubscribe = escucharInscripcionesEntrenamiento(entrenamiento.id, (organizadas) => {
-    inscritasOrganizadasAdmin.value = organizadas;
+    inscritasOrganizadasAdminRaw.value = organizadas;
+    const { visibles, excluidas } = particionarInscripcionesPorAsistencia(organizadas, jugadorasRegistradasPorId.value);
     
     // Actualizar el conteo
     conteoInscritas.value[entrenamiento.id] = {
-      confirmadas: organizadas.confirmadas.length,
-      bajas: organizadas.bajas.length,
-      pendientes: organizadas.pendientes.length
+      confirmadas: visibles.confirmadas.length,
+      bajas: visibles.bajas.length,
+      pendientes: visibles.pendientes.length,
+      excluidas: excluidas.length
     };
   }, () => entrenamientoDetallado.value); // Pasar función que retorna el entrenamiento actualizado
 
@@ -1398,6 +1444,25 @@ const formatFechaHora = (ts) => {
   });
 };
 
+const cargarJugadorasRegistradasMapa = async () => {
+  try {
+    const jugadoras = await fetchJugadorasRegistradasPorEquipo('ambos');
+    jugadorasRegistradasPorId.value = new Map(jugadoras.map((jugadora) => [jugadora.id, jugadora]));
+  } catch {
+    jugadorasRegistradasPorId.value = new Map();
+  }
+};
+
+const obtenerEstadoSaludExclusion = (estado) => {
+  const map = {
+    lesionada: 'Lesionada',
+    recuperacion: 'En recuperación',
+    vacaciones: 'De vacaciones'
+  };
+
+  return map[estado] || 'No disponible';
+};
+
 const contarInscriptasEntrenamiento = (entrenamientoId) => {
   const conteo = conteoInscritas.value[entrenamientoId];
   if (!conteo) return 0;
@@ -1408,6 +1473,10 @@ const contarPorEstado = (entrenamientoId, estado) => {
   const conteo = conteoInscritas.value[entrenamientoId];
   if (!conteo) return 0;
   return conteo[estado + 's'] || 0;
+};
+
+const contarExcluidas = (entrenamientoId) => {
+  return conteoInscritas.value[entrenamientoId]?.excluidas || 0;
 };
 
 // Cambiar estado de inscripción (admin)
@@ -1438,9 +1507,9 @@ const buscarJugadoras = async () => {
     
     // Filtrar jugadoras que ya están inscritas
     const idsInscritas = [
-      ...inscritasOrganizadasAdmin.value.confirmadas,
-      ...inscritasOrganizadasAdmin.value.bajas,
-      ...inscritasOrganizadasAdmin.value.pendientes
+      ...inscritasOrganizadasAdminRaw.value.confirmadas,
+      ...inscritasOrganizadasAdminRaw.value.bajas,
+      ...inscritasOrganizadasAdminRaw.value.pendientes
     ].map(i => i.jugadoraId);
     
     // Filtrar por búsqueda y excluir inscritas
@@ -1906,6 +1975,7 @@ const fechaPasada = (entrenamiento) => {
 // Cargar entrenamientos al montar
 onMounted(async () => {
   try {
+    await cargarJugadorasRegistradasMapa();
     // Cargar todos los entrenamientos (partidos, entrenamientos, eventos, ambos equipos)
     await fetchTodosEntrenamientos();
     
@@ -1919,10 +1989,12 @@ onMounted(async () => {
       
       // Iniciar listeners en tiempo real para cada uno
       const unsub = escucharInscripcionesEntrenamiento(ent.id, (organizadas) => {
+        const { visibles, excluidas } = particionarInscripcionesPorAsistencia(organizadas, jugadorasRegistradasPorId.value);
         conteoInscritas.value[ent.id] = {
-          confirmadas: organizadas.confirmadas.length,
-          bajas: organizadas.bajas.length,
-          pendientes: organizadas.pendientes.length
+          confirmadas: visibles.confirmadas.length,
+          bajas: visibles.bajas.length,
+          pendientes: visibles.pendientes.length,
+          excluidas: excluidas.length
         };
       }, ent); // Pasar el entrenamiento completo
       unsubscribers.value.push(unsub);

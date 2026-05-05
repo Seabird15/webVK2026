@@ -588,6 +588,7 @@ import {
 } from '../firebase/inscripciones';
 import { entrenamientos, votarMvpEntrenamiento } from '../firebase/entrenamientos';
 import { authUser, userRole } from '../firebase/auth';
+import { jugadoraPuedeAsistirEntrenamiento } from '../utils/disponibilidadEntrenamientos';
 
 const router = useRouter();
 const route = useRoute();
@@ -739,6 +740,11 @@ const cargarDatos = async () => {
   }
 
   if (!vieneDeAdmin.value && eventoFueraDeVentanaJugadora(entrenamiento.value)) {
+    router.push('/entrenamientos');
+    return;
+  }
+
+  if (!vieneDeAdmin.value && jugadoraData.value && !jugadoraPuedeAsistirEntrenamiento(jugadoraData.value, entrenamiento.value)) {
     router.push('/entrenamientos');
     return;
   }

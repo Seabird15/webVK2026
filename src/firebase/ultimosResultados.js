@@ -5,13 +5,16 @@ import {
   doc,
   getDocs,
   onSnapshot,
+  query,
   serverTimestamp,
   updateDoc,
+  where,
   writeBatch
 } from 'firebase/firestore';
 import { db } from './config';
 
 const COLECCION_RESULTADOS = 'ultimosResultadosHome';
+const TIPOS_VISIBLES = new Set(['partido', 'liga', 'competicion', 'competición', 'amistoso']);
 
 const normalizarTexto = (valor = '') => valor.toString().trim();
 const normalizarMarcador = (valor = '') => {
@@ -39,6 +42,85 @@ const extraerMarcadoresDesdeResultado = (resultadoFinal = '') => {
   };
 };
 
+const obtenerFecha = (valor) => {
+  if (!valor) return null;
+  if (valor instanceof Date) return new Date(valor);
+  if (typeof valor?.toDate === 'function') return valor.toDate();
+  if (typeof valor?.seconds === 'number') return new Date(valor.seconds * 1000);
+
+  const fecha = new Date(valor);
+  return Number.isNaN(fecha.getTime()) ? null : fecha;
+};
+
+const formatearFecha = (valor) => {
+  const fecha = obtenerFecha(valor);
+  if (!fecha) return '';
+
+  return fecha.toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+};
+
+const normalizarEquipoCategoria = (equipo = '') => {
+  const valor = normalizarTexto(equipo).toLowerCase();
+
+  if (valor === 'ascenso') return 'Ascenso';
+  if (valor === 'seriec' || valor === 'serie c' || valor === 'seriec ') return 'Serie C';
+  if (valor === 'escuela') return 'Escuela';
+  if (valor === 'ambos') return 'Ascenso y Serie C';
+
+  return normalizarTexto(equipo);
+};
+
+const normalizarTipoResultado = (tipo = '') => {
+  const valor = normalizarTexto(tipo).toLowerCase();
+
+  if (valor === 'amistoso') return 'amistoso';
+  if (['partido', 'liga', 'competicion', 'competición'].includes(valor)) return 'liga';
+
+  return valor;
+};
+
+const obtenerEtiquetaTipo = (tipo = '') => {
+  return normalizarTipoResultado(tipo) === 'amistoso' ? 'Amistoso' : 'Liga';
+};
+
+const esResultadoVisible = (data = {}) => {
+  const tipo = normalizarTexto(data.tipo).toLowerCase();
+  if (!TIPOS_VISIBLES.has(tipo)) return false;
+
+  return data.estado === 'FINALIZADO' || data.fasePartido === 'FINALIZADO';
+};
+
+const crearResultadoAutomatico = ({ id, data, fuente }) => {
+  const tipoNormalizado = normalizarTipoResultado(data.tipo);
+  const fecha = obtenerFecha(data.fecha);
+  const updatedAt = obtenerFecha(data.updatedAt) || obtenerFecha(data.createdAt) || fecha;
+  const marcadorVikingas = normalizarMarcador(data.golesLocal ?? data.resultadoLocal ?? 0);
+  const marcadorRival = normalizarMarcador(data.golesVisita ?? data.resultadoVisita ?? 0);
+
+  return {
+    id: `${fuente}-${id}`,
+    fuente,
+    nombreLiga: obtenerEtiquetaTipo(tipoNormalizado),
+    categoria: normalizarEquipoCategoria(data.equipo) || 'CD Vikingas',
+    fecha: formatearFecha(data.fecha),
+    fechaDate: fecha,
+    rival: normalizarTexto(data.rival || data.nombre || 'Rival por confirmar'),
+    orden: null,
+    marcadorVikingas,
+    marcadorRival,
+    goleadoras: Array.isArray(data.goleadoresLocal) ? data.goleadoresLocal : [],
+    resultadoFinal: `${marcadorVikingas} - ${marcadorRival}`,
+    createdAt: data.createdAt || null,
+    updatedAt: data.updatedAt || null,
+    updatedAtDate: updatedAt,
+    tipo: tipoNormalizado
+  };
+};
+
 const normalizarResultado = (docSnap) => {
   const data = docSnap.data();
   const marcadoresLegacy = extraerMarcadoresDesdeResultado(data.resultadoFinal);
@@ -50,6 +132,7 @@ const normalizarResultado = (docSnap) => {
     nombreLiga: normalizarTexto(data.nombreLiga),
     categoria: normalizarTexto(data.categoria),
     fecha: normalizarTexto(data.fecha),
+    fechaDate: obtenerFecha(data.fecha),
     rival: normalizarTexto(data.rival),
     orden: Number.isFinite(Number(data.orden)) ? Number(data.orden) : null,
     marcadorVikingas,
@@ -58,7 +141,8 @@ const normalizarResultado = (docSnap) => {
       ? `${marcadorVikingas} - ${marcadorRival}`
       : normalizarTexto(data.resultadoFinal),
     createdAt: data.createdAt || null,
-    updatedAt: data.updatedAt || null
+    updatedAt: data.updatedAt || null,
+    updatedAtDate: obtenerFecha(data.updatedAt) || obtenerFecha(data.createdAt) || obtenerFecha(data.fecha)
   };
 };
 
@@ -73,10 +157,34 @@ const ordenarResultados = (items = []) => {
       return ordenA - ordenB;
     }
 
-    const fechaA = a.createdAt?.seconds || 0;
-    const fechaB = b.createdAt?.seconds || 0;
+    const fechaA = a.updatedAtDate?.getTime?.() || a.fechaDate?.getTime?.() || a.createdAt?.seconds * 1000 || 0;
+    const fechaB = b.updatedAtDate?.getTime?.() || b.fechaDate?.getTime?.() || b.createdAt?.seconds * 1000 || 0;
     return fechaB - fechaA;
   });
+};
+
+const obtenerResultadosAutomaticos = async () => {
+  const entrenamientosQuery = query(
+    collection(db, 'entrenamientos'),
+    where('tipo', 'in', ['partido', 'amistoso'])
+  );
+
+  const [snapshotEntrenamientos, snapshotPartidos] = await Promise.all([
+    getDocs(entrenamientosQuery),
+    getDocs(collection(db, 'partidos'))
+  ]);
+
+  const resultadosEntrenamientos = snapshotEntrenamientos.docs
+    .map((docSnap) => ({ id: docSnap.id, data: docSnap.data() }))
+    .filter(({ data }) => esResultadoVisible(data))
+    .map(({ id, data }) => crearResultadoAutomatico({ id, data, fuente: 'entrenamiento' }));
+
+  const resultadosPartidos = snapshotPartidos.docs
+    .map((docSnap) => ({ id: docSnap.id, data: docSnap.data() }))
+    .filter(({ data }) => esResultadoVisible(data))
+    .map(({ id, data }) => crearResultadoAutomatico({ id, data, fuente: 'partido' }));
+
+  return ordenarResultados([...resultadosEntrenamientos, ...resultadosPartidos]);
 };
 
 const obtenerSiguienteOrden = async () => {
@@ -91,14 +199,44 @@ const obtenerSiguienteOrden = async () => {
 };
 
 export const escucharUltimosResultados = (callback) => {
-  return onSnapshot(obtenerColeccion(), (snapshot) => {
-    callback(ordenarResultados(snapshot.docs.map(normalizarResultado)));
+  let resultadosEntrenamientos = [];
+  let resultadosPartidos = [];
+
+  const emitir = () => {
+    callback(ordenarResultados([...resultadosEntrenamientos, ...resultadosPartidos]));
+  };
+
+  const entrenamientosQuery = query(
+    collection(db, 'entrenamientos'),
+    where('tipo', 'in', ['partido', 'amistoso'])
+  );
+
+  const unsubscribeEntrenamientos = onSnapshot(entrenamientosQuery, (snapshot) => {
+    resultadosEntrenamientos = snapshot.docs
+      .map((docSnap) => ({ id: docSnap.id, data: docSnap.data() }))
+      .filter(({ data }) => esResultadoVisible(data))
+      .map(({ id, data }) => crearResultadoAutomatico({ id, data, fuente: 'entrenamiento' }));
+
+    emitir();
   });
+
+  const unsubscribePartidos = onSnapshot(collection(db, 'partidos'), (snapshot) => {
+    resultadosPartidos = snapshot.docs
+      .map((docSnap) => ({ id: docSnap.id, data: docSnap.data() }))
+      .filter(({ data }) => esResultadoVisible(data))
+      .map(({ id, data }) => crearResultadoAutomatico({ id, data, fuente: 'partido' }));
+
+    emitir();
+  });
+
+  return () => {
+    unsubscribeEntrenamientos?.();
+    unsubscribePartidos?.();
+  };
 };
 
 export const obtenerUltimosResultados = async () => {
-  const snapshot = await getDocs(obtenerColeccion());
-  return ordenarResultados(snapshot.docs.map(normalizarResultado));
+  return obtenerResultadosAutomaticos();
 };
 
 export const crearUltimoResultado = async (payload) => {

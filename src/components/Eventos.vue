@@ -47,7 +47,6 @@
                 <article class="rounded-4xl border border-primary bg-[#162122] px-5 py-6 shadow-[0_18px_36px_rgba(0,0,0,0.18)] sm:px-6 sm:py-7">
                     <div class="flex items-start justify-between gap-4">
                         <div>
-                            <p class="text-[0.8rem] font-bold italic tracking-[0.04em] text-white/62">Próximo encuentro</p>
                             <h2 class="mt-2 text-[clamp(1.9rem,4vw,3rem)] font-black uppercase leading-[0.92] text-white" style="font-family: 'Gobold High', sans-serif;">
                                 Próximo partido
                             </h2>
@@ -61,9 +60,14 @@
                         <div class="text-center space-y-2">
                             <p class="text-sm font-semibold uppercase tracking-[0.14em] text-white/78">{{ proximoPartido.fecha }}</p>
                             <p class="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-white/48">{{ proximoPartido.hora }}</p>
-                            <p v-if="proximoPartido.equipoCategoria" class="text-[0.72rem] font-black uppercase tracking-[0.18em] text-primary">
-                                {{ proximoPartido.equipoCategoria }}
-                            </p>
+                            <div class="flex flex-wrap items-center justify-center gap-2">
+                                <p v-if="proximoPartido.equipoCategoria" class="text-[0.72rem] font-black uppercase tracking-[0.18em] text-primary">
+                                   Categoría {{ proximoPartido.equipoCategoria }}
+                                </p>
+                                <p class="text-[0.72rem] font-black uppercase tracking-[0.18em] text-white/60">
+                                 {{ obtenerEtiquetaTipoEvento(proximoPartido) }}
+                                </p>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-4xl bg-[#1b292a] px-4 py-5 sm:px-5">
@@ -130,7 +134,6 @@
                 <article class="rounded-4xl border border-primary bg-[#162122] px-5 py-6 shadow-[0_18px_36px_rgba(0,0,0,0.18)] sm:px-6 sm:py-7">
                     <div class="flex items-start justify-between gap-4">
                         <div>
-                            <p class="text-[0.8rem] font-bold italic tracking-[0.04em] text-white/62">Lo más reciente</p>
                             <h2 class="mt-2 text-[clamp(1.9rem,4vw,3rem)] font-black uppercase leading-[0.92] text-white" style="font-family: 'Gobold High', sans-serif;">
                                 Último partido
                             </h2>
@@ -141,7 +144,14 @@
                     <div v-if="ultimoPartido" class="mt-6 space-y-6">
                         <div class="text-center space-y-2">
                             <p class="text-sm font-semibold uppercase tracking-[0.14em] text-white/78">{{ ultimoPartido.fecha }}</p>
-                            <p class="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-white/48">{{ ultimoPartido.liga }}</p>
+                            <div class="flex flex-wrap items-center justify-center gap-2">
+                                <p v-if="ultimoPartido.equipoCategoria" class="text-[0.72rem] font-black uppercase tracking-[0.18em] text-primary">
+                                 Categoría {{ ultimoPartido.equipoCategoria }}
+                                </p>
+                                <p class="text-[0.72rem] font-black uppercase tracking-[0.18em] text-white/60">
+                               {{ obtenerEtiquetaTipoEvento(ultimoPartido) }}
+                                </p>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-4xl bg-[#1b292a] px-4 py-5 sm:px-5">
@@ -377,8 +387,56 @@ const extraerRival = (tituloPartido = '') => {
     }
 
     return titulo
-        .replace(/^(partido|amistoso|convocatoria)\s*/i, '')
+        .replace(/^(partido|amistoso|liga|competicion|competición|convocatoria)\s*/i, '')
         .trim() || 'Rival por confirmar';
+};
+
+const normalizarTipoPartido = (tipo) => {
+    const valor = (tipo || '').toString().trim().toLowerCase();
+
+    if (valor === 'amistoso') return 'amistoso';
+    if (valor === 'liga' || valor === 'partido') return 'liga';
+    if (valor === 'competicion' || valor === 'competición') return 'liga';
+
+    return valor;
+};
+
+const esTipoPartido = (tipo) => {
+    return ['amistoso', 'liga'].includes(normalizarTipoPartido(tipo));
+};
+
+const obtenerEtiquetaTipoPartido = (tipo) => {
+    const tipoNormalizado = normalizarTipoPartido(tipo);
+
+    if (tipoNormalizado === 'amistoso') return 'Amistoso';
+    return 'Liga';
+};
+
+const obtenerEtiquetaCompetencia = (partido) => {
+    const candidatos = [
+        partido?.tipoPartido,
+        partido?.tipo,
+        partido?.liga,
+        partido?.nombre,
+        partido?.equipo2?.nombre
+    ];
+
+    const textoNormalizado = candidatos
+        .map((valor) => (valor || '').toString().trim().toLowerCase())
+        .find(Boolean) || '';
+
+    if (textoNormalizado.includes('amistoso')) return 'Amistoso';
+    if (textoNormalizado.includes('campeonato interno')) return 'Campeonato Interno';
+
+    return 'Liga';
+};
+
+const obtenerEtiquetaTipoEvento = (partido) => {
+    const tipoNormalizado = normalizarTipoPartido(partido?.tipoPartido || partido?.tipo || '');
+
+    if (tipoNormalizado === 'amistoso') return 'Amistoso';
+    if (tipoNormalizado === 'liga') return 'Liga';
+    return 'Partido';
 };
 
 const normalizarEstado = (estado) => {
@@ -480,6 +538,7 @@ const normalizarEquipoCategoria = (equipo) => {
     const valor = (equipo || '').toString().toLowerCase().trim();
     if (valor === 'ascenso') return 'Ascenso';
     if (valor === 'escuela') return 'Escuela';
+    if (valor === 'seriec' || valor === 'serie c') return 'Serie C';
     if (valor === 'ambos') return 'Ascenso y Escuela';
     return '';
 };
@@ -522,6 +581,8 @@ const recalcularProximoPartido = () => {
         ultimoPartido.value = {
             fecha: elegido.fecha,
             liga: elegido.liga,
+            tipoPartido: elegido.tipoPartido || '',
+            equipoCategoria: elegido.equipoCategoria || '',
             equipo1: elegido.equipo1,
             equipo2: elegido.equipo2,
             resultado: {
@@ -584,7 +645,8 @@ const mapearPartidoDestacadoDesdeConfig = (configData) => {
     return {
         id: configData.entrenamientoId || 'proximoPartidoHome',
         fecha: formatearFecha(configData.fecha),
-        liga: configData.tipo === 'amistoso' ? 'Partido Amistoso' : 'Partido Programado',
+        liga: obtenerEtiquetaTipoPartido(configData.tipo),
+        tipoPartido: configData.tipo || '',
         equipoCategoria: normalizarEquipoCategoria(configData.equipo),
         hora: (configData.hora || '00:00').split('-')[0]?.trim() || '00:00',
         equipo1: {
@@ -620,8 +682,8 @@ const mapearPartidoNuevo = (doc) => {
     return {
         id: doc.id,
         fecha: formatearFecha(data.fecha),
-        liga: data.tipo === 'amistoso' ? 'Partido Amistoso' : 
-              data.tipo === 'competicion' ? 'Competición' : 'Liga',
+        liga: obtenerEtiquetaTipoPartido(data.tipo),
+        tipoPartido: data.tipo || '',
         equipoCategoria: normalizarEquipoCategoria(data.equipo),
         hora: (data.hora || '00:00').split(':')[0]?.trim() || '00:00',
         equipo1: {
@@ -686,6 +748,7 @@ const cargarProximoPartido = () => {
                         id: partido.id,
                         fecha: formatearFecha(partido.fecha),
                         liga: equipoLocal.liga,
+                        tipoPartido: 'campeonato_interno',
                         equipoCategoria: '',
                         hora: (partido.horario || '').split('-')[0]?.trim() || '00:00',
                         equipo1: {
@@ -715,11 +778,10 @@ const cargarProximoPartido = () => {
         );
 
         unsubscribeConvocatorias = onSnapshot(convocatoriasRef, (snapshot) => {
-            // Solo los que tienen esConvocatoria pero no son tipo 'partido' o 'amistoso'
+            // Solo los que tienen esConvocatoria pero no son partidos visibles
             partidosAdmin.value = snapshot.docs
                 .filter(doc => {
-                    const tipo = doc.data().tipo;
-                    return tipo !== 'partido' && tipo !== 'amistoso';
+                    return !esTipoPartido(doc.data().tipo);
                 })
                 .map((item) => {
                     const entrenamiento = item.data();
@@ -728,6 +790,7 @@ const cargarProximoPartido = () => {
                         id: item.id,
                         fecha: formatearFecha(entrenamiento.fecha),
                         liga: 'Convocatoria Admin',
+                        tipoPartido: entrenamiento.tipo || '',
                         equipoCategoria: normalizarEquipoCategoria(entrenamiento.equipo),
                         hora: (entrenamiento.hora || '00:00').split('-')[0]?.trim() || '00:00',
                         equipo1: {
@@ -773,14 +836,15 @@ const cargarProximoPartido = () => {
             entrenamientosPartidos.value = snapshot.docs
                 .map((item) => {
                     const entrenamiento = item.data();
-                    const tipo = (entrenamiento.tipo || '').toString().trim().toLowerCase();
-                    if (tipo !== 'partido' && tipo !== 'amistoso') return null;
+                    const tipo = normalizarTipoPartido(entrenamiento.tipo);
+                    if (!esTipoPartido(tipo)) return null;
 
                     const fechaHora = getFechaHoraEntrenamiento(entrenamiento);
                     const partido = {
                         id: item.id,
                         fecha: formatearFecha(entrenamiento.fecha),
-                        liga: tipo === 'amistoso' ? 'Partido Amistoso' : 'Partido',
+                        liga: obtenerEtiquetaTipoPartido(tipo),
+                        tipoPartido: entrenamiento.tipo || tipo,
                         equipoCategoria: normalizarEquipoCategoria(entrenamiento.equipo),
                         hora: (entrenamiento.hora || '00:00').split('-')[0]?.trim() || '00:00',
                         equipo1: { nombre: 'CD Vikingas', logo: logoUrlVikingas },

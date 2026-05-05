@@ -11,6 +11,7 @@ import {
 import { auth, db, storage } from './config';
 import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, deleteDoc } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { normalizarDisponibilidadEntrenamientos } from '../utils/disponibilidadEntrenamientos';
 
 export const jugadoraAuthUser = ref(null);
 export const jugadoraData = ref(null);
@@ -89,12 +90,44 @@ const convertirEquiposAString = (equipos) => {
 const normalizarDatosJugadora = (uid, data = {}) => {
   const equipos = obtenerEquiposJugadoraDesdeDatos(data);
   const equipo = convertirEquiposAString(equipos);
+  const disponibilidadEntrenamientos = normalizarDisponibilidadEntrenamientos(
+    data?.disponibilidadEntrenamientos || {},
+    equipos
+  );
 
   return {
     id: uid,
     ...data,
-    ...(equipos.length > 0 ? { equipos, equipo } : {})
+    ...(equipos.length > 0 ? { equipos, equipo, disponibilidadEntrenamientos } : {})
   };
+};
+
+const obtenerEstadoAccesoJugadora = async (uid) => {
+  if (!uid) return null;
+
+  const [jugadoraDoc, loginDoc] = await Promise.all([
+    getDoc(doc(db, 'jugadoras', uid)),
+    getDoc(doc(db, 'jugadorasLogin', uid))
+  ]);
+
+  return jugadoraDoc.data()?.estado || loginDoc.data()?.estado || null;
+};
+
+const obtenerMensajeEstadoAcceso = (estado) => {
+  if (estado === 'pendiente') {
+    return 'Tu acceso aun no ha sido aprobado por administracion.';
+  }
+
+  if (estado === 'rechazada') {
+    return 'Tu solicitud de acceso fue rechazada. Contacta a administracion para mas informacion.';
+  }
+
+  return 'Tu cuenta no tiene acceso habilitado todavia.';
+};
+
+export const tieneAccesoAprobadoJugadora = async (uid = jugadoraAuthUser.value?.uid) => {
+  const estadoAcceso = await obtenerEstadoAccesoJugadora(uid);
+  return estadoAcceso === 'aprobada';
 };
 
 const resolverCategoriaSeleccionada = (equipo, categoriaSolicitada, categoriaActual = '', equipos = []) => {
@@ -160,6 +193,17 @@ onAuthStateChanged(auth, async (user) => {
   jugadoraAuthUser.value = user;
   
   if (user) {
+    const estadoAcceso = await obtenerEstadoAccesoJugadora(user.uid);
+
+    if (estadoAcceso !== 'aprobada') {
+      errorJugadora.value = obtenerMensajeEstadoAcceso(estadoAcceso);
+      jugadoraAuthUser.value = null;
+      jugadoraData.value = null;
+      await signOut(auth);
+      authReady.value = true;
+      return;
+    }
+
     // Intentar cargar datos de Firestore
     // Si el documento no existe, es normal (aún no completó perfil)
     const jugadoraRegistroDoc = await getDoc(doc(db, 'jugadoraRegistro', user.uid));
@@ -189,6 +233,15 @@ export const loginJugadora = async (email, password) => {
     await setPersistence(auth, browserLocalPersistence);
     const result = await signInWithEmailAndPassword(auth, email, password);
     const uid = result.user.uid;
+    const estadoAcceso = await obtenerEstadoAccesoJugadora(uid);
+
+    if (estadoAcceso !== 'aprobada') {
+      await signOut(auth);
+      jugadoraAuthUser.value = null;
+      jugadoraData.value = null;
+      errorJugadora.value = obtenerMensajeEstadoAcceso(estadoAcceso);
+      return false;
+    }
     
     // Cargar datos de la jugadora
     await fetchJugadoraData(uid);
@@ -430,6 +483,15 @@ export const completarPerfilJugadora = async (uid, perfilData, fotoFile) => {
   isLoadingJugadora.value = true;
   errorJugadora.value = null;
   try {
+    const estadoAcceso = await obtenerEstadoAccesoJugadora(uid);
+
+    if (estadoAcceso !== 'aprobada') {
+      errorJugadora.value = obtenerMensajeEstadoAcceso(estadoAcceso);
+      await signOut(auth);
+      jugadoraAuthUser.value = null;
+      jugadoraData.value = null;
+      return false;
+    }
     
     let fotoUrl = null;
 
@@ -447,6 +509,10 @@ export const completarPerfilJugadora = async (uid, perfilData, fotoFile) => {
       uid: uid,
       equipos: obtenerEquiposJugadoraDesdeDatos(perfilData),
       equipo: convertirEquiposAString(obtenerEquiposJugadoraDesdeDatos(perfilData)),
+      disponibilidadEntrenamientos: normalizarDisponibilidadEntrenamientos(
+        perfilData?.disponibilidadEntrenamientos || {},
+        obtenerEquiposJugadoraDesdeDatos(perfilData)
+      ),
       categoriaSeleccionada: resolverCategoriaSeleccionada(
         perfilData?.equipo,
         perfilData?.categoriaSeleccionada,
@@ -489,6 +555,10 @@ export const actualizarPerfilJugadora = async (uid, perfilData, fotoFile) => {
       ...perfilData,
       equipos: equiposNormalizados,
       equipo: equipoLegacy,
+      disponibilidadEntrenamientos: normalizarDisponibilidadEntrenamientos(
+        perfilData?.disponibilidadEntrenamientos || {},
+        equiposNormalizados
+      ),
       categoriaSeleccionada: resolverCategoriaSeleccionada(
         equipoLegacy,
         perfilData?.categoriaSeleccionada,
