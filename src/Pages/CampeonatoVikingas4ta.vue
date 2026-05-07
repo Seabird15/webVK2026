@@ -274,6 +274,8 @@
 import bannerEquipos from '../assets/bannerequipos.webp'
 import logoVikingas from '../assets/logoVk.png'
 import logoZorzales from '../assets/logos/zorzaleslogo.webp'
+import logoOdiosas from '../assets/logos/odiosas.jpg'
+import logoFenix from '../assets/logos/fenix.png'
 
 const equiposParticipantes = [
   {
@@ -291,19 +293,19 @@ const equiposParticipantes = [
     logo: logoZorzales,
   },
   {
-    nombre: 'Equipo Invitado 2',
+    nombre: 'Fénix',
     etiqueta: 'Equipo invitado',
     descripcion: 'Participación orientada a dar rodaje a jugadoras con poca experiencia en un contexto formativo real.',
     esLocal: false,
-    logo: null,
+    logo: logoFenix,
 
   },
   {
-    nombre: 'Equipo Invitado 3',
+    nombre: "O'Diosas FC",
     etiqueta: 'Equipo invitado',
     descripcion: 'Proceso pensado para competir sin perder el foco en el aprendizaje y el cuidado deportivo.',
     esLocal: false,
-    logo: null,
+    logo: logoOdiosas,
 
   },
   {
