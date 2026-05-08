@@ -126,7 +126,7 @@
         <div>
           <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-primary">Equipos participantes</p>
           <h2 class="mt-3 text-[clamp(2rem,5vw,3.6rem)] font-black uppercase leading-18 text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
-            Cinco equipos en jornada todos contra todos
+            Cinco equipos en jornada todas contra todas
           </h2>
         </div>
         <p class="max-w-xl text-sm leading-7 text-[#56666b] sm:text-right sm:text-[0.98rem]">
@@ -276,26 +276,24 @@ import logoVikingas from '../assets/logoVk.png'
 import logoZorzales from '../assets/logos/zorzaleslogo.webp'
 import logoOdiosas from '../assets/logos/odiosas.jpg'
 import logoFenix from '../assets/logos/fenix.png'
+import logoPonshi from '../assets/logos/logoponshi.jpg'
 
 const equiposParticipantes = [
   {
     nombre: 'Vikingas Formativo',
     etiqueta: 'Equipo anfitrión',
-    descripcion: 'Representa el trabajo formativo de Vikingas y el objetivo de abrir experiencias competitivas para nuevas jugadoras.',
     esLocal: true,
     logo: logoVikingas,
   },
   {
     nombre: 'Zorzales FC',
     etiqueta: 'Equipo invitado',
-    descripcion: 'Club invitado para sumar una competencia ordenada, segura y ajustada a procesos iniciales.',
     esLocal: false,
     logo: logoZorzales,
   },
   {
     nombre: 'Fénix',
     etiqueta: 'Equipo invitado',
-    descripcion: 'Participación orientada a dar rodaje a jugadoras con poca experiencia en un contexto formativo real.',
     esLocal: false,
     logo: logoFenix,
 
@@ -303,17 +301,15 @@ const equiposParticipantes = [
   {
     nombre: "O'Diosas FC",
     etiqueta: 'Equipo invitado',
-    descripcion: 'Proceso pensado para competir sin perder el foco en el aprendizaje y el cuidado deportivo.',
     esLocal: false,
     logo: logoOdiosas,
 
   },
   {
-    nombre: 'Equipo Invitado 4',
+    nombre: 'PonchiCrack',
     etiqueta: 'Equipo invitado',
-    descripcion: 'Invitado con enfoque de desarrollo para nuevas futbolistas y progresión competitiva responsable.',
     esLocal: false,
-    logo: null,
+    logo: logoPonshi,
 
 
   },

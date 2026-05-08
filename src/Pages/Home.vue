@@ -1,5 +1,47 @@
 <template>
     <HeroHome :hero-data="heroData" />
+
+    <section class="relative overflow-hidden bg-[#071112] px-4 py-4 sm:px-6 lg:px-8 lg:py-5">
+      <div class="mx-auto max-w-6xl">
+        <router-link
+          to="/campeonato-vikingas-4ta"
+          @click="trackCTAClick('Ver campeonato formativo VK', 'home_campeonato_banner')"
+          class="group relative flex overflow-hidden rounded-4xl bg-[#081516] px-5 py-5 shadow-[0_24px_48px_rgba(0,0,0,0.28)] transition-all duration-300 hover:-translate-y-1 sm:px-7 sm:py-6"
+        >
+          <div
+            class="absolute inset-0 scale-[1.02] bg-bottom opacity-40 transition-transform duration-500 group-hover:scale-[1.06]"
+            :style="{ backgroundImage: `url(${campeonatoBannerImage})`, backgroundPosition: 'center 38%' }"
+          ></div>
+          <div class="absolute inset-0 bg-[linear-gradient(110deg,rgba(7,17,18,0.86)_0%,rgba(7,17,18,0.72)_42%,rgba(7,17,18,0.88)_100%),radial-gradient(circle_at_16%_18%,rgba(201,168,76,0.34),transparent_28%),radial-gradient(circle_at_84%_76%,rgba(44,207,191,0.14),transparent_22%)]"></div>
+          <div class="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[#c9a84c]/18 blur-3xl"></div>
+
+          <div class="relative flex w-full flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div class="min-w-0">
+              <span class="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-[0.68rem] font-black uppercase tracking-[0.24em] text-[#f2de9b] backdrop-blur-sm">
+                Destacado en Vikingas
+              </span>
+              <h2 class="mt-3 text-[clamp(1.7rem,4vw,2.8rem)] font-black leading-10 uppercase lg:leading-14 text-white" style="font-family: 'Gobold High', sans-serif;">
+                4ta versión del<br>
+                Campeonato Formativo VK
+              </h2>
+              <p class="mt-3 max-w-2xl text-sm leading-7 text-white/74 sm:text-[0.98rem]">
+                Revisa toda la información del campeonato, conoce el enfoque formativo de esta edición y entra directo a la página especial del evento.
+              </p>
+            </div>
+
+            <span class="relative inline-flex min-h-14 shrink-0 items-center justify-between gap-4 rounded-[1.25rem] bg-[linear-gradient(135deg,#f0d481,#c9a84c)] px-5 py-4 text-[#081516] shadow-[0_18px_30px_rgba(201,168,76,0.24)] transition-transform duration-300 group-hover:translate-x-1">
+              <span>
+                <span class="block text-[0.68rem] font-black uppercase tracking-[0.18em] text-black/70">Ir al especial</span>
+                <span class="mt-1 block text-[0.92rem] font-black uppercase tracking-[0.08em]">Ver campeonato VK</span>
+              </span>
+              <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
+          </div>
+        </router-link>
+      </div>
+    </section>
     
     <section class="relative bg-[#0b1718] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
       <div class="mx-auto grid max-w-6xl gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
@@ -8,7 +50,7 @@
           <div class="relative flex h-full flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div class="max-w-2xl text-center lg:text-left">
               <p class="text-[0.78rem] font-bold italic tracking-[0.04em] text-white/84">
-                Comienza una nueva temporada
+NUEVA TEMPORADA
               </p>
               <h2 class="mt-3 text-[clamp(2rem,5vw,3.6rem)] font-black uppercase xl:leading-15 text-white" style="font-family: 'Gobold High', sans-serif;">
                 Liga Dobleve<br>
@@ -34,7 +76,7 @@
               <button
                 @click="toggleLike"
                 :disabled="isLikeLoading"
-                class="inline-flex min-h-14 items-center justify-center gap-2 rounded-[1.35rem] border border-white/16 bg-white/8 px-5 py-4 text-white backdrop-blur-sm transition-transform duration-200 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-50"
+                class="inline-flex min-h-14 cursor-pointer items-center justify-center gap-2 rounded-[1.35rem] border border-white/16 bg-white/8 px-5 py-4 text-white backdrop-blur-sm transition-transform duration-200 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <HeartIconSolid v-if="hasLiked" class="h-5 w-5 text-red-400" />
                 <HeartIcon v-else class="h-5 w-5 text-white" />
@@ -105,6 +147,7 @@ import Eventos from '../components/Eventos.vue';
 import HeroHome from '../components/HeroHome.vue';
 import UltimosResultados from '../components/UltimosResultados.vue';
 import { trackCTAClick, trackSocialInteraction } from '../composables/useAnalytics';
+import campeonatoBannerImage from '../assets/2026/grupo.webp';
 
 const heroData = ref({
   imagenFondo: 'https://firebasestorage.googleapis.com/v0/b/loginvk-955b2.firebasestorage.app/o/slide2.webp?alt=media&token=88083cd1-4f14-4e7f-9aef-0bb1421f92e0',

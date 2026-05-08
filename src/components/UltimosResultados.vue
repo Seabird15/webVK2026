@@ -47,7 +47,7 @@
             <button
               v-if="resultado.goleadoras && resultado.goleadoras.length"
               @click="abrirGoleadoras(resultado)"
-              class="w-full rounded-2xl border border-primary/20 bg-primary/8 px-4 py-3 text-left transition-colors duration-200 hover:border-primary/40 hover:bg-primary/12"
+              class="w-full cursor-pointer rounded-2xl border border-primary/20 bg-primary/8 px-4 py-3 text-left transition-colors duration-200 hover:border-primary/40 hover:bg-primary/12"
             >
               <p class="text-[0.7rem] font-black uppercase tracking-[0.2em] text-primary">Goleadoras</p>
               <p class="mt-1 text-sm font-semibold text-white">Ver goleadoras de Vikingas</p>

@@ -186,7 +186,7 @@
                         <button
                             v-if="ultimoPartido.goleadoresLocal && ultimoPartido.goleadoresLocal.length"
                             @click="mostrarGoleadorasUltimoPartido = true"
-                            class="flex w-full items-center justify-between gap-3 rounded-[1.6rem] border border-white/10 bg-[#1b292a] px-4 py-4 text-left transition-colors duration-200 hover:bg-[#213132]"
+                            class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-[1.6rem] border border-white/10 bg-[#1b292a] px-4 py-4 text-left transition-colors duration-200 hover:bg-[#213132]"
                         >
                             <div>
                                 <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Resumen</p>
@@ -218,7 +218,7 @@
 
                     <button
                         @click="mostrarGoleadorasUltimoPartido = false"
-                        class="shrink-0 rounded-full border border-white/10 bg-white/6 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-white hover:bg-white/10"
+                        class="shrink-0 cursor-pointer rounded-full border border-white/10 bg-white/6 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-white hover:bg-white/10"
                     >
                         Cerrar
                     </button>

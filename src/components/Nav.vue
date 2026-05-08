@@ -19,15 +19,80 @@
 
         <!-- Links de navegación - Desktop -->
         <div class="hidden lg:flex min-w-0 flex-wrap items-center justify-center gap-x-4 gap-y-2 px-4 xl:gap-x-5 xl:px-6 2xl:gap-x-6">
-          <router-link 
-            v-for="link in navLinks"
-            :key="link.id"
-            :to="link.path"
-            class="text-black font-bold text-[11px] xl:text-xs tracking-[0.14em] xl:tracking-[0.16em] hover:text-black/70 transition-colors uppercase flex items-center gap-1.5 whitespace-nowrap"
-          >
-            <component :is="link.icon" class="w-4 h-4 shrink-0" />
-            {{ link.label }}
-          </router-link>
+          <template v-for="link in navLinks" :key="link.id">
+            <div
+              v-if="link.children"
+              class="relative"
+            >
+              <button
+                type="button"
+                class="text-black cursor-pointer font-bold text-[11px] xl:text-xs tracking-[0.14em] xl:tracking-[0.16em] transition-colors uppercase flex items-center gap-1.5 whitespace-nowrap"
+                :class="isGroupActive(link) || openDesktopMenuId === link.id ? 'text-black' : 'hover:text-black/70'"
+                :aria-label="`Mostrar submenu de ${link.label}`"
+                :aria-expanded="openDesktopMenuId === link.id"
+                @click="toggleDesktopSubmenu(link.id)"
+              >
+                <component :is="link.icon" class="w-4 h-4 shrink-0" />
+                {{ link.label }}
+                <ChevronDownIcon
+                  class="h-4 w-4 transition-transform duration-200"
+                  :class="openDesktopMenuId === link.id ? 'rotate-180' : ''"
+                />
+              </button>
+
+              <div
+                v-if="openDesktopMenuId === link.id"
+                class="absolute left-1/2 top-full z-50 mt-3 w-72 -translate-x-1/2 overflow-hidden rounded-2xl border border-black/10 bg-[#151515] text-white shadow-[0_20px_45px_rgba(0,0,0,0.32)]"
+              >
+                <div class="border-b text-primary px-4 py-3 text-[10px] font-black uppercase tracking-[0.28em] text-black">
+                  Competiciones Vikingas
+                </div>
+
+                <div class="p-2  space-y-2">
+                  <router-link
+                    v-for="child in link.children"
+                    :key="child.id"
+                    :to="child.path"
+                    class="flex items-center justify-between gap-3 rounded-xl px-4 py-3 transition-all duration-200"
+                    :class="[
+                      isLinkActive(child.path)
+                        ? 'bg-white text-black shadow-[0_12px_30px_rgba(255,255,255,0.18)]'
+                        : 'text-white hover:bg-white/10',
+                      child.featured ? 'ring-1 ring-[#c9a84c]/40' : ''
+                    ]"
+                    @click="closeDesktopSubmenu()"
+                  >
+                    <span class="flex items-center gap-3 min-w-0">
+                      <component :is="child.icon" class="h-5 w-5 shrink-0" />
+                      <span class="min-w-0">
+                        <span class="block truncate text-xs font-extrabold uppercase tracking-[0.2em]">{{ child.label }}</span>
+                        <span class="block text-[11px] font-medium tracking-[0.08em]" :class="isLinkActive(child.path) ? 'text-black/70' : 'text-white/70'">
+                          {{ child.description }}
+                        </span>
+                      </span>
+                    </span>
+
+                    <span
+                      v-if="child.featured"
+                      class="shrink-0 rounded-full bg-[#c9a84c] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-black"
+                    >
+                      Destacado
+                    </span>
+                  </router-link>
+                </div>
+              </div>
+            </div>
+
+            <router-link 
+              v-else
+              :to="link.path"
+              class="text-black font-bold text-[11px] xl:text-xs tracking-[0.14em] xl:tracking-[0.16em] transition-colors uppercase flex items-center gap-1.5 whitespace-nowrap"
+              :class="isLinkActive(link.path) ? 'text-black' : 'hover:text-black/70'"
+            >
+              <component :is="link.icon" class="w-4 h-4 shrink-0" />
+              {{ link.label }}
+            </router-link>
+          </template>
         </div>
 
         <div class="flex items-center justify-end gap-3 md:gap-4 lg:justify-self-end">
@@ -94,16 +159,71 @@
       class="lg:hidden bg-primary/95 backdrop-blur-sm border-t border-black/20"
     >
       <div class="flex flex-col gap-1 px-4 py-4">
-        <router-link
-          v-for="link in navLinks"
-          :key="link.id"
-          :to="link.path"
-          class="px-4 py-3 text-black font-bold text-sm tracking-wider uppercase hover:bg-black/10 rounded transition-colors flex items-center gap-3"
-          @click="isMenuOpen = false"
-        >
-          <component :is="link.icon" class="w-5 h-5" />
-          {{ link.label }}
-        </router-link>
+        <template v-for="link in navLinks" :key="link.id">
+          <div v-if="link.children" class="rounded-xl">
+            <div class="p-2">
+              <button
+                type="button"
+                class="flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left text-black font-bold text-sm tracking-wider uppercase transition-colors"
+                :class="openMobileMenuId === link.id ? 'bg-black/10' : 'hover:bg-black/10'"
+                :aria-label="`Mostrar submenu de ${link.label}`"
+                :aria-expanded="openMobileMenuId === link.id"
+                @click="toggleMobileSubmenu(link.id)"
+              >
+                <span class="flex min-w-0 items-center gap-3">
+                <component :is="link.icon" class="w-5 h-5 shrink-0" />
+                  <span class="truncate">{{ link.label }}</span>
+                </span>
+                <ChevronDownIcon
+                  class="h-5 w-5 transition-transform duration-200"
+                  :class="openMobileMenuId === link.id ? 'rotate-180' : ''"
+                />
+              </button>
+            </div>
+
+            <div v-if="openMobileMenuId === link.id" class="space-y-2 px-3 pb-3">
+              <router-link
+                v-for="child in link.children"
+                :key="child.id"
+                :to="child.path"
+                class="flex items-center justify-between gap-3 rounded-xl px-4 py-3 transition-colors"
+                :class="[
+                  isLinkActive(child.path) ? 'bg-black text-primary' : 'bg-white/50 hover:bg-black/10 text-black',
+                  child.featured ? 'border border-[#c9a84c]/60' : ''
+                ]"
+                @click="handleMobileNavigation()"
+              >
+                <span class="flex items-center gap-3 min-w-0">
+                  <component :is="child.icon" class="h-5 w-5 shrink-0" />
+                  <span class="min-w-0">
+                    <span class="block truncate text-sm font-extrabold uppercase tracking-[0.14em]">{{ child.label }}</span>
+                    <span class="block text-[11px] font-medium normal-case tracking-[0.04em]" :class="isLinkActive(child.path) ? 'text-primary/80' : 'text-black/60'">
+                      {{ child.description }}
+                    </span>
+                  </span>
+                </span>
+
+                <span
+                  v-if="child.featured"
+                  class="shrink-0 rounded-full bg-[#c9a84c] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-black"
+                >
+                  VK
+                </span>
+              </router-link>
+            </div>
+          </div>
+
+          <router-link
+            v-else
+            :to="link.path"
+            class="px-4 py-3 text-black font-bold text-sm tracking-wider uppercase rounded transition-colors flex items-center gap-3"
+            :class="isLinkActive(link.path) ? 'bg-black text-primary' : 'hover:bg-black/10'"
+            @click="handleMobileNavigation()"
+          >
+            <component :is="link.icon" class="w-5 h-5" />
+            {{ link.label }}
+          </router-link>
+        </template>
 
         <!-- Separador -->
         <div class="border-t border-black/20 my-2"></div>
@@ -134,15 +254,16 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRoute } from 'vue-router';
 import { 
   BookOpenIcon, 
   CalendarIcon, 
+  ChevronDownIcon,
   UserGroupIcon, 
   ChartBarIcon, 
   PhotoIcon, 
   EnvelopeIcon,
   UserCircleIcon,
-  PhoneIcon,
   TrophyIcon,
   UserIcon,
   ShieldCheckIcon
@@ -150,6 +271,9 @@ import {
 import { trackOutboundClick } from '../composables/useAnalytics';
 
 const isMenuOpen = ref(false);
+const openDesktopMenuId = ref(null);
+const openMobileMenuId = ref(null);
+const route = useRoute();
 const brandName = 'Vikingas';
 const logoUrl = 'https://firebasestorage.googleapis.com/v0/b/fitapp-4fa5d.firebasestorage.app/o/VK%20LOGO%20COLOR.png?alt=media&token=ab878fc2-6dc0-4e90-9608-04acfb146b27';
 
@@ -157,11 +281,52 @@ const navLinks = [
   { id: 1, label: 'Historia', path: '/historia', icon: BookOpenIcon },
   { id: 2, label: 'Calendario', path: '/calendario', icon: CalendarIcon },
   { id: 3, label: 'Equipo', path: '/equipo', icon: UserGroupIcon },
-  { id: 4, label: 'Competencias', path: '/competencias', icon: TrophyIcon },
-  { id: 5, label: 'Campeonato 4ta', path: '/campeonato-vikingas-4ta', icon: TrophyIcon },
+  {
+    id: 4,
+    label: 'Competencias',
+    icon: TrophyIcon,
+    children: [
+      {
+        id: 'competencias',
+        label: 'Liga y resultados',
+        path: '/competencias',
+        icon: TrophyIcon,
+        description: 'Tabla, fixture y seguimiento oficial'
+      },
+      {
+        id: 'campeonato-vk',
+        label: 'Campeonato VK',
+        path: '/campeonato-vikingas-4ta',
+        icon: TrophyIcon,
+        description: '4ta versión campeonato VK',
+        featured: true
+      }
+    ]
+  },
   { id: 6, label: 'Estadísticas', path: '/estadisticas', icon: ChartBarIcon },
   { id: 7, label: 'Indumentaria', path: '/indumentaria', icon: PhotoIcon },
   { id: 8, label: 'Fotos', path: '/fotos', icon: PhotoIcon },
   { id: 9, label: 'Contacto', path: '/contacto', icon: EnvelopeIcon },
 ];
+
+const isLinkActive = (path) => route.path === path;
+
+const isGroupActive = (link) => link.children?.some((child) => isLinkActive(child.path));
+
+const closeDesktopSubmenu = () => {
+  openDesktopMenuId.value = null;
+};
+
+const toggleDesktopSubmenu = (id) => {
+  openDesktopMenuId.value = openDesktopMenuId.value === id ? null : id;
+};
+
+const toggleMobileSubmenu = (id) => {
+  openMobileMenuId.value = openMobileMenuId.value === id ? null : id;
+};
+
+const handleMobileNavigation = () => {
+  isMenuOpen.value = false;
+  openMobileMenuId.value = null;
+};
 </script>
