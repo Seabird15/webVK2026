@@ -325,11 +325,29 @@ export const actualizarCategoriaSeleccionadaJugadora = async (uid, categoria) =>
 // Obtener todas las jugadoras registradas por equipo
 export const fetchJugadorasRegistradasPorEquipo = async (equipo) => {
   try {
-    const snapshot = await getDocs(collection(db, 'jugadoraRegistro'));
-    const jugadoras = snapshot.docs.map(docSnap => ({
-      id: docSnap.id,
-      ...docSnap.data()
-    }));
+    const [registroSnapshot, loginSnapshot, accesoSnapshot] = await Promise.all([
+      getDocs(collection(db, 'jugadoraRegistro')),
+      getDocs(collection(db, 'jugadorasLogin')),
+      getDocs(collection(db, 'jugadoras'))
+    ]);
+
+    const emailsLoginPorId = new Map(
+      loginSnapshot.docs.map((docSnap) => [docSnap.id, docSnap.data()?.email || ''])
+    );
+    const emailsAccesoPorId = new Map(
+      accesoSnapshot.docs.map((docSnap) => [docSnap.id, docSnap.data()?.email || ''])
+    );
+
+    const jugadoras = registroSnapshot.docs.map((docSnap) => {
+      const data = docSnap.data() || {};
+      const emailRegistro = data.email || emailsLoginPorId.get(docSnap.id) || emailsAccesoPorId.get(docSnap.id) || '';
+
+      return {
+        id: docSnap.id,
+        ...data,
+        email: emailRegistro
+      };
+    });
 
     if (equipo === 'ambos') {
       return jugadoras;
@@ -549,19 +567,20 @@ export const actualizarPerfilJugadora = async (uid, perfilData, fotoFile) => {
   isLoadingJugadora.value = true;
   errorJugadora.value = null;
   try {
-    const equiposNormalizados = obtenerEquiposJugadoraDesdeDatos(perfilData);
+    const { estadoSalud: _estadoSaludIgnorado, ...perfilSinEstado } = perfilData || {};
+    const equiposNormalizados = obtenerEquiposJugadoraDesdeDatos(perfilSinEstado);
     const equipoLegacy = convertirEquiposAString(equiposNormalizados);
     const dataToUpdate = {
-      ...perfilData,
+      ...perfilSinEstado,
       equipos: equiposNormalizados,
       equipo: equipoLegacy,
       disponibilidadEntrenamientos: normalizarDisponibilidadEntrenamientos(
-        perfilData?.disponibilidadEntrenamientos || {},
+        perfilSinEstado?.disponibilidadEntrenamientos || {},
         equiposNormalizados
       ),
       categoriaSeleccionada: resolverCategoriaSeleccionada(
         equipoLegacy,
-        perfilData?.categoriaSeleccionada,
+        perfilSinEstado?.categoriaSeleccionada,
         jugadoraData.value?.categoriaSeleccionada,
         equiposNormalizados
       ),

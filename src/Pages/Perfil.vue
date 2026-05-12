@@ -157,17 +157,10 @@
 
           <div>
             <label class="block text-sm font-bold text-gray-700 mb-2">Estado actual</label>
-            <select
-              v-model="formData.estadoSalud"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              :disabled="isLoading"
-            >
-              <option value="disponible">Disponible</option>
-              <option value="lesionada">Lesionada</option>
-              <option value="recuperacion">En recuperación</option>
-              <option value="vacaciones">De vacaciones</option>
-              <option value="no_disponible">No disponible</option>
-            </select>
+            <div class="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
+              <p class="font-semibold">{{ formatearEstadoSalud(formData.estadoSalud) }}</p>
+              <p class="mt-1 text-xs text-gray-500">Este estado solo puede ser modificado desde administración.</p>
+            </div>
           </div>
 
           <!-- Foto de perfil -->
@@ -437,7 +430,6 @@ const handleGuardar = async () => {
       posicion: formData.posicion,
       equipos: [...formData.equipos],
       fechaNacimiento: formData.fechaNacimiento,
-      estadoSalud: formData.estadoSalud,
       categoriaSeleccionada: categoriaActualizada
     },
     fotoFile.value

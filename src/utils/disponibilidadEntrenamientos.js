@@ -15,7 +15,7 @@ export const DIAS_ENTRENAMIENTO_POR_EQUIPO = {
 };
 
 const TIPOS_SIN_RESTRICCION_SEMANAL = new Set(['partido', 'amistoso']);
-export const ESTADOS_EXCLUIDOS_ASISTENCIA = new Set(['lesionada', 'recuperacion', 'vacaciones']);
+export const ESTADOS_EXCLUIDOS_ASISTENCIA = new Set(['lesionada', 'recuperacion', 'vacaciones', 'no_disponible']);
 
 export const normalizarEquipoDisponibilidad = (equipo) => {
   const valor = (equipo || '').toString().trim().toLowerCase();

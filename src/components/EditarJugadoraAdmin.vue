@@ -44,7 +44,7 @@
             <option value="vacaciones">De vacaciones</option>
             <option value="no_disponible">No disponible</option>
           </select>
-          <p class="text-xs text-gray-500">Lesionada, recuperación y vacaciones quedan fuera del cálculo de asistencia.</p>
+          <p class="text-xs text-gray-500">Lesionada, recuperación, vacaciones y no disponible quedan fuera del cálculo de asistencia y de las inscripciones.</p>
         </div>
 
         <!-- Sección de Equipos -->

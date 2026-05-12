@@ -1160,7 +1160,7 @@ import {
 import { escucharInscripcionesEntrenamiento, cambiarEstadoInscripcion, inscribirJugadoraManual, crearInscripcionesPendientes, sincronizarInscripcionesConvocatoria } from '../firebase/inscripciones';
 import { fetchJugadorasRegistradasPorEquipo } from '../firebase/jugadorasAuth';
 import { sendPushNotification } from '../firebase/notificaciones';
-import { particionarInscripcionesPorAsistencia } from '../utils/disponibilidadEntrenamientos';
+import { jugadoraExcluidaDeAsistencia, particionarInscripcionesPorAsistencia } from '../utils/disponibilidadEntrenamientos';
 
 const mostrarFormulario = ref(false);
 const isLoading = ref(false);
@@ -1457,7 +1457,8 @@ const obtenerEstadoSaludExclusion = (estado) => {
   const map = {
     lesionada: 'Lesionada',
     recuperacion: 'En recuperación',
-    vacaciones: 'De vacaciones'
+    vacaciones: 'De vacaciones',
+    no_disponible: 'No disponible'
   };
 
   return map[estado] || 'No disponible';
@@ -1516,6 +1517,7 @@ const buscarJugadoras = async () => {
     jugadorasDisponibles.value = jugadorasRegistradas.filter(j => {
       const nombreCompleto = `${j.nombre} ${j.apellido}`.toLowerCase();
       return nombreCompleto.includes(busquedaJugadora.value.toLowerCase()) && 
+             !jugadoraExcluidaDeAsistencia(j) &&
              !idsInscritas.includes(j.id);
     });
   } catch (err) {

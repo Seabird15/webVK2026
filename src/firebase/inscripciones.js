@@ -14,10 +14,50 @@ import {
 import { db } from './config';
 import {
   esEventoConRestriccionSemanal,
+  jugadoraExcluidaDeAsistencia,
   jugadoraPuedeAsistirEntrenamiento,
   normalizarEquipoDisponibilidad,
   obtenerEquiposJugadoraDisponibilidad
 } from '../utils/disponibilidadEntrenamientos';
+
+const validarJugadoraDisponibleParaInscripcion = async (entrenamientoId, jugadoraId) => {
+  const [jugadoraSnap, entrenamientoSnap] = await Promise.all([
+    getDoc(doc(db, 'jugadoraRegistro', jugadoraId)),
+    getDoc(doc(db, 'entrenamientos', entrenamientoId))
+  ]);
+
+  if (!jugadoraSnap.exists()) {
+    return { valida: true };
+  }
+
+  const jugadora = {
+    id: jugadoraSnap.id,
+    ...jugadoraSnap.data()
+  };
+
+  if (jugadoraExcluidaDeAsistencia(jugadora)) {
+    return {
+      valida: false,
+      mensaje: 'La jugadora no puede anotarse a eventos con su estado actual.'
+    };
+  }
+
+  if (entrenamientoSnap.exists()) {
+    const entrenamiento = {
+      id: entrenamientoSnap.id,
+      ...entrenamientoSnap.data()
+    };
+
+    if (esEventoConRestriccionSemanal(entrenamiento) && !jugadoraPuedeAsistirEntrenamiento(jugadora, entrenamiento)) {
+      return {
+        valida: false,
+        mensaje: 'La jugadora no está habilitada para este evento.'
+      };
+    }
+  }
+
+  return { valida: true };
+};
 
 export const inscripciones = ref([]);
 export const isLoadingInscripciones = ref(false);
@@ -28,6 +68,12 @@ export const inscribirseEntrenamiento = async (entrenamientoId, jugadoraId, juga
   isLoadingInscripciones.value = true;
   errorInscripciones.value = null;
   try {
+    const validacion = await validarJugadoraDisponibleParaInscripcion(entrenamientoId, jugadoraId);
+    if (!validacion.valida) {
+      errorInscripciones.value = validacion.mensaje;
+      return false;
+    }
+
     
     // Verificar si ya existe un registro
     const q = query(
@@ -423,6 +469,12 @@ export const inscribirJugadoraManual = async (entrenamientoId, jugadoraId, jugad
   isLoadingInscripciones.value = true;
   errorInscripciones.value = null;
   try {
+    const validacion = await validarJugadoraDisponibleParaInscripcion(entrenamientoId, jugadoraId);
+    if (!validacion.valida) {
+      errorInscripciones.value = validacion.mensaje;
+      return false;
+    }
+
     // Verificar si ya está inscrita
     const q = query(
       collection(db, 'inscripcionesEntrenamientos'),

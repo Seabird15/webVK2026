@@ -455,6 +455,10 @@
                 <NoSymbolIcon class="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
                 <p class="text-xs text-red-700 font-semibold">No estás en la lista de convocadas</p>
               </div>
+              <div v-if="jugadoraRestringidaPorEstado" class="p-3 bg-slate-100 rounded-lg border border-slate-300 flex items-start gap-2">
+                <NoSymbolIcon class="w-4 h-4 text-slate-600 mt-0.5 flex-shrink-0" />
+                <p class="text-xs text-slate-700 font-semibold">{{ mensajeBloqueoPorEstado }}</p>
+              </div>
               <div v-else-if="entrenamiento.esConvocatoria && esConvocada(entrenamiento) && !estaInscrita(entrenamiento.id)" class="p-3 bg-purple-50 rounded-lg border border-purple-200 flex items-start gap-2">
                 <CheckCircleIcon class="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
                 <p class="text-xs text-purple-700 font-semibold">¡Has sido convocada! Confirma tu asistencia</p>
@@ -472,7 +476,7 @@
                 <button
                   v-if="estadoInscripcion[entrenamiento.id] === 'confirmada'"
                   @click="abrirModalBaja(entrenamiento)"
-                  :disabled="isLoadingAccion || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
+                  :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                   class="flex-1 px-3 py-2.5 rounded-lg font-bold transition-all text-sm cursor-pointer flex items-center justify-center gap-1 bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ArrowPathIcon class="w-4 h-4" />
@@ -482,7 +486,7 @@
                 <button
                   v-else-if="estadoInscripcion[entrenamiento.id] === 'baja'"
                   @click="handleInscribirse(entrenamiento)"
-                  :disabled="isLoadingAccion || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
+                  :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                   class="flex-1 px-3 py-2.5 rounded-lg font-bold transition-all text-sm cursor-pointer flex items-center justify-center gap-1 bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ArrowPathIcon class="w-4 h-4" />
@@ -492,7 +496,7 @@
                 <button
                   v-else
                   @click="handleInscribirse(entrenamiento)"
-                  :disabled="isLoadingAccion || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
+                  :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                   class="flex-1 px-3 py-2.5 rounded-lg font-bold transition-all text-sm cursor-pointer flex items-center justify-center gap-1 bg-green-500 text-white hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <CheckIcon class="w-4 h-4" />
@@ -501,7 +505,7 @@
                 <button
                   v-if="!estaInscrita(entrenamiento.id) && estadoInscripcion[entrenamiento.id] !== 'baja'"
                   @click="abrirModalBaja(entrenamiento)"
-                  :disabled="isLoadingAccion || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
+                  :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                   class="flex-1 px-3 py-2.5 rounded-lg font-bold transition-all text-sm cursor-pointer flex items-center justify-center gap-1 bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <XMarkIcon class="w-4 h-4" />
@@ -1101,59 +1105,62 @@
             ]">
               {{ mensajeDetalle }}
             </div>
+            <div v-if="jugadoraRestringidaPorEstado" class="mb-2 rounded-lg border border-slate-300 bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700">
+              {{ mensajeBloqueoPorEstado }}
+            </div>
             <!-- Si ya confirmó - botón para cambiar a baja -->
             <button
               v-if="estadoInscripcion[entrenamientoSeleccionado.id] === 'confirmada'"
               @click="abrirModalBaja(entrenamientoSeleccionado)"
-              :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
+              :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
               :class="[
                 'w-full px-4 py-3 rounded-lg font-bold transition-colors cursor-pointer',
-                fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
+                jugadoraRestringidaPorEstado || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50'
               ]"
             >
-              {{ fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin) ? '⛔ No convocada' : '🔄 Cambiar mi respuesta a Baja' }}
+              {{ jugadoraRestringidaPorEstado ? '⛔ No disponible' : fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin) ? '⛔ No convocada' : '🔄 Cambiar mi respuesta a Baja' }}
             </button>
             <!-- Si ya se dio de baja - botón para cambiar a confirmada -->
             <button
               v-else-if="estadoInscripcion[entrenamientoSeleccionado.id] === 'baja'"
               @click="handleInscribirse(entrenamientoSeleccionado)"
-              :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
+              :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
               :class="[
                 'w-full px-4 py-3 rounded-lg font-bold transition-colors cursor-pointer',
-                fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
+                jugadoraRestringidaPorEstado || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50'
               ]"
             >
-              {{ fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin) ? '⛔ No convocada' : '🔄 Cambiar mi respuesta a Confirmada' }}
+              {{ jugadoraRestringidaPorEstado ? '⛔ No disponible' : fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin) ? '⛔ No convocada' : '🔄 Cambiar mi respuesta a Confirmada' }}
             </button>
             <!-- Si no ha respondido - botones de acción -->
             <template v-else>
               <button
                 @click="handleInscribirse(entrenamientoSeleccionado)"
-                :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
+                :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
                 :class="[
                   'w-full px-4 py-3 rounded-lg font-bold transition-colors cursor-pointer',
-                  fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
+                  jugadoraRestringidaPorEstado || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-green-500 text-white hover:bg-green-600 disabled:opacity-50'
                 ]"
               >
-                {{ fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin) ? '⛔ No convocada' : '✓ Confirmar mi Asistencia' }}
+                {{ jugadoraRestringidaPorEstado ? '⛔ No disponible' : fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin) ? '⛔ No convocada' : '✓ Confirmar mi Asistencia' }}
               </button>
               <button
                 @click="abrirModalBaja(entrenamientoSeleccionado)"
-                :disabled="isLoadingAccion || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
+                :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
                 :class="[
                   'w-full px-4 py-3 rounded-lg font-bold transition-colors cursor-pointer',
-                  fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
+                  jugadoraRestringidaPorEstado || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-red-500 text-white hover:bg-red-600 disabled:opacity-50'
                 ]"
               >
-                {{ fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin) ? '⛔ No convocada' : '✕ Darme de Baja' }}
+                {{ jugadoraRestringidaPorEstado ? '⛔ No disponible' : fechaPasada(entrenamientoSeleccionado) ? '⚠️ Fecha pasada' : (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin) ? '⛔ No convocada' : '✕ Darme de Baja' }}
               </button>
             </template>
           </div>
@@ -1367,7 +1374,7 @@ import { obtenerTotalesEstadisticasJugadora } from '../firebase/estadisticas';
 import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
 import CuestionarioSaludSemanal from '../components/CuestionarioSaludSemanal.vue';
 import kinesioLogo from '../assets/sponsors/kinesio.png';
-import { jugadoraCuentaParaAsistencia, jugadoraPuedeAsistirEntrenamiento, particionarInscripcionesPorAsistencia } from '../utils/disponibilidadEntrenamientos';
+import { jugadoraCuentaParaAsistencia, jugadoraExcluidaDeAsistencia, jugadoraPuedeAsistirEntrenamiento, particionarInscripcionesPorAsistencia } from '../utils/disponibilidadEntrenamientos';
 
 const router = useRouter();
 const route = useRoute();
@@ -1446,6 +1453,11 @@ const jugadorasDisponiblesMvpSeleccionado = ref([]);
 const jugadorasRegistradasPorId = ref(new Map());
 const equiposDisponibles = computed(() => obtenerEquiposDisponibles());
 const mostrarSelectorEquipos = computed(() => equiposDisponibles.value.length > 1);
+const jugadoraRestringidaPorEstado = computed(() => !esAdmin.value && jugadoraExcluidaDeAsistencia(jugadoraData.value));
+const mensajeBloqueoPorEstado = computed(() => {
+  const estado = formatearEstadoSalud(jugadoraData.value?.estadoSalud);
+  return `Tu estado actual es ${estado}. Solo administración puede modificarlo y no puedes anotarte a eventos.`;
+});
 const bannerMensualidad = ref({
   activo: true,
   mensaje: 'Recuerda el pago de la mensualidad. Gracias a esto seguimos existiendo.'
@@ -1593,7 +1605,8 @@ const obtenerEstadoSaludExclusion = (estado) => {
   const map = {
     lesionada: 'Lesionada',
     recuperacion: 'En recuperación',
-    vacaciones: 'De vacaciones'
+    vacaciones: 'De vacaciones',
+    no_disponible: 'No disponible'
   };
 
   return map[estado] || 'No disponible';
@@ -2191,6 +2204,11 @@ const mostrarMensajeDetalle = (mensaje, tipo = 'success') => {
 const handleInscribirse = async (entrenamiento) => {
   if (!jugadoraData.value) return;
 
+  if (jugadoraRestringidaPorEstado.value) {
+    mostrarToast(mensajeBloqueoPorEstado.value, 'error');
+    return;
+  }
+
   // Bloquear si es convocatoria y no está convocada (excepto admin)
   if (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin.value) {
     mostrarToast('No estás en la lista de convocadas para este partido.', 'error');
@@ -2229,6 +2247,11 @@ const handleInscribirse = async (entrenamiento) => {
 };
 
 const abrirModalBaja = (entrenamiento) => {
+  if (jugadoraRestringidaPorEstado.value) {
+    mostrarToast(mensajeBloqueoPorEstado.value, 'error');
+    return;
+  }
+
   // Bloquear si es convocatoria y no está convocada (excepto admin)
   if (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin.value) {
     mostrarToast('No estás en la lista de convocadas para este partido.', 'error');
