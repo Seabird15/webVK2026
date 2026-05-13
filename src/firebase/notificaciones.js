@@ -1,9 +1,18 @@
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { doc, setDoc } from 'firebase/firestore';
 import app from './config';
-import { db } from './config';
+import { auth, db } from './config';
+import { authReady, authUser } from './auth';
 
 const functions = getFunctions(app);
+
+const esperarAuthAdmin = async (timeoutMs = 5000) => {
+  const inicio = Date.now();
+
+  while (!authReady.value && (Date.now() - inicio) < timeoutMs) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+};
 
 /**
  * Llama a una función de Firebase Cloud para enviar una notificación push.
@@ -22,6 +31,40 @@ export const sendPushNotification = async (topic, title, body) => {
   } catch (error) {
     // // console.error('Error al enviar la notificación:', error);
     throw new Error('Hubo un problema al enviar la notificación.');
+  }
+};
+
+export const resendTrainingEmailReminder = async (entrenamientoId) => {
+  try {
+    await esperarAuthAdmin();
+
+    const usuario = auth.currentUser || authUser.value;
+
+    if (!usuario) {
+      throw new Error('Debes iniciar sesión para reenviar el correo recordatorio.');
+    }
+
+    const idToken = await usuario.getIdToken(true);
+    const endpoint = `https://us-central1-${import.meta.env.VITE_FIREBASE_PROJECT_ID}.cloudfunctions.net/resendTrainingEmailReminder`;
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${idToken}`
+      },
+      body: JSON.stringify({ entrenamientoId })
+    });
+
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(payload?.error || payload?.message || 'No se pudo reenviar el correo recordatorio.');
+    }
+
+    return payload;
+  } catch (error) {
+    throw new Error(error?.message || 'Hubo un problema al reenviar el correo recordatorio.');
   }
 };
 

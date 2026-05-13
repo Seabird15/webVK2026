@@ -23,9 +23,16 @@ const EQUIPOS_VALIDOS = ['ascenso', 'escuela', 'serieC'];
 
 const normalizarCategoriaEquipo = (valor) => {
   if (!valor) return '';
-  const normalizado = valor.toString().trim().toLowerCase();
+  const normalizado = valor
+    .toString()
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\s_-]+/g, '');
+
   // Retornar 'serieC' consistente con el resto del código
-  if (normalizado === 'seriec' || normalizado === 'serieC') return 'serieC';
+  if (normalizado === 'seriec') return 'serieC';
   if (normalizado === 'ascenso' || normalizado === 'escuela' || normalizado === 'ambos') return normalizado;
   return '';
 };
@@ -325,17 +332,18 @@ export const actualizarCategoriaSeleccionadaJugadora = async (uid, categoria) =>
 // Obtener todas las jugadoras registradas por equipo
 export const fetchJugadorasRegistradasPorEquipo = async (equipo) => {
   try {
-    const [registroSnapshot, loginSnapshot, accesoSnapshot] = await Promise.all([
-      getDocs(collection(db, 'jugadoraRegistro')),
-      getDocs(collection(db, 'jugadorasLogin')),
-      getDocs(collection(db, 'jugadoras'))
+    const registroSnapshot = await getDocs(collection(db, 'jugadoraRegistro'));
+
+    const [loginSnapshot, accesoSnapshot] = await Promise.all([
+      getDocs(collection(db, 'jugadorasLogin')).catch(() => null),
+      getDocs(collection(db, 'jugadoras')).catch(() => null)
     ]);
 
     const emailsLoginPorId = new Map(
-      loginSnapshot.docs.map((docSnap) => [docSnap.id, docSnap.data()?.email || ''])
+      (loginSnapshot?.docs || []).map((docSnap) => [docSnap.id, docSnap.data()?.email || ''])
     );
     const emailsAccesoPorId = new Map(
-      accesoSnapshot.docs.map((docSnap) => [docSnap.id, docSnap.data()?.email || ''])
+      (accesoSnapshot?.docs || []).map((docSnap) => [docSnap.id, docSnap.data()?.email || ''])
     );
 
     const jugadoras = registroSnapshot.docs.map((docSnap) => {
@@ -362,19 +370,24 @@ export const fetchJugadorasRegistradasPorEquipo = async (equipo) => {
 
 // Verificar si una jugadora pertenece a un equipo
 const pertenecePorEquipo = (jugadora, equipo) => {
+  const equipoObjetivo = normalizarCategoriaEquipo(equipo);
+
   // Soportar formato nuevo: equipos como array
   if (Array.isArray(jugadora.equipos)) {
-    return jugadora.equipos.map(normalizarCategoriaEquipo).includes(equipo);
+    return jugadora.equipos.map(normalizarCategoriaEquipo).includes(equipoObjetivo);
   }
+
   const equipoNormalizado = normalizarCategoriaEquipo(jugadora.equipo);
+
   // Soportar formato antiguo: equipo como string
-  if (equipo === 'ascenso') {
+  if (equipoObjetivo === 'ascenso') {
     return equipoNormalizado === 'ascenso' || equipoNormalizado === 'ambos';
-  } else if (equipo === 'escuela') {
+  } else if (equipoObjetivo === 'escuela') {
     return equipoNormalizado === 'escuela' || equipoNormalizado === 'ambos';
-  } else if (equipo === 'serieC') {
+  } else if (equipoObjetivo === 'serieC') {
     return equipoNormalizado === 'serieC';
   }
+
   return false;
 };
 

@@ -1,1 +1,0 @@
-sendPushNotification({ topic: "ascenso", title: "Prueba", body: "Hola Vikingas" })

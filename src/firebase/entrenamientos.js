@@ -14,6 +14,7 @@ import {
   setDoc
 } from 'firebase/firestore';
 import { db } from './config';
+import { authUser } from './auth';
 
 export const entrenamientos = ref([]);
 export const isLoadingEntrenamientos = ref(false);
@@ -285,6 +286,40 @@ export const actualizarEntrenamiento = async (entrenamientoId, data) => {
     // // console.error('Error actualizando entrenamiento:', err);
     errorEntrenamientos.value = err.message;
     return false;
+  } finally {
+    isLoadingEntrenamientos.value = false;
+  }
+};
+
+export const solicitarRecordatorioCorreoEntrenamiento = async (entrenamientoId) => {
+  isLoadingEntrenamientos.value = true;
+  errorEntrenamientos.value = null;
+
+  try {
+    const requestId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+    await updateDoc(doc(db, 'entrenamientos', entrenamientoId), {
+      emailReminderRequest: {
+        requestId,
+        requestedAt: new Date(),
+        requestedByUid: authUser.value?.uid || null
+      },
+      updatedAt: new Date()
+    });
+
+    return {
+      success: true,
+      emailNotification: {
+        status: 'queued',
+        mode: 'recordatorio',
+        source: 'manual',
+        requestedByUid: authUser.value?.uid || null,
+        updatedAt: new Date().toISOString()
+      }
+    };
+  } catch (err) {
+    errorEntrenamientos.value = err.message;
+    throw err;
   } finally {
     isLoadingEntrenamientos.value = false;
   }

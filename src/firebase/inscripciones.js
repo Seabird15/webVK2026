@@ -311,13 +311,11 @@ export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
       return false;
     }
     
-    // Crear inscripción pendiente para cada jugadora
+    // Crear inscripción pendiente para cada jugadora del plantel.
+    // La disponibilidad semanal se usa para validar confirmaciones y mostrar exclusiones,
+    // no para omitir la creación base de inscripciones del entrenamiento.
     const batch = [];
     for (const jugadora of jugadoras) {
-      if (entrenamiento && esEventoConRestriccionSemanal(entrenamiento) && !jugadoraPuedeAsistirEntrenamiento(jugadora, entrenamiento)) {
-        continue;
-      }
-
       // Verificar si ya existe una inscripción
       const q = query(
         collection(db, 'inscripcionesEntrenamientos'),
@@ -388,7 +386,7 @@ export const sincronizarInscripcionesPorDisponibilidadJugadora = async (jugadora
       const perteneceAlEquipo = equiposJugadora.includes(equipoEntrenamiento);
       const estaHabilitada = perteneceAlEquipo && jugadoraPuedeAsistirEntrenamiento(jugadora, entrenamiento);
 
-      if (estaHabilitada && !inscripcionExistente) {
+      if (perteneceAlEquipo && !inscripcionExistente) {
         promesas.push(
           addDoc(collection(db, 'inscripcionesEntrenamientos'), {
             entrenamientoId: entrenamiento.id,
@@ -401,7 +399,7 @@ export const sincronizarInscripcionesPorDisponibilidadJugadora = async (jugadora
         );
       }
 
-      if (!estaHabilitada && inscripcionExistente) {
+      if (!perteneceAlEquipo && inscripcionExistente) {
         promesas.push(deleteDoc(doc(db, 'inscripcionesEntrenamientos', inscripcionExistente.id)));
       }
 

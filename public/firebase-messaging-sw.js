@@ -2,10 +2,15 @@
 importScripts("https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging-compat.js");
 
-// Inicializa Firebase en el Service Worker con la mínima
-// información necesaria para FCM (no expone apiKey ni otros campos).
+// Inicializa Firebase en el Service Worker con la configuración completa
+// requerida por Installations y Cloud Messaging en producción.
 const firebaseConfig = {
-  messagingSenderId: "400299482128"
+  apiKey: "AIzaSyDsbiUocTAjYAMuzsYqH6uj06pvUnOelYY",
+  authDomain: "loginvk-955b2.firebaseapp.com",
+  projectId: "loginvk-955b2",
+  storageBucket: "loginvk-955b2.firebasestorage.app",
+  messagingSenderId: "400299482128",
+  appId: "1:400299482128:web:1835fcb5d6941e11127e95"
 };
 
 // Ahora usa la sintaxis de la versión "compat"
@@ -29,7 +34,7 @@ messaging.onBackgroundMessage(function(payload) {
 
   const notificationOptions = {
     body: payload?.notification?.body || '',
-    icon: '/src/assets/logoVk.png',
+    icon: '/logoVk.png',
     data: { click_action: clickAction }
   };
 

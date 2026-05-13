@@ -105,6 +105,20 @@
             </select>
           </div>
 
+          <div class="bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded-xl border-2 border-amber-200">
+            <label class="flex items-start sm:items-center gap-3 cursor-pointer">
+              <input
+                v-model="formulario.enviarCorreoJugadoras"
+                type="checkbox"
+                class="w-5 h-5 mt-0.5 sm:mt-0 text-primary-dark focus:ring-2 focus:ring-primary rounded shrink-0"
+              />
+              <div class="flex-1">
+                <span class="text-sm font-black text-gray-700 uppercase tracking-wide">Enviar correo para anotarse</span>
+                <p class="text-xs text-gray-600 mt-1 font-medium">Al crear el entrenamiento se enviará un email a las jugadoras del equipo con el enlace para inscribirse.</p>
+              </div>
+            </label>
+          </div>
+
           <!-- Tipo de actividad -->
           <div>
             <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide">Tipo de actividad *</label>
@@ -718,19 +732,26 @@
                 <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
                   <BellIcon class="w-5 h-5 text-white" />
                 </div>
-                <div class="text-xs text-gray-600 font-black uppercase tracking-wide">Enviar Notificación</div>
+                <div class="text-xs text-gray-600 font-black uppercase tracking-wide">Enviar Notificación vía Correo</div>
               </div>
               <div class="space-y-3">
-                <input type="text" v-model="notificationData.title" placeholder="Título" class="w-full px-3 py-2.5 border-2 border-gray-200 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                <textarea v-model="notificationData.body" placeholder="Mensaje" rows="2" class="w-full px-3 py-2.5 border-2 border-gray-200 rounded-lg text-sm font-semibold resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"></textarea>
-                <button
-                  @click="enviarNotificacionEntrenamiento"
-                  :disabled="isSendingNotification"
-                  class="w-full px-4 py-3 rounded-xl font-bold transition-all text-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-400 hover:scale-[1.02] shadow-md flex items-center justify-center gap-2"
-                >
-                  <BellIcon class="w-5 h-5" />
-                  {{ isSendingNotification ? 'Enviando...' : 'Enviar' }}
-                </button>
+        
+                <div class="pt-3 border-t border-gray-100">
+                  <div class="flex items-center justify-between gap-3 mb-2">
+                    <p class="text-[11px] font-black uppercase tracking-wide text-gray-500">Correo recordatorio</p>
+                    <span v-if="entrenamientoDetallado?.emailNotification" class="text-[11px] font-semibold text-gray-500">
+                      {{ formatearResumenEmail(entrenamientoDetallado.emailNotification) }}
+                    </span>
+                  </div>
+                  <button
+                    @click="reenviarCorreoRecordatorio"
+                    :disabled="isSendingEmailReminder"
+                    class="w-full px-4 py-3 rounded-xl font-bold transition-all text-sm bg-gradient-to-r from-amber-500 to-yellow-500 text-white hover:from-amber-600 hover:to-yellow-600 disabled:from-gray-400 disabled:to-gray-400 hover:scale-[1.02] shadow-md flex items-center justify-center gap-2"
+                  >
+                    <ArrowPathIcon class="w-5 h-5" />
+                    {{ isSendingEmailReminder ? 'Reenviando...' : 'Reenviar correo recordatorio' }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1128,7 +1149,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { 
   CalendarIcon, 
   MapPinIcon, 
@@ -1151,6 +1172,7 @@ import {
   fetchEntrenamientosPorEquipo,
   fetchTodosEntrenamientos,
   actualizarEntrenamiento,
+  solicitarRecordatorioCorreoEntrenamiento,
   finalizarVotacionMvpEntrenamiento,
   eliminarEntrenamiento,
   isLoadingEntrenamientos,
@@ -1176,10 +1198,12 @@ const inscritasOrganizadasAdminRaw = ref({
   pendientes: []
 });
 const jugadorasRegistradasPorId = ref(new Map());
-const unsubscribers = ref([]);
+const unsubscribersListado = ref([]);
+const unsubscribeDetalle = ref(null);
 const busquedaJugadora = ref('');
 const jugadorasDisponibles = ref([]);
 const isSendingNotification = ref(false);
+const isSendingEmailReminder = ref(false);
 const notificationData = ref({ title: '', body: '' });
 const mapaCargandoAdmin = ref(false);
 
@@ -1209,6 +1233,7 @@ const formulario = ref({
   nombre: '',
   equipo: '',
   tipo: '',
+  enviarCorreoJugadoras: true,
   rival: '',
   fecha: '',
   hora: '',
@@ -1325,6 +1350,7 @@ const mostrarFormularioNuevo = () => {
     nombre: '',
     equipo: '',
     tipo: '',
+    enviarCorreoJugadoras: true,
     rival: '',
     fecha: '',
     hora: '',
@@ -1366,6 +1392,7 @@ const editarEntrenamiento = (entrenamiento) => {
     nombre: entrenamiento.nombre,
     equipo: entrenamiento.equipo,
     tipo: entrenamiento.tipo || 'entrenamiento',
+    enviarCorreoJugadoras: entrenamiento.enviarCorreoJugadoras !== false,
     rival: entrenamiento.rival || '',
     fecha: fechaFormato,
     hora: entrenamiento.hora,
@@ -1401,9 +1428,8 @@ const verDetallesEntrenamiento = (entrenamiento) => {
     body: `Recordatorio: ${entrenamiento.tipo} el ${formatearFecha(entrenamiento.fecha)} a las ${entrenamiento.hora}`
   };
 
-  // Desuscribir de listeners anteriores
-  unsubscribers.value.forEach(unsub => unsub());
-  unsubscribers.value = [];
+  // Desuscribir solo del listener anterior del detalle
+  limpiarListenerDetalle();
 
   // Iniciar listener en tiempo real para este entrenamiento
   const unsubscribe = escucharInscripcionesEntrenamiento(entrenamiento.id, (organizadas) => {
@@ -1419,7 +1445,7 @@ const verDetallesEntrenamiento = (entrenamiento) => {
     };
   }, () => entrenamientoDetallado.value); // Pasar función que retorna el entrenamiento actualizado
 
-  unsubscribers.value.push(unsubscribe);
+  unsubscribeDetalle.value = unsubscribe;
 };
 
 const obtenerIniciales = (nombreCompleto) => {
@@ -1441,6 +1467,41 @@ const formatFechaHora = (ts) => {
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit'
+  });
+};
+
+const limpiarListenersListado = () => {
+  unsubscribersListado.value.forEach((unsub) => unsub?.());
+  unsubscribersListado.value = [];
+};
+
+const limpiarListenerDetalle = () => {
+  unsubscribeDetalle.value?.();
+  unsubscribeDetalle.value = null;
+};
+
+const sincronizarListenersListado = () => {
+  limpiarListenersListado();
+
+  entrenamientos.value.forEach((ent) => {
+    conteoInscritas.value[ent.id] = {
+      confirmadas: 0,
+      bajas: 0,
+      pendientes: 0,
+      excluidas: 0
+    };
+
+    const unsub = escucharInscripcionesEntrenamiento(ent.id, (organizadas) => {
+      const { visibles, excluidas } = particionarInscripcionesPorAsistencia(organizadas, jugadorasRegistradasPorId.value);
+      conteoInscritas.value[ent.id] = {
+        confirmadas: visibles.confirmadas.length,
+        bajas: visibles.bajas.length,
+        pendientes: visibles.pendientes.length,
+        excluidas: excluidas.length
+      };
+    }, ent);
+
+    unsubscribersListado.value.push(unsub);
   });
 };
 
@@ -1675,6 +1736,66 @@ const enviarNotificacionEntrenamiento = async () => {
   }
 };
 
+const aplicarEmailNotificationLocal = (emailNotification) => {
+  if (!emailNotification || !entrenamientoDetallado.value) return;
+
+  entrenamientoDetallado.value = {
+    ...entrenamientoDetallado.value,
+    emailNotification: {
+      ...(entrenamientoDetallado.value.emailNotification || {}),
+      ...emailNotification
+    }
+  };
+
+  const entrenamientoIndex = entrenamientos.value.findIndex((item) => item.id === entrenamientoDetallado.value.id);
+  if (entrenamientoIndex >= 0) {
+    entrenamientos.value[entrenamientoIndex] = {
+      ...entrenamientos.value[entrenamientoIndex],
+      emailNotification: {
+        ...(entrenamientos.value[entrenamientoIndex].emailNotification || {}),
+        ...emailNotification
+      }
+    };
+  }
+};
+
+const formatearResumenEmail = (emailNotification = {}) => {
+  const estados = {
+    queued: 'En cola',
+    sent: 'Enviado',
+    partial: 'Parcial',
+    failed: 'Error',
+    no_recipients: 'Sin destinatarias',
+    skipped_missing_config: 'Falta configuración',
+    disabled: 'Desactivado'
+  };
+
+  const estado = estados[emailNotification?.status] || 'Sin datos';
+  const enviados = Number(emailNotification?.sentCount || 0);
+  const destinatarias = Number(emailNotification?.recipientsCount || 0);
+
+  if (destinatarias > 0) {
+    return `${estado} · ${enviados}/${destinatarias}`;
+  }
+
+  return estado;
+};
+
+const reenviarCorreoRecordatorio = async () => {
+  if (!entrenamientoDetallado.value?.id) return;
+
+  isSendingEmailReminder.value = true;
+  try {
+    const result = await solicitarRecordatorioCorreoEntrenamiento(entrenamientoDetallado.value.id);
+    aplicarEmailNotificationLocal(result?.emailNotification);
+    alert(result?.success ? 'Solicitud de recordatorio enviada. El correo se procesará en unos segundos.' : 'La solicitud se registró con observaciones. Revisa el estado del entrenamiento.');
+  } catch (error) {
+    alert(error.message || 'No se pudo reenviar el correo recordatorio.');
+  } finally {
+    isSendingEmailReminder.value = false;
+  }
+};
+
 const obtenerTextoMapa = (entrenamiento) => {
   const ubicacionMapa = (entrenamiento?.ubicacionMapa || '').toString().trim();
   if (ubicacionMapa) return ubicacionMapa;
@@ -1737,6 +1858,7 @@ const guardarEntrenamiento = async () => {
         nombre: formulario.value.nombre,
         equipo: formulario.value.equipo,
         tipo: formulario.value.tipo,
+        enviarCorreoJugadoras: formulario.value.enviarCorreoJugadoras === true,
         rival: formulario.value.rival?.trim() || '',
         fecha: fechaCorrecta,
         hora: formulario.value.hora,
@@ -1764,6 +1886,7 @@ const guardarEntrenamiento = async () => {
         nombre: formulario.value.nombre,
         equipo: formulario.value.equipo,
         tipo: formulario.value.tipo,
+        enviarCorreoJugadoras: formulario.value.enviarCorreoJugadoras === true,
         rival: formulario.value.rival?.trim() || '',
         fecha: fechaCorrecta,
         hora: formulario.value.hora,
@@ -1980,36 +2103,20 @@ onMounted(async () => {
     await cargarJugadorasRegistradasMapa();
     // Cargar todos los entrenamientos (partidos, entrenamientos, eventos, ambos equipos)
     await fetchTodosEntrenamientos();
-    
-    // Inicializar conteo para cada entrenamiento
-    entrenamientos.value.forEach(ent => {
-      conteoInscritas.value[ent.id] = {
-        confirmadas: 0,
-        bajas: 0,
-        pendientes: 0
-      };
-      
-      // Iniciar listeners en tiempo real para cada uno
-      const unsub = escucharInscripcionesEntrenamiento(ent.id, (organizadas) => {
-        const { visibles, excluidas } = particionarInscripcionesPorAsistencia(organizadas, jugadorasRegistradasPorId.value);
-        conteoInscritas.value[ent.id] = {
-          confirmadas: visibles.confirmadas.length,
-          bajas: visibles.bajas.length,
-          pendientes: visibles.pendientes.length,
-          excluidas: excluidas.length
-        };
-      }, ent); // Pasar el entrenamiento completo
-      unsubscribers.value.push(unsub);
-    });
+    sincronizarListenersListado();
   } catch (err) {
     // // console.error('Error cargando entrenamientos:', err);
   }
 });
 
+watch(entrenamientos, () => {
+  sincronizarListenersListado();
+});
+
 // Limpiar listeners cuando se desmonta el componente
 onUnmounted(() => {
-  unsubscribers.value.forEach(unsub => unsub());
-  unsubscribers.value = [];
+  limpiarListenersListado();
+  limpiarListenerDetalle();
 });
 </script>
 
