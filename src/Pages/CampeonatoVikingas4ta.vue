@@ -227,42 +227,117 @@
     </section>
 
     <section class="mx-auto max-w-7xl px-4 pb-14 sm:px-6 lg:px-8 lg:pb-20">
-      <div class="rounded-[2.2rem] border border-[#d8ebe5] bg-[#152227] px-5 py-7 shadow-[0_24px_80px_rgba(21,34,39,0.18)] sm:px-7 sm:py-9 lg:px-9">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#d8b45d]">Cruces del campeonato</p>
-            <h2 class="mt-3 text-[clamp(2rem,5vw,3.6rem)] font-black uppercase leading-[0.94] text-white" style="font-family: 'Gobold High', sans-serif;">
-              Programación por definir
-            </h2>
-          </div>
- 
+      <div>
+        <div class="mb-10">
+          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-primary">Cruces del campeonato</p>
+          <h2 class="mt-3 text-[clamp(2rem,5vw,3.6rem)] font-black uppercase leading-[0.94] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
+            Programación definitiva
+          </h2>
         </div>
 
-        <div class="mt-8 grid gap-4 lg:grid-cols-2">
+        <div class="grid gap-4 lg:grid-cols-3">
           <article
-            v-for="cruce in crucesDummy"
-            :key="cruce.id"
-            class="rounded-[1.7rem] border border-white/10 bg-white/6 px-4 py-4 backdrop-blur-sm sm:px-5"
+            v-for="bloque in programacionCompleta.filter(b => !b.esDescanso)"
+            :key="bloque.id"
+            class="rounded-[1.7rem] border border-[#d7ebe5] bg-white px-5 py-5 sm:px-6 sm:py-6"
           >
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex flex-col gap-4">
               <div>
-                <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#d8b45d]">{{ cruce.etapa }}</p>
-                <p class="mt-1 text-sm leading-6 text-white/64">Por definir</p>
+                <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">{{ bloque.horario }}</p>
+                <p class="mt-1 text-sm font-black uppercase leading-6 text-[#152227]">{{ bloque.titulo }}</p>
               </div>
-              <span class="inline-flex w-fit rounded-full border border-white/12 px-3 py-1 text-[0.68rem] font-black uppercase tracking-[0.16em] text-white/70">
-                Próximamente
-              </span>
-            </div>
 
-            <div class="mt-4 grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
-              <div class="rounded-[1.2rem] bg-white/8 px-4 py-4 text-center text-sm font-black uppercase leading-6 text-white">
-                {{ cruce.local }}
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div class="rounded-[1.2rem] border border-[#d7ebe5] bg-[#f5fbf9] p-4">
+                  <p class="text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#8a6b2d] mb-3">Cancha 1</p>
+                  <div class="flex flex-col items-center text-center gap-3">
+                    <div class="flex items-center justify-center gap-2 w-full">
+                      <div class="h-14 w-14 flex items-center justify-center rounded-full border-2 border-[#d8b45d]/30 bg-white p-2">
+                        <img 
+                          v-if="getLogoEquipo(bloque.cancha1.split(' vs ')[0])" 
+                          :src="getLogoEquipo(bloque.cancha1.split(' vs ')[0])"
+                          :alt="bloque.cancha1.split(' vs ')[0]"
+                          class="h-10 w-10 object-contain"
+                        >
+                      </div>
+                      <span class="text-[0.7rem] font-black uppercase text-primary">VS</span>
+                      <div class="h-14 w-14 flex items-center justify-center rounded-full border-2 border-[#d8b45d]/30 bg-white p-2">
+                        <img 
+                          v-if="getLogoEquipo(bloque.cancha1.split(' vs ')[1])" 
+                          :src="getLogoEquipo(bloque.cancha1.split(' vs ')[1])"
+                          :alt="bloque.cancha1.split(' vs ')[1]"
+                          class="h-10 w-10 object-contain"
+                        >
+                      </div>
+                    </div>
+                    <p class="text-sm font-semibold leading-5 text-[#152227]">{{ bloque.cancha1 }}</p>
+                  </div>
+                </div>
+
+                <div class="rounded-[1.2rem] border border-[#d7ebe5] bg-[#f5fbf9] p-4">
+                  <p class="text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#8a6b2d] mb-3">Cancha 2</p>
+                  <div class="flex flex-col items-center text-center gap-3">
+                    <div class="flex items-center justify-center gap-2 w-full">
+                      <div class="h-14 w-14 flex items-center justify-center rounded-full border-2 border-[#d8b45d]/30 bg-white p-2">
+                        <img 
+                          v-if="getLogoEquipo(bloque.cancha2.split(' vs ')[0])" 
+                          :src="getLogoEquipo(bloque.cancha2.split(' vs ')[0])"
+                          :alt="bloque.cancha2.split(' vs ')[0]"
+                          class="h-10 w-10 object-contain"
+                        >
+                      </div>
+                      <span class="text-[0.7rem] font-black uppercase text-primary">VS</span>
+                      <div class="h-14 w-14 flex items-center justify-center rounded-full border-2 border-[#d8b45d]/30 bg-white p-2">
+                        <img 
+                          v-if="getLogoEquipo(bloque.cancha2.split(' vs ')[1])" 
+                          :src="getLogoEquipo(bloque.cancha2.split(' vs ')[1])"
+                          :alt="bloque.cancha2.split(' vs ')[1]"
+                          class="h-10 w-10 object-contain"
+                        >
+                      </div>
+                    </div>
+                    <p class="text-sm font-semibold leading-5 text-[#152227]">{{ bloque.cancha2 }}</p>
+                  </div>
+                </div>
               </div>
-              <div class="text-center text-[0.7rem] font-black uppercase tracking-[0.22em] text-[#9dc9c2]">vs</div>
-              <div class="rounded-[1.2rem] bg-white/8 px-4 py-4 text-center text-sm font-black uppercase leading-6 text-white">
-                {{ cruce.visita }}
+
+              <div v-if="bloque.libre" class="rounded-[1.2rem] bg-[#d8b45d]/15 px-4 py-3 border border-[#d8b45d]/25 flex items-center gap-3">
+                <div class="h-12 w-12 flex items-center justify-center rounded-full border border-[#d8b45d]/40 bg-white p-1 shrink-0">
+                  <img 
+                    v-if="getLogoEquipo(bloque.libre)" 
+                    :src="getLogoEquipo(bloque.libre)"
+                    :alt="bloque.libre"
+                    class="h-10 w-10 object-contain"
+                  >
+                </div>
+                <div>
+                  <p class="text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#8a6b2d]">Equipo libre</p>
+                  <p class="mt-1 text-sm font-semibold text-[#152227]">{{ bloque.libre }}</p>
+                </div>
               </div>
             </div>
+          </article>
+        </div>
+
+        <div class="mt-8 grid gap-4 sm:grid-cols-2">
+          <article class="rounded-[1.7rem] border border-[#d8b45d]/35 bg-[#fffaf0]/70 px-5 py-6 sm:px-6">
+            <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#8a6b2d]">Ceremonia final</p>
+            <p class="mt-2 text-sm font-semibold text-[#152227]">Premiación: 20:00 - 20:10 hrs</p>
+            <p class="mt-2 text-[0.9rem] leading-6 text-[#546267]">Una excelente hora porque ya habrá bajado el sol.</p>
+          </article>
+
+          <article class="rounded-[1.7rem] border border-[#d7ebe5] bg-white px-5 py-6 sm:px-6">
+            <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Criterios de desempate</p>
+            <ul class="mt-3 space-y-2 text-sm text-[#546267]">
+              <li class="flex items-start gap-3">
+                <span class="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-primary shrink-0"></span>
+                <span>Diferencia de goles</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-primary shrink-0"></span>
+                <span>Duelo directo</span>
+              </li>
+            </ul>
           </article>
         </div>
       </div>
@@ -292,7 +367,7 @@ const equiposParticipantes = [
     logo: logoZorzales,
   },
   {
-    nombre: 'Fénix',
+    nombre: 'Fenix',
     etiqueta: 'Equipo invitado',
     esLocal: false,
     logo: logoFenix,
@@ -315,6 +390,11 @@ const equiposParticipantes = [
   },
 ]
 
+const getLogoEquipo = (nombreEquipo) => {
+  const equipo = equiposParticipantes.find(e => e.nombre.toLowerCase().includes(nombreEquipo.toLowerCase()) || nombreEquipo.toLowerCase().includes(e.nombre.toLowerCase()))
+  return equipo?.logo
+}
+
 const tablaPosiciones = equiposParticipantes.map(({ nombre }) => ({
   equipo: nombre,
   pj: 0,
@@ -325,6 +405,86 @@ const tablaPosiciones = equiposParticipantes.map(({ nombre }) => ({
   gc: 0,
   pts: 0,
 }))
+
+const programacionCompleta = [
+  {
+    id: 1,
+    horario: '16:00 - 16:30',
+    titulo: 'Fecha 1',
+    cancha1: 'Vikingas Formativo vs O\'diosas',
+    cancha2: 'Ponchicrack vs Fenix',
+    libre: 'Zorzales',
+    esDescanso: false,
+  },
+  {
+    id: 2,
+    horario: '16:30 - 16:45',
+    titulo: 'Receso',
+    cancha1: 'Receso 15 min',
+    cancha2: 'Receso 15 min',
+    esDescanso: true,
+  },
+  {
+    id: 3,
+    horario: '16:45 - 17:15',
+    titulo: 'Fecha 2',
+    cancha1: 'Zorzales vs Vikingas Formativo',
+    cancha2: 'O\'diosas vs Ponchicrack',
+    libre: 'Fenix',
+    esDescanso: false,
+  },
+  {
+    id: 4,
+    horario: '17:15 - 17:30',
+    titulo: 'Receso',
+    cancha1: 'Receso 15 min',
+    cancha2: 'Receso 15 min',
+    esDescanso: true,
+  },
+  {
+    id: 5,
+    horario: '17:30 - 18:00',
+    titulo: 'Fecha 3',
+    cancha1: 'Fenix vs Zorzales',
+    cancha2: 'Vikingas Formativo vs Ponchicrack',
+    libre: 'O\'diosas',
+    esDescanso: false,
+  },
+  {
+    id: 6,
+    horario: '18:00 - 18:40',
+    titulo: 'Descanso largo',
+    cancha1: '',
+    cancha2: '',
+    esDescanso: true,
+  },
+  {
+    id: 7,
+    horario: '18:40 - 19:10',
+    titulo: 'Fecha 4',
+    cancha1: 'O\'diosas vs Fenix',
+    cancha2: 'Ponchicrack vs Zorzales',
+    libre: 'Vikingas Formativo',
+    esDescanso: false,
+  },
+  {
+    id: 8,
+    horario: '19:10 - 19:25',
+    titulo: 'Receso',
+    cancha1: 'Receso 15 min',
+    cancha2: 'Receso 15 min',
+    esDescanso: true,
+  },
+  {
+    id: 9,
+    horario: '19:25 - 19:55',
+    titulo: 'Fecha 5',
+    cancha1: 'Vikingas Formativo vs Fenix',
+    cancha2: 'O\'diosas vs Zorzales',
+    libre: 'Ponchicrack',
+    esDescanso: false,
+  },
+]
 
 const crucesDummy = [
   {
