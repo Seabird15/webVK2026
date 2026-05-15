@@ -187,7 +187,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="fila in tablaPosiciones" :key="fila.equipo" class="border-t border-[#e5f0ed]">
+                <tr v-for="fila in tablaPosicionesCalculada" :key="fila.equipo" class="border-t border-[#e5f0ed]">
                   <th scope="row" class="px-4 py-4 text-sm font-black uppercase text-[#152227] sm:px-6">{{ fila.equipo }}</th>
                   <td class="px-3 py-4 text-center">{{ fila.pj }}</td>
                   <td class="px-3 py-4 text-center">{{ fila.pg }}</td>
@@ -260,7 +260,21 @@
                           class="h-10 w-10 object-contain"
                         >
                       </div>
-                      <span class="text-[0.7rem] font-black uppercase text-primary">VS</span>
+                      <!-- Resultado o VS -->
+                      <div class="flex flex-col items-center gap-1">
+                        <span v-if="resultados.get(`${bloque.id}-cancha1`)?.finalizado" class="text-lg font-black text-primary">
+                          {{ resultados.get(`${bloque.id}-cancha1`)?.golesLocal }} - {{ resultados.get(`${bloque.id}-cancha1`)?.golesVisita }}
+                        </span>
+                        <span v-else class="text-[0.7rem] font-black uppercase text-primary">VS</span>
+                        <!-- Botón editar para admin -->
+                        <button 
+                          v-if="esAdmin && !bloque.esDescanso"
+                          @click="abrirEditarResultado(bloque.id, 'cancha1', bloque.cancha1)"
+                          class="text-[0.65rem] font-bold text-primary hover:underline"
+                        >
+                          {{ resultados.get(`${bloque.id}-cancha1`)?.finalizado ? 'Editar' : 'Ingresar' }}
+                        </button>
+                      </div>
                       <div class="h-14 w-14 flex items-center justify-center rounded-full border-2 border-[#d8b45d]/30 bg-white p-2">
                         <img 
                           v-if="getLogoEquipo(bloque.cancha1.split(' vs ')[1])" 
@@ -286,7 +300,21 @@
                           class="h-10 w-10 object-contain"
                         >
                       </div>
-                      <span class="text-[0.7rem] font-black uppercase text-primary">VS</span>
+                      <!-- Resultado o VS -->
+                      <div class="flex flex-col items-center gap-1">
+                        <span v-if="resultados.get(`${bloque.id}-cancha2`)?.finalizado" class="text-lg font-black text-primary">
+                          {{ resultados.get(`${bloque.id}-cancha2`)?.golesLocal }} - {{ resultados.get(`${bloque.id}-cancha2`)?.golesVisita }}
+                        </span>
+                        <span v-else class="text-[0.7rem] font-black uppercase text-primary">VS</span>
+                        <!-- Botón editar para admin -->
+                        <button 
+                          v-if="esAdmin && !bloque.esDescanso"
+                          @click="abrirEditarResultado(bloque.id, 'cancha2', bloque.cancha2)"
+                          class="text-[0.65rem] font-bold text-primary hover:underline"
+                        >
+                          {{ resultados.get(`${bloque.id}-cancha2`)?.finalizado ? 'Editar' : 'Ingresar' }}
+                        </button>
+                      </div>
                       <div class="h-14 w-14 flex items-center justify-center rounded-full border-2 border-[#d8b45d]/30 bg-white p-2">
                         <img 
                           v-if="getLogoEquipo(bloque.cancha2.split(' vs ')[1])" 
@@ -294,6 +322,11 @@
                           :alt="bloque.cancha2.split(' vs ')[1]"
                           class="h-10 w-10 object-contain"
                         >
+                      </div>
+                    </div>
+                    <p class="text-sm font-semibold leading-5 text-[#152227]">{{ bloque.cancha2 }}</p>
+                  </div>
+                </div>
                       </div>
                     </div>
                     <p class="text-sm font-semibold leading-5 text-[#152227]">{{ bloque.cancha2 }}</p>
@@ -342,16 +375,74 @@
         </div>
       </div>
     </section>
+    <!-- Modal para editar resultado -->
+    <div 
+      v-if="modalResultadoActivo" 
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+    >
+      <div class="rounded-2xl bg-white p-6 shadow-2xl max-w-sm w-full">
+        <h2 class="text-2xl font-black text-[#152227] mb-4">Ingresar Resultado</h2>
+        
+        <div v-if="partidoEditando" class="mb-6">
+          <p class="text-sm text-gray-600 mb-4">{{ partidoEditando.matchup }}</p>
+          
+          <div class="space-y-4">
+            <!-- Goles Local -->
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">
+                {{ partidoEditando.matchup.split(' vs ')[0] }} - Goles
+              </label>
+              <input
+                v-model.number="golesLocal"
+                type="number"
+                min="0"
+                class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary"
+              />
+            </div>
+            
+            <!-- Goles Visita -->
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">
+                {{ partidoEditando.matchup.split(' vs ')[1] }} - Goles
+              </label>
+              <input
+                v-model.number="golesVisita"
+                type="number"
+                min="0"
+                class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary"
+              />
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex gap-3">
+          <button
+            @click="guardarResultado"
+            class="flex-1 px-4 py-2 bg-primary text-white font-bold rounded-lg hover:bg-opacity-90 transition"
+          >
+            Guardar
+          </button>
+          <button
+            @click="modalResultadoActivo = false"
+            class="flex-1 px-4 py-2 bg-gray-300 text-gray-800 font-bold rounded-lg hover:bg-gray-400 transition"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
   </main>
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
 import bannerEquipos from '../assets/bannerequipos.webp'
 import logoVikingas from '../assets/logoVk.png'
 import logoZorzales from '../assets/logos/zorzaleslogo.webp'
 import logoOdiosas from '../assets/logos/odiosas.jpg'
 import logoFenix from '../assets/logos/fenix.png'
 import logoPonshi from '../assets/logos/logoponshi.jpg'
+import { authUser, userRole } from '../firebase/auth'
 
 const equiposParticipantes = [
   {
@@ -405,6 +496,124 @@ const tablaPosiciones = equiposParticipantes.map(({ nombre }) => ({
   gc: 0,
   pts: 0,
 }))
+
+// Estado para resultados de partidos
+const resultados = ref(new Map())
+const modalResultadoActivo = ref(false)
+const partidoEditando = ref(null)
+const golesLocal = ref(0)
+const golesVisita = ref(0)
+
+// Extraer nombres de equipos del matchup
+const extraerEquipos = (matchup) => {
+  const [local, visita] = matchup.split(' vs ')
+  return { 
+    local: local.trim(), 
+    visita: visita.trim() 
+  }
+}
+
+// Guardar resultado de un partido
+const guardarResultado = () => {
+  if (!partidoEditando.value) return
+  
+  const clave = `${partidoEditando.value.bloque}-${partidoEditando.value.cancha}`
+  resultados.value.set(clave, {
+    matchup: partidoEditando.value.matchup,
+    golesLocal: Number(golesLocal.value),
+    golesVisita: Number(golesVisita.value),
+    finalizado: true
+  })
+  
+  modalResultadoActivo.value = false
+  golesLocal.value = 0
+  golesVisita.value = 0
+  partidoEditando.value = null
+}
+
+// Abrir modal para editar resultado
+const abrirEditarResultado = (bloque, cancha, matchup) => {
+  const clave = `${bloque}-${cancha}`
+  const resultado = resultados.value.get(clave)
+  
+  golesLocal.value = resultado?.golesLocal || 0
+  golesVisita.value = resultado?.golesVisita || 0
+  
+  partidoEditando.value = {
+    bloque,
+    cancha,
+    matchup
+  }
+  
+  modalResultadoActivo.value = true
+}
+
+// Calcular tabla de posiciones basada en resultados
+const tablaPosicionesCalculada = computed(() => {
+  const tabla = new Map()
+  
+  // Inicializar tabla
+  equiposParticipantes.forEach(eq => {
+    tabla.set(eq.nombre, {
+      equipo: eq.nombre,
+      pj: 0,
+      pg: 0,
+      pe: 0,
+      pp: 0,
+      gf: 0,
+      gc: 0,
+      pts: 0,
+    })
+  })
+  
+  // Procesar cada resultado
+  resultados.value.forEach(resultado => {
+    if (!resultado.finalizado) return
+    
+    const { local, visita } = extraerEquipos(resultado.matchup)
+    const datoLocal = tabla.get(local)
+    const datoVisita = tabla.get(visita)
+    
+    if (!datoLocal || !datoVisita) return
+    
+    // Actualizar partidos jugados
+    datoLocal.pj++
+    datoVisita.pj++
+    
+    // Actualizar goles
+    datoLocal.gf += resultado.golesLocal
+    datoLocal.gc += resultado.golesVisita
+    datoVisita.gf += resultado.golesVisita
+    datoVisita.gc += resultado.golesLocal
+    
+    // Determinar ganador y puntos
+    if (resultado.golesLocal > resultado.golesVisita) {
+      datoLocal.pg++
+      datoVisita.pp++
+      datoLocal.pts += 3
+    } else if (resultado.golesLocal < resultado.golesVisita) {
+      datoVisita.pg++
+      datoLocal.pp++
+      datoVisita.pts += 3
+    } else {
+      datoLocal.pe++
+      datoVisita.pe++
+      datoLocal.pts += 1
+      datoVisita.pts += 1
+    }
+  })
+  
+  // Ordenar por puntos (descendente), luego por diferencia de goles
+  return [...tabla.values()].sort((a, b) => {
+    if (b.pts !== a.pts) return b.pts - a.pts
+    return (b.gf - b.gc) - (a.gf - a.gc)
+  })
+})
+
+// Verificar si usuario es admin
+const esAdmin = computed(() => {
+  return userRole.value === 'admin'
+})
 
 const programacionCompleta = [
   {
