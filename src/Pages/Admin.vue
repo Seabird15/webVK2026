@@ -975,6 +975,10 @@
             <EditorResultadosPartidosAdmin />
           </div>
 
+          <div v-if="activeTab === 'campeonato-4ta'">
+            <CampeonatoVikingasEditorAdmin />
+          </div>
+
           <div v-if="activeTab === 'ultimos-resultados'">
             <GestionarUltimosResultados />
           </div>
@@ -1019,6 +1023,7 @@ import GestionarSolicitudesRegistro from '../components/GestionarSolicitudesRegi
 import GestionarEntrenamientos from '../components/GestionarEntrenamientos.vue';
 import GestionarPartidos from '../components/GestionarPartidos.vue';
 import EditorResultadosPartidosAdmin from '../components/EditorResultadosPartidosAdmin.vue';
+import CampeonatoVikingasEditorAdmin from '../components/CampeonatoVikingasEditorAdmin.vue';
 import GestionarUltimosResultados from '../components/GestionarUltimosResultados.vue';
 import { entrenamientos, fetchTodosEntrenamientos, finalizarVotacionMvpEntrenamiento } from '../firebase/entrenamientos';
 import VistaJugadorasAdmin from '../components/VistaJugadorasAdmin.vue';
@@ -1072,6 +1077,7 @@ const tabs = computed(() => {
     { id: 'galeria', label: 'Galería', icon: CameraIcon },
     { id: 'estadisticas', label: 'Estadísticas', icon: ArrowTrendingUpIcon },
     { id: 'resultados-partidos', label: 'Editar Resultados en tiempo real', icon: TrophyIcon },
+    { id: 'campeonato-4ta', label: 'Campeonato Vikingas 4ta', icon: TrophyIcon },
     { id: 'ultimos-resultados', label: 'Editar últimos resultados vista home', icon: FlagIcon },
   ];
 

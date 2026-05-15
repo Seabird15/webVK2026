@@ -183,18 +183,24 @@
                   <th scope="col" class="px-3 py-4 text-center">PP</th>
                   <th scope="col" class="px-3 py-4 text-center">GF</th>
                   <th scope="col" class="px-3 py-4 text-center">GC</th>
+                  <th scope="col" class="px-3 py-4 text-center">DG</th>
                   <th scope="col" class="px-4 py-4 text-center sm:px-6">Pts</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="fila in tablaPosicionesCalculada" :key="fila.equipo" class="border-t border-[#e5f0ed]">
-                  <th scope="row" class="px-4 py-4 text-sm font-black uppercase text-[#152227] sm:px-6">{{ fila.equipo }}</th>
+                <tr v-for="(fila, idx) in tablaPosicionesCalculada" :key="fila.equipo" class="border-t border-[#e5f0ed]" :class="[
+                  idx === 0 && 'bg-green-50',
+                  idx === 1 && 'bg-blue-50',
+                  idx === 2 && 'bg-amber-50'
+                ]">
+                  <th scope="row" class="px-4 py-4 text-sm font-black uppercase text-[#152227] sm:px-6">{{ idx + 1 }}. {{ fila.equipo }}</th>
                   <td class="px-3 py-4 text-center">{{ fila.pj }}</td>
                   <td class="px-3 py-4 text-center">{{ fila.pg }}</td>
                   <td class="px-3 py-4 text-center">{{ fila.pe }}</td>
                   <td class="px-3 py-4 text-center">{{ fila.pp }}</td>
                   <td class="px-3 py-4 text-center">{{ fila.gf }}</td>
                   <td class="px-3 py-4 text-center">{{ fila.gc }}</td>
+                  <td class="px-3 py-4 text-center text-amber-600 font-bold">{{ fila.gf - fila.gc }}</td>
                   <td class="px-4 py-4 text-center font-black sm:px-6">{{ fila.pts }}</td>
                 </tr>
               </tbody>
@@ -262,18 +268,13 @@
                       </div>
                       <!-- Resultado o VS -->
                       <div class="flex flex-col items-center gap-1">
-                        <span v-if="resultados.get(`${bloque.id}-cancha1`)?.finalizado" class="text-lg font-black text-primary">
-                          {{ resultados.get(`${bloque.id}-cancha1`)?.golesLocal }} - {{ resultados.get(`${bloque.id}-cancha1`)?.golesVisita }}
-                        </span>
-                        <span v-else class="text-[0.7rem] font-black uppercase text-primary">VS</span>
-                        <!-- Botón editar para admin -->
-                        <button 
-                          v-if="esAdmin && !bloque.esDescanso"
-                          @click="abrirEditarResultado(bloque.id, 'cancha1', bloque.cancha1)"
-                          class="text-[0.65rem] font-bold text-primary hover:underline"
-                        >
-                          {{ resultados.get(`${bloque.id}-cancha1`)?.finalizado ? 'Editar' : 'Ingresar' }}
-                        </button>
+                        <span v-if="!resultados.get(`${bloque.id}-cancha1`)?.finalizado" class="text-[0.7rem] font-black uppercase text-primary">VS</span>
+                        <span v-else class="text-lg font-black text-primary">{{ resultados.get(`${bloque.id}-cancha1`)?.golesLocal ?? 0 }}</span>
+                      </div>
+                      <div v-if="resultados.get(`${bloque.id}-cancha1`)?.finalizado" class="text-xs font-black text-gray-400">-</div>
+                      <div class="flex flex-col items-center gap-1">
+                        <span v-if="!resultados.get(`${bloque.id}-cancha1`)?.finalizado" class="text-[0.7rem] font-black uppercase text-primary"></span>
+                        <span v-else class="text-lg font-black text-primary">{{ resultados.get(`${bloque.id}-cancha1`)?.golesVisita ?? 0 }}</span>
                       </div>
                       <div class="h-14 w-14 flex items-center justify-center rounded-full border-2 border-[#d8b45d]/30 bg-white p-2">
                         <img 
@@ -302,18 +303,13 @@
                       </div>
                       <!-- Resultado o VS -->
                       <div class="flex flex-col items-center gap-1">
-                        <span v-if="resultados.get(`${bloque.id}-cancha2`)?.finalizado" class="text-lg font-black text-primary">
-                          {{ resultados.get(`${bloque.id}-cancha2`)?.golesLocal }} - {{ resultados.get(`${bloque.id}-cancha2`)?.golesVisita }}
-                        </span>
-                        <span v-else class="text-[0.7rem] font-black uppercase text-primary">VS</span>
-                        <!-- Botón editar para admin -->
-                        <button 
-                          v-if="esAdmin && !bloque.esDescanso"
-                          @click="abrirEditarResultado(bloque.id, 'cancha2', bloque.cancha2)"
-                          class="text-[0.65rem] font-bold text-primary hover:underline"
-                        >
-                          {{ resultados.get(`${bloque.id}-cancha2`)?.finalizado ? 'Editar' : 'Ingresar' }}
-                        </button>
+                        <span v-if="!resultados.get(`${bloque.id}-cancha2`)?.finalizado" class="text-[0.7rem] font-black uppercase text-primary">VS</span>
+                        <span v-else class="text-lg font-black text-primary">{{ resultados.get(`${bloque.id}-cancha2`)?.golesLocal ?? 0 }}</span>
+                      </div>
+                      <div v-if="resultados.get(`${bloque.id}-cancha2`)?.finalizado" class="text-xs font-black text-gray-400">-</div>
+                      <div class="flex flex-col items-center gap-1">
+                        <span v-if="!resultados.get(`${bloque.id}-cancha2`)?.finalizado" class="text-[0.7rem] font-black uppercase text-primary"></span>
+                        <span v-else class="text-lg font-black text-primary">{{ resultados.get(`${bloque.id}-cancha2`)?.golesVisita ?? 0 }}</span>
                       </div>
                       <div class="h-14 w-14 flex items-center justify-center rounded-full border-2 border-[#d8b45d]/30 bg-white p-2">
                         <img 
@@ -322,11 +318,6 @@
                           :alt="bloque.cancha2.split(' vs ')[1]"
                           class="h-10 w-10 object-contain"
                         >
-                      </div>
-                    </div>
-                    <p class="text-sm font-semibold leading-5 text-[#152227]">{{ bloque.cancha2 }}</p>
-                  </div>
-                </div>
                       </div>
                     </div>
                     <p class="text-sm font-semibold leading-5 text-[#152227]">{{ bloque.cancha2 }}</p>
@@ -375,74 +366,18 @@
         </div>
       </div>
     </section>
-    <!-- Modal para editar resultado -->
-    <div 
-      v-if="modalResultadoActivo" 
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-    >
-      <div class="rounded-2xl bg-white p-6 shadow-2xl max-w-sm w-full">
-        <h2 class="text-2xl font-black text-[#152227] mb-4">Ingresar Resultado</h2>
-        
-        <div v-if="partidoEditando" class="mb-6">
-          <p class="text-sm text-gray-600 mb-4">{{ partidoEditando.matchup }}</p>
-          
-          <div class="space-y-4">
-            <!-- Goles Local -->
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-2">
-                {{ partidoEditando.matchup.split(' vs ')[0] }} - Goles
-              </label>
-              <input
-                v-model.number="golesLocal"
-                type="number"
-                min="0"
-                class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary"
-              />
-            </div>
-            
-            <!-- Goles Visita -->
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-2">
-                {{ partidoEditando.matchup.split(' vs ')[1] }} - Goles
-              </label>
-              <input
-                v-model.number="golesVisita"
-                type="number"
-                min="0"
-                class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary"
-              />
-            </div>
-          </div>
-        </div>
-        
-        <div class="flex gap-3">
-          <button
-            @click="guardarResultado"
-            class="flex-1 px-4 py-2 bg-primary text-white font-bold rounded-lg hover:bg-opacity-90 transition"
-          >
-            Guardar
-          </button>
-          <button
-            @click="modalResultadoActivo = false"
-            class="flex-1 px-4 py-2 bg-gray-300 text-gray-800 font-bold rounded-lg hover:bg-gray-400 transition"
-          >
-            Cancelar
-          </button>
-        </div>
-      </div>
-    </div>
   </main>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { observarCampeonatoFirestore } from '../firebase/campeonato4ta'
 import bannerEquipos from '../assets/bannerequipos.webp'
 import logoVikingas from '../assets/logoVk.png'
 import logoZorzales from '../assets/logos/zorzaleslogo.webp'
 import logoOdiosas from '../assets/logos/odiosas.jpg'
 import logoFenix from '../assets/logos/fenix.png'
 import logoPonshi from '../assets/logos/logoponshi.jpg'
-import { authUser, userRole, authReady } from '../firebase/auth'
 
 const equiposParticipantes = [
   {
@@ -486,73 +421,22 @@ const getLogoEquipo = (nombreEquipo) => {
   return equipo?.logo
 }
 
-const tablaPosiciones = equiposParticipantes.map(({ nombre }) => ({
-  equipo: nombre,
-  pj: 0,
-  pg: 0,
-  pe: 0,
-  pp: 0,
-  gf: 0,
-  gc: 0,
-  pts: 0,
-}))
-
-// Estado para resultados de partidos
+// Estado para datos de Firestore
 const resultados = ref(new Map())
-const modalResultadoActivo = ref(false)
-const partidoEditando = ref(null)
-const golesLocal = ref(0)
-const golesVisita = ref(0)
+const goleadoras = ref([])
 
-// Extraer nombres de equipos del matchup
-const extraerEquipos = (matchup) => {
-  const [local, visita] = matchup.split(' vs ')
-  return { 
-    local: local.trim(), 
-    visita: visita.trim() 
-  }
+// Encontrar equipo por nombre fuzzy matching
+const encontrarEquipo = (nombreBuscado) => {
+  return equiposParticipantes.find(e =>
+    e.nombre.toLowerCase().includes(nombreBuscado.toLowerCase()) ||
+    nombreBuscado.toLowerCase().includes(e.nombre.toLowerCase())
+  )
 }
 
-// Guardar resultado de un partido
-const guardarResultado = () => {
-  if (!partidoEditando.value) return
-  
-  const clave = `${partidoEditando.value.bloque}-${partidoEditando.value.cancha}`
-  resultados.value.set(clave, {
-    matchup: partidoEditando.value.matchup,
-    golesLocal: Number(golesLocal.value),
-    golesVisita: Number(golesVisita.value),
-    finalizado: true
-  })
-  
-  modalResultadoActivo.value = false
-  golesLocal.value = 0
-  golesVisita.value = 0
-  partidoEditando.value = null
-}
-
-// Abrir modal para editar resultado
-const abrirEditarResultado = (bloque, cancha, matchup) => {
-  const clave = `${bloque}-${cancha}`
-  const resultado = resultados.value.get(clave)
-  
-  golesLocal.value = resultado?.golesLocal || 0
-  golesVisita.value = resultado?.golesVisita || 0
-  
-  partidoEditando.value = {
-    bloque,
-    cancha,
-    matchup
-  }
-  
-  modalResultadoActivo.value = true
-}
-
-// Calcular tabla de posiciones basada en resultados
+// Tabla de posiciones calculada en tiempo real
 const tablaPosicionesCalculada = computed(() => {
   const tabla = new Map()
   
-  // Inicializar tabla
   equiposParticipantes.forEach(eq => {
     tabla.set(eq.nombre, {
       equipo: eq.nombre,
@@ -562,80 +446,78 @@ const tablaPosicionesCalculada = computed(() => {
       pp: 0,
       gf: 0,
       gc: 0,
-      pts: 0,
+      pts: 0
     })
   })
-  
-  // Procesar cada resultado
+
+  // Procesar todos los resultados finalizados
   resultados.value.forEach(resultado => {
     if (!resultado.finalizado) return
     
-    const { local, visita } = extraerEquipos(resultado.matchup)
-    const datoLocal = tabla.get(local)
-    const datoVisita = tabla.get(visita)
+    const matchup = resultado.matchup
+    const [localNombre, visitaNombre] = matchup.split(' vs ').map(t => t.trim())
+    const golesLocal = resultado.golesLocal || 0
+    const golesVisita = resultado.golesVisita || 0
+
+    // Encontrar equipos con fuzzy matching
+    const equipoLocal = encontrarEquipo(localNombre)
+    const equipoVisita = encontrarEquipo(visitaNombre)
     
-    if (!datoLocal || !datoVisita) return
-    
-    // Actualizar partidos jugados
-    datoLocal.pj++
-    datoVisita.pj++
-    
-    // Actualizar goles
-    datoLocal.gf += resultado.golesLocal
-    datoLocal.gc += resultado.golesVisita
-    datoVisita.gf += resultado.golesVisita
-    datoVisita.gc += resultado.golesLocal
-    
-    // Determinar ganador y puntos
-    if (resultado.golesLocal > resultado.golesVisita) {
-      datoLocal.pg++
-      datoVisita.pp++
-      datoLocal.pts += 3
-    } else if (resultado.golesLocal < resultado.golesVisita) {
-      datoVisita.pg++
-      datoLocal.pp++
-      datoVisita.pts += 3
-    } else {
-      datoLocal.pe++
-      datoVisita.pe++
-      datoLocal.pts += 1
-      datoVisita.pts += 1
+    if (!equipoLocal || !equipoVisita) return
+
+    const localStats = tabla.get(equipoLocal.nombre)
+    const visitaStats = tabla.get(equipoVisita.nombre)
+
+    if (localStats && visitaStats) {
+      // Actualizar partidos jugados
+      localStats.pj += 1
+      visitaStats.pj += 1
+
+      // Actualizar goles
+      localStats.gf += golesLocal
+      localStats.gc += golesVisita
+      visitaStats.gf += golesVisita
+      visitaStats.gc += golesLocal
+
+      // Calcular resultado
+      if (golesLocal > golesVisita) {
+        localStats.pg += 1
+        localStats.pts += 3
+        visitaStats.pp += 1
+      } else if (golesLocal < golesVisita) {
+        visitaStats.pg += 1
+        visitaStats.pts += 3
+        localStats.pp += 1
+      } else {
+        localStats.pe += 1
+        localStats.pts += 1
+        visitaStats.pe += 1
+        visitaStats.pts += 1
+      }
     }
   })
-  
-  // Ordenar por puntos (descendente), luego por diferencia de goles
+
   return [...tabla.values()].sort((a, b) => {
     if (b.pts !== a.pts) return b.pts - a.pts
     return (b.gf - b.gc) - (a.gf - a.gc)
   })
 })
 
-// Verificar si usuario es admin
-const esAdmin = computed(() => {
-  return authReady.value && userRole.value === 'admin'
-})
-
-// Debug: monitorear cambios de autenticación
+// Cargar datos de Firestore al montar
 onMounted(() => {
-  console.log('🚀 CampeonatoVikingas4ta montado');
-  console.log('authReady:', authReady.value);
-  console.log('authUser:', authUser.value?.email);
-  console.log('userRole:', userRole.value);
-  console.log('esAdmin:', esAdmin.value);
-});
-
-watch(authReady, (newVal) => {
-  console.log('✅ authReady cambió a:', newVal);
-});
-
-watch(userRole, (newVal) => {
-  console.log('👤 userRole cambió a:', newVal);
-  console.log('esAdmin ahora es:', esAdmin.value);
-});
-
-watch(authUser, (newVal) => {
-  console.log('🔑 authUser cambió a:', newVal?.email || 'No autenticado');
-});
+  try {
+    const unsubscribe = observarCampeonatoFirestore((datos) => {
+      resultados.value = datos.resultados
+      goleadoras.value = datos.goleadoras
+      console.log('✅ Datos actualizados desde Firestore')
+    })
+    
+    // Retornar unsubscribe para limpiar cuando el componente se destruya
+    return () => unsubscribe()
+  } catch (error) {
+    console.error('Error observando campeonato:', error)
+  }
+})
 
 const programacionCompleta = [
   {
