@@ -1,10 +1,8 @@
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { 
   signInWithEmailAndPassword, 
   signOut, 
-  onAuthStateChanged,
-  setPersistence,
-  browserLocalPersistence
+  onAuthStateChanged
 } from 'firebase/auth';
 import { auth, db } from './config';
 import { doc, getDoc } from 'firebase/firestore';
@@ -18,30 +16,39 @@ export const authReady = ref(false);
 // Obtener rol del usuario desde Firestore
 const fetchUserRole = async (uid) => {
   try {
+    console.log('Obteniendo rol para UID:', uid);
     const userDoc = await getDoc(doc(db, 'users', uid));
     if (userDoc.exists()) {
       const role = userDoc.data().rol;
+      console.log('Rol obtenido:', role);
       userRole.value = role;
       return role;
     } else {
-    //  console.warn('No existe documento de usuario en Firestore para UID:', uid);
+      console.warn('No existe documento de usuario en Firestore para UID:', uid);
     }
     return null;
   } catch (err) {
-   console.error('Error obteniendo rol del usuario:', err);
+    console.error('Error obteniendo rol del usuario:', err);
     return null;
   }
 };
 
 // Observar cambios de autenticación
 onAuthStateChanged(auth, async (user) => {
-  authUser.value = user;
+  console.log('onAuthStateChanged fired. Usuario:', user?.email || 'No autenticado');
   if (user) {
+    authUser.value = user;
+    console.log('Usuario establecido en ref:', user.email);
+    // Obtener rol del usuario
     await fetchUserRole(user.uid);
   } else {
+    console.log('Limpiando autenticación');
+    authUser.value = null;
     userRole.value = null;
   }
-  authReady.value = true; // Marcar que Auth está listo
+  // Marcar que Auth está listo DESPUÉS de obtener los datos
+  authReady.value = true;
+  console.log('authReady establecido a true. userRole:', userRole.value);
 });
 
 // Login
@@ -49,26 +56,15 @@ export const login = async (email, password) => {
   isLoading.value = true;
   error.value = null;
   try {
-    await setPersistence(auth, browserLocalPersistence);
+    console.log('Iniciando sesión con:', email);
     const result = await signInWithEmailAndPassword(auth, email, password);
     const uid = result.user.uid;
+    console.log('Usuario autenticado en Firebase:', uid);
     
-    // Obtener rol del usuario
-    const role = await fetchUserRole(uid);
-    
-    // Verificar si el usuario tiene rol admin o coach
-    if (role !== 'admin' && role !== 'coach') {
-      // // console.warn('Usuario no tiene rol válido. Rol:', role);
-      await signOut(auth);
-      error.value = 'No tienes permisos para acceder al panel de administración';
-      authUser.value = null;
-      userRole.value = null;
-      return false;
-    }
-    
+    // El onAuthStateChanged se disparará automáticamente y obtendrá el rol
     return true;
   } catch (err) {
-    // // console.error('Error en login:', err);
+    console.error('Error en login:', err);
     // Mensajes de error amigables
     if (err.code === 'auth/user-not-found') {
       error.value = 'Usuario no encontrado';
@@ -88,9 +84,12 @@ export const login = async (email, password) => {
 // Logout
 export const logout = async () => {
   try {
+    console.log('Cerrando sesión');
     await signOut(auth);
-    userRole.value = null;
+    console.log('Sesión cerrada. userRole limpiado');
+    // authUser se limpiará automáticamente en onAuthStateChanged
   } catch (err) {
+    console.error('Error en logout:', err);
     error.value = err.message;
   }
 };

@@ -435,14 +435,14 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import bannerEquipos from '../assets/bannerequipos.webp'
 import logoVikingas from '../assets/logoVk.png'
 import logoZorzales from '../assets/logos/zorzaleslogo.webp'
 import logoOdiosas from '../assets/logos/odiosas.jpg'
 import logoFenix from '../assets/logos/fenix.png'
 import logoPonshi from '../assets/logos/logoponshi.jpg'
-import { authUser, userRole } from '../firebase/auth'
+import { authUser, userRole, authReady } from '../firebase/auth'
 
 const equiposParticipantes = [
   {
@@ -612,8 +612,30 @@ const tablaPosicionesCalculada = computed(() => {
 
 // Verificar si usuario es admin
 const esAdmin = computed(() => {
-  return userRole.value === 'admin'
+  return authReady.value && userRole.value === 'admin'
 })
+
+// Debug: monitorear cambios de autenticación
+onMounted(() => {
+  console.log('🚀 CampeonatoVikingas4ta montado');
+  console.log('authReady:', authReady.value);
+  console.log('authUser:', authUser.value?.email);
+  console.log('userRole:', userRole.value);
+  console.log('esAdmin:', esAdmin.value);
+});
+
+watch(authReady, (newVal) => {
+  console.log('✅ authReady cambió a:', newVal);
+});
+
+watch(userRole, (newVal) => {
+  console.log('👤 userRole cambió a:', newVal);
+  console.log('esAdmin ahora es:', esAdmin.value);
+});
+
+watch(authUser, (newVal) => {
+  console.log('🔑 authUser cambió a:', newVal?.email || 'No autenticado');
+});
 
 const programacionCompleta = [
   {
