@@ -126,6 +126,7 @@ export const obtenerDiaSemanaEntrenamiento = (entrenamiento = {}) => {
 
 export const jugadoraPuedeAsistirEntrenamiento = (jugadora = {}, entrenamiento = {}) => {
   if (!esEventoConRestriccionSemanal(entrenamiento)) {
+    console.log(`  └─ Evento sin restricción (${entrenamiento?.tipo}) ✅`);
     return true;
   }
 
@@ -133,10 +134,26 @@ export const jugadoraPuedeAsistirEntrenamiento = (jugadora = {}, entrenamiento =
   const diaSemana = obtenerDiaSemanaEntrenamiento(entrenamiento);
   const diasDisponibles = obtenerDiasDisponiblesJugadora(jugadora, equipo);
 
-  if (diaSemana === null) return true;
-  if (diasDisponibles.length === 0) return false;
+  const diasNombre = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  
+  console.log(`  └─ Verificación de disponibilidad:`);
+  console.log(`     • Equipo: ${equipo}`);
+  console.log(`     • Día del entrenamiento: ${diaSemana} (${diasNombre[diaSemana]})`);
+  console.log(`     • Días disponibles: ${diasDisponibles.join(', ')} (${diasDisponibles.map(d => diasNombre[d]).join(', ')})`);
 
-  return diasDisponibles.includes(diaSemana);
+  if (diaSemana === null) {
+    console.log(`     • Resultado: ✅ Día es null, se permite por defecto`);
+    return true;
+  }
+  
+  if (diasDisponibles.length === 0) {
+    console.log(`     • Resultado: ❌ No hay días disponibles`);
+    return false;
+  }
+
+  const resultado = diasDisponibles.includes(diaSemana);
+  console.log(`     • Resultado: ${resultado ? '✅ Día está en disponibles' : '❌ Día NO está en disponibles'}`);
+  return resultado;
 };
 
 export const jugadoraExcluidaDeAsistencia = (jugadora = {}) => {

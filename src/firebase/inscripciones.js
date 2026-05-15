@@ -410,7 +410,8 @@ export const sincronizarInscripcionesPorDisponibilidadJugadora = async (jugadora
       const perteneceAlEquipo = equiposJugadora.includes(equipoEntrenamiento);
       const estaHabilitada = perteneceAlEquipo && jugadoraPuedeAsistirEntrenamiento(jugadora, entrenamiento);
 
-      if (perteneceAlEquipo && !inscripcionExistente) {
+      // 1. CREAR inscripción si pertenece al equipo, está habilitada y no existe
+      if (perteneceAlEquipo && estaHabilitada && !inscripcionExistente) {
         promesas.push(
           addDoc(collection(db, 'inscripcionesEntrenamientos'), {
             entrenamientoId: entrenamiento.id,
@@ -423,10 +424,14 @@ export const sincronizarInscripcionesPorDisponibilidadJugadora = async (jugadora
         );
       }
 
-      if (!perteneceAlEquipo && inscripcionExistente) {
+      // 2. ELIMINAR inscripción si:
+      //    - NO pertenece al equipo, O
+      //    - Pertenece pero NO está habilitada (desmarcó el día)
+      if (inscripcionExistente && (!perteneceAlEquipo || !estaHabilitada)) {
         promesas.push(deleteDoc(doc(db, 'inscripcionesEntrenamientos', inscripcionExistente.id)));
       }
 
+      // 3. ACTUALIZAR nombre si está habilitada y el nombre cambió
       if (estaHabilitada && inscripcionExistente && inscripcionExistente.jugadoraNombre !== nombreCompleto) {
         promesas.push(updateDoc(doc(db, 'inscripcionesEntrenamientos', inscripcionExistente.id), {
           jugadoraNombre: nombreCompleto,

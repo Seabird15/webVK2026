@@ -13,7 +13,7 @@
       </div>
 
       <!-- Tabs -->
-      <div class="flex gap-4 mb-6 border-b border-gray-200">
+      <div class="flex gap-4 mb-6 border-b border-gray-200 flex-wrap">
         <button
           @click="tabActivo = 'datos'"
           :class="[
@@ -25,7 +25,7 @@
         >
           Datos Personales
         </button>
-      
+
       </div>
 
       <!-- Tab: Datos Personales -->
@@ -211,6 +211,7 @@
       </div>
 
       <!-- Tab: Mis Categorías -->
+
       <div v-if="tabActivo === 'categorias'" class="space-y-6">
         <div class="bg-white rounded-lg shadow-lg p-8">
           <h2 class="text-2xl font-bold mb-6">Mis equipos</h2>

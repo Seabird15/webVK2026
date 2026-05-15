@@ -1627,17 +1627,30 @@ if (!jugadoraAuthUser.value) {
 }
 
 const entrenamientosFiltered = computed(() => {
-  return entrenamientos.value
-    .filter(e => {
+  const resultado = entrenamientos.value
+    .filter((e, index) => {
       // Filtrar por equipo: mostrar si coincide o si es "todos"
-      if (e.equipo !== equipoSeleccionado.value && e.equipo !== 'todos') return false;
-
-      if (!esAdmin.value && jugadoraData.value && !jugadoraPuedeAsistirEntrenamiento(jugadoraData.value, e)) {
+      if (e.equipo !== equipoSeleccionado.value && e.equipo !== 'todos') {
+        console.log(`[FILTRO] "${e.nombre}" - Excluido: equipo no coincide (${e.equipo} != ${equipoSeleccionado.value})`);
         return false;
       }
 
+      // ✅ Validar disponibilidad por días habilitados (solo si NO es admin)
+      if (!esAdmin.value && jugadoraData.value) {
+        const puedeAsistir = jugadoraPuedeAsistirEntrenamiento(jugadoraData.value, e);
+        if (!puedeAsistir) {
+          console.log(`[FILTRO] "${e.nombre}" - EXCLUIDO: Jugadora NO tiene este día habilitado`);
+          return false;
+        }
+        console.log(`[FILTRO] "${e.nombre}" - OK: Jugadora tiene este día habilitado`);
+      }
+
       // Mantener en listado según rol y tipo de evento
-      return eventoVisibleEnListado(e);
+      const visible = eventoVisibleEnListado(e);
+      if (!visible) {
+        console.log(`[FILTRO] "${e.nombre}" - Excluido: No visible en listado (fecha pasada)`);
+      }
+      return visible;
     })
     .sort((a, b) => {
       // Ordenar por fecha: más próximo primero
@@ -1645,6 +1658,14 @@ const entrenamientosFiltered = computed(() => {
       const fechaB = new Date(b.fecha?.seconds ? b.fecha.seconds * 1000 : b.fecha || 0);
       return fechaA.getTime() - fechaB.getTime();
     });
+
+  // Log del estado del filtrado
+  if (resultado.length === 0 && entrenamientos.value.length > 0) {
+    console.warn(`[FILTRO] ⚠️ NINGÚN ENTRENAMIENTO VISIBLE para ${jugadoraData.value?.nombre} (${equipoSeleccionado.value})`);
+    console.warn(`[DEBUG] Disponibilidad: ${JSON.stringify(jugadoraData.value?.disponibilidadEntrenamientos)}`);
+  }
+
+  return resultado;
 });
 
 const mvpHabilitadoEvento = (entrenamiento) => {

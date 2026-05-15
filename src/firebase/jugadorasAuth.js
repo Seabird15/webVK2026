@@ -9,7 +9,7 @@ import {
   browserLocalPersistence
 } from 'firebase/auth';
 import { auth, db, storage } from './config';
-import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, where, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { normalizarDisponibilidadEntrenamientos } from '../utils/disponibilidadEntrenamientos';
 
@@ -18,6 +18,9 @@ export const jugadoraData = ref(null);
 export const isLoadingJugadora = ref(false);
 export const errorJugadora = ref(null);
 export const authReady = ref(false); // Flag para saber cuando Auth está listo
+
+// Listener para cambios en tiempo real de datos de jugadora
+let unsubscribeJugadoraData = null;
 
 const EQUIPOS_VALIDOS = ['ascenso', 'escuela', 'serieC'];
 
@@ -190,6 +193,12 @@ let ignorarProximoAuthChange = false;
 // Observar cambios de autenticación para jugadoras
 onAuthStateChanged(auth, async (user) => {
   
+  // Limpiar listener anterior si existe
+  if (unsubscribeJugadoraData) {
+    unsubscribeJugadoraData();
+    unsubscribeJugadoraData = null;
+  }
+  
   // Si debemos ignorar este cambio, solo marcamos el flag como falso
   if (ignorarProximoAuthChange) {
     ignorarProximoAuthChange = false;
@@ -217,6 +226,25 @@ onAuthStateChanged(auth, async (user) => {
     
     if (jugadoraRegistroDoc.exists()) {
       jugadoraData.value = normalizarDatosJugadora(user.uid, jugadoraRegistroDoc.data());
+      
+      // ✅ IMPORTANTE: Establecer listener en tiempo real para cambios en datos de jugadora
+      // Esto permite que cuando el admin actualice la disponibilidad, la jugadora vea los cambios inmediatamente
+      unsubscribeJugadoraData = onSnapshot(
+        doc(db, 'jugadoraRegistro', user.uid),
+        (docSnap) => {
+          if (docSnap.exists()) {
+            const nuevosDatos = normalizarDatosJugadora(user.uid, docSnap.data());
+            jugadoraData.value = nuevosDatos;
+            console.log('✅ Datos de jugadora actualizados en tiempo real:', {
+              nombre: nuevosDatos.nombre,
+              disponibilidad: nuevosDatos.disponibilidadEntrenamientos
+            });
+          }
+        },
+        (error) => {
+          console.error('❌ Error en listener de datos de jugadora:', error);
+        }
+      );
     } else {
       // Si no existe, crear estado vacío (perfil no completado aún)
       jugadoraData.value = {
@@ -624,6 +652,12 @@ export const actualizarPerfilJugadora = async (uid, perfilData, fotoFile) => {
 // Logout para jugadoras
 export const logoutJugadora = async () => {
   try {
+    // Limpiar listener de cambios en tiempo real
+    if (unsubscribeJugadoraData) {
+      unsubscribeJugadoraData();
+      unsubscribeJugadoraData = null;
+    }
+    
     await signOut(auth);
     jugadoraData.value = null;
   } catch (err) {
