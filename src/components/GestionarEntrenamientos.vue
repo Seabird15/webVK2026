@@ -101,7 +101,7 @@
               <option value="ascenso">Ascenso</option>
               <option value="escuela">Escuela</option>
               <option value="serieC">Serie C</option>
-              <option value="ambos">Ambos Equipos</option>
+              <option value="todos">Todos los Equipos</option>
             </select>
           </div>
 
@@ -134,6 +134,21 @@
               <option value="amistoso">Amistoso</option>
               <option value="evento">Evento</option>
             </select>
+          </div>
+
+          <!-- Evento Informativo (solo para eventos) -->
+          <div v-if="formulario.tipo === 'evento'" class="bg-gradient-to-br from-cyan-50 to-blue-50 p-4 rounded-xl border-2 border-cyan-200">
+            <label class="flex items-start sm:items-center gap-3 cursor-pointer">
+              <input
+                v-model="formulario.eventoInformativo"
+                type="checkbox"
+                class="w-5 h-5 mt-0.5 sm:mt-0 text-primary-dark focus:ring-2 focus:ring-primary rounded shrink-0"
+              />
+              <div class="flex-1">
+                <span class="text-sm font-black text-gray-700 uppercase tracking-wide">Evento Informativo</span>
+                <p class="text-xs text-gray-600 mt-1 font-medium">Si activas esta opción, las jugadoras solo verán el evento como información, sin necesidad de anotarse.</p>
+              </div>
+            </label>
           </div>
 
           <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'">
@@ -1245,7 +1260,8 @@ const formulario = ref({
   mostrarEnProximoPartido: false,
   mvpHabilitado: false,
   esConvocatoria: false,
-  jugadorasConvocadas: []
+  jugadorasConvocadas: [],
+  eventoInformativo: false
 });
 
 const busquedaConvocatoria = ref('');
@@ -1404,7 +1420,8 @@ const editarEntrenamiento = (entrenamiento) => {
     mostrarEnProximoPartido: entrenamiento.mostrarEnProximoPartido || false,
     mvpHabilitado: entrenamiento.mvpHabilitado === true,
     esConvocatoria: entrenamiento.esConvocatoria || false,
-    jugadorasConvocadas: entrenamiento.jugadorasConvocadas || []
+    jugadorasConvocadas: entrenamiento.jugadorasConvocadas || [],
+    eventoInformativo: entrenamiento.eventoInformativo || false
   };
   busquedaConvocatoria.value = '';
   jugadorasParaConvocar.value = [];
@@ -1870,7 +1887,8 @@ const guardarEntrenamiento = async () => {
         mostrarEnProximoPartido: formulario.value.mostrarEnProximoPartido,
         mvpHabilitado: formulario.value.mvpHabilitado,
         esConvocatoria: formulario.value.esConvocatoria,
-        jugadorasConvocadas: formulario.value.jugadorasConvocadas
+        jugadorasConvocadas: formulario.value.jugadorasConvocadas,
+        eventoInformativo: formulario.value.eventoInformativo
       });
       
       // Si es una convocatoria, sincronizar las inscripciones
@@ -1898,7 +1916,8 @@ const guardarEntrenamiento = async () => {
         mostrarEnProximoPartido: formulario.value.mostrarEnProximoPartido,
         mvpHabilitado: formulario.value.mvpHabilitado,
         esConvocatoria: formulario.value.esConvocatoria,
-        jugadorasConvocadas: formulario.value.jugadorasConvocadas
+        jugadorasConvocadas: formulario.value.jugadorasConvocadas,
+        eventoInformativo: formulario.value.eventoInformativo
       });
     }
 

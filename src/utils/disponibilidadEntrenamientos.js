@@ -21,7 +21,7 @@ export const normalizarEquipoDisponibilidad = (equipo) => {
   const valor = (equipo || '').toString().trim().toLowerCase();
 
   if (valor === 'seriec' || valor === 'serie c') return 'serieC';
-  if (valor === 'ascenso' || valor === 'escuela' || valor === 'ambos') return valor;
+  if (valor === 'ascenso' || valor === 'escuela' || valor === 'ambos' || valor === 'todos') return valor;
 
   return '';
 };

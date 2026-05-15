@@ -380,7 +380,7 @@
                 </p>
               </div>
             </div>
-            <span :class="[
+            <span v-if="!entrenamiento.eventoInformativo" :class="[
               'px-3 py-1 rounded-full text-xs font-bold',
               estadoInscripcion[entrenamiento.id] === 'confirmada'
                 ? 'bg-green-100 text-green-700'
@@ -396,6 +396,9 @@
                 estadoInscripcion[entrenamiento.id] === 'pendiente' ? '⏳ Pendiente' :
                 'Sin respuesta'
               }}
+            </span>
+            <span v-else class="px-3 py-1 rounded-full text-xs font-bold bg-cyan-100 text-cyan-700">
+              ℹ️ Informativo
             </span>
           </div>
 
@@ -465,7 +468,7 @@
             </div>
 
             <!-- Botones de acción -->
-            <div class="flex flex-col gap-2 mt-auto">
+            <div v-if="!entrenamiento.eventoInformativo" class="flex flex-col gap-2 mt-auto">
               <div class="flex gap-2">
                 <!-- Cuando está confirmada - botón para cambiar a baja -->
                 <button
@@ -1626,8 +1629,8 @@ if (!jugadoraAuthUser.value) {
 const entrenamientosFiltered = computed(() => {
   return entrenamientos.value
     .filter(e => {
-      // Filtrar por equipo
-      if (e.equipo !== equipoSeleccionado.value) return false;
+      // Filtrar por equipo: mostrar si coincide o si es "todos"
+      if (e.equipo !== equipoSeleccionado.value && e.equipo !== 'todos') return false;
 
       if (!esAdmin.value && jugadoraData.value && !jugadoraPuedeAsistirEntrenamiento(jugadoraData.value, e)) {
         return false;

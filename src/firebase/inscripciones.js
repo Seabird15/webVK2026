@@ -300,11 +300,35 @@ export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
       ? { id: entrenamientoSnap.id, ...entrenamientoSnap.data() }
       : null;
 
+    // Si es un evento informativo, no crear inscripciones
+    if (entrenamiento && entrenamiento.eventoInformativo === true) {
+      return true;
+    }
+
     // Importar la función para obtener jugadoras
     const { fetchJugadorasRegistradasPorEquipo } = await import('./jugadorasAuth');
     
-    // Obtener todas las jugadoras del equipo
-    const jugadoras = await fetchJugadorasRegistradasPorEquipo(equipo);
+    // Si el equipo es "todos", obtener jugadoras de todos los equipos
+    let jugadoras = [];
+    if (equipo === 'todos') {
+      const [ascenso, escuela, serieC] = await Promise.all([
+        fetchJugadorasRegistradasPorEquipo('ascenso'),
+        fetchJugadorasRegistradasPorEquipo('escuela'),
+        fetchJugadorasRegistradasPorEquipo('serieC')
+      ]);
+      
+      // Combinar y deduplicar por ID
+      const mapa = new Map();
+      [...ascenso, ...escuela, ...serieC].forEach((jugadora) => {
+        if (jugadora?.id && !mapa.has(jugadora.id)) {
+          mapa.set(jugadora.id, jugadora);
+        }
+      });
+      jugadoras = [...mapa.values()];
+    } else {
+      // Obtener jugadoras del equipo específico
+      jugadoras = await fetchJugadorasRegistradasPorEquipo(equipo);
+    }
     
     if (jugadoras.length === 0) {
       // // console.warn('No se encontraron jugadoras para el equipo:', equipo);
