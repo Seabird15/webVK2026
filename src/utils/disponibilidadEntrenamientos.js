@@ -10,7 +10,7 @@ const DIAS_SEMANA_LABELS = {
 
 export const DIAS_ENTRENAMIENTO_POR_EQUIPO = {
   ascenso: [2, 5],
-  escuela: [3, 0],
+  escuela: [1, 3, 0],
   serieC: [1]
 };
 
