@@ -75,8 +75,22 @@
             </div>
           </div>
 
+        <!-- Overlay de loading -->
+        <div v-if="isLoading" class="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 rounded-2xl">
+          <div class="flex flex-col items-center gap-4">
+            <div class="relative w-16 h-16">
+              <div class="absolute inset-0 border-4 border-white/20 rounded-full"></div>
+              <div class="absolute inset-0 border-4 border-transparent border-t-white rounded-full animate-spin"></div>
+            </div>
+            <div class="text-center">
+              <p class="text-white font-bold text-lg">Guardando entrenamiento...</p>
+              <p class="text-white/70 text-sm mt-1">Por favor espera</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Formulario mejorado -->
-        <form @submit.prevent="guardarEntrenamiento" class="p-6 space-y-6">
+        <form @submit.prevent="solicitarConfirmacionGuardar" class="p-6 space-y-6">
           <!-- Nombre -->
           <div>
             <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide">Nombre *</label>
@@ -86,6 +100,7 @@
               required
               placeholder="Ej: Entrenamiento Técnico"
               class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
+              :disabled="isLoading"
             />
           </div>
 
@@ -95,7 +110,8 @@
             <select
               v-model="formulario.equipo"
               required
-              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
+              :disabled="isLoading"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
               <option value="">Selecciona equipo</option>
               <option value="ascenso">Ascenso</option>
@@ -125,8 +141,9 @@
             <select
               v-model="formulario.tipo"
               required
+              :disabled="isLoading"
               @change="onTipoChange"
-              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
+              class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
               <option value="">Selecciona tipo</option>
               <option value="entrenamiento">Entrenamiento</option>
@@ -380,21 +397,118 @@
               type="button"
               @click="cerrarFormulario"
               :disabled="isLoading"
-              class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl font-bold hover:bg-gray-50 hover:scale-[1.02] transition-all disabled:opacity-50 order-2 sm:order-1"
+              class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl font-bold hover:bg-gray-50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed order-2 sm:order-1"
             >
               Cancelar
             </button>
             <button
               type="submit"
               :disabled="isLoading"
-              class="flex-1 px-6 py-3 bg-gradient-to-r from-primary-dark to-primary text-white rounded-xl font-bold hover:scale-[1.02] transition-all disabled:opacity-50 order-1 sm:order-2 shadow-lg"
+              class="flex-1 px-6 py-3 bg-gradient-to-r from-primary-dark to-primary text-white rounded-xl font-bold hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2 shadow-lg flex items-center justify-center gap-2"
             >
+              <span v-if="isLoading" class="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
               {{ isLoading ? 'Guardando...' : 'Guardar' }}
             </button>
           </div>
         </form>
       </div>
     </div>
+    </Teleport>
+
+    <!-- Modal de confirmación de creación -->
+    <Teleport to="body">
+      <div v-if="mostrarConfirmacionGuardar" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[10000] p-2 sm:p-4 animate-fade-in">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <!-- Header -->
+          <div class="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 z-10 shadow-lg">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                <CheckCircleIcon class="w-6 h-6" />
+              </div>
+              <div>
+                <h3 class="text-xl font-black uppercase tracking-wide">Confirmar Creación</h3>
+                <p class="text-xs opacity-90 mt-1">Revisa los datos antes de crear</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contenido -->
+          <div class="p-6 space-y-4">
+            <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
+              <h4 class="text-sm font-black text-blue-900 uppercase tracking-wide mb-3">Datos del entrenamiento</h4>
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between items-start gap-2">
+                  <span class="text-gray-600 font-bold">Nombre:</span>
+                  <span class="text-gray-900 font-black text-right">{{ formulario.nombre }}</span>
+                </div>
+                <div class="flex justify-between items-start gap-2">
+                  <span class="text-gray-600 font-bold">Equipo:</span>
+                  <span class="text-gray-900 font-black text-right capitalize">{{ formulario.equipo }}</span>
+                </div>
+                <div class="flex justify-between items-start gap-2">
+                  <span class="text-gray-600 font-bold">Tipo:</span>
+                  <span class="text-gray-900 font-black text-right capitalize">{{ formulario.tipo }}</span>
+                </div>
+                <div class="flex justify-between items-start gap-2">
+                  <span class="text-gray-600 font-bold">Fecha:</span>
+                  <span class="text-gray-900 font-black text-right">{{ formulario.fecha }}</span>
+                </div>
+                <div class="flex justify-between items-start gap-2">
+                  <span class="text-gray-600 font-bold">Hora:</span>
+                  <span class="text-gray-900 font-black text-right">{{ formulario.hora }}</span>
+                </div>
+                <div v-if="formulario.horaFin" class="flex justify-between items-start gap-2">
+                  <span class="text-gray-600 font-bold">Hora Fin:</span>
+                  <span class="text-gray-900 font-black text-right">{{ formulario.horaFin }}</span>
+                </div>
+                <div class="flex justify-between items-start gap-2">
+                  <span class="text-gray-600 font-bold">Lugar:</span>
+                  <span class="text-gray-900 font-black text-right">{{ formulario.lugar }}</span>
+                </div>
+                <div v-if="formulario.rival" class="flex justify-between items-start gap-2">
+                  <span class="text-gray-600 font-bold">Rival:</span>
+                  <span class="text-gray-900 font-black text-right">{{ formulario.rival }}</span>
+                </div>
+                <div v-if="formulario.esConvocatoria && formulario.jugadorasConvocadas.length > 0" class="flex justify-between items-start gap-2">
+                  <span class="text-gray-600 font-bold">Convocadas:</span>
+                  <span class="text-gray-900 font-black text-right">{{ formulario.jugadorasConvocadas.length }} jugadoras</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-4">
+              <div class="flex items-start gap-3">
+                <div class="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs font-black shrink-0 mt-1">!</div>
+                <div class="flex-1">
+                  <p class="text-xs font-black text-amber-900 uppercase tracking-wide mb-1">Verificación final</p>
+                  <p class="text-xs text-amber-800 leading-relaxed">Asegúrate de que todos los datos sean correctos. {{ formulario.enviarCorreoJugadoras ? 'Se enviará un correo de anotación a las jugadoras.' : 'No se enviará correo de anotación.' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones -->
+          <div class="flex flex-col sm:flex-row gap-3 p-6 border-t-2 border-gray-200 bg-gray-50">
+            <button
+              type="button"
+              @click="mostrarConfirmacionGuardar = false"
+              :disabled="isLoading"
+              class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl font-bold hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed order-2 sm:order-1"
+            >
+              Revisar
+            </button>
+            <button
+              type="button"
+              @click="guardarEntrenamiento"
+              :disabled="isLoading"
+              class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-bold hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2 shadow-lg flex items-center justify-center gap-2"
+            >
+              <span v-if="isLoading" class="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              {{ isLoading ? 'Guardando...' : 'Sí, crear entrenamiento' }}
+            </button>
+          </div>
+        </div>
+      </div>
     </Teleport>
 
       <!-- Lista de Entrenamientos -->
@@ -1170,7 +1284,6 @@ import {
   MapPinIcon, 
   ClockIcon, 
   UserGroupIcon,
-  CheckCircleIcon,
   XCircleIcon,
   QuestionMarkCircleIcon,
   PencilSquareIcon,
@@ -1179,7 +1292,8 @@ import {
   BellIcon,
   PlusCircleIcon,
   ClipboardDocumentListIcon,
-  FlagIcon
+  FlagIcon,
+  CheckCircleIcon
 } from '@heroicons/vue/24/outline';
 import ModalConfirmacion from './ModalConfirmacion.vue';
 import {
@@ -1194,12 +1308,13 @@ import {
   errorEntrenamientos,
   entrenamientos
 } from '../firebase/entrenamientos';
-import { escucharInscripcionesEntrenamiento, cambiarEstadoInscripcion, inscribirJugadoraManual, crearInscripcionesPendientes, sincronizarInscripcionesConvocatoria } from '../firebase/inscripciones';
+import { escucharInscripcionesEntrenamiento, cambiarEstadoInscripcion, inscribirJugadoraManual, crearInscripcionesPendientes, sincronizarInscripcionesConvocatoria, limpiarYRegenerarInscripcionesEntrenamiento } from '../firebase/inscripciones';
 import { fetchJugadorasRegistradasPorEquipo } from '../firebase/jugadorasAuth';
 import { sendPushNotification } from '../firebase/notificaciones';
 import { jugadoraExcluidaDeAsistencia, particionarInscripcionesPorAsistencia } from '../utils/disponibilidadEntrenamientos';
 
 const mostrarFormulario = ref(false);
+const mostrarConfirmacionGuardar = ref(false);
 const isLoading = ref(false);
 const error = ref(null);
 const filtroEquipo = ref('');
@@ -1431,6 +1546,7 @@ const editarEntrenamiento = (entrenamiento) => {
 
 const cerrarFormulario = () => {
   mostrarFormulario.value = false;
+  mostrarConfirmacionGuardar.value = false;
   entrenamientoEditando.value = null;
 };
 
@@ -1660,7 +1776,6 @@ const desconvocarJugadora = async (jugadoraId) => {
     
     alert('Jugadora desconvocada correctamente');
   } catch (err) {
-    console.error('Error desconvocando jugadora:', err);
     alert('Error al desconvocar la jugadora: ' + err.message);
   }
 };
@@ -1837,7 +1952,10 @@ const abrirMapaNuevaPestana = (entrenamiento) => {
   window.open(url, '_blank', 'noopener,noreferrer');
 };
 
-const guardarEntrenamiento = async () => {
+
+
+const solicitarConfirmacionGuardar = (e) => {
+  e.preventDefault();
   error.value = null;
 
   // Validar campos
@@ -1861,6 +1979,13 @@ const guardarEntrenamiento = async () => {
     error.value = 'Debes seleccionar al menos una jugadora para la convocatoria';
     return;
   }
+
+  // Mostrar modal de confirmación
+  mostrarConfirmacionGuardar.value = true;
+};
+
+const guardarEntrenamiento = async () => {
+  error.value = null;
 
   isLoading.value = true;
 
@@ -1899,7 +2024,8 @@ const guardarEntrenamiento = async () => {
         );
       }
     } else {
-      // Crear
+      //                                                                                                                                                                                                              
+      
       await crearEntrenamiento({
         nombre: formulario.value.nombre,
         equipo: formulario.value.equipo,
@@ -1970,23 +2096,23 @@ const confirmarEliminar = (entrenamientoId) => {
 // Regenerar inscripciones pendientes para un entrenamiento
 const regenerarInscripciones = (entrenamiento) => {
   modalConfig.value = {
-    titulo: '¿Crear inscripciones?',
-    mensaje: `Se crearán inscripciones pendientes para todas las jugadoras del equipo ${entrenamiento.equipo}.`,
-    detalles: 'Esto facilitará el control de asistencia.',
+    titulo: '¿Regenerar inscripciones?',
+    mensaje: `Se eliminarán las inscripciones pendientes antiguas y se crearán nuevas respetando la disponibilidad de cada jugadora del equipo ${entrenamiento.equipo}.`,
+    detalles: 'Solo se crearán inscripciones para jugadoras que tengan disponible el día del entrenamiento.',
     tipo: 'info',
-    textoConfirmar: 'Crear inscripciones',
+    textoConfirmar: 'Regenerar inscripciones',
     accion: async () => {
       try {
         modalCargando.value = true;
-        const success = await crearInscripcionesPendientes(entrenamiento.id, entrenamiento.equipo);
+        const success = await limpiarYRegenerarInscripcionesEntrenamiento(entrenamiento.id, entrenamiento.equipo);
         if (success) {
-          alert('Inscripciones pendientes creadas correctamente');
+          alert('✅ Inscripciones regeneradas correctamente. Abre el F12 para ver los detalles en consola.');
           mostrarModal.value = false;
         } else {
-          alert('No se pudieron crear las inscripciones. Verifica la consola.');
+          alert('❌ No se pudieron regenerar las inscripciones. Verifica la consola (F12).');
         }
       } catch (err) {
-        alert('Error: ' + err.message);
+        alert('❌ Error: ' + err.message);
       } finally {
         modalCargando.value = false;
       }

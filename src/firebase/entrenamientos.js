@@ -34,6 +34,17 @@ const normalizarVotosMvp = (mvpVotos = []) => {
 
 const normalizarNombreMvp = (nombre) => (nombre || '').toString().trim().toLowerCase();
 
+// Limpiar valores undefined del objeto (Firestore no los acepta)
+const limpiarDatos = (data) => {
+  const cleaned = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (value !== undefined) {
+      cleaned[key] = value;
+    }
+  }
+  return cleaned;
+};
+
 const construirNombreJugadoraMvp = (jugadora = {}) => {
   const nombreCompleto = `${jugadora?.nombre || ''} ${jugadora?.apellido || ''}`.trim();
   return nombreCompleto || (jugadora?.displayName || '').toString().trim();
@@ -139,27 +150,30 @@ export const crearEntrenamiento = async (entrenamientoData) => {
   isLoadingEntrenamientos.value = true;
   errorEntrenamientos.value = null;
   try {
+    // Limpiar datos de valores undefined
+    const datosLimpios = limpiarDatos(entrenamientoData);
+    
     const docRef = await addDoc(collection(db, 'entrenamientos'), {
-      ...entrenamientoData,
-      mvpHabilitado: entrenamientoData?.mvpHabilitado === true,
-      mvpCerrada: entrenamientoData?.mvpCerrada === true,
-      mvpVotos: Array.isArray(entrenamientoData?.mvpVotos) ? normalizarVotosMvp(entrenamientoData.mvpVotos) : [],
+      ...datosLimpios,
+      mvpHabilitado: datosLimpios?.mvpHabilitado === true,
+      mvpCerrada: datosLimpios?.mvpCerrada === true,
+      mvpVotos: Array.isArray(datosLimpios?.mvpVotos) ? normalizarVotosMvp(datosLimpios.mvpVotos) : [],
       createdAt: new Date(),
       updatedAt: new Date()
     });
 
     const entrenamientoId = docRef.id;
 
-    if (entrenamientoData.mostrarEnProximoPartido) {
+    if (datosLimpios.mostrarEnProximoPartido) {
       await limpiarProximoPartidoHome(entrenamientoId);
-      await actualizarConfigProximoPartidoHome(entrenamientoId, entrenamientoData);
+      await actualizarConfigProximoPartidoHome(entrenamientoId, datosLimpios);
     }
 
     // Si es una convocatoria, crear inscripciones solo para las jugadoras convocadas
-    if (entrenamientoData.esConvocatoria && entrenamientoData.jugadorasConvocadas && entrenamientoData.jugadorasConvocadas.length > 0) {
+    if (datosLimpios.esConvocatoria && datosLimpios.jugadorasConvocadas && datosLimpios.jugadorasConvocadas.length > 0) {
       try {
         const { crearInscripcionesConvocadas } = await import('./inscripciones');
-        await crearInscripcionesConvocadas(entrenamientoId, entrenamientoData.jugadorasConvocadas);
+        await crearInscripcionesConvocadas(entrenamientoId, datosLimpios.jugadorasConvocadas);
       } catch (err) {
         // // console.error('Error creando inscripciones de convocatoria:', err);
       }
@@ -167,7 +181,7 @@ export const crearEntrenamiento = async (entrenamientoData) => {
       // Crear inscripciones pendientes para todas las jugadoras del equipo
       try {
         const { crearInscripcionesPendientes } = await import('./inscripciones');
-        await crearInscripcionesPendientes(entrenamientoId, entrenamientoData.equipo);
+        await crearInscripcionesPendientes(entrenamientoId, datosLimpios.equipo);
       } catch (err) {
         // // console.error('Error creando inscripciones pendientes:', err);
         // No lanzar error, el entrenamiento ya fue creado exitosamente
@@ -176,7 +190,7 @@ export const crearEntrenamiento = async (entrenamientoData) => {
 
     return {
       id: entrenamientoId,
-      ...entrenamientoData
+      ...datosLimpios
     };
   } catch (err) {
     // // console.error('Error creando entrenamiento:', err);
@@ -268,15 +282,18 @@ export const actualizarEntrenamiento = async (entrenamientoId, data) => {
   isLoadingEntrenamientos.value = true;
   errorEntrenamientos.value = null;
   try {
+    // Limpiar datos de valores undefined
+    const datosLimpios = limpiarDatos(data);
+    
     await updateDoc(doc(db, 'entrenamientos', entrenamientoId), {
-      ...data,
-      ...(Object.prototype.hasOwnProperty.call(data, 'mvpVotos') ? { mvpVotos: normalizarVotosMvp(data.mvpVotos) } : {}),
+      ...datosLimpios,
+      ...(Object.prototype.hasOwnProperty.call(datosLimpios, 'mvpVotos') ? { mvpVotos: normalizarVotosMvp(datosLimpios.mvpVotos) } : {}),
       updatedAt: new Date()
     });
 
-    if (data.mostrarEnProximoPartido) {
+    if (datosLimpios.mostrarEnProximoPartido) {
       await limpiarProximoPartidoHome(entrenamientoId);
-      await actualizarConfigProximoPartidoHome(entrenamientoId, data);
+      await actualizarConfigProximoPartidoHome(entrenamientoId, datosLimpios);
     } else {
       await limpiarConfigProximoPartidoHomeSiCorresponde(entrenamientoId);
     }
