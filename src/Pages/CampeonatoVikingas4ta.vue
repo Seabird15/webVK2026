@@ -450,7 +450,7 @@ const galeriaPrincipal = [
 const records = [
   { kicker: 'Mejor defensa', titulo: 'VK Formativo', descripcion: 'Solo 2 goles recibidos en cuatro partidos.', valor: '2', logo: logoVikingas },
   { kicker: 'Mayor ataque', titulo: 'Ponchicrack', descripcion: 'La producción ofensiva más alta del torneo.', valor: '9', logo: logoPonshi },
-  { kicker: 'Momento decisivo', titulo: 'Gol de Belén', descripcion: 'Último minuto para cerrar el empate campeón.', valor: '90+', logo: logoVikingas },
+  { kicker: 'Momento decisivo', titulo: 'Gol de Belén', descripcion: 'Último minuto para cerrar el empate campeón.', valor: '+', logo: logoVikingas },
   { kicker: 'Consistencia', titulo: 'VK invicta', descripcion: 'Tres triunfos, un empate y ninguna derrota.', valor: '100%', logo: logoVikingas },
   { kicker: 'Mejor debut', titulo: 'Ponchicrack', descripcion: 'Goleada 4-0 en la primera fecha.', valor: '4-0', logo: logoPonshi },
   { kicker: 'Partido abierto', titulo: 'Las Fénix', descripcion: 'Victoria 4-2 ante Zorzales en la fecha 3.', valor: '4-2', logo: logoFenix },
