@@ -21,11 +21,12 @@
                 Destacado en Vikingas
               </span>
               <h2 class="mt-3 text-[clamp(1.7rem,4vw,2.8rem)] font-black leading-10 uppercase lg:leading-14 text-white" style="font-family: 'Gobold High', sans-serif;">
-                4ta versión del<br>
-                Campeonato Formativo VK
+                4ta versión del Campeonato Formativo<br>
+      <span class="text-secondary">VK Formativo CAMPEONAS</span>
+
               </h2>
               <p class="mt-3 max-w-2xl text-sm leading-7 text-white/74 sm:text-[0.98rem]">
-                Revisa toda la información del campeonato, conoce el enfoque formativo de esta edición y entra directo a la página especial del evento.
+                Revisa la crónica, resultados y fotos de la última edición del campeonato formativo, un espacio de competencia, aprendizaje y compañerismo para la comunidad.
               </p>
             </div>
 

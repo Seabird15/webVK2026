@@ -1,653 +1,497 @@
 <template>
-  <main class="bg-[#f3fbf8] text-[#152227]">
-    <section class="relative overflow-hidden border-b border-[#d7ebe5] bg-[radial-gradient(circle_at_top_left,rgba(44,207,191,0.18),transparent_34%),linear-gradient(180deg,#f7fcfa_0%,#eef8f5_100%)]">
-      <div class="absolute inset-x-0 top-0 h-32 bg-[linear-gradient(180deg,rgba(255,255,255,0.75),rgba(255,255,255,0))]"></div>
-      <div class="absolute -right-12 top-20 h-48 w-48 rounded-full bg-primary/10 blur-3xl sm:h-64 sm:w-64"></div>
-      <div class="absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-[#d8b45d]/20 blur-3xl sm:h-56 sm:w-56"></div>
+  <main class="bg-stone-50 text-slate-950">
+    <section class="relative overflow-hidden bg-slate-950 text-white">
+      <img
+        :src="fotoCampeonas"
+        alt="Vikingas Formativo celebrando el campeonato"
+        class="absolute inset-0 h-full w-full object-cover opacity-70"
+      />
+      <div class="absolute inset-0 bg-slate-950/55"></div>
 
-      <div class="relative mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] lg:items-center lg:px-8 lg:py-16 xl:gap-14">
-        <div class="max-w-3xl">
-          <p class="text-[0.72rem] font-black uppercase tracking-[0.24em] text-primary">Campeonato Vikingas 4ta versión</p>
-          <h1 class="mt-4 text-[clamp(2.4rem,8vw,5.8rem)] font-black uppercase leading-[0.88] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
-            Fútbol formativo
-            <span class="block text-primary">Un espacio real</span>
-          </h1>
-          <p class="mt-5 max-w-2xl text-[1rem] leading-7 text-[#546267] sm:text-[1.08rem] sm:leading-8">
-            Una jornada pensada para equipos formativos reales, con jugadoras de poca o nula experiencia que merecen vivir la competencia en un entorno cuidado, claro y coherente con su etapa.
+      <div class="relative mx-auto grid min-h-[76dvh] max-w-7xl content-end px-4 pb-10 pt-24 sm:px-6 lg:px-8 lg:pb-14">
+        <div class="max-w-4xl">
+          <p class="mb-4 inline-flex rounded-sm bg-[#d8b45d] px-3 py-2 text-xs font-black uppercase text-slate-950">
+            Campeonato Vikingas Formativo 2026
           </p>
-
-          <div class="mt-7 grid gap-3 sm:grid-cols-3">
-            <article class="rounded-[1.8rem] border border-[#d6ebe5] bg-white/88 px-4 py-4 shadow-[0_18px_40px_rgba(21,34,39,0.06)] backdrop-blur-sm">
-              <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Fecha</p>
-              <p class="mt-2 text-lg font-black uppercase text-[#152227]">16 de mayo</p>
-            </article>
-            <article class="rounded-[1.8rem] border border-[#d6ebe5] bg-white/88 px-4 py-4 shadow-[0_18px_40px_rgba(21,34,39,0.06)] backdrop-blur-sm">
-              <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Horario</p>
-              <p class="mt-2 text-lg font-black uppercase text-[#152227]">Desde 16:00</p>
-            </article>
-            <article class="rounded-[1.8rem] border border-[#d6ebe5] bg-white/88 px-4 py-4 shadow-[0_18px_40px_rgba(21,34,39,0.06)] backdrop-blur-sm sm:col-span-3 lg:col-span-1">
-              <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Lugar</p>
-              <p class="mt-2 text-lg font-black uppercase text-[#152227]">Domingo Tocornal</p>
-            </article>
-          </div>
-
-          <div class="mt-7 flex flex-col gap-3 sm:flex-row">
-            <a
-              href="#equipos"
-              class="inline-flex min-h-12 items-center justify-center rounded-[1.2rem] bg-[#152227] px-6 py-3 text-sm font-black uppercase tracking-[0.14em] text-white transition-transform duration-200 hover:-translate-y-1"
-            >
-              Ver equipos
-            </a>
-            <a
-              href="#formato"
-              class="inline-flex min-h-12 items-center justify-center rounded-[1.2rem] border border-[#cfe5de] bg-white px-6 py-3 text-sm font-black uppercase tracking-[0.14em] text-[#152227] transition-transform duration-200 hover:-translate-y-1"
-            >
-              Cómo funciona
-            </a>
-          </div>
+          <h1 class="text-balance text-5xl font-black leading-none sm:text-7xl lg:text-8xl" style="font-family: 'Gobold High', system-ui, sans-serif;">
+            Vikingas campeonas
+          </h1>
+          <p class="mt-6 max-w-2xl text-pretty text-lg font-semibold leading-relaxed text-white/85 sm:text-2xl">
+            Una campaña invicta, un empate agónico y un torneo formativo que dejó historia propia.
+          </p>
         </div>
 
-        <div class="relative">
-          <div class="absolute inset-0 translate-x-2 translate-y-3 rounded-[2.25rem] bg-[#d8b45d]/18 blur-2xl"></div>
-          <div class="relative overflow-hidden rounded-[2.25rem] border border-white/70 bg-white p-3 shadow-[0_28px_80px_rgba(21,34,39,0.12)] sm:p-4">
-            <img
-              src="../assets/seriec/eve.jpg"
-              alt="Jugadoras Vikingas en jornada de campeonato"
-              class=" h-96  w-full rounded-[1.75rem] object-cover object-top sm:h-70 lg:h-105"
+        <div class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div v-for="stat in heroStats" :key="stat.label" class="border border-white/20 bg-slate-950/75 p-5">
+            <p class="tabular-nums text-4xl font-black text-[#d8b45d]">{{ stat.value }}</p>
+            <p class="mt-2 text-sm font-bold uppercase text-white/75">{{ stat.label }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="border-b border-slate-200 bg-white">
+      <div class="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+        <p class="text-pretty text-sm font-semibold text-slate-700">
+          Recorrido editorial por las cinco fechas, el podio, los equipos y los momentos que definieron la cuarta versión.
+        </p>
+        <nav class="flex flex-wrap gap-2 text-sm font-black uppercase">
+          <a href="#cronica" class="rounded-sm bg-slate-950 px-4 py-3 text-white">Crónica</a>
+          <a href="#podio" class="rounded-sm border border-slate-300 px-4 py-3 text-slate-950">Podio</a>
+          <a href="#galeria" class="rounded-sm border border-slate-300 px-4 py-3 text-slate-950">Galería</a>
+        </nav>
+      </div>
+    </section>
+
+    <section id="cronica" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+      <div class="mb-12 grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+        <div>
+          <p class="mb-3 text-sm font-black uppercase text-[#9f7c26]">Fecha a fecha</p>
+          <h2 class="text-balance text-4xl font-black text-slate-950 sm:text-6xl" style="font-family: 'Gobold High', system-ui, sans-serif;">
+            Crónica del torneo
+          </h2>
+        </div>
+        
+      </div>
+
+      <div class="grid gap-6 lg:grid-cols-2">
+        <article
+          v-for="jornada in jornadas"
+          :key="jornada.titulo"
+          class="overflow-hidden rounded-lg border border-slate-200 bg-white"
+          :class="jornada.destacada ? 'border-[#d8b45d] bg-[#fffaf0]' : ''"
+        >
+          <div class="grid md:grid-cols-[0.9fr_1.1fr]">
+            <div class="relative min-h-64 overflow-hidden md:min-h-full">
+              <img :src="jornada.foto" :alt="jornada.titulo" class="absolute inset-0 h-full w-full object-cover" />
+              <div class="absolute left-4 top-4 rounded-sm bg-white px-3 py-2 text-xs font-black uppercase text-slate-950">
+                {{ jornada.libre }}
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-6 p-6 sm:p-8">
+              <div>
+                <p class="mb-2 text-sm font-black uppercase text-[#9f7c26]">{{ jornada.kicker }}</p>
+                <h3 class="text-balance text-2xl font-black text-slate-950">{{ jornada.titulo }}</h3>
+                <p class="mt-2 text-pretty text-sm font-semibold text-slate-500">{{ jornada.subtitulo }}</p>
+              </div>
+
+              <div class="grid gap-3">
+                <div
+                  v-for="partido in jornada.partidos"
+                  :key="`${jornada.titulo}-${partido.cancha}`"
+                  class="rounded-lg border border-slate-200 bg-stone-50 p-4"
+                  :class="partido.destacado ? 'border-[#d8b45d] bg-white' : ''"
+                >
+                  <p class="mb-3 text-xs font-black uppercase text-slate-500">{{ partido.cancha }}</p>
+                  <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                    <div>
+                      <p class="line-clamp-1 text-sm font-black text-slate-950">{{ partido.local }}</p>
+                      <p class="tabular-nums text-3xl font-black" :class="partido.golesLocal >= partido.golesVisita ? 'text-[#9f7c26]' : 'text-slate-400'">
+                        {{ partido.golesLocal }}
+                      </p>
+                    </div>
+                    <p class="rounded-sm bg-slate-950 px-2 py-1 text-xs font-black text-white">VS</p>
+                    <div class="text-right">
+                      <p class="line-clamp-1 text-sm font-black text-slate-950">{{ partido.visita }}</p>
+                      <p class="tabular-nums text-3xl font-black" :class="partido.golesVisita >= partido.golesLocal ? 'text-[#9f7c26]' : 'text-slate-400'">
+                        {{ partido.golesVisita }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <p class="text-pretty text-sm leading-relaxed text-slate-700" v-html="jornada.relato"></p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="podio" class="bg-slate-950 py-16 text-white lg:py-24">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-12 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <p class="mb-3 text-sm font-black uppercase text-[#d8b45d]">Tabla final</p>
+            <h2 class="text-balance text-4xl font-black sm:text-6xl" style="font-family: 'Gobold High', system-ui, sans-serif;">
+              Podio y posiciones
+            </h2>
+          </div>
+          <p class="text-pretty text-sm font-semibold text-white/70 lg:max-w-md">
+            El campeonato se decidió por consistencia: Vikingas cerró invicta y sostuvo la diferencia cuando más pesaba.
+          </p>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <div class="grid gap-4 md:grid-cols-3">
+            <article
+              v-for="equipo in podio"
+              :key="equipo.nombre"
+              class="overflow-hidden rounded-lg border border-white/15 bg-white text-slate-950"
+              :class="equipo.posicion === 1 ? 'md:col-span-2 md:row-span-2' : ''"
             >
-            <div class="mt-4 grid gap-3 sm:grid-cols-[auto_1fr] sm:items-center">
-              <div class="mx-auto flex h-20 w-20 items-center justify-center   sm:mx-0 sm:h-24 sm:w-24">
-                <img :src="logoVikingas" alt="Logo Vikingas Formativo" class="h-12 w-12 object-contain sm:h-14 sm:w-14">
+              <div class="relative aspect-[4/3] overflow-hidden" :class="equipo.posicion === 1 ? 'md:aspect-[5/4]' : ''">
+                <img :src="equipo.foto" :alt="equipo.nombre" class="h-full w-full object-cover" />
+                <div class="absolute left-4 top-4 rounded-sm bg-[#d8b45d] px-3 py-2 text-xs font-black uppercase text-slate-950">
+                  {{ equipo.badge }}
+                </div>
               </div>
-              <div class="rounded-[1.6rem] border border-[#d8ebe5] bg-[#f5fbf9] px-4 py-4">
-                <p class="text-[0.68rem] font-black uppercase tracking-[0.2em] text-primary">Objetivo</p>
-                <p class="mt-2 text-sm leading-7 text-[#4f5d63] sm:text-[0.98rem]">
-                  Abrir un espacio competitivo para mujeres que están dando sus primeros pasos, con clubes que se toman en serio el trabajo formativo y el cuidado del entorno.
-                </p>
+              <div class="p-6">
+                <h3 class="text-2xl font-black">{{ equipo.nombre }}</h3>
+                <p class="mt-2 tabular-nums text-5xl font-black text-[#9f7c26]">{{ equipo.puntos }} pts</p>
+                <p class="mt-4 text-pretty text-sm font-semibold leading-relaxed text-slate-600">{{ equipo.detalle }}</p>
               </div>
+            </article>
+          </div>
+
+          <div class="overflow-hidden rounded-lg border border-white/15 bg-white">
+            <div class="border-b border-slate-200 bg-[#d8b45d] p-5 text-slate-950">
+              <h3 class="text-xl font-black">Clasificación completa</h3>
+              <p class="mt-1 text-sm font-semibold">Ordenada por puntos y diferencia de gol.</p>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[520px] text-slate-950">
+                <thead class="bg-slate-100 text-xs uppercase text-slate-600">
+                  <tr>
+                    <th class="px-4 py-4 text-left font-black">Equipo</th>
+                    <th v-for="head in tableHeads" :key="head" class="px-3 py-4 text-center font-black">{{ head }}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                  <tr v-for="equipo in tablaFinal" :key="equipo.equipo" :class="equipo.campeona ? 'bg-[#fff4d1]' : ''">
+                    <td class="px-4 py-4 font-black">{{ equipo.equipo }}</td>
+                    <td class="px-3 py-4 text-center font-bold tabular-nums">{{ equipo.pj }}</td>
+                    <td class="px-3 py-4 text-center font-bold tabular-nums">{{ equipo.pg }}</td>
+                    <td class="px-3 py-4 text-center font-bold tabular-nums">{{ equipo.pe }}</td>
+                    <td class="px-3 py-4 text-center font-bold tabular-nums">{{ equipo.pp }}</td>
+                    <td class="px-3 py-4 text-center font-bold tabular-nums">{{ equipo.gf }}</td>
+                    <td class="px-3 py-4 text-center font-bold tabular-nums">{{ equipo.gc }}</td>
+                    <td class="px-3 py-4 text-center font-black tabular-nums text-[#9f7c26]">{{ equipo.pts }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-      <div class="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.95fr)] lg:items-start">
-        <article class="rounded-4xl border border-[#d8ebe5] bg-white px-5 py-6 shadow-[0_18px_60px_rgba(21,34,39,0.07)] sm:px-7 sm:py-8">
-          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-primary">Sobre el torneo</p>
-          <h2 class="mt-4 text-[clamp(2rem,5vw,4rem)] font-black uppercase leading-18 text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
-            Un espacio para jugadoras que quieren competir por primera vez
-          </h2>
-          <div class="mt-6 space-y-5 text-[1rem] leading-8 text-[#55646a] sm:text-[1.04rem]">
-            <p>
-              Este campeonato nace para defender un espacio real para equipos formativos, con jugadoras que recién comienzan o que todavía tienen poca experiencia competitiva.
-            </p>
-            <p>
-              La idea es reunir a clubes organizados que sí están abriendo lugar a nuevas jugadoras, sin mezclar niveles que terminen rompiendo el sentido del torneo.
-            </p>
-            <p>
-              El foco está puesto en que cada partido se viva desde un contexto seguro, sano y coherente con la etapa formativa de las futbolistas que participan.
-            </p>
-          </div>
-        </article>
-
-        <aside class="rounded-4xl border border-[#d8b45d]/35 bg-[linear-gradient(180deg,#fffaf0_0%,#fff3d8_100%)] px-5 py-6 shadow-[0_22px_70px_rgba(138,107,45,0.16)] sm:px-7 sm:py-8">
-          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-[#8a6b2d]">Sin excepciones</p>
-          <h3 class="mt-3 text-[clamp(1.8rem,5vw,2.8rem)] font-black uppercase leading-[0.95] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
-            Restricciones
-          </h3>
-          <p class="mt-4 max-w-md text-sm leading-7 text-[#6f5a28] sm:text-[0.98rem]">
-            El campeonato está reservado para procesos formativos reales. Estas condiciones se aplican a todos los equipos invitados.
-          </p>
-          <ul class="mt-6 space-y-4 text-sm leading-7 text-[#4e4330] sm:text-[1rem]">
-            <li class="flex items-start gap-3 rounded-[1.35rem] border border-[#e4c985] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(138,107,45,0.1)]">
-              <span class="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#8a6b2d] text-[0.72rem] font-black text-white">1</span>
-              <span class="font-semibold">No se aceptan jugadoras de primera división.</span>
-            </li>
-            <li class="flex items-start gap-3 rounded-[1.35rem] border border-[#e4c985] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(138,107,45,0.1)]">
-              <span class="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#8a6b2d] text-[0.72rem] font-black text-white">2</span>
-              <span class="font-semibold">No se aceptan jugadoras de serie B+.</span>
-            </li>
-            <li class="flex items-start gap-3 rounded-[1.35rem] border border-[#e4c985] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(138,107,45,0.1)]">
-              <span class="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#8a6b2d] text-[0.72rem] font-black text-white">3</span>
-              <span class="font-semibold">No se aceptan jugadoras federadas.</span>
-            </li>
-            <li class="flex items-start gap-3 rounded-[1.35rem] border border-[#e4c985] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(138,107,45,0.1)]">
-              <span class="mt-1 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#8a6b2d] text-[0.72rem] font-black text-white">4</span>
-              <span class="font-semibold">No se aceptan ex federadas.</span>
-            </li>
-          </ul>
-        </aside>
-      </div>
-    </section>
-
-    <section id="equipos" class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <section class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+      <div class="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-primary">Equipos participantes</p>
-          <h2 class="mt-3 text-[clamp(2rem,5vw,3.6rem)] font-black uppercase leading-18 text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
-            Cinco equipos en jornada todas contra todas
+          <p class="mb-3 text-sm font-black uppercase text-[#9f7c26]">Participantes</p>
+          <h2 class="text-balance text-4xl font-black text-slate-950 sm:text-5xl" style="font-family: 'Gobold High', system-ui, sans-serif;">
+            Equipos en juego
           </h2>
         </div>
-        <p class="max-w-xl text-sm leading-7 text-[#56666b] sm:text-right sm:text-[0.98rem]">
-            Vikingas Formativo participa junto a cuatro equipos invitados que comparten el enfoque de abrir competencia para nuevas jugadoras.
+        <p class="max-w-xl text-pretty text-sm leading-relaxed text-slate-600">
+          Cinco equipos, dos canchas y una jornada larga diseñada para competir sin perder el foco formativo.
         </p>
       </div>
 
-      <div class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <article
           v-for="equipo in equiposParticipantes"
           :key="equipo.nombre"
-          class="group rounded-[1.9rem] border border-[#d6ebe5] bg-white px-5 py-5 shadow-[0_18px_40px_rgba(21,34,39,0.06)] transition-transform duration-200 hover:-translate-y-1"
+          class="rounded-lg border bg-white p-5 text-center"
+          :class="equipo.esLocal ? 'border-[#d8b45d]' : 'border-slate-200'"
         >
-          <div class="flex flex-col gap-4" :class="equipo.esLocal ? 'items-center text-center' : 'items-start'">
-            <div
-              class="flex w-24 mx-auto shrink-0 items-center justify-center rounded-[1.35rem] "
-            >
-              <img v-if="equipo.logo" :src="equipo.logo" :alt="`Logo ${equipo.nombre}`" class=" rounded-full object-cover">
-              <span v-else class="text-xs font-black uppercase tracking-[0.14em] py-7 ">Por confirmar</span>
-            </div>
-
-            <div class="min-w-0 flex flex-col item-center mx-auto justify-center " :class="equipo.esLocal ? 'w-full' : ''">
-              <p class="text-[0.68rem] text-center font-black uppercase tracking-[0.2em]" :class="equipo.esLocal ? 'text-primary' : 'text-[#8a6b2d]'">
-                {{ equipo.etiqueta }}
-              </p>
-              <h3 class="mt-2 text-xl text-center font-black uppercase leading-tight text-[#152227]">
-                {{ equipo.nombre }}
-              </h3>
-            </div>
+          <div class="mx-auto flex size-20 items-center justify-center rounded-lg bg-stone-100 p-3">
+            <img v-if="equipo.logo" :src="equipo.logo" :alt="equipo.nombre" class="max-h-full max-w-full object-contain" />
           </div>
-        
+          <h3 class="mt-4 text-pretty text-sm font-black uppercase text-slate-950">{{ equipo.nombre }}</h3>
+          <p class="mt-2 text-xs font-bold uppercase" :class="equipo.esLocal ? 'text-[#9f7c26]' : 'text-slate-500'">
+            {{ equipo.etiqueta }}
+          </p>
         </article>
       </div>
     </section>
 
-    <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-      <div class="grid gap-8 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-        <article class="overflow-hidden rounded-4xl border border-[#d8ebe5] bg-white shadow-[0_18px_60px_rgba(21,34,39,0.07)]">
-          <div class="border-b border-[#e2efeb] px-5 py-5 sm:px-7">
-            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-primary">Tabla de posiciones</p>
-            <h2 class="mt-3 text-[clamp(1.9rem,5vw,3.2rem)] font-black uppercase leading-[0.95] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
-              CAMPEONATO VK
+    <section id="galeria" class="bg-white py-16 lg:py-24">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-12 max-w-3xl">
+          <p class="mb-3 text-sm font-black uppercase text-[#9f7c26]">Archivo visual</p>
+          <h2 class="text-balance text-4xl font-black text-slate-950 sm:text-6xl" style="font-family: 'Gobold High', system-ui, sans-serif;">
+            Acción y momentos
+          </h2>
+      
+        </div>
+
+        <div class="grid auto-rows-[180px] grid-cols-2 gap-3 md:auto-rows-[240px] md:grid-cols-4">
+          <figure
+            v-for="foto in galeriaPrincipal"
+            :key="foto.alt"
+            class="overflow-hidden rounded-lg bg-slate-200"
+            :class="foto.class"
+          >
+            <img loading="lazy" :src="foto.src" :alt="foto.alt" class="h-full w-full object-cover" />
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-slate-950 py-16 text-white lg:py-24">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-12 grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+          <div>
+            <p class="mb-3 text-sm font-black uppercase text-[#d8b45d]">Lectura táctica</p>
+            <h2 class="text-balance text-4xl font-black sm:text-5xl" style="font-family: 'Gobold High', system-ui, sans-serif;">
+              Registros del torneo
             </h2>
           </div>
-
-          <div class="overflow-x-auto">
-            <table class="min-w-full text-left text-sm text-[#425158]">
-              <thead class="bg-[#f4faf8] text-[0.7rem] font-black uppercase tracking-[0.16em] text-[#55727a]">
-                <tr>
-                  <th scope="col" class="px-4 py-4 sm:px-6">Equipo</th>
-                  <th scope="col" class="px-3 py-4 text-center">PJ</th>
-                  <th scope="col" class="px-3 py-4 text-center">PG</th>
-                  <th scope="col" class="px-3 py-4 text-center">PE</th>
-                  <th scope="col" class="px-3 py-4 text-center">PP</th>
-                  <th scope="col" class="px-3 py-4 text-center">GF</th>
-                  <th scope="col" class="px-3 py-4 text-center">GC</th>
-                  <th scope="col" class="px-3 py-4 text-center">DG</th>
-                  <th scope="col" class="px-4 py-4 text-center sm:px-6">Pts</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(fila, idx) in tablaPosicionesCalculada" :key="fila.equipo" class="border-t border-[#e5f0ed]" :class="[
-                  idx === 0 && 'bg-green-50',
-                  idx === 1 && 'bg-blue-50',
-                  idx === 2 && 'bg-amber-50'
-                ]">
-                  <th scope="row" class="px-4 py-4 text-sm font-black uppercase text-[#152227] sm:px-6">{{ idx + 1 }}. {{ fila.equipo }}</th>
-                  <td class="px-3 py-4 text-center">{{ fila.pj }}</td>
-                  <td class="px-3 py-4 text-center">{{ fila.pg }}</td>
-                  <td class="px-3 py-4 text-center">{{ fila.pe }}</td>
-                  <td class="px-3 py-4 text-center">{{ fila.pp }}</td>
-                  <td class="px-3 py-4 text-center">{{ fila.gf }}</td>
-                  <td class="px-3 py-4 text-center">{{ fila.gc }}</td>
-                  <td class="px-3 py-4 text-center text-amber-600 font-bold">{{ fila.gf - fila.gc }}</td>
-                  <td class="px-4 py-4 text-center font-black sm:px-6">{{ fila.pts }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </article>
-
-        <article id="formato" class="rounded-4xl border border-[#d8ebe5] bg-[linear-gradient(180deg,#ffffff_0%,#f5faf8_100%)] px-5 py-6 shadow-[0_18px_60px_rgba(21,34,39,0.07)] sm:px-7 sm:py-8">
-          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-primary">Formato</p>
-          <h2 class="mt-3 text-[clamp(1.9rem,5vw,3rem)] font-black uppercase leading-[0.95] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
-            Fácil de entender
-          </h2>
-
-          <div class="mt-6 space-y-4">
-            <article class="rounded-[1.4rem] border border-[#deece7] bg-white px-4 py-4">
-              <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Paso 1</p>
-              <p class="mt-2 text-sm leading-7 text-[#55636a]">Los cinco equipos juegan una fase todos contra todos durante la jornada.</p>
-            </article>
-            <article class="rounded-[1.4rem] border border-[#deece7] bg-white px-4 py-4">
-              <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Paso 2</p>
-              <p class="mt-2 text-sm leading-7 text-[#55636a]">La tabla define a las campeonas y también el orden del segundo y tercer lugar.</p>
-            </article>
-            <article class="rounded-[1.4rem] border border-[#deece7] bg-white px-4 py-4">
-              <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Paso 3</p>
-              <p class="mt-2 text-sm leading-7 text-[#55636a]">Lo importante no es solo competir: también sostener un ambiente seguro para procesos iniciales.</p>
-            </article>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section class="mx-auto max-w-7xl px-4 pb-14 sm:px-6 lg:px-8 lg:pb-20">
-      <div>
-        <div class="mb-10">
-          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-primary">Cruces del campeonato</p>
-          <h2 class="mt-3 text-[clamp(2rem,5vw,3.6rem)] font-black uppercase leading-[0.94] text-[#152227]" style="font-family: 'Gobold High', sans-serif;">
-            Programación definitiva
-          </h2>
+        
         </div>
 
-        <div class="grid gap-4 lg:grid-cols-3">
-          <article
-            v-for="bloque in programacionCompleta.filter(b => !b.esDescanso)"
-            :key="bloque.id"
-            class="rounded-[1.7rem] border border-[#d7ebe5] bg-white px-5 py-5 sm:px-6 sm:py-6"
-          >
-            <div class="flex flex-col gap-4">
-              <div>
-                <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">{{ bloque.horario }}</p>
-                <p class="mt-1 text-sm font-black uppercase leading-6 text-[#152227]">{{ bloque.titulo }}</p>
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <article v-for="record in records" :key="record.titulo" class="rounded-lg border border-white/15 bg-white p-6 text-slate-950">
+            <div class="flex items-start gap-4">
+              <img :src="record.logo" :alt="record.titulo" class="size-14 rounded-lg object-contain" />
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-black uppercase text-[#9f7c26]">{{ record.kicker }}</p>
+                <h3 class="mt-1 text-pretty text-xl font-black">{{ record.titulo }}</h3>
+                <p class="mt-2 text-pretty text-sm font-semibold text-slate-600">{{ record.descripcion }}</p>
               </div>
-
-              <div class="grid gap-4 sm:grid-cols-2">
-                <div class="rounded-[1.2rem] border border-[#d7ebe5] bg-[#f5fbf9] p-4">
-                  <p class="text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#8a6b2d] mb-3">Cancha 1</p>
-                  <div class="flex flex-col items-center text-center gap-3">
-                    <div class="flex items-center justify-center gap-2 w-full">
-                      <div class="h-14 w-14 flex items-center justify-center rounded-full border-2 border-[#d8b45d]/30 bg-white p-2">
-                        <img 
-                          v-if="getLogoEquipo(bloque.cancha1.split(' vs ')[0])" 
-                          :src="getLogoEquipo(bloque.cancha1.split(' vs ')[0])"
-                          :alt="bloque.cancha1.split(' vs ')[0]"
-                          class="h-10 w-10 object-contain"
-                        >
-                      </div>
-                      <!-- Resultado o VS -->
-                      <div class="flex flex-col items-center gap-1">
-                        <span v-if="!resultados.get(`${bloque.id}-cancha1`)?.finalizado" class="text-[0.7rem] font-black uppercase text-primary">VS</span>
-                        <span v-else class="text-lg font-black text-primary">{{ resultados.get(`${bloque.id}-cancha1`)?.golesLocal ?? 0 }}</span>
-                      </div>
-                      <div v-if="resultados.get(`${bloque.id}-cancha1`)?.finalizado" class="text-xs font-black text-gray-400">-</div>
-                      <div class="flex flex-col items-center gap-1">
-                        <span v-if="!resultados.get(`${bloque.id}-cancha1`)?.finalizado" class="text-[0.7rem] font-black uppercase text-primary"></span>
-                        <span v-else class="text-lg font-black text-primary">{{ resultados.get(`${bloque.id}-cancha1`)?.golesVisita ?? 0 }}</span>
-                      </div>
-                      <div class="h-14 w-14 flex items-center justify-center rounded-full border-2 border-[#d8b45d]/30 bg-white p-2">
-                        <img 
-                          v-if="getLogoEquipo(bloque.cancha1.split(' vs ')[1])" 
-                          :src="getLogoEquipo(bloque.cancha1.split(' vs ')[1])"
-                          :alt="bloque.cancha1.split(' vs ')[1]"
-                          class="h-10 w-10 object-contain"
-                        >
-                      </div>
-                    </div>
-                    <p class="text-sm font-semibold leading-5 text-[#152227]">{{ bloque.cancha1 }}</p>
-                  </div>
-                </div>
-
-                <div class="rounded-[1.2rem] border border-[#d7ebe5] bg-[#f5fbf9] p-4">
-                  <p class="text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#8a6b2d] mb-3">Cancha 2</p>
-                  <div class="flex flex-col items-center text-center gap-3">
-                    <div class="flex items-center justify-center gap-2 w-full">
-                      <div class="h-14 w-14 flex items-center justify-center rounded-full border-2 border-[#d8b45d]/30 bg-white p-2">
-                        <img 
-                          v-if="getLogoEquipo(bloque.cancha2.split(' vs ')[0])" 
-                          :src="getLogoEquipo(bloque.cancha2.split(' vs ')[0])"
-                          :alt="bloque.cancha2.split(' vs ')[0]"
-                          class="h-10 w-10 object-contain"
-                        >
-                      </div>
-                      <!-- Resultado o VS -->
-                      <div class="flex flex-col items-center gap-1">
-                        <span v-if="!resultados.get(`${bloque.id}-cancha2`)?.finalizado" class="text-[0.7rem] font-black uppercase text-primary">VS</span>
-                        <span v-else class="text-lg font-black text-primary">{{ resultados.get(`${bloque.id}-cancha2`)?.golesLocal ?? 0 }}</span>
-                      </div>
-                      <div v-if="resultados.get(`${bloque.id}-cancha2`)?.finalizado" class="text-xs font-black text-gray-400">-</div>
-                      <div class="flex flex-col items-center gap-1">
-                        <span v-if="!resultados.get(`${bloque.id}-cancha2`)?.finalizado" class="text-[0.7rem] font-black uppercase text-primary"></span>
-                        <span v-else class="text-lg font-black text-primary">{{ resultados.get(`${bloque.id}-cancha2`)?.golesVisita ?? 0 }}</span>
-                      </div>
-                      <div class="h-14 w-14 flex items-center justify-center rounded-full border-2 border-[#d8b45d]/30 bg-white p-2">
-                        <img 
-                          v-if="getLogoEquipo(bloque.cancha2.split(' vs ')[1])" 
-                          :src="getLogoEquipo(bloque.cancha2.split(' vs ')[1])"
-                          :alt="bloque.cancha2.split(' vs ')[1]"
-                          class="h-10 w-10 object-contain"
-                        >
-                      </div>
-                    </div>
-                    <p class="text-sm font-semibold leading-5 text-[#152227]">{{ bloque.cancha2 }}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div v-if="bloque.libre" class="rounded-[1.2rem] bg-[#d8b45d]/15 px-4 py-3 border border-[#d8b45d]/25 flex items-center gap-3">
-                <div class="h-12 w-12 flex items-center justify-center rounded-full border border-[#d8b45d]/40 bg-white p-1 shrink-0">
-                  <img 
-                    v-if="getLogoEquipo(bloque.libre)" 
-                    :src="getLogoEquipo(bloque.libre)"
-                    :alt="bloque.libre"
-                    class="h-10 w-10 object-contain"
-                  >
-                </div>
-                <div>
-                  <p class="text-[0.65rem] font-black uppercase tracking-[0.16em] text-[#8a6b2d]">Equipo libre</p>
-                  <p class="mt-1 text-sm font-semibold text-[#152227]">{{ bloque.libre }}</p>
-                </div>
-              </div>
+              <p class="tabular-nums text-3xl font-black text-[#9f7c26]">{{ record.valor }}</p>
             </div>
           </article>
         </div>
 
-        <div class="mt-8 grid gap-4 sm:grid-cols-2">
-          <article class="rounded-[1.7rem] border border-[#d8b45d]/35 bg-[#fffaf0]/70 px-5 py-6 sm:px-6">
-            <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[#8a6b2d]">Ceremonia final</p>
-            <p class="mt-2 text-sm font-semibold text-[#152227]">Premiación: 20:00 - 20:10 hrs</p>
-            <p class="mt-2 text-[0.9rem] leading-6 text-[#546267]">Una excelente hora porque ya habrá bajado el sol.</p>
-          </article>
-
-          <article class="rounded-[1.7rem] border border-[#d7ebe5] bg-white px-5 py-6 sm:px-6">
-            <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Criterios de desempate</p>
-            <ul class="mt-3 space-y-2 text-sm text-[#546267]">
-              <li class="flex items-start gap-3">
-                <span class="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-primary shrink-0"></span>
-                <span>Diferencia de goles</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <span class="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-primary shrink-0"></span>
-                <span>Duelo directo</span>
-              </li>
-            </ul>
+        <div class="mt-6 grid gap-4 lg:grid-cols-3">
+          <article v-for="equipo in comparativa" :key="equipo.nombre" class="rounded-lg border border-white/15 bg-slate-900 p-6">
+            <p class="mb-2 text-xs font-black uppercase text-[#d8b45d]">{{ equipo.posicion }}</p>
+            <h3 class="text-2xl font-black">{{ equipo.nombre }}</h3>
+            <p class="mt-2 text-pretty text-sm font-semibold text-white/65">{{ equipo.clave }}</p>
+            <div class="mt-6 grid gap-3">
+              <div v-for="dato in equipo.datos" :key="dato.label" class="flex items-center justify-between border-t border-white/10 pt-3">
+                <span class="text-sm font-semibold text-white/70">{{ dato.label }}</span>
+                <span class="tabular-nums text-lg font-black text-white">{{ dato.valor }}</span>
+              </div>
+            </div>
           </article>
         </div>
       </div>
+    </section>
+
+    <section class="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8 lg:py-24">
+      <blockquote>
+        <p class="text-balance text-3xl font-black text-slate-950 sm:text-5xl" style="font-family: 'Gobold High', system-ui, sans-serif;">
+          "Un espacio donde nuevas jugadoras escribieron su primer capítulo competitivo"
+        </p>
+        <p class="mt-6 text-pretty text-base leading-relaxed text-slate-600 sm:text-lg">
+          El nivel formativo se respetó. Los duelos fueron apretados. Las jugadoras compitieron sin presión en un ambiente seguro, coherente con su etapa deportiva. Esto es lo que Vikingas significa: abrir espacios hasta que sobren.
+        </p>
+        <div class="mx-auto mt-8 h-1 w-16 bg-[#d8b45d]"></div>
+      </blockquote>
     </section>
   </main>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { observarCampeonatoFirestore } from '../firebase/campeonato4ta'
-import bannerEquipos from '../assets/bannerequipos.webp'
 import logoVikingas from '../assets/logoVk.png'
 import logoZorzales from '../assets/logos/zorzaleslogo.webp'
 import logoOdiosas from '../assets/logos/odiosas.jpg'
 import logoFenix from '../assets/logos/fenix.png'
 import logoPonshi from '../assets/logos/logoponshi.jpg'
 
+import foto2dolugar from '../assets/fotosCampeonato/duplicado.JPG'
+import foto3erlugar from '../assets/fotosCampeonato/3erlugar.JPG'
+import fotoCampeonas from '../assets/fotosCampeonato/campeonas.JPG'
+import fotoClubvikingas from '../assets/fotosCampeonato/clubvikingas.JPG'
+import fotoDSC01076 from '../assets/fotosCampeonato/DSC01076.JPG'
+import fotoDSC01125 from '../assets/fotosCampeonato/DSC01125.JPG'
+import fotoDSC01157 from '../assets/fotosCampeonato/DSC01157.JPG'
+import fotoDSC01199 from '../assets/fotosCampeonato/DSC01199.JPG'
+import fotoDSC08128 from '../assets/fotosCampeonato/DSC08128.JPG'
+import fotoDSC08154 from '../assets/fotosCampeonato/DSC08154.JPG'
+import fotoDSC08167 from '../assets/fotosCampeonato/DSC08167.JPG'
+import fotoDSC08191 from '../assets/fotosCampeonato/DSC08191.JPG'
+import fotoDSC08264 from '../assets/fotosCampeonato/DSC08264.JPG'
+import fotoDSC08283 from '../assets/fotosCampeonato/DSC08283.JPG'
+import fotoDSC08334 from '../assets/fotosCampeonato/DSC08334.JPG'
+import fotoDtTactico from '../assets/fotosCampeonato/foto-dt-tactico.JPG'
+import fotoOrganizacion from '../assets/fotosCampeonato/organizacion.JPG'
+import fotoPremios from '../assets/fotosCampeonato/premios.JPG'
+
+const heroStats = [
+  { value: '5', label: 'Equipos' },
+  { value: '5', label: 'Fechas' },
+  { value: '50+', label: 'Jugadoras' },
+  { value: '10', label: 'Puntos campeonas' },
+]
+
 const equiposParticipantes = [
+  { nombre: 'Vikingas Formativo', etiqueta: 'Equipo anfitrión', esLocal: true, logo: logoVikingas },
+  { nombre: 'Zorzales FC', etiqueta: 'Equipo invitado', esLocal: false, logo: logoZorzales },
+  { nombre: 'Fénix', etiqueta: 'Equipo invitado', esLocal: false, logo: logoFenix },
+  { nombre: "O'Diosas FC", etiqueta: 'Equipo invitado', esLocal: false, logo: logoOdiosas },
+  { nombre: 'PonchiCrack', etiqueta: 'Equipo invitado', esLocal: false, logo: logoPonshi },
+]
+
+const jornadas = [
   {
+    kicker: 'Fecha 1',
+    titulo: 'Debut local',
+    subtitulo: 'Vikingas abre el torneo en su cancha',
+    libre: 'Libre: Zorzales',
+    foto: fotoDSC01076,
+    partidos: [
+      { cancha: 'Cancha 1', local: 'VK', golesLocal: 1, visita: 'Odiosas', golesVisita: 0, destacado: true },
+      { cancha: 'Cancha 2', local: 'Ponchicrack', golesLocal: 4, visita: 'Las Fénix', golesVisita: 0 },
+    ],
+    relato: 'Las Vikingas partieron con una victoria limpia ante Odiosas. Ponchicrack también marcó presencia con un 4-0 que las instaló temprano como candidatas.',
+  },
+  {
+    kicker: 'Fecha 2',
+    titulo: 'Ascensos y caídas',
+    subtitulo: 'Ponchicrack entra en la carrera',
+    libre: 'Libre: Las Fénix',
+    foto: fotoDSC01125,
+    partidos: [
+      { cancha: 'Cancha 1', local: 'VK', golesLocal: 2, visita: 'Zorzales', golesVisita: 0, destacado: true },
+      { cancha: 'Cancha 2', local: 'Ponchicrack', golesLocal: 2, visita: 'Odiosas', golesVisita: 1 },
+    ],
+    relato: 'Vikingas confirmó que el arranque no fue casualidad. El triunfo ante Zorzales sostuvo el liderato, mientras Ponchicrack se metió de lleno en la pelea.',
+  },
+  {
+    kicker: 'Fecha 3',
+    titulo: 'El clásico defensivo',
+    subtitulo: 'Vikingas y Ponchicrack se miden de frente',
+    libre: 'Libre: Odiosas',
+    foto: fotoDSC01157,
+    partidos: [
+      { cancha: 'Cancha 1', local: 'Las Fénix', golesLocal: 4, visita: 'Zorzales', golesVisita: 2 },
+      { cancha: 'Cancha 2', local: 'VK', golesLocal: 1, visita: 'Ponchicrack', golesVisita: 0, destacado: true },
+    ],
+    relato: '<strong>El partido bisagra.</strong> Vikingas venció 1-0 a su perseguidor directo con un gol agónico de Belén, una diferencia mínima que terminó pesando todo el campeonato.',
+  },
+  {
+    kicker: 'Fecha 4',
+    titulo: 'Lucha por la cima',
+    subtitulo: 'Fénix sigue persiguiendo a las líderes',
+    libre: 'Libre: VK Formativo',
+    foto: fotoDSC01199,
+    partidos: [
+      { cancha: 'Cancha 1', local: 'Odiosas', golesLocal: 1, visita: 'Las Fénix', golesVisita: 2 },
+      { cancha: 'Cancha 2', local: 'Ponchicrack', golesLocal: 3, visita: 'Zorzales', golesVisita: 1 },
+    ],
+    relato: 'Con VK descansando, Fénix y Ponchicrack sumaron. La tabla se apretó y dejó todo listo para una última fecha con margen mínimo.',
+  },
+  {
+    kicker: 'Fecha 5',
+    titulo: 'Coronación final',
+    subtitulo: 'Las campeonas cierran invictas',
+    libre: 'Libre: Ponchicrack',
+    foto: fotoDSC08128,
+    destacada: true,
+    partidos: [
+      { cancha: 'Cancha 1', local: 'VK', golesLocal: 2, visita: 'Fénix', golesVisita: 2, destacado: true },
+      { cancha: 'Cancha 2', local: 'Odiosas', golesLocal: 1, visita: 'Zorzales', golesVisita: 0 },
+    ],
+    relato: '<strong>El grito en el último suspiro.</strong> Fénix estuvo arriba dos veces, pero Vikingas respondió. El gol final de Belén selló el 2-2, sostuvo el invicto y dejó el título en casa.',
+  },
+]
+
+const podio = [
+  {
+    posicion: 1,
+    badge: 'Campeonas',
     nombre: 'Vikingas Formativo',
-    etiqueta: 'Equipo anfitrión',
-    esLocal: true,
-    logo: logoVikingas,
+    puntos: 10,
+    foto: fotoCampeonas,
+    detalle: '3 victorias, 1 empate, 6 goles a favor y apenas 2 en contra. La campaña más equilibrada del torneo.',
   },
   {
-    nombre: 'Zorzales FC',
-    etiqueta: 'Equipo invitado',
-    esLocal: false,
-    logo: logoZorzales,
+    posicion: 2,
+    badge: 'Segundo lugar',
+    nombre: 'Ponchicrack',
+    puntos: 9,
+    foto: foto2dolugar,
+    detalle: 'El mejor ataque del campeonato, con 9 goles y una presión constante hasta la última fecha.',
   },
   {
-    nombre: 'Fenix',
-    etiqueta: 'Equipo invitado',
-    esLocal: false,
-    logo: logoFenix,
-
-  },
-  {
-    nombre: "O'Diosas FC",
-    etiqueta: 'Equipo invitado',
-    esLocal: false,
-    logo: logoOdiosas,
-
-  },
-  {
-    nombre: 'PonchiCrack',
-    etiqueta: 'Equipo invitado',
-    esLocal: false,
-    logo: logoPonshi,
-
-
+    posicion: 3,
+    badge: 'Tercer lugar',
+    nombre: 'Las Fénix',
+    puntos: 7,
+    foto: foto3erlugar,
+    detalle: 'Ofensiva valiente, partidos abiertos y una final emocional que casi cambia la historia.',
   },
 ]
 
-const getLogoEquipo = (nombreEquipo) => {
-  const equipo = equiposParticipantes.find(e => e.nombre.toLowerCase().includes(nombreEquipo.toLowerCase()) || nombreEquipo.toLowerCase().includes(e.nombre.toLowerCase()))
-  return equipo?.logo
-}
+const tableHeads = ['J', 'G', 'E', 'P', 'GF', 'GC', 'Pts']
 
-// Estado para datos de Firestore
-const resultados = ref(new Map())
-const goleadoras = ref([])
-
-// Encontrar equipo por nombre fuzzy matching
-const encontrarEquipo = (nombreBuscado) => {
-  return equiposParticipantes.find(e =>
-    e.nombre.toLowerCase().includes(nombreBuscado.toLowerCase()) ||
-    nombreBuscado.toLowerCase().includes(e.nombre.toLowerCase())
-  )
-}
-
-// Tabla de posiciones calculada en tiempo real
-const tablaPosicionesCalculada = computed(() => {
-  const tabla = new Map()
-  
-  equiposParticipantes.forEach(eq => {
-    tabla.set(eq.nombre, {
-      equipo: eq.nombre,
-      pj: 0,
-      pg: 0,
-      pe: 0,
-      pp: 0,
-      gf: 0,
-      gc: 0,
-      pts: 0
-    })
-  })
-
-  // Procesar todos los resultados finalizados
-  resultados.value.forEach(resultado => {
-    if (!resultado.finalizado) return
-    
-    const matchup = resultado.matchup
-    const [localNombre, visitaNombre] = matchup.split(' vs ').map(t => t.trim())
-    const golesLocal = resultado.golesLocal || 0
-    const golesVisita = resultado.golesVisita || 0
-
-    // Encontrar equipos con fuzzy matching
-    const equipoLocal = encontrarEquipo(localNombre)
-    const equipoVisita = encontrarEquipo(visitaNombre)
-    
-    if (!equipoLocal || !equipoVisita) return
-
-    const localStats = tabla.get(equipoLocal.nombre)
-    const visitaStats = tabla.get(equipoVisita.nombre)
-
-    if (localStats && visitaStats) {
-      // Actualizar partidos jugados
-      localStats.pj += 1
-      visitaStats.pj += 1
-
-      // Actualizar goles
-      localStats.gf += golesLocal
-      localStats.gc += golesVisita
-      visitaStats.gf += golesVisita
-      visitaStats.gc += golesLocal
-
-      // Calcular resultado
-      if (golesLocal > golesVisita) {
-        localStats.pg += 1
-        localStats.pts += 3
-        visitaStats.pp += 1
-      } else if (golesLocal < golesVisita) {
-        visitaStats.pg += 1
-        visitaStats.pts += 3
-        localStats.pp += 1
-      } else {
-        localStats.pe += 1
-        localStats.pts += 1
-        visitaStats.pe += 1
-        visitaStats.pts += 1
-      }
-    }
-  })
-
-  return [...tabla.values()].sort((a, b) => {
-    if (b.pts !== a.pts) return b.pts - a.pts
-    return (b.gf - b.gc) - (a.gf - a.gc)
-  })
-})
-
-// Cargar datos de Firestore al montar
-onMounted(() => {
-  try {
-    const unsubscribe = observarCampeonatoFirestore((datos) => {
-      resultados.value = datos.resultados
-      goleadoras.value = datos.goleadoras
-      console.log('✅ Datos actualizados desde Firestore')
-    })
-    
-    // Retornar unsubscribe para limpiar cuando el componente se destruya
-    return () => unsubscribe()
-  } catch (error) {
-    console.error('Error observando campeonato:', error)
-  }
-})
-
-const programacionCompleta = [
-  {
-    id: 1,
-    horario: '16:00 - 16:30',
-    titulo: 'Fecha 1',
-    cancha1: 'Vikingas Formativo vs O\'diosas',
-    cancha2: 'Ponchicrack vs Fenix',
-    libre: 'Zorzales',
-    esDescanso: false,
-  },
-  {
-    id: 2,
-    horario: '16:30 - 16:45',
-    titulo: 'Receso',
-    cancha1: 'Receso 15 min',
-    cancha2: 'Receso 15 min',
-    esDescanso: true,
-  },
-  {
-    id: 3,
-    horario: '16:45 - 17:15',
-    titulo: 'Fecha 2',
-    cancha1: 'Zorzales vs Vikingas Formativo',
-    cancha2: 'O\'diosas vs Ponchicrack',
-    libre: 'Fenix',
-    esDescanso: false,
-  },
-  {
-    id: 4,
-    horario: '17:15 - 17:30',
-    titulo: 'Receso',
-    cancha1: 'Receso 15 min',
-    cancha2: 'Receso 15 min',
-    esDescanso: true,
-  },
-  {
-    id: 5,
-    horario: '17:30 - 18:00',
-    titulo: 'Fecha 3',
-    cancha1: 'Fenix vs Zorzales',
-    cancha2: 'Vikingas Formativo vs Ponchicrack',
-    libre: 'O\'diosas',
-    esDescanso: false,
-  },
-  {
-    id: 6,
-    horario: '18:00 - 18:40',
-    titulo: 'Descanso largo',
-    cancha1: '',
-    cancha2: '',
-    esDescanso: true,
-  },
-  {
-    id: 7,
-    horario: '18:40 - 19:10',
-    titulo: 'Fecha 4',
-    cancha1: 'O\'diosas vs Fenix',
-    cancha2: 'Ponchicrack vs Zorzales',
-    libre: 'Vikingas Formativo',
-    esDescanso: false,
-  },
-  {
-    id: 8,
-    horario: '19:10 - 19:25',
-    titulo: 'Receso',
-    cancha1: 'Receso 15 min',
-    cancha2: 'Receso 15 min',
-    esDescanso: true,
-  },
-  {
-    id: 9,
-    horario: '19:25 - 19:55',
-    titulo: 'Fecha 5',
-    cancha1: 'Vikingas Formativo vs Fenix',
-    cancha2: 'O\'diosas vs Zorzales',
-    libre: 'Ponchicrack',
-    esDescanso: false,
-  },
+const tablaFinal = [
+  { equipo: 'VK Formativo', pj: 4, pg: 3, pe: 1, pp: 0, gf: 6, gc: 2, pts: 10, campeona: true },
+  { equipo: 'Ponchicrack', pj: 4, pg: 3, pe: 0, pp: 1, gf: 9, gc: 3, pts: 9 },
+  { equipo: 'Las Fénix', pj: 4, pg: 2, pe: 1, pp: 1, gf: 8, gc: 9, pts: 7 },
+  { equipo: 'Odiosas', pj: 4, pg: 1, pe: 0, pp: 3, gf: 3, gc: 5, pts: 3 },
+  { equipo: 'Zorzales', pj: 4, pg: 0, pe: 0, pp: 4, gf: 3, gc: 10, pts: 0 },
 ]
 
-const crucesDummy = [
+const galeriaPrincipal = [
+  { src: fotoDSC01076, alt: 'Acción de la primera fecha', class: 'col-span-2 row-span-2' },
+  { src: fotoDSC01125, alt: 'Jugada en cancha' },
+  { src: fotoDSC01157, alt: 'Disputa de balón' },
+  { src: fotoDSC01199, alt: 'Partido del torneo' },
+  { src: fotoDSC08128, alt: 'Momento de la fecha final' },
+  { src: fotoOrganizacion, alt: 'Organización del torneo', class: 'col-span-2' },
+  { src: fotoDSC08154, alt: 'Técnica durante el juego' },
+  { src: fotoDtTactico, alt: 'Indicaciones técnicas' },
+  { src: fotoDSC08167, alt: 'Celebración del equipo' },
+  { src: fotoDSC08191, alt: 'Momento del campeonato' },
+  { src: fotoDSC08264, alt: 'Acción adicional' },
+  { src: fotoDSC08283, alt: 'Jugada adicional' },
+  { src: fotoDSC08334, alt: 'Cierre de partido' },
+  { src: fotoClubvikingas, alt: 'Club Vikingas', class: 'col-span-2' },
+  { src: fotoPremios, alt: 'Premiación del torneo' },
+]
+
+const records = [
+  { kicker: 'Mejor defensa', titulo: 'VK Formativo', descripcion: 'Solo 2 goles recibidos en cuatro partidos.', valor: '2', logo: logoVikingas },
+  { kicker: 'Mayor ataque', titulo: 'Ponchicrack', descripcion: 'La producción ofensiva más alta del torneo.', valor: '9', logo: logoPonshi },
+  { kicker: 'Momento decisivo', titulo: 'Gol de Belén', descripcion: 'Último minuto para cerrar el empate campeón.', valor: '90+', logo: logoVikingas },
+  { kicker: 'Consistencia', titulo: 'VK invicta', descripcion: 'Tres triunfos, un empate y ninguna derrota.', valor: '100%', logo: logoVikingas },
+  { kicker: 'Mejor debut', titulo: 'Ponchicrack', descripcion: 'Goleada 4-0 en la primera fecha.', valor: '4-0', logo: logoPonshi },
+  { kicker: 'Partido abierto', titulo: 'Las Fénix', descripcion: 'Victoria 4-2 ante Zorzales en la fecha 3.', valor: '4-2', logo: logoFenix },
+]
+
+const comparativa = [
   {
-    id: 1,
-    etapa: 'Fecha 1',
-    horario: '16:00 - Cancha 1',
-    local: 'Equipo',
-    visita: 'Equipo Invitado 1',
+    posicion: 'Campeonas',
+    nombre: 'VK Formativo',
+    clave: 'Equilibrio defensivo y carácter para resolver los momentos estrechos.',
+    datos: [
+      { label: 'Ataque', valor: '6 GF' },
+      { label: 'Defensa', valor: '2 GC' },
+      { label: 'Diferencia', valor: '+4' },
+    ],
   },
   {
-    id: 2,
-    etapa: 'Fecha 1',
-    horario: '16:00 - Cancha 2',
-    local: 'Equipo Invitado 2',
-    visita: 'Equipo Invitado 3',
+    posicion: 'Segunda',
+    nombre: 'Ponchicrack',
+    clave: 'Potencia ofensiva alta, frenada por el duelo directo ante VK.',
+    datos: [
+      { label: 'Ataque', valor: '9 GF' },
+      { label: 'Defensa', valor: '3 GC' },
+      { label: 'Diferencia', valor: '+6' },
+    ],
   },
   {
-    id: 3,
-    etapa: 'Fecha 2',
-    horario: '16:40 - Cancha 1',
-    local: 'Equipo',
-    visita: 'Equipo Invitado 4',
-  },
-  {
-    id: 4,
-    etapa: 'Fecha 2',
-    horario: '16:40 - Cancha 2',
-    local: 'Equipo Invitado 1',
-    visita: 'Equipo Invitado 2',
-  },
-  {
-    id: 5,
-    etapa: 'Fecha 3',
-    horario: '17:20 - Cancha 1',
-    local: 'Equipo Invitado 3',
-    visita: 'Equipo',
-  },
-  {
-    id: 6,
-    etapa: 'Fecha 3',
-    horario: '17:20 - Cancha 2',
-    local: 'Equipo Invitado 4',
-    visita: 'Equipo Invitado 1',
+    posicion: 'Tercera',
+    nombre: 'Las Fénix',
+    clave: 'Equipo emocionante, agresivo en ataque y expuesto en transición.',
+    datos: [
+      { label: 'Ataque', valor: '8 GF' },
+      { label: 'Defensa', valor: '9 GC' },
+      { label: 'Diferencia', valor: '-1' },
+    ],
   },
 ]
 </script>
 
 <style>
-
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 </style>
