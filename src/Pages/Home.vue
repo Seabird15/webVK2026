@@ -138,9 +138,9 @@ NUEVA TEMPORADA
     <section class="relative overflow-hidden bg-[#071112] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       <div class="mx-auto max-w-6xl overflow-hidden rounded-4xl border border-primary/18 bg-[linear-gradient(135deg,rgba(201,168,76,0.12),rgba(7,17,18,0.96)_36%,rgba(7,17,18,0.92)_100%)] shadow-[0_24px_48px_rgba(0,0,0,0.26)]">
         <div class="grid gap-8 px-5 py-7 sm:px-7 sm:py-8 lg:px-10 lg:py-10">
-          <div class="flex items-center gap-10 justify-center">
+          <div class="flex flex-col md:flex-row items-center md:gap-10 justify-center">
          
-            <h2 class="mt-4 text-[clamp(2rem,5vw,3.7rem)] font-black uppercase leading-[0.92] text-white" style="font-family: 'Gobold High', sans-serif;">
+            <h2 class="mt-4 text-[clamp(2rem,5vw,3.7rem)] text-center font-black uppercase leading-[0.92] text-white" style="font-family: 'Gobold High', sans-serif;">
               ¿Quieres sumarte a<br>
               <span class="text-primary">Vikingas?</span>
             </h2>
