@@ -43,6 +43,11 @@
         </router-link>
       </div>
     </section>
+
+      <div id="eventos-home">
+      <Eventos />
+    </div>
+    <UltimosResultados />
     
     <section class="relative bg-[#0b1718] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
       <div class="mx-auto grid max-w-6xl gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
@@ -129,11 +134,49 @@ NUEVA TEMPORADA
         </svg>
       </router-link>
     </section>
+
+    <section class="relative overflow-hidden bg-[#071112] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <div class="mx-auto max-w-6xl overflow-hidden rounded-4xl border border-primary/18 bg-[linear-gradient(135deg,rgba(201,168,76,0.12),rgba(7,17,18,0.96)_36%,rgba(7,17,18,0.92)_100%)] shadow-[0_24px_48px_rgba(0,0,0,0.26)]">
+        <div class="grid gap-8 px-5 py-7 sm:px-7 sm:py-8 lg:px-10 lg:py-10">
+          <div class="flex items-center gap-10 justify-center">
+         
+            <h2 class="mt-4 text-[clamp(2rem,5vw,3.7rem)] font-black uppercase leading-[0.92] text-white" style="font-family: 'Gobold High', sans-serif;">
+              ¿Quieres sumarte a<br>
+              <span class="text-primary">Vikingas?</span>
+            </h2>
+          
+
+            <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+              <router-link
+                to="/sumate"
+                @click="trackCTAClick('Postular a Vikingas', 'home_sumate')"
+                class="inline-flex min-h-14 items-center justify-between gap-3 rounded-[1.35rem] bg-[linear-gradient(135deg,#f0d481,#c9a84c)] px-5 py-4 text-[#081516] shadow-[0_18px_30px_rgba(201,168,76,0.24)] transition-transform duration-200 hover:-translate-y-1 active:scale-[0.96]"
+              >
+                <span>
+                  <span class="block text-[0.68rem] font-black uppercase tracking-[0.18em] text-black/70">Primer paso</span>
+                  <span class="mt-1 block text-[0.92rem] font-black uppercase tracking-[0.08em]">Enviar postulación</span>
+                </span>
+              </router-link>
+
+              <router-link
+                to="/equipo"
+                @click="trackCTAClick('Ver perfiles del plantel', 'home_perfiles')"
+                class="inline-flex min-h-14 items-center justify-between gap-3 rounded-[1.35rem] border border-white/16 bg-white/8 px-5 py-4 text-white backdrop-blur-sm transition-transform duration-200 hover:-translate-y-1 active:scale-[0.96]"
+              >
+                <span>
+                  <span class="block text-[0.68rem] font-black uppercase tracking-[0.18em] text-white/54">Conoce el club</span>
+                  <span class="mt-1 block text-[0.92rem] font-black uppercase tracking-[0.08em]">Ver perfiles públicos</span>
+                </span>
+              </router-link>
+            </div>
+          </div>
+
+        
+        </div>
+      </div>
+    </section>
     
-    <div id="eventos-home">
-      <Eventos />
-    </div>
-    <UltimosResultados />
+  
 </template>
 
 <script setup>

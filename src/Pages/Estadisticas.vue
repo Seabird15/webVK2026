@@ -133,7 +133,11 @@
                     class="border-b border-white/8 transition-colors hover:bg-white/4"
                   >
                     <td class="px-5 py-4 text-sm font-black text-(--st-primary)">{{ index + 1 }}</td>
-                    <td class="px-5 py-4 text-sm font-semibold text-white sm:text-base">{{ jugadora.nombre }} {{ jugadora.apellido }}</td>
+                    <td class="px-5 py-4 text-sm font-semibold text-white sm:text-base">
+                      <router-link :to="`/jugadoras/${jugadora.id}`" class="transition-colors hover:text-(--st-primary)">
+                        {{ jugadora.nombre }} {{ jugadora.apellido }}
+                      </router-link>
+                    </td>
                     <td class="px-5 py-4 text-center">
                       <span class="inline-flex min-w-12 justify-center rounded-full bg-(--st-primary) px-3 py-1 text-sm font-black text-[#082022] sm:text-base">
                         {{ jugadora.goles || 0 }}
@@ -171,7 +175,11 @@
                     class="border-b border-white/8 transition-colors hover:bg-white/4"
                   >
                     <td class="px-5 py-4 text-sm font-black text-(--st-primary)">{{ index + 1 }}</td>
-                    <td class="px-5 py-4 text-sm font-semibold text-white sm:text-base">{{ jugadora.nombre }} {{ jugadora.apellido }}</td>
+                    <td class="px-5 py-4 text-sm font-semibold text-white sm:text-base">
+                      <router-link :to="`/jugadoras/${jugadora.id}`" class="transition-colors hover:text-(--st-primary)">
+                        {{ jugadora.nombre }} {{ jugadora.apellido }}
+                      </router-link>
+                    </td>
                     <td class="px-5 py-4 text-center">
                       <span class="inline-flex min-w-12 justify-center rounded-full bg-(--st-primary) px-3 py-1 text-sm font-black text-[#082022] sm:text-base">
                         {{ jugadora.asistencias || 0 }}
@@ -212,7 +220,11 @@
                     class="border-b border-white/8 transition-colors hover:bg-white/4"
                   >
                     <td class="px-5 py-4 text-sm font-black text-(--st-primary)">{{ index + 1 }}</td>
-                    <td class="px-5 py-4 text-sm font-semibold text-white sm:text-base">{{ jugadora.nombre }} {{ jugadora.apellido }}</td>
+                    <td class="px-5 py-4 text-sm font-semibold text-white sm:text-base">
+                      <router-link :to="`/jugadoras/${jugadora.id}`" class="transition-colors hover:text-(--st-primary)">
+                        {{ jugadora.nombre }} {{ jugadora.apellido }}
+                      </router-link>
+                    </td>
                     <td class="px-5 py-4 text-center text-sm font-semibold text-white sm:text-base">{{ jugadora.goles || 0 }}</td>
                     <td class="px-5 py-4 text-center text-sm font-semibold text-white sm:text-base">{{ jugadora.asistencias || 0 }}</td>
                     <td class="px-5 py-4 text-center">

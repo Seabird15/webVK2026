@@ -97,6 +97,29 @@ const convertirEquiposAString = (equipos) => {
   return equiposNormalizados[0];
 };
 
+const sanitizarTextoSolicitud = (valor = '') => {
+  return valor.toString().trim();
+};
+
+const construirMetadataSolicitud = (metadata = {}) => {
+  const equipoInteres = normalizarCategoriaEquipo(metadata?.equipoInteres);
+
+  return {
+    nombre: sanitizarTextoSolicitud(metadata?.nombre),
+    apellido: sanitizarTextoSolicitud(metadata?.apellido),
+    telefono: sanitizarTextoSolicitud(metadata?.telefono),
+    comuna: sanitizarTextoSolicitud(metadata?.comuna),
+    posicion: sanitizarTextoSolicitud(metadata?.posicion),
+    experiencia: sanitizarTextoSolicitud(metadata?.experiencia),
+    disponibilidad: sanitizarTextoSolicitud(metadata?.disponibilidad),
+    instagram: sanitizarTextoSolicitud(metadata?.instagram),
+    mensaje: sanitizarTextoSolicitud(metadata?.mensaje),
+    equipoInteres,
+    edad: Number.isFinite(Number(metadata?.edad)) ? Number(metadata.edad) : null,
+    origen: 'web_publica'
+  };
+};
+
 const normalizarDatosJugadora = (uid, data = {}) => {
   const equipos = obtenerEquiposJugadoraDesdeDatos(data);
   const equipo = convertirEquiposAString(equipos);
@@ -486,10 +509,11 @@ export const obtenerEquipoCompletoRegistro = async (equipo) => {
 };
 
 // Registrar solicitud de acceso
-export const solicitarAcceso = async (email, password) => {
+export const solicitarAcceso = async (email, password, metadata = {}) => {
   isLoadingJugadora.value = true;
   errorJugadora.value = null;
   try {
+    const metadataSolicitud = construirMetadataSolicitud(metadata);
     
     // Marcar que ignoremos el próximo onAuthStateChanged
     ignorarProximoAuthChange = true;
@@ -503,6 +527,7 @@ export const solicitarAcceso = async (email, password) => {
       email: email,
       estado: 'pendiente',
       uid: uid,
+      ...metadataSolicitud,
       createdAt: new Date(),
       updatedAt: new Date()
     });
@@ -512,6 +537,7 @@ export const solicitarAcceso = async (email, password) => {
       email: email,
       estado: 'pendiente',
       uid: uid,
+      ...metadataSolicitud,
       createdAt: new Date(),
       updatedAt: new Date()
     });

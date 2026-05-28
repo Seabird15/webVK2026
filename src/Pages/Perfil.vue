@@ -48,7 +48,31 @@
                 <p><strong>Equipos:</strong> {{ equiposSeleccionadosTexto }}</p>
                 <p><strong>Estado:</strong> {{ formatearEstadoSalud(formData.estadoSalud) }}</p>
                 <p><strong>Fecha de nacimiento:</strong> {{ formatearFecha(formData.fechaNacimiento) }}</p>
+                <p v-if="formData.pieHabil"><strong>Pie hábil:</strong> {{ formData.pieHabil }}</p>
+                <p v-if="formData.aniosTrayectoria"><strong>Trayectoria:</strong> {{ formData.aniosTrayectoria }} años</p>
+                <p v-if="formData.instagram"><strong>Instagram:</strong> {{ formData.instagram }}</p>
               </div>
+            </div>
+          </div>
+
+          <div v-if="formData.bioPublica" class="rounded-lg border border-gray-200 bg-gray-50 px-5 py-4">
+            <p class="text-xs font-bold uppercase tracking-wide text-gray-500">Bio pública</p>
+            <p class="mt-2 text-sm leading-7 text-gray-700">{{ formData.bioPublica }}</p>
+          </div>
+
+          <div v-if="formData.galeriaPublica.length" class="space-y-3">
+            <p class="text-xs font-bold uppercase tracking-wide text-gray-500">Galería pública</p>
+            <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <a
+                v-for="(foto, idx) in formData.galeriaPublica"
+                :key="`${foto}-${idx}`"
+                :href="foto"
+                target="_blank"
+                rel="noreferrer"
+                class="overflow-hidden rounded-lg border border-gray-200 bg-gray-100"
+              >
+                <img :src="foto" :alt="`Foto pública ${idx + 1}`" class="h-28 w-full object-cover" />
+              </a>
             </div>
           </div>
 
@@ -161,6 +185,69 @@
               <p class="font-semibold">{{ formatearEstadoSalud(formData.estadoSalud) }}</p>
               <p class="mt-1 text-xs text-gray-500">Este estado solo puede ser modificado desde administración.</p>
             </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Pie hábil</label>
+              <select
+                v-model="formData.pieHabil"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                :disabled="isLoading"
+              >
+                <option value="">Prefiero no mostrarlo</option>
+                <option value="Derecha">Derecha</option>
+                <option value="Izquierda">Izquierda</option>
+                <option value="Ambos">Ambos</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Años de trayectoria</label>
+              <input
+                v-model.number="formData.aniosTrayectoria"
+                type="number"
+                min="0"
+                max="60"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                :disabled="isLoading"
+                placeholder="Ej. 6"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Instagram público</label>
+              <input
+                v-model="formData.instagram"
+                type="text"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                :disabled="isLoading"
+                placeholder="Ej. @tuusuario"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Fotos para ficha pública</label>
+              <textarea
+                v-model="galeriaPublicaTexto"
+                rows="4"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                :disabled="isLoading"
+                placeholder="Pega una URL por línea"
+              ></textarea>
+              <p class="mt-1 text-xs text-gray-500">Puedes pegar hasta 6 enlaces de fotos alojadas en Firebase o donde ya estén publicadas.</p>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Bio pública</label>
+            <textarea
+              v-model="formData.bioPublica"
+              rows="4"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              :disabled="isLoading"
+              placeholder="Cuéntale a la gente qué te mueve, cómo juegas o qué significa Vikingas para ti."
+            ></textarea>
           </div>
 
           <!-- Foto de perfil -->
@@ -311,6 +398,7 @@ const editando = ref(false);
 const tabActivo = ref('datos');
 const previewFoto = ref(null);
 const fotoFile = ref(null);
+const galeriaPublicaTexto = ref('');
 const isLoading = ref(false);
 const error = ref(null);
 const equiposIniciales = obtenerEquiposDesdeDatos(jugadoraData.value);
@@ -325,7 +413,12 @@ const formData = reactive({
   posicion: jugadoraData.value?.posicion || '',
   equipos: equiposIniciales,
   fechaNacimiento: jugadoraData.value?.fechaNacimiento || '',
-  estadoSalud: jugadoraData.value?.estadoSalud || 'disponible'
+  estadoSalud: jugadoraData.value?.estadoSalud || 'disponible',
+  pieHabil: jugadoraData.value?.pieHabil || '',
+  aniosTrayectoria: jugadoraData.value?.aniosTrayectoria || null,
+  instagram: jugadoraData.value?.instagram || '',
+  bioPublica: jugadoraData.value?.bioPublica || '',
+  galeriaPublica: Array.isArray(jugadoraData.value?.galeriaPublica) ? jugadoraData.value.galeriaPublica : []
 });
 
 const equiposSeleccionadosTexto = computed(() => formatearEquipos(formData.equipos));
@@ -370,10 +463,24 @@ const formatearFecha = (date) => {
   });
 };
 
+const parsearGaleriaPublica = (texto = '') => {
+  return [...new Set(
+    texto
+      .split(/\r?\n|,/) 
+      .map(item => item.trim())
+      .filter(item => /^https?:\/\//i.test(item))
+  )].slice(0, 6);
+};
+
+const formatearGaleriaPublica = (galeria = []) => {
+  return (Array.isArray(galeria) ? galeria : []).join('\n');
+};
+
 const activarEdicion = () => {
   editando.value = true;
   previewFoto.value = fotoPerfil.value;
   fotoFile.value = null;
+  galeriaPublicaTexto.value = formatearGaleriaPublica(formData.galeriaPublica);
 };
 
 const cancelarEdicion = () => {
@@ -386,8 +493,14 @@ const cancelarEdicion = () => {
   formData.equipos = obtenerEquiposDesdeDatos(jugadoraData.value);
   formData.fechaNacimiento = jugadoraData.value?.fechaNacimiento || '';
   formData.estadoSalud = jugadoraData.value?.estadoSalud || 'disponible';
+  formData.pieHabil = jugadoraData.value?.pieHabil || '';
+  formData.aniosTrayectoria = jugadoraData.value?.aniosTrayectoria || null;
+  formData.instagram = jugadoraData.value?.instagram || '';
+  formData.bioPublica = jugadoraData.value?.bioPublica || '';
+  formData.galeriaPublica = Array.isArray(jugadoraData.value?.galeriaPublica) ? jugadoraData.value.galeriaPublica : [];
   previewFoto.value = null;
   fotoFile.value = null;
+  galeriaPublicaTexto.value = '';
   error.value = null;
 };
 
@@ -419,6 +532,7 @@ const handleGuardar = async () => {
   const categoriaActualizada = formData.equipos.includes(categoriaSeleccionada.value)
     ? categoriaSeleccionada.value
     : formData.equipos[0];
+  const galeriaPublica = parsearGaleriaPublica(galeriaPublicaTexto.value);
 
   isLoading.value = true;
 
@@ -431,7 +545,12 @@ const handleGuardar = async () => {
       posicion: formData.posicion,
       equipos: [...formData.equipos],
       fechaNacimiento: formData.fechaNacimiento,
-      categoriaSeleccionada: categoriaActualizada
+      categoriaSeleccionada: categoriaActualizada,
+      pieHabil: formData.pieHabil,
+      aniosTrayectoria: formData.aniosTrayectoria || null,
+      instagram: formData.instagram.trim(),
+      bioPublica: formData.bioPublica.trim(),
+      galeriaPublica
     },
     fotoFile.value
   );
@@ -472,6 +591,11 @@ onMounted(() => {
     formData.equipos = obtenerEquiposDesdeDatos(jugadoraData.value);
     formData.fechaNacimiento = jugadoraData.value.fechaNacimiento || '';
     formData.estadoSalud = jugadoraData.value?.estadoSalud || 'disponible';
+    formData.pieHabil = jugadoraData.value?.pieHabil || '';
+    formData.aniosTrayectoria = jugadoraData.value?.aniosTrayectoria || null;
+    formData.instagram = jugadoraData.value?.instagram || '';
+    formData.bioPublica = jugadoraData.value?.bioPublica || '';
+    formData.galeriaPublica = Array.isArray(jugadoraData.value?.galeriaPublica) ? jugadoraData.value.galeriaPublica : [];
     categoriaSeleccionada.value = jugadoraData.value?.categoriaSeleccionada || formData.equipos[0] || 'ascenso';
     fotoPerfil.value = jugadoraData.value.fotoPerfil || null;
   }

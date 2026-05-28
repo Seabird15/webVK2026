@@ -121,7 +121,11 @@ const routes = [
     path: '/solicitud-acceso',
     name: 'SolicitudAcceso',
     component: () => import('../Pages/SolicitudAcceso.vue'),
-    meta: { title: 'Solicitud de Acceso — CD Vikingas', robots: 'noindex' }
+    alias: ['/sumate', '/postula'],
+    meta: {
+      title: 'Súmate a Vikingas — Postula al Club',
+      description: 'Postula para sumarte a CD Vikingas. Cuéntanos tu posición, categoría de interés y disponibilidad para integrarte al club.',
+    }
   },
   {
     path: '/login-jugadora',
@@ -158,6 +162,15 @@ const routes = [
     name: 'Perfil',
     component: () => import('../Pages/Perfil.vue'),
     meta: { requiresJugadora: true, title: 'Mi Perfil — CD Vikingas', robots: 'noindex' }
+  },
+  {
+    path: '/jugadoras/:id',
+    name: 'PerfilJugadoraPublico',
+    component: () => import('../Pages/JugadoraPublica.vue'),
+    meta: {
+      title: 'Perfil de Jugadora — CD Vikingas',
+      description: 'Conoce a las jugadoras y al cuerpo técnico de CD Vikingas: perfil, equipo, posición y recorrido dentro del club.'
+    }
   },
   // Ruta por defecto
   {

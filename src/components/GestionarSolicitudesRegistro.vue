@@ -64,6 +64,35 @@
               {{ solicitud.estado }}
             </span>
           </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs text-gray-600">
+            <div v-if="solicitud.nombre || solicitud.apellido" class="rounded-lg bg-gray-50 px-3 py-2">
+              <span class="block font-bold uppercase text-gray-500">Nombre</span>
+              <span class="mt-1 block font-semibold text-gray-900">{{ [solicitud.nombre, solicitud.apellido].filter(Boolean).join(' ') }}</span>
+            </div>
+            <div v-if="solicitud.equipoInteres" class="rounded-lg bg-gray-50 px-3 py-2">
+              <span class="block font-bold uppercase text-gray-500">Interés</span>
+              <span class="mt-1 block font-semibold text-gray-900">{{ formatearEquipoInteres(solicitud.equipoInteres) }}</span>
+            </div>
+            <div v-if="solicitud.posicion" class="rounded-lg bg-gray-50 px-3 py-2">
+              <span class="block font-bold uppercase text-gray-500">Posición</span>
+              <span class="mt-1 block font-semibold text-gray-900">{{ solicitud.posicion }}</span>
+            </div>
+            <div v-if="solicitud.comuna" class="rounded-lg bg-gray-50 px-3 py-2">
+              <span class="block font-bold uppercase text-gray-500">Comuna</span>
+              <span class="mt-1 block font-semibold text-gray-900">{{ solicitud.comuna }}</span>
+            </div>
+          </div>
+
+          <p v-if="solicitud.experiencia" class="mt-3 text-xs leading-5 text-gray-600">
+            <span class="font-bold uppercase text-gray-700">Experiencia:</span>
+            {{ solicitud.experiencia }}
+          </p>
+
+          <p v-if="solicitud.disponibilidad" class="mt-2 text-xs leading-5 text-gray-600">
+            <span class="font-bold uppercase text-gray-700">Disponibilidad:</span>
+            {{ solicitud.disponibilidad }}
+          </p>
           
           <div v-if="solicitud.estado === 'pendiente'" class="flex gap-2 mt-3">
             <button
@@ -88,6 +117,7 @@
           <thead>
             <tr class="border-b border-gray-200 bg-gray-50">
               <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Email</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Perfil</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Estado</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Fecha</th>
               <th class="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase">Acciones</th>
@@ -100,6 +130,11 @@
               class="border-b border-gray-200 hover:bg-gray-50 transition-colors"
             >
               <td class="px-6 py-4">{{ solicitud.email }}</td>
+              <td class="px-6 py-4 text-sm text-gray-600">
+                <div class="font-bold text-gray-900">{{ [solicitud.nombre, solicitud.apellido].filter(Boolean).join(' ') || 'Sin nombre' }}</div>
+                <div>{{ formatearEquipoInteres(solicitud.equipoInteres) || 'Sin categoría' }}</div>
+                <div v-if="solicitud.posicion">{{ solicitud.posicion }}</div>
+              </td>
               <td class="px-6 py-4">
                 <span
                   :class="[
@@ -238,6 +273,16 @@ const contarSolicitudes = (estado) => {
   return solicitudes.value.filter(s => s.estado === estado).length;
 };
 
+const formatearEquipoInteres = (equipo) => {
+  const mapa = {
+    ascenso: 'Ascenso',
+    escuela: 'Escuela',
+    serieC: 'Serie C'
+  };
+
+  return mapa[equipo] || equipo || '';
+};
+
 const formatearFecha = (date) => {
   if (!date) return '-';
   const d = new Date(date.seconds ? date.seconds * 1000 : date);
@@ -256,7 +301,12 @@ const abrirModal = (tipo, solicitud) => {
     modalConfig.value = {
       titulo: 'Aprobar Solicitud',
       mensaje: '¿Estás seguro de que deseas aprobar esta solicitud?',
-      detalles: `Email: ${solicitud.email}`,
+      detalles: [
+        `Email: ${solicitud.email}`,
+        solicitud.nombre || solicitud.apellido ? `Nombre: ${[solicitud.nombre, solicitud.apellido].filter(Boolean).join(' ')}` : '',
+        solicitud.equipoInteres ? `Categoría de interés: ${formatearEquipoInteres(solicitud.equipoInteres)}` : '',
+        solicitud.posicion ? `Posición: ${solicitud.posicion}` : ''
+      ].filter(Boolean).join(' · '),
       tipo: 'info',
       textoConfirmar: 'Aprobar',
       accion: async () => {

@@ -20,7 +20,7 @@
             </h1>
             <p v-if="equipoSeleccionado" class="mt-2 text-sm font-semibold text-white/70 sm:text-base">
               <span class="inline-block px-3 py-1.5 rounded-full bg-primary/20 border border-primary/40">
-                {{ equipoSeleccionado === 'ascenso' ? '🏆 Equipo Ascenso' : equipoSeleccionado === 'escuela' ? '📚 Equipo Escuela' : equipoSeleccionado === 'serieC' ? '⚽ Serie C' : '📅 Eventos' }}
+                {{ equipoSeleccionado === 'ascenso' ? ' Equipo Ascenso' : equipoSeleccionado === 'escuela' ? ' Equipo Escuela' : equipoSeleccionado === 'serieC' ? ' Serie C' : ' Eventos' }}
               </span>
             </p>
           </div>
@@ -39,16 +39,15 @@
       </div>
     </header>
 
-    <div v-if="bannerMensualidad.activo" class="mx-auto max-w-6xl px-4 mt-4 sm:px-6 lg:px-8">
-      <div class="relative overflow-hidden rounded-2xl bg-linear-to-r from-red-600/80 via-rose-500/80 to-red-600/80 p-4 sm:p-5 shadow-2xl border border-red-400/40 backdrop-blur-sm">
-        <div class="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-red-400/20 blur-3xl"></div>
-        <div class="relative flex items-start gap-3">
-          <div class="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-white/20">
-            <span class="text-lg">⚠️</span>
+    <div v-if="bannerMensualidad.activo" class="max-w-6xl mx-auto px-6 mt-3">
+      <div class="bg-linear-to-r from-red-600 via-rose-500 to-red-600 text-white rounded-2xl p-4 sm:p-5 shadow-2xl border-2 border-red-300/40">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0 my-auto">
+            <ExclamationTriangleIcon class="w-6 h-6 animate-pulse" />
           </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-[0.75rem] sm:text-xs font-black uppercase tracking-widest text-white/95">Importante</p>
-            <p class="text-sm sm:text-base font-600 leading-snug mt-1 text-white/90">{{ bannerMensualidad.mensaje }}</p>
+          <div class="flex-1">
+            <p class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-white/90">Importante</p>
+            <p class="text-sm sm:text-lg font-500 leading-tight mt-1">{{ bannerMensualidad.mensaje }}</p>
           </div>
         </div>
       </div>
@@ -65,52 +64,45 @@
       />
     </div>
 
-    <div class="mx-auto max-w-6xl px-4 mt-4 sm:px-6 lg:px-8">
-      <div class="relative overflow-hidden rounded-2xl border border-primary/25 bg-linear-to-br from-[#0f2425] to-black p-4 sm:p-6 shadow-2xl">
-        <!-- Decorative elements -->
-        <div class="absolute -right-32 -top-32 h-80 w-80 rounded-full bg-primary/5 blur-3xl"></div>
-        <div class="absolute -left-20 -bottom-20 h-60 w-60 rounded-full bg-primary/10 blur-3xl"></div>
-
-        <div class="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
-          <div class="flex-1">
-            <p class="inline-flex items-center justify-center lg:justify-start rounded-full border border-primary/40 bg-primary/15 px-3 py-1.5 text-[0.7rem] font-black uppercase tracking-[0.15em] text-primary/90">
-              📊 Temporada 2026
+    <div class="max-w-6xl mx-auto px-6 mt-4">
+      <div class="rounded-3xl border border-primary/20 bg-linear-to-r from-primary-dark via-[#12342f] to-black p-4 sm:p-5 shadow-[0_14px_36px_rgba(0,0,0,0.24)]">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div class="text-center lg:text-left">
+            <p class="inline-flex items-center justify-center lg:justify-start rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.2em] text-primary">
+              Temporada 2026
             </p>
-            <h3 class="mt-3 text-2xl sm:text-3xl font-black uppercase text-white leading-tight" style="font-family: 'Gobold High', system-ui, sans-serif;">
-              Revisa las estadísticas del semestre
-            </h3>
-            <p class="mt-2 max-w-2xl text-sm sm:text-base text-white/70 font-semibold">
-              Consulta el rendimiento de tu equipo en la competencia, estadísticas individuales y resultados.
+            <h3 class="text-white text-lg sm:text-xl font-black mt-3">Revisa las estadisticas del semestre</h3>
+            <p class="text-white/80 text-sm sm:text-base mt-1.5">
+              Consulta el rendimiento de tu equipo en la competencia actual, estadísticas individuales y resultados..
             </p>
           </div>
 
-          <router-link
-            to="/competencias"
-            @click="trackCTAClick('Ver temporada', 'entrenamientos_liga')"
-            class="group relative inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary/90 px-5 py-3.5 text-sm font-black uppercase tracking-widest text-black shadow-lg shadow-primary/30 transition-all duration-200 hover:shadow-2xl hover:shadow-primary/40 active:scale-95"
-          >
-            <span>Ver competencia</span>
-            <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </router-link>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:min-w-90">
+            <router-link
+              to="/competencias"
+              class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs uppercase font-black text-white tracking-widest transition hover:bg-primary/90"
+            >
+              Ver competencia
+              <ChevronRightIcon class="w-4 h-4" />
+            </router-link>
+       
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Contenido -->
-    <div class="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+    <div class="max-w-6xl mx-auto p-6">
       <!-- Notificaciones de Feedback -->
       <div v-if="feedbacksPendientes && feedbacksPendientes.length > 0" class="mb-6">
-        <div class="relative overflow-hidden rounded-2xl bg-linear-to-r from-emerald-600/80 to-green-600/80 shadow-2xl p-4 sm:p-5 border border-emerald-400/40 backdrop-blur-sm">
-          <div class="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-emerald-400/20 blur-3xl"></div>
-          <div class="relative flex items-start gap-3">
-            <div class="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-white/20">
-              <span class="text-lg">🔔</span>
+        <div class="bg-linear-to-r from-green-50 to-emerald-50 rounded-2xl shadow-lg p-4 border-2 border-green-300">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-green-600 flex items-center justify-center shrink-0 text-white font-bold">
+              <BellIcon class="w-5 h-5" />
             </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-[0.75rem] sm:text-xs font-black uppercase tracking-widest text-white/95">Mensajes del DT</p>
-              <p class="text-sm sm:text-base font-600 mt-1 text-white/90">Tienes {{ feedbacksPendientes.length }} mensaje{{ feedbacksPendientes.length === 1 ? '' : 's' }} sin leer</p>
+            <div class="flex-1">
+              <p class="text-sm font-bold text-green-900">Tienes {{ feedbacksPendientes.length }} mensaje{{ feedbacksPendientes.length === 1 ? '' : 's' }} del DT</p>
+              <p class="text-xs text-green-700 mt-1">Haz clic para leer y responder</p>
             </div>
           </div>
           
@@ -120,16 +112,16 @@
               v-for="feedback in feedbacksPendientes"
               :key="feedback.id"
               @click="abrirModalFeedback(feedback)"
-              class="w-full text-left p-3 rounded-xl border border-emerald-300/40 hover:border-emerald-300/80 bg-white/10 hover:bg-white/20 transition-all cursor-pointer group backdrop-blur-sm"
+              class="w-full text-left p-3 bg-white rounded-xl border border-green-200 hover:border-green-500 hover:shadow-md transition-all cursor-pointer group"
             >
               <div class="flex items-center justify-between">
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-bold text-white capitalize">{{ feedback.tipo }}</p>
-                  <p class="text-xs text-white/80 mt-1 line-clamp-1">{{ feedback.mensaje }}</p>
-                  <p class="text-xs text-white/60 mt-2">{{ new Date(feedback.createdAt?.seconds ? feedback.createdAt.seconds * 1000 : feedback.createdAt).toLocaleString('es-ES') }}</p>
+                <div class="flex-1">
+                  <p class="text-sm font-bold text-gray-900 capitalize">{{ feedback.tipo }}</p>
+                  <p class="text-xs text-gray-600 mt-1 line-clamp-1">{{ feedback.mensaje }}</p>
+                  <p class="text-xs text-gray-500 mt-2">{{ new Date(feedback.createdAt?.seconds ? feedback.createdAt.seconds * 1000 : feedback.createdAt).toLocaleString('es-ES') }}</p>
                 </div>
-                <div class="ml-2 flex-shrink-0 w-8 h-8 flex items-center justify-center bg-white/20 rounded-lg group-hover:bg-white/30 transition-colors">
-                  <span class="text-white">→</span>
+                <div class="shrink-0 w-8 h-8 flex items-center justify-center bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
+                  <ChevronDownIcon class="w-4 h-4 text-green-700 rotate-180" />
                 </div>
               </div>
             </button>
@@ -138,173 +130,188 @@
       </div>
 
       <!-- Información de jugadora compacta -->
-      <div v-if="jugadoraData" class="mb-8 rounded-2xl border border-primary/25 bg-linear-to-br from-[#0f2425] to-black p-4 sm:p-5 shadow-xl overflow-hidden">
-        <!-- Decorative background -->
-        <div class="absolute -right-32 -top-32 h-80 w-80 rounded-full bg-primary/5 blur-3xl"></div>
-        
-        <div class="relative grid grid-cols-1 gap-4 sm:gap-5">
-          <!-- Main Player Card -->
-          <div class="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between rounded-xl border border-primary/20 bg-linear-to-r from-primary/10 to-primary/5 p-4 sm:p-5">
-            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 flex-1 min-w-0">
-              <!-- Photo -->
-              <div v-if="jugadoraData.fotoPerfil" class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden rounded-xl border-2 border-primary/40 shadow-lg">
-                <img :src="jugadoraData.fotoPerfil" alt="Perfil" class="h-full w-full object-cover" />
-              </div>
-              <div v-else class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-xl border-2 border-primary/40 bg-linear-to-br from-primary/30 to-primary/10 flex items-center justify-center">
-                <span class="text-4xl">👤</span>
+      <div v-if="jugadoraData" class="mb-8 rounded-2xl border border-white/60 bg-linear-to-br from-white to-gray-50 p-4 shadow-xl md:p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="md:col-span-2">
+            <div class="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                <div v-if="jugadoraData.fotoPerfil" class="w-58 h-58 mx-auto shrink-0 overflow-hidden rounded-xl bg-gray-100 ring-2 ring-primary/10">
+                  <img :src="jugadoraData.fotoPerfil" alt="Perfil" class="h-full w-full object-cover" />
+                </div>
+              <div class="flex items-center gap-3 min-w-0">
+              
+                <div class="min-w-0">
+                  <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Ficha jugadora</p>
+                  <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm sm:text-[15px]">
+                    <span class="font-black text-gray-900 truncate max-w-full">{{ jugadoraData.nombre }} {{ jugadoraData.apellido }}</span>
+                    <span class="text-gray-300 font-bold">|</span>
+                    <span class="font-semibold text-gray-600">{{ jugadoraData.posicion || 'Sin posición' }}</span>
+                    <span class="text-gray-300 font-bold">|</span>
+                    <span class="font-black text-primary">#{{ jugadoraData.dorsal || '--' }}</span>
+                    <span class="text-gray-300 font-bold">|</span>
+                    <span :class="[
+                      'font-bold',
+                      jugadoraData.estadoSalud === 'lesionada' ? 'text-red-700' :
+                      jugadoraData.estadoSalud === 'recuperacion' ? 'text-yellow-700' :
+                      jugadoraData.estadoSalud === 'no_disponible' ? 'text-gray-700' :
+                      'text-green-700'
+                    ]">
+                      {{ formatearEstadoSalud(jugadoraData.estadoSalud) }}
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              <!-- Player Info -->
-              <div class="text-center sm:text-left flex-1 min-w-0">
-                <p class="text-[0.7rem] font-black uppercase tracking-[0.2em] text-primary/70">Ficha Jugadora</p>
-                <h3 class="mt-2 text-xl sm:text-2xl font-black uppercase text-white leading-tight">{{ jugadoraData.nombre }} {{ jugadoraData.apellido }}</h3>
-                <div class="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1 text-sm sm:text-base">
-                  <span class="font-semibold text-white/80">{{ jugadoraData.posicion || '—' }}</span>
-                  <span class="text-white/40">•</span>
-                  <span class="font-black text-primary text-lg">#{{ jugadoraData.dorsal || '—' }}</span>
-                  <span class="text-white/40">•</span>
-                  <span :class="[
-                    'font-bold px-2.5 py-1 rounded-full text-xs',
-                    jugadoraData.estadoSalud === 'lesionada' ? 'bg-red-500/20 text-red-300' :
-                    jugadoraData.estadoSalud === 'recuperacion' ? 'bg-yellow-500/20 text-yellow-300' :
-                    jugadoraData.estadoSalud === 'no_disponible' ? 'bg-gray-500/20 text-gray-300' :
-                    'bg-green-500/20 text-green-300'
+              <router-link
+                to="/perfil"
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-primary-dark to-primary px-4 py-2.5 text-sm font-bold text-white transition-all hover:shadow-md sm:shrink-0"
+              >
+                <PencilIcon class="w-4 h-4" />
+                Editar perfil
+              </router-link>
+            </div>
+          </div>
+
+          <!-- COLUMNA 3: Racha, cumpleaños, camiseta y botón -->
+          <div class="flex flex-col gap-4">
+            <!-- Racha Reciente -->
+            <div v-if="rachaReciente" class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wide font-black text-gray-500">Racha Reciente entrenamientos</p>
+                  <p :class="[
+                    'text-lg font-black mt-1.5',
+                    rachaReciente.estado === 'confirmada' ? 'text-green-700' : 'text-red-700'
                   ]">
-                    {{ formatearEstadoSalud(jugadoraData.estadoSalud) }}
-                  </span>
+                    {{ rachaReciente.cantidad }}
+                    <span class="text-xs font-bold">{{ rachaReciente.estado === 'confirmada' ? '✓' : '✗' }}</span>
+                  </p>
+                </div>
+                <div :class="[
+                  'w-12 h-12 rounded-full flex items-center justify-center',
+                  rachaReciente.estado === 'confirmada' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                ]">
+                  <CheckIcon v-if="rachaReciente.estado === 'confirmada'" class="w-6 h-6" />
+                  <XMarkIcon v-else class="w-6 h-6" />
                 </div>
               </div>
             </div>
 
-            <!-- Edit Profile Button -->
-            <router-link
-              to="/perfil"
-              class="group w-full sm:w-auto relative inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary/80 to-primary px-4 py-3 font-bold text-black uppercase tracking-widest text-sm transition-all duration-200 hover:shadow-lg hover:shadow-primary/30 active:scale-95"
-            >
-              <span>✎</span>
-              <span>Editar</span>
-            </router-link>
-          </div>
-
-          <!-- Stats Grid -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <!-- Racha -->
-            <div v-if="rachaReciente" class="rounded-lg border border-primary/20 bg-linear-to-br from-primary/10 to-primary/5 p-3 text-center">
-              <p class="text-[0.65rem] font-black uppercase tracking-wide text-primary/70">Racha</p>
-              <p :class="['text-2xl font-black mt-1', rachaReciente.estado === 'confirmada' ? 'text-green-300' : 'text-red-300']">
-                {{ rachaReciente.cantidad }}<span class="text-base ml-0.5">{{ rachaReciente.estado === 'confirmada' ? '✓' : '✗' }}</span>
-              </p>
-            </div>
-
-            <!-- Asistencia -->
-            <div v-if="estadisticasJugadora" class="rounded-lg border border-primary/20 bg-linear-to-br from-primary/10 to-primary/5 p-3 text-center">
-              <p class="text-[0.65rem] font-black uppercase tracking-wide text-primary/70">Asistencia</p>
-              <p class="text-2xl font-black text-primary mt-1">{{ porcentajeAsistencia }}%</p>
-            </div>
-
-            <!-- Goals -->
-            <div v-if="estadisticasJugadora?.goles !== undefined" class="rounded-lg border border-primary/20 bg-linear-to-br from-primary/10 to-primary/5 p-3 text-center">
-              <p class="text-[0.65rem] font-black uppercase tracking-wide text-primary/70">Goles</p>
-              <p class="text-2xl font-black text-primary mt-1">{{ estadisticasJugadora.goles }}</p>
-            </div>
-
-            <!-- Assists -->
-            <div v-if="estadisticasJugadora?.asistencias !== undefined" class="rounded-lg border border-primary/20 bg-linear-to-br from-primary/10 to-primary/5 p-3 text-center">
-              <p class="text-[0.65rem] font-black uppercase tracking-wide text-primary/70">Asistencias</p>
-              <p class="text-2xl font-black text-primary mt-1">{{ estadisticasJugadora.asistencias }}</p>
-            </div>
-          </div>
-
-          <!-- Upcoming birthdays -->
-          <div v-if="cumpleaniosHoy.length > 0 || proximoCumpleanios.length > 0" class="rounded-lg border border-primary/20 bg-linear-to-r from-primary/10 to-primary/5 p-4 sm:p-5">
-            <div v-if="cumpleaniosHoy.length > 0" class="flex items-center gap-3 mb-3">
-              <span class="text-2xl">🎂</span>
-              <div>
-                <p class="text-[0.7rem] font-black uppercase tracking-widest text-primary/70">¡HOY!</p>
-                <p class="text-base font-black text-white mt-1">
-                  <span v-if="cumpleaniosHoy.length === 1">{{ cumpleaniosHoy[0].nombre }}</span>
-                  <span v-else>{{ cumpleaniosHoy.length }} cumpleaños</span>
-                </p>
+            <!-- Cumpleaños Hoy -->
+            <div v-if="cumpleaniosHoy.length > 0" class="bg-linear-to-r from-pink-500 to-purple-500 rounded-xl p-4 shadow-md text-white border border-pink-300/50">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wide font-black">¡HOY!</p>
+                  <p class="text-sm font-black mt-1">Cumpleaños</p>
+                  <div class="mt-2 space-y-1">
+                    <p
+                      v-for="cumple in cumpleaniosHoy"
+                      :key="cumple.nombre"
+                      class="text-sm font-semibold text-white/95"
+                    >
+                      {{ cumple.nombre }}
+                    </p>
+                  </div>
+                </div>
+                <CakeIcon class="w-6 h-6" />
               </div>
             </div>
-            <div v-else class="flex items-center gap-3">
-              <span class="text-2xl">🎂</span>
-              <div>
-                <p class="text-[0.7rem] font-black uppercase tracking-widest text-primary/70">Próximo cumpleaños</p>
-                <p class="text-base font-black text-white mt-1">{{ proximoCumpleanios[0]?.nombre }}</p>
-                <p class="text-[0.75rem] text-white/60 mt-0.5">
+
+            <!-- Próximo Cumpleaños -->
+            <div v-if="cumpleaniosHoy.length === 0 && proximoCumpleanios.length > 0" class="bg-linear-to-r from-purple-500 to-pink-500 rounded-xl p-4 shadow-md text-white border border-purple-300/50">
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <p class="text-[10px] uppercase tracking-wide font-black">Próximo</p>
+                  <p class="text-sm font-black mt-1">Cumpleaños</p>
+                </div>
+                <CakeIcon class="w-6 h-6" />
+              </div>
+              <div class="mt-2 pt-2 border-t border-white/30 text-xs">
+                <p class="font-bold">{{ proximoCumpleanios[0]?.nombre }}</p>
+                <p class="text-white/90 mt-1">
                   <span v-if="proximoCumpleanios[0]?.diasRestantes === 1">Mañana</span>
                   <span v-else>En {{ proximoCumpleanios[0]?.diasRestantes }} días</span>
                 </p>
               </div>
             </div>
+            <!-- Camiseta 2026 -->
+            <div
+              aria-disabled="true"
+              class="bg-linear-to-r from-blue-500 to-indigo-600 text-white rounded-xl p-4 font-bold text-center cursor-not-allowed opacity-60 flex flex-col items-center justify-center gap-1 select-none"
+            >
+              <div class="flex items-center justify-center gap-2">
+                <ShoppingBagIcon class="w-5 h-5" />
+                <span>Camiseta 2026</span>
+              </div>
+              <span class="text-[11px] font-semibold uppercase tracking-wide text-white/90">No disponible</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILA ESTADÍSTICAS: Asistencia % y Goles/Asistencias -->
+        <div v-if="estadisticasJugadora" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
+          <!-- Asistencia % -->
+          <div class="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200 shadow-sm">
+            <div class="flex items-center gap-2 mb-2">
+              <PercentBadgeIcon class="w-4 h-4 text-blue-600" />
+              <p class="text-[11px] uppercase tracking-wide font-bold text-blue-600">Asistencia entrenamientos</p>
+            </div>
+            <p class="text-3xl font-black text-blue-700">{{ porcentajeAsistencia }}%</p>
+            <p class="text-xs text-blue-600 mt-1">{{ estadisticasJugadora.confirmadas }}/{{ estadisticasJugadora.total }}</p>
+          </div>
+
+          <!-- Goles -->
+          <div v-if="estadisticasJugadora.goles !== undefined" class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 border border-red-200 shadow-sm">
+            <div class="flex items-center gap-2 mb-2">
+              <TrophyIcon class="w-4 h-4 text-red-600" />
+              <p class="text-[11px] uppercase tracking-wide font-bold text-red-600">Goles</p>
+            </div>
+            <p class="text-3xl font-black text-red-700">{{ estadisticasJugadora.goles }}</p>
+          </div>
+
+          <!-- Asistencias -->
+          <div v-if="estadisticasJugadora.asistencias !== undefined" class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200 shadow-sm">
+            <div class="flex items-center gap-2 mb-2">
+              <CalculatorIcon class="w-4 h-4 text-green-600" />
+              <p class="text-[11px] uppercase tracking-wide font-bold text-green-600">Asistencias</p>
+            </div>
+            <p class="text-3xl font-black text-green-700">{{ estadisticasJugadora.asistencias }}</p>
           </div>
         </div>
       </div>
 
       <!-- Selector de equipo (si tiene ambos) -->
       <div v-if="mostrarSelectorEquipos" class="mb-8">
-        <div class="rounded-2xl shadow-lg p-4 md:p-6 border border-primary/15 bg-linear-to-br from-[#0f2425] to-[#0a1415]">
-          <div class="mb-4 md:mb-5">
-            <h3 class="text-lg md:text-xl font-black uppercase tracking-widest text-white">Selecciona tu equipo</h3>
-            <p class="text-xs md:text-sm text-white/60 mt-1 font-semibold">Cambia entre los equipos a los que perteneces</p>
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-gray-100">
+          <div class="mb-6">
+            <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-2">Selecciona tu equipo</h3>
+            <p class="text-gray-600 text-sm">Cambia entre los equipos a los que perteneces</p>
           </div>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <button
               v-if="equiposDisponibles.includes('ascenso')"
               @click="cambiarEquipo('ascenso')"
               :class="[
-                'relative px-3 py-2 sm:py-3 rounded-xl font-black transition-all duration-200 cursor-pointer flex flex-col items-center justify-center gap-1 border-2 group overflow-hidden text-xs sm:text-sm',
+                'px-4 py-3 rounded-xl font-bold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 border-2',
                 equipoSeleccionado === 'ascenso'
-                  ? 'bg-primary text-black border-primary shadow-lg shadow-primary/40 scale-105'
-                  : 'bg-white/5 text-white border-primary/30 hover:border-primary/60 hover:bg-primary/10 hover:shadow-lg'
+                  ? 'bg-teal-500 text-white border-teal-600 shadow-lg scale-105'
+                  : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-teal-300 hover:bg-teal-50'
               ]"
             >
-              <span class="text-lg">🏆</span>
-              <span class="font-black uppercase tracking-wide">Ascenso</span>
+              <TrophyIcon class="w-5 h-5" />
+              Ascenso
             </button>
             <button
               v-if="equiposDisponibles.includes('serieC')"
               @click="cambiarEquipo('serieC')"
               :class="[
-                'relative px-3 py-2 sm:py-3 rounded-xl font-black transition-all duration-200 cursor-pointer flex flex-col items-center justify-center gap-1 border-2 group overflow-hidden text-xs sm:text-sm',
+                'px-4 py-3 rounded-xl font-bold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 border-2',
                 equipoSeleccionado === 'serieC'
-                  ? 'bg-primary text-black border-primary shadow-lg shadow-primary/40 scale-105'
-                  : 'bg-white/5 text-white border-primary/30 hover:border-primary/60 hover:bg-primary/10 hover:shadow-lg'
+                  ? 'bg-purple-500 text-white border-purple-600 shadow-lg scale-105'
+                  : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-purple-300 hover:bg-purple-50'
               ]"
             >
-              <span class="text-lg">⚽</span>
-              <span class="font-black uppercase tracking-wide">Serie C</span>
-            </button>
-            <button
-              v-if="equiposDisponibles.includes('escuela')"
-              @click="cambiarEquipo('escuela')"
-              :class="[
-                'relative px-3 py-2 sm:py-3 rounded-xl font-black transition-all duration-200 cursor-pointer flex flex-col items-center justify-center gap-1 border-2 group overflow-hidden text-xs sm:text-sm',
-                equipoSeleccionado === 'escuela'
-                  ? 'bg-primary text-black border-primary shadow-lg shadow-primary/40 scale-105'
-                  : 'bg-white/5 text-white border-primary/30 hover:border-primary/60 hover:bg-primary/10 hover:shadow-lg'
-              ]"
-            >
-              <span class="text-lg">📚</span>
-              <span class="font-black uppercase tracking-wide">Escuela</span>
-            </button>
-            <button
-              v-if="mostrarSelectorEquipos"
-              @click="cambiarEquipo('ambos')"
-              :class="[
-                'relative px-3 py-2 sm:py-3 rounded-xl font-black transition-all duration-200 cursor-pointer flex flex-col items-center justify-center gap-1 border-2 group overflow-hidden text-xs sm:text-sm',
-                equipoSeleccionado === 'ambos'
-                  ? 'bg-primary text-black border-primary shadow-lg shadow-primary/40 scale-105'
-                  : 'bg-white/5 text-white border-primary/30 hover:border-primary/60 hover:bg-primary/10 hover:shadow-lg'
-              ]"
-            >
-              <span class="text-lg">📅</span>
-              <span class="font-black uppercase tracking-wide">Eventos</span>
-            </button>
-          </div>
-        </div>
-      </div>
+              <ArrowTrendingUpIcon class="w-5 h-5" />
+              Serie C
             </button>
             <button
               v-if="equiposDisponibles.includes('escuela')"
@@ -337,207 +344,192 @@
       </div>
 
       <!-- Loading -->
-      <div v-if="isLoading || primeraCarga" class="flex flex-col items-center justify-center rounded-2xl border border-primary/20 bg-linear-to-br from-[#0f2425] to-black py-20 px-4">
+      <div v-if="isLoading || primeraCarga" class="flex flex-col items-center justify-center py-20">
         <div class="relative">
-          <div class="animate-spin rounded-full h-16 w-16 border-4 border-primary/30 border-t-primary"></div>
-          <div class="animate-pulse absolute inset-0 rounded-full h-16 w-16 border-4 border-primary/10"></div>
+          <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-primary"></div>
+          <div class="animate-ping absolute inset-0 rounded-full h-16 w-16 border-b-4 border-primary opacity-20"></div>
         </div>
-        <p class="text-white mt-8 text-lg font-black uppercase tracking-widest">Cargando entrenamientos...</p>
-        <p class="text-primary/60 mt-2 text-sm font-semibold">Esto puede tomar unos segundos</p>
+        <p class="text-white mt-6 text-lg font-semibold">Cargando entrenamientos...</p>
+        <p class="text-gray-300 mt-2 text-sm">Esto puede tomar unos segundos</p>
       </div>
 
       <!-- Sin entrenamientos -->
-      <div v-else-if="entrenamientosFiltered.length === 0" class="flex flex-col items-center justify-center rounded-2xl border border-primary/20 bg-linear-to-br from-[#0f2425] to-black p-12 text-center">
-        <div class="text-6xl mb-4 opacity-40">📭</div>
-        <p class="text-xl font-black text-white uppercase tracking-wide mb-2">Sin eventos disponibles</p>
-        <p class="text-white/60 font-semibold">No hay entrenamientos o eventos programados en este momento</p>
-        <router-link
-          v-if="equipoSeleccionado !== 'ambos'"
-          :to="equipoSeleccionado ? '#' : '/login-jugadora'"
-          @click="cambiarEquipo('ambos')"
-          class="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary/20 border border-primary/40 px-4 py-2.5 font-bold text-primary/90 transition-all hover:bg-primary/30 cursor-pointer"
-        >
-          <span>🔄</span>
-          Ver todos los eventos
-        </router-link>
+      <div v-else-if="entrenamientosFiltered.length === 0" class="bg-white rounded-lg shadow p-12 text-center">
+        <p class="text-gray-500 text-lg">No hay eventos disponibles en este momento</p>
       </div>
 
       <!-- Lista de entrenamientos -->
-      <div v-if="!primeraCarga && entrenamientosFiltered.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div v-if="!primeraCarga && entrenamientosFiltered.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
           v-for="entrenamiento in entrenamientosFiltered"
           :key="entrenamiento.id"
-          class="group relative flex flex-col overflow-hidden rounded-2xl border border-primary/15 bg-linear-to-br from-[#0f2425] via-[#0a1415] to-black shadow-lg transition-all duration-300 hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/10 h-full"
+          class="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-full"
         >
-          <!-- Accent gradient on hover -->
-          <div class="absolute -inset-0.5 bg-gradient-to-r from-primary/0 via-primary/0 to-primary/0 group-hover:from-primary/10 group-hover:via-primary/5 group-hover:to-primary/0 transition-all duration-300 pointer-events-none rounded-2xl"></div>
-
-          <!-- Card Header with type indicator -->
+          <!-- Card Header con color según tipo -->
           <div :class="[
-            'relative z-10 flex items-center justify-between border-b px-4 py-3 sm:px-5 sm:py-4 transition-all duration-300',
+            'px-6 py-4 border-b-2 flex items-center justify-between',
             entrenamiento.tipo?.toLowerCase() === 'partido' || entrenamiento.tipo?.toLowerCase() === 'amistoso'
-              ? 'border-red-500/30 bg-linear-to-r from-red-500/10 to-red-500/5'
-              : 'border-primary/25 bg-linear-to-r from-primary/10 to-primary/5'
+              ? 'bg-red-50 border-red-200'
+              : 'bg-blue-50 border-blue-200'
           ]">
             <div class="flex items-center gap-3">
               <div :class="[
-                'flex h-10 w-10 items-center justify-center rounded-lg font-bold text-lg transition-transform duration-300 group-hover:scale-110',
+                'w-10 h-10 rounded-lg flex items-center justify-center',
                 entrenamiento.tipo?.toLowerCase() === 'partido' || entrenamiento.tipo?.toLowerCase() === 'amistoso'
-                  ? 'bg-red-500/30 text-red-300'
-                  : 'bg-primary/30 text-primary'
+                  ? 'bg-red-100 text-red-600'
+                  : 'bg-blue-100 text-blue-600'
               ]">
-                <span v-if="entrenamiento.tipo?.toLowerCase() === 'partido'">🏆</span>
-                <span v-else-if="entrenamiento.tipo?.toLowerCase() === 'amistoso'">🤝</span>
-                <span v-else>🔥</span>
+                <TrophyIcon v-if="entrenamiento.tipo?.toLowerCase() === 'partido'" class="w-5 h-5" />
+                <CheckCircleIcon v-else-if="entrenamiento.tipo?.toLowerCase() === 'amistoso'" class="w-5 h-5" />
+                <FireIcon v-else class="w-5 h-5" />
               </div>
               <div>
                 <p :class="[
-                  'text-[0.7rem] font-black uppercase tracking-[0.15em]',
+                  'text-xs font-bold uppercase tracking-wide',
                   entrenamiento.tipo?.toLowerCase() === 'partido' || entrenamiento.tipo?.toLowerCase() === 'amistoso'
-                    ? 'text-red-300'
-                    : 'text-primary/80'
+                    ? 'text-red-700'
+                    : 'text-blue-700'
                 ]">
                   {{ entrenamiento.tipo || 'Evento' }}
                 </p>
               </div>
             </div>
-            <div class="flex items-center gap-2">
-              <span v-if="!entrenamiento.eventoInformativo" :class="[
-                'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-wide border',
-                estadoInscripcion[entrenamiento.id] === 'confirmada'
-                  ? 'border-green-500/50 bg-green-500/20 text-green-300'
-                  : estadoInscripcion[entrenamiento.id] === 'baja'
-                  ? 'border-red-500/50 bg-red-500/20 text-red-300'
-                  : estadoInscripcion[entrenamiento.id] === 'pendiente'
-                  ? 'border-yellow-500/50 bg-yellow-500/20 text-yellow-300'
-                  : 'border-white/20 bg-white/10 text-white/70'
-              ]">
-                {{ 
-                  estadoInscripcion[entrenamiento.id] === 'confirmada' ? '✓' :
-                  estadoInscripcion[entrenamiento.id] === 'baja' ? '✗' :
-                  estadoInscripcion[entrenamiento.id] === 'pendiente' ? '⏳' :
-                  '○'
-                }}
-                <span class="hidden sm:inline">
-                  {{ 
-                    estadoInscripcion[entrenamiento.id] === 'confirmada' ? 'Confirmada' :
-                    estadoInscripcion[entrenamiento.id] === 'baja' ? 'Baja' :
-                    estadoInscripcion[entrenamiento.id] === 'pendiente' ? 'Pendiente' :
-                    'Sin respuesta'
-                  }}
-                </span>
-              </span>
-              <span v-else class="inline-flex items-center gap-1 rounded-full border border-cyan-500/50 bg-cyan-500/20 px-2.5 py-1 text-[0.65rem] font-black uppercase tracking-wide text-cyan-300">
-                ℹ️
-                <span class="hidden sm:inline">Info</span>
-              </span>
-            </div>
+            <span v-if="!entrenamiento.eventoInformativo" :class="[
+              'px-3 py-1 rounded-full text-xs font-bold',
+              estadoInscripcion[entrenamiento.id] === 'confirmada'
+                ? 'bg-green-100 text-green-700'
+                : estadoInscripcion[entrenamiento.id] === 'baja'
+                ? 'bg-red-100 text-red-700'
+                : estadoInscripcion[entrenamiento.id] === 'pendiente'
+                ? 'bg-yellow-100 text-yellow-700'
+                : 'bg-gray-100 text-gray-700'
+            ]">
+              {{ 
+                estadoInscripcion[entrenamiento.id] === 'confirmada' ? '✓ Confirmada' :
+                estadoInscripcion[entrenamiento.id] === 'baja' ? '✗ Baja' :
+                estadoInscripcion[entrenamiento.id] === 'pendiente' ? '⏳ Pendiente' :
+                'Sin respuesta'
+              }}
+            </span>
+            <span v-else class="px-3 py-1 rounded-full text-xs font-bold bg-cyan-100 text-cyan-700">
+              ℹ️ Informativo
+            </span>
           </div>
 
           <!-- Card Body -->
-          <div class="relative z-10 flex flex-1 flex-col p-4 sm:p-5">
-            <!-- Attendees badge -->
-            <div class="mb-3 inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-[0.7rem] font-black uppercase tracking-widest text-primary/90 w-fit">
-              <span>👥</span>
-              <span>{{ contarConfirmadas(entrenamiento.id) }}</span>
-              <span class="text-primary/70">confirmada{{ contarConfirmadas(entrenamiento.id) === 1 ? '' : 's' }}</span>
+          <div class="p-6 flex flex-col flex-grow">
+            <div class="mb-4 flex items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
+                <UserGroupIcon class="w-3.5 h-3.5" />
+                {{ contarConfirmadas(entrenamiento.id) }} confirmada{{ contarConfirmadas(entrenamiento.id) === 1 ? '' : 's' }}
+              </span>
+             
             </div>
 
-            <!-- Title -->
-            <h3 class="text-base sm:text-lg font-black uppercase text-white mb-4 line-clamp-2 leading-tight">{{ entrenamiento.nombre }}</h3>
+            <!-- Título -->
+            <h3 class="text-lg font-bold text-gray-900 mb-4 line-clamp-2">{{ entrenamiento.nombre }}</h3>
 
-            <!-- Info details -->
-            <div class="mb-4 space-y-2.5 text-[0.85rem] flex-grow">
+            <!-- Información de evento -->
+            <div class="space-y-3 mb-6 text-sm">
               <div class="flex items-start gap-3">
-                <div class="mt-0.5 flex h-5 w-5 items-center justify-center rounded-md bg-primary/20 flex-shrink-0">
-                  <span class="text-xs">📅</span>
-                </div>
-                <div class="min-w-0">
-                  <p class="text-[0.65rem] uppercase tracking-wide font-bold text-white/60">Fecha</p>
-                  <p class="font-semibold text-white">{{ formatearFecha(entrenamiento.fecha) }}</p>
+                <CalendarIcon class="w-5 h-5 text-primary-dark mt-0.5 flex-shrink-0" />
+                <div class="flex-1">
+                  <p class="text-gray-500 text-xs uppercase tracking-wide font-bold">Fecha</p>
+                  <p class="text-gray-900 font-semibold">{{ formatearFecha(entrenamiento.fecha) }}</p>
                 </div>
               </div>
               
               <div class="flex items-start gap-3">
-                <div class="mt-0.5 flex h-5 w-5 items-center justify-center rounded-md bg-primary/20 flex-shrink-0">
-                  <span class="text-xs">⏰</span>
-                </div>
-                <div class="min-w-0">
-                  <p class="text-[0.65rem] uppercase tracking-wide font-bold text-white/60">Hora</p>
-                  <p class="font-semibold text-white">
+                <ClockIcon class="w-5 h-5 text-primary-dark mt-0.5 flex-shrink-0" />
+                <div class="flex-1">
+                  <p class="text-gray-500 text-xs uppercase tracking-wide font-bold">Hora</p>
+                  <p class="text-gray-900 font-semibold">
                     {{ entrenamiento.hora }}<template v-if="entrenamiento.horaFin"> - {{ entrenamiento.horaFin }}</template>
                   </p>
                 </div>
               </div>
               
               <div class="flex items-start gap-3">
-                <div class="mt-0.5 flex h-5 w-5 items-center justify-center rounded-md bg-primary/20 flex-shrink-0">
-                  <span class="text-xs">📍</span>
-                </div>
-                <div class="min-w-0">
-                  <p class="text-[0.65rem] uppercase tracking-wide font-bold text-white/60">Lugar</p>
-                  <p class="font-semibold text-white line-clamp-2">{{ entrenamiento.lugar }}</p>
+                <MapPinIcon class="w-5 h-5 text-primary-dark mt-0.5 flex-shrink-0" />
+                <div class="flex-1">
+                  <p class="text-gray-500 text-xs uppercase tracking-wide font-bold">Lugar</p>
+                  <p class="text-gray-900 font-semibold line-clamp-2">{{ entrenamiento.lugar }}</p>
                 </div>
               </div>
             </div>
 
-            <!-- Description -->
-            <p class="text-[0.8rem] text-white/70 mb-4 line-clamp-2">{{ entrenamiento.descripcion }}</p>
+            <!-- Descripción -->
+            <p class="text-gray-600 text-sm mb-6 line-clamp-3 flex-grow">{{ entrenamiento.descripcion }}</p>
 
-            <!-- Special alerts -->
-            <div v-if="entrenamiento.esConvocatoria && !esConvocada(entrenamiento)" class="mb-4 flex items-start gap-2 rounded-lg border border-red-500/40 bg-red-500/10 p-2.5">
-              <span class="mt-0.5 flex-shrink-0 text-base">⚠️</span>
-              <p class="text-[0.7rem] font-bold text-red-200">No estás en la lista de convocadas</p>
+            <!-- Alertas especiales -->
+            <div class="space-y-2 mb-6">
+              <div v-if="entrenamiento.esConvocatoria && !esConvocada(entrenamiento)" class="p-3 bg-red-50 rounded-lg border border-red-200 flex items-start gap-2">
+                <NoSymbolIcon class="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+                <p class="text-xs text-red-700 font-semibold">No estás en la lista de convocadas</p>
+              </div>
+              <div v-if="jugadoraRestringidaPorEstado" class="p-3 bg-slate-100 rounded-lg border border-slate-300 flex items-start gap-2">
+                <NoSymbolIcon class="w-4 h-4 text-slate-600 mt-0.5 flex-shrink-0" />
+                <p class="text-xs text-slate-700 font-semibold">{{ mensajeBloqueoPorEstado }}</p>
+              </div>
+              <div v-else-if="entrenamiento.esConvocatoria && esConvocada(entrenamiento) && !estaInscrita(entrenamiento.id)" class="p-3 bg-purple-50 rounded-lg border border-purple-200 flex items-start gap-2">
+                <CheckCircleIcon class="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
+                <p class="text-xs text-purple-700 font-semibold">¡Has sido convocada! Confirma tu asistencia</p>
+              </div>
+              <div v-if="fechaPasada(entrenamiento)" class="p-3 bg-gray-100 rounded-lg border border-gray-300 flex items-start gap-2">
+                <ExclamationTriangleIcon class="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+                <p class="text-xs text-gray-700 font-semibold">Este evento ya finalizó</p>
+              </div>
             </div>
 
-            <!-- Action buttons -->
-            <div v-if="!entrenamiento.eventoInformativo" class="flex flex-col gap-2 mt-auto pt-2 border-t border-white/10">
-              <div class="grid grid-cols-2 gap-2">
+            <!-- Botones de acción -->
+            <div v-if="!entrenamiento.eventoInformativo" class="flex flex-col gap-2 mt-auto">
+              <div class="flex gap-2">
+                <!-- Cuando está confirmada - botón para cambiar a baja -->
                 <button
                   v-if="estadoInscripcion[entrenamiento.id] === 'confirmada'"
                   @click="abrirModalBaja(entrenamiento)"
-                  :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento)"
-                  class="relative group/btn flex items-center justify-center gap-1 rounded-lg bg-orange-500/80 px-3 py-2.5 text-[0.7rem] font-black uppercase tracking-wide text-white transition-all duration-200 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                  :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
+                  class="flex-1 px-3 py-2.5 rounded-lg font-bold transition-all text-sm cursor-pointer flex items-center justify-center gap-1 bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span>↔️</span>
-                  <span class="hidden sm:inline">Cambiar</span>
+                  <ArrowPathIcon class="w-4 h-4" />
+                  Cambiar estado
                 </button>
+                <!-- Cuando está de baja - botón para cambiar a confirmada -->
                 <button
                   v-else-if="estadoInscripcion[entrenamiento.id] === 'baja'"
                   @click="handleInscribirse(entrenamiento)"
-                  :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento)"
-                  class="relative group/btn flex items-center justify-center gap-1 rounded-lg bg-blue-500/80 px-3 py-2.5 text-[0.7rem] font-black uppercase tracking-wide text-white transition-all duration-200 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                  :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
+                  class="flex-1 px-3 py-2.5 rounded-lg font-bold transition-all text-sm cursor-pointer flex items-center justify-center gap-1 bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span>↔️</span>
-                  <span class="hidden sm:inline">Cambiar</span>
+                  <ArrowPathIcon class="w-4 h-4" />
+                  Cambiar estado
                 </button>
+                <!-- Botones cuando no ha respondido -->
                 <button
                   v-else
                   @click="handleInscribirse(entrenamiento)"
-                  :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento)"
-                  class="col-span-2 flex items-center justify-center gap-1.5 rounded-lg bg-green-500/80 px-3 py-2.5 text-[0.7rem] font-black uppercase tracking-wide text-white transition-all duration-200 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                  :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
+                  class="flex-1 px-3 py-2.5 rounded-lg font-bold transition-all text-sm cursor-pointer flex items-center justify-center gap-1 bg-green-500 text-white hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span>✓</span>
-                  <span>Confirmar</span>
+                  <CheckIcon class="w-4 h-4" />
+                  Confirmar
+                </button>
+                <button
+                  v-if="!estaInscrita(entrenamiento.id) && estadoInscripcion[entrenamiento.id] !== 'baja'"
+                  @click="abrirModalBaja(entrenamiento)"
+                  :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
+                  class="flex-1 px-3 py-2.5 rounded-lg font-bold transition-all text-sm cursor-pointer flex items-center justify-center gap-1 bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <XMarkIcon class="w-4 h-4" />
+                  Baja
                 </button>
               </div>
-
-              <button
-                v-if="!estaInscrita(entrenamiento.id) && estadoInscripcion[entrenamiento.id] !== 'baja'"
-                @click="abrirModalBaja(entrenamiento)"
-                :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento)"
-                class="flex items-center justify-center gap-1 rounded-lg border border-red-500/50 bg-red-500/10 px-3 py-2.5 text-[0.7rem] font-black uppercase tracking-wide text-red-300 transition-all duration-200 hover:bg-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
-              >
-                <span>✕</span>
-                <span>Baja</span>
-              </button>
-
               <button
                 @click="verDetalles(entrenamiento)"
-                class="flex items-center justify-center gap-1.5 rounded-lg border border-primary/50 bg-primary/20 px-3 py-2.5 text-[0.7rem] font-black uppercase tracking-wide text-primary/90 transition-all duration-200 hover:bg-primary/30 hover:border-primary/70 active:scale-95"
+                class="w-full px-3 py-2.5 border-2 border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-all text-sm cursor-pointer flex items-center justify-center gap-1"
               >
-                <span>📋</span>
-                <span>Detalles</span>
+                <ClipboardDocumentListIcon class="w-4 h-4" />
+               Ver Detalles
               </button>
             </div>
           </div>

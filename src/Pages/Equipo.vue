@@ -45,8 +45,69 @@
     <!-- Contenido de las pestañas -->
     <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
 
+      <!-- Contenido especial para Cuerpo técnico -->
+      <div v-if="activeTab === 'cuerpo-tecnico'">
+        <div class="eq-fade eq-paper rounded-4xl px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
+          <div class="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-10">
+            <div>
+              <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--eq-primary)">Procesos, formación y competencia</p>
+              <h2 class="mt-3 text-[clamp(2rem,4vw,3.2rem)] font-black uppercase leading-[0.94] text-(--eq-ink)" style="font-family: 'Gobold High', sans-serif;">
+                Cuerpo técnico
+              </h2>
+            </div>
+            <div class="space-y-4 text-[1rem] leading-8 text-(--eq-muted) sm:text-[1.05rem]">
+              <p>
+                Quienes sostienen el trabajo diario del club, acompañando el crecimiento del plantel desde la formación y la competencia.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-10 grid gap-6 xl:grid-cols-2">
+          <article
+            v-for="integrante in cuerpoTecnico"
+            :key="integrante.id"
+            class="eq-fade overflow-hidden rounded-4xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-4 shadow-[0_24px_60px_rgba(0,0,0,0.24)] backdrop-blur-sm sm:p-5"
+          >
+            <div class="grid gap-5 lg:grid-cols-[minmax(13rem,0.85fr)_minmax(0,1.15fr)] lg:items-stretch">
+              <div class="overflow-hidden rounded-[1.7rem] border border-white/10 bg-black/20 shadow-[0_18px_40px_rgba(0,0,0,0.22)] outline-1 outline-white/10">
+                <img :src="integrante.foto" :alt="integrante.nombre" class="aspect-4/5 w-full object-cover" />
+              </div>
+
+              <div class="flex flex-col rounded-[1.7rem] border border-white/8 bg-black/16 px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:px-6">
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--eq-primary)">{{ integrante.kicker }}</p>
+                    <h3 class="mt-3 text-[clamp(1.8rem,3vw,2.7rem)] font-black uppercase leading-12 text-white" style="font-family: 'Gobold High', sans-serif;">
+                      {{ integrante.nombre }}
+                    </h3>
+                  </div>
+                  <span class="inline-flex min-h-12 items-center rounded-full border border-(--eq-primary)/25 bg-(--eq-primary)/10 px-4 text-sm font-black uppercase text-(--eq-primary)">
+                    {{ integrante.rol }}
+                  </span>
+                </div>
+
+                <p class="mt-4 text-[0.98rem] leading-7 text-white/76">
+                  {{ integrante.bajada }}
+                </p>
+
+                <div class="mt-5 flex flex-wrap gap-2">
+                  <span
+                    v-for="item in integrante.enfoque"
+                    :key="`${integrante.id}-${item}`"
+                    class="inline-flex min-h-10 items-center rounded-full border border-white/10 bg-white/6 px-4 text-[0.72rem] font-black uppercase tracking-[0.12em] text-white/78"
+                  >
+                    {{ item }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
       <!-- Contenido especial para Futsal -->
-      <div v-if="activeTab === 'futsal'">
+      <div v-else-if="activeTab === 'futsal'">
         <!-- Banner Futsal -->
         <div class="eq-fade eq-paper rounded-4xl px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
           <div class="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-10">
@@ -155,44 +216,19 @@
         </div>
 
         <div v-else class="mt-10 space-y-10">
-          <!-- Directora Técnica -->
-          <div v-if="equipoActual.directoraTecnica" class="eq-fade">
-            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--eq-primary)">Directora Técnica</p>
-            <div class="mt-4 flex max-w-2xl items-center gap-5 rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-              <div class="h-28 w-28 shrink-0 overflow-hidden rounded-2xl bg-white/10">
-                <img :src="obtenerFoto(equipoActual.directoraTecnica.foto)" :alt="equipoActual.directoraTecnica.nombre" class="h-full w-full object-cover"/>
-              </div>
-              <div>
-                <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-(--eq-primary)">{{ equipoActual.directoraTecnica.posicion }}</p>
-                <h4 class="mt-1 text-xl font-black text-white md:text-2xl">{{ equipoActual.directoraTecnica.nombre }} {{ equipoActual.directoraTecnica.apellido }}</h4>
-                <p class="mt-1 text-2xl font-black text-(--eq-primary)">DT</p>
-              </div>
-            </div>
-          </div>
+       
 
-          <!-- Preparador Porteras -->
-          <div v-if="equipoActual.preparadorPorteras" class="eq-fade">
-            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--eq-primary)">Preparador Porteras</p>
-            <div class="mt-4 flex max-w-2xl items-center gap-5 rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-              <div class="h-28 w-28 shrink-0 overflow-hidden rounded-2xl bg-white/10">
-                <img :src="obtenerFoto(equipoActual.preparadorPorteras.foto)" :alt="equipoActual.preparadorPorteras.nombre" class="h-full w-full object-cover"/>
-              </div>
-              <div>
-                <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-(--eq-primary)">{{ equipoActual.preparadorPorteras.posicion }}</p>
-                <h4 class="mt-1 text-xl font-black text-white md:text-2xl">{{ equipoActual.preparadorPorteras.nombre }} {{ equipoActual.preparadorPorteras.apellido }}</h4>
-                <p class="mt-1 text-2xl font-black text-(--eq-primary)">PA</p>
-              </div>
-            </div>
-          </div>
+       
 
           <!-- Secciones de jugadoras por posición -->
           <template v-for="seccion in secciones" :key="seccion.key">
             <div v-if="equipoActual[seccion.key].length > 0" class="eq-fade">
               <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--eq-primary)">{{ seccion.label }}</p>
               <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <div
+                <router-link
                   v-for="jugadora in equipoActual[seccion.key]"
                   :key="jugadora.id"
+                  :to="`/jugadoras/${jugadora.id}`"
                   class="group flex items-center gap-4 rounded-3xl border border-white/10 bg-white/5 p-3 transition-all duration-300 hover:border-(--eq-primary)/30 hover:bg-white/8"
                 >
                   <div class="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-white/10 md:h-28 md:w-28">
@@ -202,8 +238,9 @@
                     <p class="text-[0.65rem] font-black uppercase tracking-[0.16em] text-(--eq-primary)">{{ jugadora.posicion }}</p>
                     <h4 class="mt-1 truncate text-base font-black text-white md:text-lg">{{ jugadora.nombre }} {{ jugadora.apellido }}</h4>
                     <p class="mt-1 text-3xl font-black text-(--eq-primary) md:text-4xl">{{ jugadora.numero?.toString().padStart(2, '0') || '00' }}</p>
+                    <p class="mt-1 text-[0.7rem] font-black uppercase text-white/45">Ver ficha pública</p>
                   </div>
-                </div>
+                </router-link>
               </div>
             </div>
           </template>
@@ -227,6 +264,8 @@ import { trackTabChange } from '../composables/useAnalytics';
 import logoBlanco from '@/assets/logoblanco.jpg';
 import fotoFutsal1 from '@/assets/futsal1.jpeg';
 import fotoFutsal2 from '@/assets/fustal2.jpeg';
+import fotoYesi from '@/assets/ct/WhatsApp Image 2026-05-27 at 17.21.16.jpeg';
+import fotoLucas from '@/assets/ct/701612690_18067511408679446_5594093179394221215_n.webp';
 import { obtenerEquipoCompletoRegistro } from '../firebase/jugadorasAuth';
 import { useLoader } from '../composables/useLoader.js';
 
@@ -237,7 +276,27 @@ const tabs = [
   { id: 'ascenso', label: 'Ascenso' },
   { id: 'serie-c', label: 'Serie C' },
   { id: 'escuela', label: 'Escuela' },
+  { id: 'cuerpo-tecnico', label: 'Cuerpo técnico' },
   { id: 'futsal', label: 'Futsal' },
+];
+
+const cuerpoTecnico = [
+  {
+    id: 'dt',
+    kicker: 'Directora técnica',
+    nombre: 'Yesennia Gallardo',
+    rol: 'DT',
+    foto: fotoYesi,
+    bajada: 'Licenciada en educación física y entrenadora de Ascenso, Serie C y Escuela Formativa.',
+  },
+  {
+    id: 'arqueras',
+    kicker: 'Preparador arqueras',
+    nombre: 'Lucas Hernandez',
+    rol: 'PA',
+    foto: fotoLucas,
+    bajada: 'Preparador de arqueras del club, enfocado en técnica, lectura del juego y confianza bajo presión.',
+  }
 ];
 
 const secciones = [
@@ -285,7 +344,7 @@ const equipoActual = computed(() => equipos.value[activeTab.value]);
 // Cargar datos del equipo desde Firestore
 const cargarEquipo = async (equipoId) => {
   // No cargar datos para futsal ya que es contenido estático
-  if (equipoId === 'futsal') {
+  if (equipoId === 'futsal' || equipoId === 'cuerpo-tecnico') {
     return;
   }
   
