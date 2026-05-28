@@ -1,179 +1,165 @@
 <template>
-  <div class="min-h-screen bg-black flex items-center justify-center px-4 py-12 relative overflow-hidden">
-    <!-- Patrón de líneas diagonales de fondo -->
-    <div class="absolute inset-0 opacity-5">
-      <div class="absolute w-full h-full" style="background: repeating-linear-gradient(45deg, white, white 10px, transparent 10px, transparent 20px);"></div>
+  <section class="relative min-h-dvh overflow-hidden bg-black px-4 py-8 text-white sm:px-6 lg:px-8">
+    <div class="pointer-events-none absolute inset-0 text-primary/10">
+      <span class="absolute -left-5 top-28 text-8xl font-black leading-none sm:text-9xl" style="font-family: 'Gobold High', system-ui, sans-serif;">
+        VK
+      </span>
+      <span class="absolute right-4 top-20 text-7xl font-black leading-none sm:text-8xl" style="font-family: 'Gobold High', system-ui, sans-serif;">
+        #
+      </span>
+      <span class="absolute bottom-24 right-0 text-9xl font-black leading-none opacity-40 sm:text-[11rem]" style="font-family: 'Gobold High', system-ui, sans-serif;">
+        VK
+      </span>
     </div>
 
-    <!-- Círculos decorativos sutiles -->
-    <div class="absolute top-20 right-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-20 left-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+    <div class="relative mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-md flex-col justify-center gap-6 lg:max-w-5xl lg:grid lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+      <aside class="hidden rounded-lg border border-white/10 bg-slate-950 p-8 lg:block">
+        <p class="text-sm font-black uppercase text-primary">Portal jugadoras</p>
+        <h1 class="mt-4 text-balance text-6xl font-black leading-none" style="font-family: 'Gobold High', system-ui, sans-serif;">
+          Entrena, confirma, compite
+        </h1>
+        <p class="mt-5 text-pretty text-base font-semibold leading-relaxed text-white/70">
+          Acceso privado para revisar entrenamientos, convocatorias, asistencia y novedades internas del equipo.
+        </p>
 
-    <div class="max-w-md w-full relative z-10">
-      <!-- Card principal estilo jersey/credencial deportiva -->
-      <div class="bg-gradient-to-br from-white via-gray-50 to-white rounded-3xl shadow-2xl overflow-hidden border-4 border-primary">
-        <!-- Franja superior deportiva -->
-        <div class="h-3 bg-gradient-to-r from-primary-dark via-primary to-primary-light"></div>
-        
-        <!-- Header con logo -->
-        <div class="bg-white px-8 pt-8 pb-6 text-center relative">
-          <!-- Logo del club -->
-          <div class="mb-4 relative inline-block">
-            <div class="absolute inset-0 bg-primary/20 rounded-full blur-xl"></div>
-            <img 
-              src="@/assets/logoVk.png" 
-              alt="VK Vikingas" 
-              class="w-24 h-24 mx-auto relative z-10 drop-shadow-lg"
-            />
+        <div class="mt-8 grid gap-3">
+          <div v-for="item in playerHighlights" :key="item" class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+            <p class="text-sm font-black uppercase text-white">{{ item }}</p>
           </div>
-          
-          <h1 class="text-4xl font-black mb-2 text-gray-900 tracking-tight" style="font-family: 'Gobold High', sans-serif;">
-            VK VIKINGAS
-          </h1>
-          
-          <!-- Badge de jugadora -->
-          <div class="inline-flex items-center gap-2 bg-gradient-to-r from-primary-dark to-primary text-white px-6 py-2 rounded-full shadow-lg">
-            <UserGroupIcon class="w-5 h-5" />
-            <span class="font-black text-sm uppercase tracking-widest">Acceso Jugadoras</span>
-          </div>
+        </div>
+      </aside>
 
-          <!-- Decoración tipo jersey -->
-          <div class="absolute top-4 right-4 text-primary/10 font-black text-6xl" style="font-family: 'Gobold High', sans-serif;">
-            #
-          </div>
-          <div class="absolute bottom-4 left-4 text-primary/10 font-black text-6xl" style="font-family: 'Gobold High', sans-serif;">
+      <div class="overflow-hidden rounded-lg border-2 border-primary bg-white text-slate-950 shadow-2xl">
+        <header class="relative overflow-hidden px-6 pb-7 pt-7 text-center sm:px-8">
+          <div class="pointer-events-none absolute left-4 top-28 text-6xl font-black text-primary/10 sm:text-7xl" style="font-family: 'Gobold High', system-ui, sans-serif;">
             VK
           </div>
-        </div>
+          <div class="pointer-events-none absolute right-5 top-5 text-6xl font-black text-primary/10" style="font-family: 'Gobold High', system-ui, sans-serif;">
+            #
+          </div>
 
-        <!-- Separador deportivo -->
-        <div class="flex items-center justify-center gap-2 px-8 py-3 bg-gray-50">
-          <div class="flex-1 h-1 bg-gradient-to-r from-transparent via-primary/30 to-primary/30 rounded"></div>
-          <BoltIcon class="w-5 h-5 text-primary" />
-          <div class="flex-1 h-1 bg-gradient-to-l from-transparent via-primary/30 to-primary/30 rounded"></div>
-        </div>
+          <img
+            :src="logoVikingas"
+            alt="VK Vikingas"
+            class="mx-auto size-24 object-contain drop-shadow-lg"
+          />
 
-        <!-- Formulario -->
-        <div class="p-8 bg-white">
-          <form @submit.prevent="handleLogin" class="space-y-5">
-            <!-- Email -->
-            <div class="space-y-2">
-              <label class="flex items-center gap-2 text-xs font-black text-gray-700 uppercase tracking-wider">
-                <EnvelopeIcon class="w-4 h-4 text-primary" />
-                Correo Electrónico
-              </label>
-              <div class="relative group">
-                <input
-                  v-model="email"
-                  type="email"
-                  required
-                  class="w-full px-4 py-3 pl-11 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold group-hover:border-gray-300"
-                  placeholder="tuemail@ejemplo.com"
-                  :disabled="isLoading"
-                />
-                <div class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <UserCircleIcon class="w-4 h-4 text-primary" />
-                </div>
-              </div>
-            </div>
+          <h2 class="mt-4 text-3xl font-black leading-none text-slate-950" style="font-family: 'Gobold High', system-ui, sans-serif;">
+            VK Vikingas
+          </h2>
 
-            <!-- Contraseña -->
-            <div class="space-y-2">
-              <label class="flex items-center gap-2 text-xs font-black text-gray-700 uppercase tracking-wider">
-                <ShieldCheckIcon class="w-4 h-4 text-primary" />
-                Contraseña
-              </label>
-              <div class="relative group">
-                <input
-                  v-model="password"
-                  type="password"
-                  required
-                  class="w-full px-4 py-3 pl-11 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold group-hover:border-gray-300"
-                  placeholder="••••••••"
-                  :disabled="isLoading"
-                />
-                <div class="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <LockClosedIcon class="w-4 h-4 text-primary" />
-                </div>
-              </div>
-            </div>
+          <div class="mt-4 inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary px-5 text-sm font-black uppercase text-white shadow-lg">
+            <UserGroupIcon class="size-5" aria-hidden="true" />
+            Acceso jugadoras
+          </div>
+        </header>
 
-            <!-- Errores -->
-            <div v-if="error" class="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg flex items-start gap-3">
-              <ExclamationCircleIcon class="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-              <p class="text-red-700 text-sm font-bold">{{ error }}</p>
-            </div>
-
-            <!-- Botón submit -->
-            <button
-              type="submit"
-              :disabled="isLoading"
-              class="w-full bg-gradient-to-r from-primary-dark to-primary text-white py-4 rounded-xl font-black uppercase tracking-wider hover:scale-[1.02] hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-2 text-base relative overflow-hidden group"
-            >
-              <!-- Efecto hover -->
-              <div class="absolute inset-0 bg-gradient-to-r from-primary to-primary-light opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              
-              <template v-if="isLoading">
-                <ArrowPathIcon class="w-5 h-5 animate-spin relative z-10" />
-                <span class="relative z-10">Iniciando...</span>
-              </template>
-              <template v-else>
-                <BoltIcon class="w-5 h-5 relative z-10" />
-                <span class="relative z-10">Entrar al Equipo</span>
-              </template>
-            </button>
-          </form>
-        </div>
-
-        <!-- Footer de la card -->
-        <div class="bg-gradient-to-br from-gray-50 to-gray-100 px-8 py-6 border-t-2 border-gray-200">
-          <div class="text-center">
-            <p class="text-gray-600 text-sm font-semibold mb-3">¿Primera vez en la app?</p>
-            <router-link
-              to="/solicitud-acceso"
-              class="inline-flex items-center gap-2 text-primary-dark font-black hover:text-primary transition-colors group text-sm"
-            >
-              <UserPlusIcon class="w-5 h-5 group-hover:scale-110 transition-transform" />
-              Solicitar Acceso al Equipo
-              <ArrowRightIcon class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </router-link>
+        <div class="border-y border-slate-200 bg-slate-50 px-6 py-4 sm:px-8">
+          <div class="flex items-center justify-center gap-4">
+            <div class="h-1 flex-1 rounded-full bg-primary/25"></div>
+            <BoltIcon class="size-5 text-primary" aria-hidden="true" />
+            <div class="h-1 flex-1 rounded-full bg-primary/25"></div>
           </div>
         </div>
 
-        <!-- Franja inferior deportiva -->
-        <div class="h-3 bg-gradient-to-r from-primary-light via-primary to-primary-dark"></div>
+        <form class="space-y-5 px-6 py-7 sm:px-8" @submit.prevent="handleLogin">
+          <div class="space-y-2">
+            <label for="jugadora-email" class="flex items-center gap-2 text-xs font-black uppercase text-slate-700">
+              <EnvelopeIcon class="size-4 text-primary" aria-hidden="true" />
+              Correo electrónico
+            </label>
+            <div class="relative">
+              <UserCircleIcon class="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-primary/75" aria-hidden="true" />
+              <input
+                id="jugadora-email"
+                v-model="email"
+                type="email"
+                autocomplete="email"
+                required
+                :disabled="isLoading"
+                class="min-h-12 w-full rounded-lg border-2 border-slate-200 bg-white px-4 pl-12 text-base font-semibold text-slate-950 outline-none focus:border-primary focus:ring-2 focus:ring-primary/25 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                placeholder="tuemail@ejemplo.com"
+              />
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label for="jugadora-password" class="flex items-center gap-2 text-xs font-black uppercase text-slate-700">
+              <ShieldCheckIcon class="size-4 text-primary" aria-hidden="true" />
+              Contraseña
+            </label>
+            <div class="relative">
+              <LockClosedIcon class="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-primary/75" aria-hidden="true" />
+              <input
+                id="jugadora-password"
+                v-model="password"
+                type="password"
+                autocomplete="current-password"
+                required
+                :disabled="isLoading"
+                class="min-h-12 w-full rounded-lg border-2 border-slate-200 bg-white px-4 pl-12 text-base font-semibold text-slate-950 outline-none focus:border-primary focus:ring-2 focus:ring-primary/25 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                placeholder="••••••••"
+              />
+            </div>
+          </div>
+
+          <div v-if="error" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3" role="alert">
+            <div class="flex items-start gap-3">
+              <ExclamationCircleIcon class="mt-0.5 size-5 shrink-0 text-red-600" aria-hidden="true" />
+              <p class="text-sm font-bold text-red-700">{{ error }}</p>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            :disabled="isLoading"
+            class="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-black uppercase text-white shadow-lg transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
+          >
+            <ArrowPathIcon v-if="isLoading" class="size-5 animate-spin" aria-hidden="true" />
+            <BoltIcon v-else class="size-5" aria-hidden="true" />
+            {{ isLoading ? 'Iniciando...' : 'Entrar al equipo' }}
+          </button>
+        </form>
+
+        <footer class="border-t border-slate-200 bg-slate-50 px-6 py-6 text-center sm:px-8">
+          <p class="text-sm font-semibold text-slate-600">¿Primera vez en la app?</p>
+          <router-link
+            to="/solicitud-acceso"
+            class="mt-3 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 text-sm font-black text-primary-dark transition-colors hover:bg-primary/10"
+          >
+            <UserPlusIcon class="size-5" aria-hidden="true" />
+            Solicitar acceso al equipo
+            <ArrowRightIcon class="size-4" aria-hidden="true" />
+          </router-link>
+        </footer>
       </div>
 
-      <!-- Mensaje informativo -->
-      <div class="mt-8 text-center">
-        <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-full border border-white/20">
-          <SparklesIcon class="w-5 h-5 text-primary-light" />
-          <p class="text-sm font-bold">
-            Portal exclusivo para jugadoras VK Vikingas
-          </p>
-        </div>
+      <div class="mx-auto inline-flex w-fit items-center gap-2 rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-white">
+        <SparklesIcon class="size-5 text-primary" aria-hidden="true" />
+        <p class="text-sm font-bold">Portal exclusivo para jugadoras VK Vikingas</p>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { 
-  UserGroupIcon, 
-  SparklesIcon, 
-  EnvelopeIcon, 
-  UserCircleIcon, 
-  ShieldCheckIcon,
-  LockClosedIcon,
-  ExclamationCircleIcon,
-  BoltIcon,
+import {
   ArrowPathIcon,
+  ArrowRightIcon,
+  BoltIcon,
+  EnvelopeIcon,
+  ExclamationCircleIcon,
+  LockClosedIcon,
+  ShieldCheckIcon,
+  SparklesIcon,
+  UserCircleIcon,
+  UserGroupIcon,
   UserPlusIcon,
-  ArrowRightIcon
 } from '@heroicons/vue/24/outline';
-import { loginJugadora, isLoadingJugadora, errorJugadora, tienePerfılCompleto, obtenerEquiposJugadora } from '../firebase/jugadorasAuth';
+import { loginJugadora, errorJugadora, tienePerfılCompleto, obtenerEquiposJugadora } from '../firebase/jugadorasAuth';
+import logoVikingas from '../assets/logoVk.png';
 
 const router = useRouter();
 const email = ref('');
@@ -181,10 +167,15 @@ const password = ref('');
 const isLoading = ref(false);
 const error = ref(null);
 
+const playerHighlights = [
+  'Confirma entrenamientos',
+  'Revisa convocatorias',
+  'Actualiza tu perfil',
+];
+
 const handleLogin = async () => {
   error.value = null;
-  
-  // Validar campos
+
   if (!email.value || !password.value) {
     error.value = 'Por favor completa email y contraseña';
     return;
@@ -196,13 +187,10 @@ const handleLogin = async () => {
   isLoading.value = false;
 
   if (success) {
-    // Verificar si tiene perfil completo
     const perfilCompleto = await tienePerfılCompleto();
     if (!perfilCompleto) {
-      // Ir a completar perfil
       router.push('/completar-perfil');
     } else {
-      // Verificar equipo y redirigir
       const equipos = obtenerEquiposJugadora();
       if (equipos.length > 1) {
         router.push('/seleccionar-categoria');
@@ -215,39 +203,3 @@ const handleLogin = async () => {
   }
 };
 </script>
-
-<style scoped>
-input:disabled {
-  background-color: #f3f4f6;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* Efecto sutil en el patrón de fondo */
-@keyframes fadePattern {
-  0%, 100% {
-    opacity: 0.05;
-  }
-  50% {
-    opacity: 0.08;
-  }
-}
-
-.absolute.inset-0 > div {
-  animation: fadePattern 4s ease-in-out infinite;
-}
-
-/* Efecto de brillo en el logo */
-@keyframes glow {
-  0%, 100% {
-    filter: drop-shadow(0 0 8px rgba(var(--primary), 0.3));
-  }
-  50% {
-    filter: drop-shadow(0 0 16px rgba(var(--primary), 0.5));
-  }
-}
-
-img[alt="VK Vikingas"] {
-  animation: glow 3s ease-in-out infinite;
-}
-</style>
