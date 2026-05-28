@@ -128,6 +128,11 @@
                   </button>
                 </div>
 
+                <div v-if="(disponibilidadEditadaNormalizada[config.equipo] || []).length === 0" class="rounded-lg bg-red-50 border border-red-200 p-3 mb-3">
+                  <p class="text-sm font-bold text-red-700">🚫 No entrena ningún día</p>
+                  <p class="text-xs text-red-600 mt-1">No será contada en asistencias ni aparecerá en entrenamientos de este equipo.</p>
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button
                     v-for="dia in config.opciones"
@@ -306,9 +311,6 @@ const toggleDiaEquipo = (equipo, dia) => {
   const actuales = new Set(disponibilidadEntrenamientos.value[equipoNormalizado] || []);
 
   if (actuales.has(dia)) {
-    if (actuales.size === 1) {
-      return;
-    }
     actuales.delete(dia);
   } else {
     actuales.add(dia);

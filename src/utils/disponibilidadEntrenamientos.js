@@ -72,7 +72,8 @@ export const normalizarDisponibilidadEntrenamientos = (disponibilidad = {}, equi
 
   return equiposActivos.reduce((resultado, equipo) => {
     const diasPersonalizados = normalizarDiasSemana(disponibilidad?.[equipo]);
-    resultado[equipo] = diasPersonalizados.length > 0
+    // Si hay días personalizados (aunque sea un array vacío), usar esos. Si no, usar días base.
+    resultado[equipo] = Array.isArray(disponibilidad?.[equipo])
       ? diasPersonalizados
       : obtenerDiasBasePorEquipo(equipo);
     return resultado;
