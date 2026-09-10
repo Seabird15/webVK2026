@@ -9,18 +9,16 @@
         <div class="absolute right-[-8%] top-0 h-64 w-64 rounded-full bg-(--ct-accent)/10 blur-3xl"></div>
       </div>
 
-      <div class="relative z-10 mx-auto max-w-7xl px-4 pb-8 pt-14 sm:px-6 lg:px-8 lg:pb-12 lg:pt-18">
-        <p class="ct-fade text-sm font-semibold italic text-white/70 sm:text-base">
-          Hablemos
-        </p>
+      <div class="relative z-10 text-center mx-auto max-w-7xl px-4 pb-8 pt-14 sm:px-6 lg:px-8 lg:pb-12 lg:pt-18">
+   
         <h1 class="ct-fade mt-4 uppercase leading-[0.88]" style="font-family: 'Gobold High', sans-serif; font-size: clamp(3.5rem, 12vw, 7.5rem);">
-          <span class="block text-transparent [-webkit-text-stroke:1.5px_rgba(247,255,253,0.85)]">Nuestro</span>
-          <span class="block text-white">Contacto</span>
+          <span class="block text-transparent [-webkit-text-stroke:1.5px_rgba(247,255,253,0.85)]">¿Quieres ser parte de</span>
+          <span class="block text-white">Vikingas?</span>
         </h1>
-        <p class="ct-fade mt-6 max-w-2xl text-[clamp(1rem,2.6vw,1.28rem)] leading-relaxed text-white/80">
+        <p class="ct-fade mt-6 max-w-2xl text-[clamp(1rem,2.6vw,1.28rem)] text-center mx-auto leading-relaxed text-white/80">
           Si te interesa ser parte, colaborar o simplemente saber más de Vikingas, escríbenos. Siempre hay espacio para sumar.
         </p>
-      </div>
+      </div> 
     </div>
 
     <!-- Canales de contacto -->
@@ -70,6 +68,80 @@
         </a>
       </div>
 
+      <!-- Formulario de contacto -->
+      <div class="ct-fade mt-10 grid gap-8 rounded-4xl border border-(--ct-primary)/20 bg-white/5 p-6 backdrop-blur-sm sm:p-8 lg:grid-cols-[0.7fr_1.3fr] lg:p-10">
+        <div>
+          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--ct-primary)">Escríbenos directo</p>
+          <h2 class="mt-3 text-3xl font-black uppercase leading-none text-white sm:text-4xl" style="font-family: 'Gobold High', sans-serif;">Queremos conocerte</h2>
+          <p class="mt-5 text-sm leading-7 text-white/65">Déjanos tus datos y cuéntanos qué te gustaría conversar. Te responderemos por el canal que te acomode.</p>
+          <div class="mt-6 rounded-2xl border border-emerald-300/20 bg-emerald-400/8 p-4 text-sm text-white/75">
+            <p class="font-black text-emerald-200">También puedes escribirnos por WhatsApp</p>
+            <p class="mt-1">+56 9 8745 1232</p>
+          </div>
+        </div>
+
+        <form class="grid gap-4" @submit.prevent="enviarFormulario">
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="grid gap-2 text-xs font-black uppercase tracking-[0.14em] text-white/60">
+              Nombre *
+              <input v-model.trim="formulario.nombre" required maxlength="80" type="text" autocomplete="given-name" class="rounded-xl border border-white/15 bg-black/25 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-white outline-none transition focus:border-(--ct-primary)" />
+            </label>
+            <label class="grid gap-2 text-xs font-black uppercase tracking-[0.14em] text-white/60">
+              Apellido *
+              <input v-model.trim="formulario.apellido" required maxlength="80" type="text" autocomplete="family-name" class="rounded-xl border border-white/15 bg-black/25 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-white outline-none transition focus:border-(--ct-primary)" />
+            </label>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="grid gap-2 text-xs font-black uppercase tracking-[0.14em] text-white/60">
+              WhatsApp *
+              <input v-model.trim="formulario.whatsapp" required maxlength="40" type="tel" autocomplete="tel" placeholder="+56 9..." class="rounded-xl border border-white/15 bg-black/25 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-white outline-none transition focus:border-(--ct-primary)" />
+            </label>
+            <label class="grid gap-2 text-xs font-black uppercase tracking-[0.14em] text-white/60">
+              Correo <span class="normal-case tracking-normal text-white/35">(opcional)</span>
+              <input v-model.trim="formulario.email" maxlength="160" type="email" autocomplete="email" class="rounded-xl border border-white/15 bg-black/25 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-white outline-none transition focus:border-(--ct-primary)" />
+            </label>
+          </div>
+
+          <label class="grid gap-2 text-xs font-black uppercase tracking-[0.14em] text-white/60">
+            Instagram u otra red <span class="normal-case tracking-normal text-white/35">(opcional)</span>
+            <input v-model.trim="formulario.redesSociales" maxlength="160" type="text" placeholder="@tuusuario o enlace" class="rounded-xl border border-white/15 bg-black/25 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-white outline-none transition focus:border-(--ct-primary)" />
+          </label>
+
+          <label class="grid gap-2 text-xs font-black uppercase tracking-[0.14em] text-white/60">
+            ¿Qué te gustaría conversar? *
+            <select v-model="formulario.motivo" required class="rounded-xl border border-white/15 bg-[#10201e] px-4 py-3 text-sm font-semibold normal-case tracking-normal text-white outline-none transition focus:border-(--ct-primary)">
+              <option disabled value="">Selecciona una opción</option>
+              <option value="Quiero jugar">Quiero jugar</option>
+              <option value="Quiero probar">Quiero probar</option>
+              <option value="Consulta general">Consulta general</option>
+              <option value="Patrocinio o colaboración">Patrocinio o colaboración</option>
+              <option value="Prensa">Prensa</option>
+            </select>
+          </label>
+
+          <label class="grid gap-2 text-xs font-black uppercase tracking-[0.14em] text-white/60">
+            Mensaje *
+            <textarea v-model.trim="formulario.mensaje" required maxlength="1200" rows="4" class="resize-y rounded-xl border border-white/15 bg-black/25 px-4 py-3 text-sm font-semibold normal-case tracking-normal text-white outline-none transition focus:border-(--ct-primary)"></textarea>
+          </label>
+
+          <input v-model="formulario.website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
+
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-xs leading-relaxed text-white/45">Usaremos estos datos solo para responderte sobre tu mensaje.</p>
+            <button type="submit" :disabled="enviando" class="inline-flex items-center justify-center rounded-xl bg-(--ct-primary) px-5 py-3 text-sm font-black text-[#06201c] transition hover:brightness-110 disabled:cursor-wait disabled:opacity-60">
+              {{ enviando ? 'Enviando...' : 'Enviar mensaje' }}
+            </button>
+          </div>
+
+          <div v-if="enviado" class="rounded-xl border border-emerald-300/30 bg-emerald-400/10 p-4 text-sm font-semibold text-emerald-100">
+            Recibimos tu mensaje. También puedes continuar la conversación directamente por WhatsApp.
+            <a :href="enlaceWhatsapp" target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex rounded-lg bg-emerald-400 px-3 py-2 text-xs font-black text-[#06201c]">Abrir WhatsApp</a>
+          </div>
+          <p v-if="errorFormulario" class="rounded-xl border border-red-300/25 bg-red-400/10 p-4 text-sm font-semibold text-red-100">{{ errorFormulario }}</p>
+        </form>
+      </div>
+
       <!-- Bloque invitación -->
       <div class="ct-fade mt-14 rounded-4xl border border-(--ct-primary)/20 bg-[linear-gradient(135deg,rgba(44,207,191,0.08),rgba(216,178,85,0.06))] px-6 py-10 text-center sm:px-10 lg:px-14 lg:py-14">
         <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--ct-primary)">Sumate al club</p>
@@ -95,8 +167,50 @@
 </template>
 
 <script setup>
+import { computed, ref } from 'vue';
 import { EnvelopeIcon } from '@heroicons/vue/24/solid';
 import { trackOutboundClick } from '../composables/useAnalytics';
+import { enviarMensajeContacto } from '../firebase/mensajesContacto';
+
+const formularioInicial = () => ({
+  nombre: '',
+  apellido: '',
+  whatsapp: '',
+  email: '',
+  redesSociales: '',
+  motivo: '',
+  mensaje: '',
+  website: ''
+});
+
+const formulario = ref(formularioInicial());
+const enviando = ref(false);
+const enviado = ref(false);
+const errorFormulario = ref('');
+const enlaceWhatsapp = computed(() => {
+  const texto = `Hola Vikingas, soy ${formulario.value.nombre} ${formulario.value.apellido}. Les escribí desde el formulario de contacto por: ${formulario.value.motivo}.`;
+  return `https://wa.me/56987451232?text=${encodeURIComponent(texto)}`;
+});
+
+const enviarFormulario = async () => {
+  if (enviando.value) return;
+
+  enviando.value = true;
+  enviado.value = false;
+  errorFormulario.value = '';
+
+  try {
+    await enviarMensajeContacto(formulario.value);
+    enviado.value = true;
+    formulario.value = formularioInicial();
+  } catch (error) {
+    errorFormulario.value = error?.message?.includes('invalid-argument')
+      ? 'Revisa los campos obligatorios e intenta nuevamente.'
+      : 'No pudimos enviar tu mensaje. Intenta nuevamente o escríbenos por WhatsApp.';
+  } finally {
+    enviando.value = false;
+  }
+};
 </script>
 
 <style scoped>

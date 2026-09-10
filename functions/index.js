@@ -1,5 +1,6 @@
 const functions = require("firebase-functions");
 const functionsV1 = require("firebase-functions/v1");
+const { onCall } = require("firebase-functions/v2/https");
 const { defineSecret, defineString } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 
@@ -11,6 +12,9 @@ const NOTIFICATIONS_FROM_EMAIL = defineString("NOTIFICATIONS_FROM_EMAIL", {
 });
 const NOTIFICATIONS_FROM_NAME = defineString("NOTIFICATIONS_FROM_NAME", {
   default: "CD Vikingas"
+});
+const CONTACT_EMAIL_RECIPIENTS = defineString("CONTACT_EMAIL_RECIPIENTS", {
+  default: "cdvikingas@gmail.com"
 });
 
 const SITE_URL = "https://www.clubdeportivovikingas.cl";
@@ -219,7 +223,7 @@ const chunkArray = (items = [], chunkSize = MAX_DESTINATARIAS_POR_ENVIO) => {
   return chunks;
 };
 
-const enviarCorreoResendBatch = async ({ destinatarias = [], subject, text, html }) => {
+const enviarCorreoResendBatch = async ({ destinatarias = [], subject, text, html, replyTo = "" }) => {
   const { resendApiKey, fromEmail, fromName } = leerConfigCorreo();
 
   if (!resendApiKey || !fromEmail) {
@@ -233,6 +237,7 @@ const enviarCorreoResendBatch = async ({ destinatarias = [], subject, text, html
   const payload = destinatarias.map((destinataria) => ({
     from: `${fromName} <${fromEmail}>`,
     to: [destinataria],
+    ...(replyTo ? { reply_to: replyTo } : {}),
     subject,
     text,
     html
@@ -572,6 +577,104 @@ exports.resendTrainingEmailReminder = functionsV1.runWith({
       detail: serializarErrorCorreo(error)
     });
   }
+});
+
+const normalizarContacto = (valor, maximo) => (valor || "")
+  .toString()
+  .trim()
+  .slice(0, maximo);
+
+exports.submitContactMessage = onCall({ secrets: [RESEND_API_KEY] }, async (request) => {
+  const payload = request.data?.data || request.data || {};
+  const nombre = normalizarContacto(payload.nombre, 80);
+  const apellido = normalizarContacto(payload.apellido, 80);
+  const whatsapp = normalizarContacto(payload.whatsapp, 40);
+  const redesSociales = normalizarContacto(payload.redesSociales, 160);
+  const email = normalizarContacto(payload.email, 160).toLowerCase();
+  const motivo = normalizarContacto(payload.motivo, 60);
+  const mensaje = normalizarContacto(payload.mensaje, 1200);
+  const honeypot = normalizarContacto(payload.website, 80);
+
+  if (honeypot) {
+    return { success: true };
+  }
+
+  if (!nombre || !apellido || !whatsapp || !motivo || !mensaje) {
+    throw new functions.https.HttpsError("invalid-argument", "Completa los campos obligatorios.");
+  }
+
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new functions.https.HttpsError("invalid-argument", "El correo no parece válido.");
+  }
+
+  const contacto = {
+    nombre,
+    apellido,
+    whatsapp,
+    redesSociales,
+    email,
+    motivo,
+    mensaje,
+    estado: "pendiente",
+    origen: "web_contacto",
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+  };
+
+  const contactoRef = await admin.firestore().collection("mensajesContacto").add(contacto);
+  const destinatarias = (CONTACT_EMAIL_RECIPIENTS.value() || "cdvikingas@gmail.com")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+  const nombreCompleto = `${nombre} ${apellido}`;
+  const subject = `Nuevo contacto web: ${nombreCompleto}`;
+  const text = [
+    "Nuevo mensaje recibido desde el sitio de CD Vikingas.",
+    "",
+    `Nombre: ${nombreCompleto}`,
+    `WhatsApp: ${whatsapp}`,
+    `Correo: ${email || "No informado"}`,
+    `Redes sociales: ${redesSociales || "No informadas"}`,
+    `Motivo: ${motivo}`,
+    "",
+    "Mensaje:",
+    mensaje
+  ].join("\n");
+  const html = `
+    <div style="font-family:Arial,sans-serif;color:#17201f;line-height:1.6;">
+      <h2 style="color:#087f72;">Nuevo contacto desde la web</h2>
+      <p><strong>${escaparHtml(nombreCompleto)}</strong> quiere comunicarse con Vikingas.</p>
+      <p><strong>WhatsApp:</strong> ${escaparHtml(whatsapp)}<br>
+      <strong>Correo:</strong> ${escaparHtml(email || "No informado")}<br>
+      <strong>Redes:</strong> ${escaparHtml(redesSociales || "No informadas")}<br>
+      <strong>Motivo:</strong> ${escaparHtml(motivo)}</p>
+      <div style="padding:16px;background:#f3f8f7;border-radius:12px;white-space:pre-wrap;">${escaparHtml(mensaje)}</div>
+      <p style="color:#66706e;font-size:13px;">Mensaje guardado con ID: ${escaparHtml(contactoRef.id)}</p>
+    </div>
+  `;
+
+  try {
+    const resultadoCorreo = await enviarCorreoResendBatch({
+      destinatarias,
+      subject,
+      text,
+      html,
+      replyTo: email
+    });
+
+    await contactoRef.update({
+      emailNotification: resultadoCorreo.ok ? "sent" : "failed",
+      emailNotificationError: resultadoCorreo.ok ? null : resultadoCorreo.error || "No enviado",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (error) {
+    functions.logger.error("submitContactMessage email error", {
+      contactoId: contactoRef.id,
+      error: serializarErrorCorreo(error)
+    });
+  }
+
+  return { success: true, id: contactoRef.id };
 });
 
 /**

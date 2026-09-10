@@ -63,7 +63,7 @@
         </div>
 
         <form class="space-y-5 px-6 py-7 sm:px-8" @submit.prevent="handleLogin">
-          <div class="space-y-2">
+          <div v-if="!showResetForm" class="space-y-2">
             <label for="jugadora-email" class="flex items-center gap-2 text-xs font-black uppercase text-slate-700">
               <EnvelopeIcon class="size-4 text-primary" aria-hidden="true" />
               Correo electrónico
@@ -83,7 +83,7 @@
             </div>
           </div>
 
-          <div class="space-y-2">
+          <div v-if="!showResetForm" class="space-y-2">
             <label for="jugadora-password" class="flex items-center gap-2 text-xs font-black uppercase text-slate-700">
               <ShieldCheckIcon class="size-4 text-primary" aria-hidden="true" />
               Contraseña
@@ -111,6 +111,7 @@
           </div>
 
           <button
+            v-if="!showResetForm"
             type="submit"
             :disabled="isLoading"
             class="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-black uppercase text-white shadow-lg transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
@@ -119,18 +120,63 @@
             <BoltIcon v-else class="size-5" aria-hidden="true" />
             {{ isLoading ? 'Iniciando...' : 'Entrar al equipo' }}
           </button>
+
+          <div v-if="!showResetForm" class="space-y-3 text-center">
+            <button
+              type="button"
+              :disabled="isLoading || isSendingReset"
+              class="min-h-10 px-1 text-sm font-bold text-primary underline decoration-2 underline-offset-4 transition-colors hover:text-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
+              @click="showResetForm = !showResetForm; resetMessage = ''; error = null"
+            >
+              {{ showResetForm ? 'Ocultar recuperación' : '¿Olvidaste tu contraseña?' }}
+            </button>
+
+          </div>
+
+          <div v-else class="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-left">
+            <div>
+              <label for="recuperar-email" class="block text-xs font-black uppercase text-slate-700">
+                Correo con el que creaste tu cuenta
+              </label>
+              <p class="mt-1 text-xs font-semibold text-slate-500">
+                Ingresa el correo utilizado al crear tu cuenta.
+              </p>
+            </div>
+              <input
+                id="recuperar-email"
+                v-model="resetEmail"
+                type="email"
+                autocomplete="email"
+                placeholder="tuemail@ejemplo.com"
+                :disabled="isSendingReset"
+                class="min-h-12 w-full rounded-lg border-2 border-slate-200 bg-white px-4 text-base font-semibold text-slate-950 outline-none focus:border-primary focus:ring-2 focus:ring-primary/25 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+              />
+              <button
+                type="button"
+                :disabled="isSendingReset"
+                class="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-black uppercase text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
+                @click="handlePasswordReset"
+              >
+                <ArrowPathIcon v-if="isSendingReset" class="size-5 animate-spin" aria-hidden="true" />
+                {{ isSendingReset ? 'Enviando...' : 'Enviar enlace de recuperación' }}
+              </button>
+              <div v-if="resetMessage" class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3" role="status">
+                <p class="text-sm font-bold text-emerald-700">{{ resetMessage }}</p>
+              </div>
+              <button
+                type="button"
+                :disabled="isSendingReset"
+                class="min-h-10 w-full text-sm font-bold text-primary underline decoration-2 underline-offset-4 transition-colors hover:text-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
+                @click="showResetForm = false; resetMessage = ''; error = null"
+              >
+                Volver al inicio de sesión
+              </button>
+          </div>
         </form>
 
         <footer class="border-t border-slate-200 bg-slate-50 px-6 py-6 text-center sm:px-8">
-          <p class="text-sm font-semibold text-slate-600">¿Primera vez en la app?</p>
-          <router-link
-            to="/solicitud-acceso"
-            class="mt-3 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 text-sm font-black text-primary-dark transition-colors hover:bg-primary/10"
-          >
-            <UserPlusIcon class="size-5" aria-hidden="true" />
-            Solicitar acceso al equipo
-            <ArrowRightIcon class="size-4" aria-hidden="true" />
-          </router-link>
+          <p class="text-sm font-semibold text-slate-600">El ingreso se realiza mediante invitación del club.</p>
+          <p class="mt-2 text-xs text-slate-500">Si recibiste una URL de invitación, úsala para completar tu ficha.</p>
         </footer>
       </div>
 
@@ -147,7 +193,6 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   ArrowPathIcon,
-  ArrowRightIcon,
   BoltIcon,
   EnvelopeIcon,
   ExclamationCircleIcon,
@@ -156,9 +201,8 @@ import {
   SparklesIcon,
   UserCircleIcon,
   UserGroupIcon,
-  UserPlusIcon,
 } from '@heroicons/vue/24/outline';
-import { loginJugadora, errorJugadora, tienePerfılCompleto, obtenerEquiposJugadora } from '../firebase/jugadorasAuth';
+import { loginJugadora, errorJugadora, tienePerfılCompleto, obtenerEquiposJugadora, recuperarContrasenaJugadora } from '../firebase/jugadorasAuth';
 import logoVikingas from '../assets/logoVk.png';
 
 const router = useRouter();
@@ -166,6 +210,10 @@ const email = ref('');
 const password = ref('');
 const isLoading = ref(false);
 const error = ref(null);
+const isSendingReset = ref(false);
+const resetMessage = ref('');
+const resetEmail = ref('');
+const showResetForm = ref(false);
 
 const playerHighlights = [
   'Confirma entrenamientos',
@@ -200,6 +248,26 @@ const handleLogin = async () => {
     }
   } else {
     error.value = errorJugadora.value || 'Error al iniciar sesión';
+  }
+};
+
+const handlePasswordReset = async () => {
+  error.value = null;
+  resetMessage.value = '';
+
+  if (!resetEmail.value) {
+    error.value = 'Ingresa tu correo electrónico para recuperar la contraseña';
+    return;
+  }
+
+  isSendingReset.value = true;
+  const success = await recuperarContrasenaJugadora(resetEmail.value);
+  isSendingReset.value = false;
+
+  if (success) {
+    resetMessage.value = 'Revisa tu correo para crear una nueva contraseña';
+  } else {
+    error.value = errorJugadora.value || 'No se pudo enviar el correo de recuperación';
   }
 };
 </script>

@@ -1,16 +1,16 @@
 <template>
   <nav class="sticky top-0 z-50 bg-primary-dark text-black shadow-[0_12px_32px_rgba(0,0,0,0.24)]">
-    <div class="bg-black px-4 py-2 text-center text-xs font-semibold text-white md:text-sm">
+    <div class="bg-black px-4 py-2 text-center text-xs font-semibold text-white ">
       "Cuando pienses en dejarlo, recuerda el porqué comenzaste"
     </div>
 
-    <div class="mx-auto max-w-screen-2xl px-4 py-3 md:px-6 xl:px-8">
+    <div class="mx-auto max-w-screen-2xl px-4 py-3 lg:py-1 md:px-6 xl:px-8">
       <div class="flex items-center justify-between gap-4">
         <router-link to="/" class="flex shrink-0 items-center" aria-label="Ir al inicio">
           <img :src="logoUrl" :alt="brandName" class="h-11 w-auto md:h-12" />
         </router-link>
 
-        <div class="hidden min-w-0 flex-1 items-center justify-center gap-0.5 2xl:flex">
+        <div class="hidden min-w-0 flex-1 items-center justify-center gap-0.5 xl:flex">
           <template v-for="link in navLinks" :key="link.id">
             <div v-if="link.children" class="relative">
               <button
@@ -34,9 +34,9 @@
                 v-if="openDesktopMenuId === link.id"
                 class="absolute left-1/2 top-full z-50 mt-3 w-80 -translate-x-1/2 overflow-hidden rounded-lg border border-black/10 bg-[#101010] text-white shadow-[0_22px_48px_rgba(0,0,0,0.35)]"
               >
-                <div class="border-b border-white/10 px-4 py-4">
-                  <p class="text-xs font-black uppercase text-primary">Competencias Vikingas</p>
-                  <p class="mt-1 text-sm font-semibold text-white/65">Resultados, torneos y seguimiento deportivo.</p>
+                <div v-if="link.id === 4 || link.id === 10" class="border-b border-white/10 px-4 py-4">
+                  <p class="text-xs font-black uppercase text-primary">{{ link.id === 4 ? 'Competencias Vikingas' : 'Accesos Vikingas' }}</p>
+                  <p class="mt-1 text-sm font-semibold text-white/65">{{ link.id === 4 ? 'Resultados, torneos y seguimiento deportivo.' : 'Acceso VKS y panel administrativo.' }}</p>
                 </div>
 
                 <div class="grid gap-2 p-2">
@@ -81,7 +81,7 @@
         </div>
 
         <div class="flex shrink-0 items-center justify-end gap-2">
-          <div class="hidden items-center gap-2 md:flex">
+          <div class="hidden items-center gap-2 md:flex xl:hidden">
             <router-link
               v-for="access in quickAccessLinks"
               :key="access.path"
@@ -125,7 +125,7 @@
 
           <button
             type="button"
-            class="flex size-11 items-center justify-center rounded-lg text-black transition-colors hover:bg-black/10 2xl:hidden"
+            class="flex size-11 items-center justify-center rounded-lg text-black transition-colors hover:bg-black/10 xl:hidden"
             :aria-expanded="isMenuOpen"
             aria-label="Abrir menú"
             @click="isMenuOpen = !isMenuOpen"
@@ -140,7 +140,7 @@
       </div>
     </div>
 
-    <div v-if="isMenuOpen" class="border-t border-black/20 bg-primary-dark px-4 pb-5 pt-3 2xl:hidden">
+    <div v-if="isMenuOpen" class="border-t border-black/20 bg-primary-dark px-4 pb-5 pt-3 xl:hidden">
       <div class="mb-4 grid grid-cols-2 gap-3">
         <router-link
           v-for="access in quickAccessLinks"
@@ -302,7 +302,28 @@ const navLinks = [
   { id: 6, label: 'Estadísticas', path: '/estadisticas', icon: ChartBarIcon },
   { id: 7, label: 'Indumentaria', path: '/indumentaria', icon: PhotoIcon },
   { id: 8, label: 'Fotos', path: '/fotos', icon: PhotoIcon },
-  { id: 9, label: 'Contacto', path: '/contacto', icon: EnvelopeIcon },
+  { id: 9, label: 'Únete a vks', path: '/contacto', icon: EnvelopeIcon },
+    {
+    id: 10,
+    label: 'Accesos',
+    icon: UserGroupIcon,
+    children: [
+      {
+        id: 'acceso-jugadoras',
+        label: 'Acceso jugadoras',
+        path: '/login-jugadora',
+        icon: UserIcon,
+        description: 'Acceso VKS',
+      },
+      {
+        id: 'acceso-admin',
+        label: 'Acceso admin',
+        path: '/login',
+        icon: LockClosedIcon,
+        description: 'Panel administrativo',
+      },
+    ],
+  }
 ];
 
 const isLinkActive = (path) => route.path === path;

@@ -2,6 +2,7 @@ import { ref } from 'vue';
 import { 
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut,
   onAuthStateChanged,
   updateProfile,
@@ -322,6 +323,25 @@ export const loginJugadora = async (email, password) => {
   }
 };
 
+// Enviar correo de recuperación de contraseña de jugadora
+export const recuperarContrasenaJugadora = async (email) => {
+  errorJugadora.value = null;
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return true;
+  } catch (err) {
+    if (err.code === 'auth/user-not-found') {
+      errorJugadora.value = 'No encontramos una cuenta con ese correo';
+    } else if (err.code === 'auth/invalid-email') {
+      errorJugadora.value = 'Email inválido';
+    } else {
+      errorJugadora.value = err.message;
+    }
+    return false;
+  }
+};
+
 // Obtener datos de la jugadora desde Firestore
 export const fetchJugadoraData = async (uid, coleccion = 'jugadoraRegistro') => {
   try {
@@ -634,20 +654,23 @@ export const actualizarPerfilJugadora = async (uid, perfilData, fotoFile) => {
   isLoadingJugadora.value = true;
   errorJugadora.value = null;
   try {
-    const { estadoSalud: _estadoSaludIgnorado, ...perfilSinEstado } = perfilData || {};
-    const equiposNormalizados = obtenerEquiposJugadoraDesdeDatos(perfilSinEstado);
+    const perfilSinValoresUndefined = Object.fromEntries(
+      Object.entries(perfilData || {}).filter(([, valor]) => valor !== undefined)
+    );
+    const { id: _idIgnorado, ...perfilSinId } = perfilSinValoresUndefined;
+    const equiposNormalizados = obtenerEquiposJugadoraDesdeDatos(perfilSinId);
     const equipoLegacy = convertirEquiposAString(equiposNormalizados);
     const dataToUpdate = {
-      ...perfilSinEstado,
+      ...perfilSinId,
       equipos: equiposNormalizados,
       equipo: equipoLegacy,
       disponibilidadEntrenamientos: normalizarDisponibilidadEntrenamientos(
-        perfilSinEstado?.disponibilidadEntrenamientos || {},
+        perfilSinId?.disponibilidadEntrenamientos || {},
         equiposNormalizados
       ),
       categoriaSeleccionada: resolverCategoriaSeleccionada(
         equipoLegacy,
-        perfilSinEstado?.categoriaSeleccionada,
+        perfilSinId?.categoriaSeleccionada,
         jugadoraData.value?.categoriaSeleccionada,
         equiposNormalizados
       ),
@@ -662,8 +685,16 @@ export const actualizarPerfilJugadora = async (uid, perfilData, fotoFile) => {
       dataToUpdate.fotoPerfil = await getDownloadURL(fileRef);
     }
 
-    // Actualizar en jugadoraRegistro
-    await updateDoc(doc(db, 'jugadoraRegistro', uid), dataToUpdate);
+    const datosSinCamposInternos = Object.fromEntries(
+      Object.entries(dataToUpdate).filter(([campo]) => !['id', 'uid'].includes(campo))
+    );
+
+    // Mantener sincronizadas las tres fuentes usadas por el acceso y administración.
+    await Promise.all([
+      setDoc(doc(db, 'jugadoraRegistro', uid), { ...datosSinCamposInternos, uid }, { merge: true }),
+      setDoc(doc(db, 'jugadoras', uid), { ...datosSinCamposInternos, uid }, { merge: true }),
+      setDoc(doc(db, 'jugadorasLogin', uid), { ...datosSinCamposInternos, uid }, { merge: true })
+    ]);
     await fetchJugadoraData(uid, 'jugadoraRegistro');
     return true;
   } catch (err) {

@@ -118,13 +118,12 @@ const routes = [
   },
   // Rutas de jugadoras
   {
-    path: '/solicitud-acceso',
+    path: '/invitacion-vikingas',
     name: 'SolicitudAcceso',
     component: () => import('../Pages/SolicitudAcceso.vue'),
-    alias: ['/sumate', '/postula'],
     meta: {
-      title: 'Súmate a Vikingas — Postula al Club',
-      description: 'Postula para sumarte a CD Vikingas. Cuéntanos tu posición, categoría de interés y disponibilidad para integrarte al club.',
+      title: 'Ficha de ingreso — CD Vikingas',
+      description: 'Completa tu ficha de ingreso a CD Vikingas mediante el enlace de invitación recibido.',
     }
   },
   {

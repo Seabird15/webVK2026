@@ -82,6 +82,18 @@
               <span class="block font-bold uppercase text-gray-500">Comuna</span>
               <span class="mt-1 block font-semibold text-gray-900">{{ solicitud.comuna }}</span>
             </div>
+            <div v-if="solicitud.telefono" class="rounded-lg bg-gray-50 px-3 py-2">
+              <span class="block font-bold uppercase text-gray-500">Teléfono</span>
+              <a :href="`tel:${solicitud.telefono}`" class="mt-1 block font-semibold text-primary-dark">{{ solicitud.telefono }}</a>
+            </div>
+            <div v-if="solicitud.instagram" class="rounded-lg bg-gray-50 px-3 py-2">
+              <span class="block font-bold uppercase text-gray-500">Instagram</span>
+              <span class="mt-1 block font-semibold text-gray-900">{{ solicitud.instagram }}</span>
+            </div>
+            <div v-if="solicitud.edad" class="rounded-lg bg-gray-50 px-3 py-2">
+              <span class="block font-bold uppercase text-gray-500">Edad</span>
+              <span class="mt-1 block font-semibold text-gray-900">{{ solicitud.edad }} años</span>
+            </div>
           </div>
 
           <p v-if="solicitud.experiencia" class="mt-3 text-xs leading-5 text-gray-600">
@@ -92,6 +104,11 @@
           <p v-if="solicitud.disponibilidad" class="mt-2 text-xs leading-5 text-gray-600">
             <span class="font-bold uppercase text-gray-700">Disponibilidad:</span>
             {{ solicitud.disponibilidad }}
+          </p>
+
+          <p v-if="solicitud.mensaje" class="mt-2 rounded-lg bg-primary/5 px-3 py-2 text-xs leading-5 text-gray-700">
+            <span class="font-bold uppercase text-gray-700">Mensaje:</span>
+            {{ solicitud.mensaje }}
           </p>
           
           <div v-if="solicitud.estado === 'pendiente'" class="flex gap-2 mt-3">
@@ -134,6 +151,10 @@
                 <div class="font-bold text-gray-900">{{ [solicitud.nombre, solicitud.apellido].filter(Boolean).join(' ') || 'Sin nombre' }}</div>
                 <div>{{ formatearEquipoInteres(solicitud.equipoInteres) || 'Sin categoría' }}</div>
                 <div v-if="solicitud.posicion">{{ solicitud.posicion }}</div>
+                <div v-if="solicitud.telefono">Tel: {{ solicitud.telefono }}</div>
+                <div v-if="solicitud.instagram">IG: {{ solicitud.instagram }}</div>
+                <div v-if="solicitud.edad">{{ solicitud.edad }} años</div>
+                <div v-if="solicitud.mensaje" class="mt-1 max-w-xs truncate text-gray-500" :title="solicitud.mensaje">{{ solicitud.mensaje }}</div>
               </td>
               <td class="px-6 py-4">
                 <span
