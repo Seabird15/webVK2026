@@ -1,176 +1,150 @@
 <template>
   <section class="historia-page overflow-hidden bg-(--historia-bg) text-(--historia-text)">
-    <div class="relative isolate">
-      <div class="absolute inset-0" aria-hidden="true">
-        <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,17,18,0.22)_0%,rgba(11,17,18,0.72)_55%,rgba(11,17,18,0.96)_100%)]"></div>
-        <div class="absolute left-[-8%] top-10 h-56 w-56 rounded-full bg-(--historia-primary)/14 blur-3xl"></div>
-        <div class="absolute right-[-10%] top-0 h-72 w-72 rounded-full bg-(--historia-secondary)/8 blur-3xl"></div>
-      </div>
-
-      <div class="mx-auto grid min-h-136 max-w-7xl items-end gap-8 px-4 pb-12 pt-14 sm:px-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(18rem,1.05fr)] lg:px-8 lg:pb-16 lg:pt-18">
-        <div class="relative z-10 max-w-2xl">
-          <p class="historia-fade text-sm font-semibold italic text-white/74 sm:text-base">
-            Desde diciembre de 2019
-          </p>
-          <h1 class="historia-fade mt-4 uppercase leading-[0.88]" style="font-family: 'Gobold High', sans-serif; font-size: clamp(4rem, 13vw, 8.5rem);">
-            <span class="block text-transparent [-webkit-text-stroke:1.5px_rgba(247,255,253,0.88)]">Nuestra</span>
-            <span class="block text-white">Historia</span>
+    <header class="relative isolate border-b border-white/10">
+      <div class="absolute inset-0 bg-[linear-gradient(115deg,rgba(11,17,18,0.98)_0%,rgba(11,17,18,0.78)_52%,rgba(11,17,18,0.46)_100%)]" aria-hidden="true"></div>
+      <div class="relative mx-auto grid max-w-7xl gap-10 px-4 pb-14 pt-16 sm:px-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(20rem,1.1fr)] lg:items-end lg:px-8 lg:pb-20 lg:pt-24">
+        <div class="max-w-2xl">
+          <p class="historia-fade text-sm font-black uppercase tracking-[0.2em] text-(--historia-primary)">Club Deportivo Social y Cultural Vikingas · 2019</p>
+          <h1 class="historia-fade mt-5 uppercase leading-[0.84]" style="font-family: 'Gobold High', sans-serif; font-size: clamp(4.2rem, 14vw, 9rem);">
+            <span class="block text-transparent [-webkit-text-stroke:1.5px_rgba(247,255,253,0.88)]">Una</span>
+            <span class="block text-white">cancha</span>
+            <span class="block text-white">propia</span>
           </h1>
-          <p class="historia-fade mt-6 max-w-xl text-[clamp(1.02rem,2.8vw,1.34rem)] leading-relaxed text-white/84">
-            Vikingas es un club creado por y para mujeres. Nació para que volver a la pelota no fuera un lujo ni una rareza, sino una cancha propia, una red de apoyo y un lugar donde quedarse de verdad.
+          <p class="historia-fade mt-7 max-w-xl text-[clamp(1.02rem,2.8vw,1.34rem)] leading-relaxed text-white/82">
+            Vikingas nació para que mujeres adultas pudieran comenzar, volver a jugar, aprender y competir en un espacio estable, seguro y exigente.
           </p>
         </div>
 
-        <div class="historia-fade relative z-10 lg:justify-self-end">
-          <div class="relative overflow-hidden rounded-[2.2rem] border border-white/10 bg-white/6 p-3 shadow-[0_24px_60px_rgba(0,0,0,0.22)] backdrop-blur-sm">
-            <img
-              :src="heroImage"
-              alt="Jugadoras de Vikingas reunidas en la cancha"
-              class="h-80 w-full rounded-[1.7rem] object-cover sm:h-100 lg:w-136"
-            >
-            <div class="absolute inset-x-8 bottom-8 rounded-[1.6rem] bg-[rgba(10,17,18,0.72)] px-5 py-4 backdrop-blur-sm">
-              <p class="text-[0.72rem] font-black uppercase tracking-[0.2em] text-(--historia-primary)">Creado por y para mujeres</p>
-              <p class="mt-2 text-sm leading-6 text-white/82 sm:text-base">
-                Acá el fútbol se vive con barrio, con abrazo y con paciencia. Primero se construye la casa; después, el juego encuentra su forma.
-              </p>
-            </div>
+        <div class="historia-fade relative lg:justify-self-end">
+          <img :src="heroImage" alt="Plantel de Vikingas reunido en la cancha" class="h-80 w-full object-cover sm:h-104 lg:w-xl">
+          <div class="absolute inset-x-4 bottom-4 border-l-4 border-(--historia-primary) bg-(--historia-bg)/90 px-5 py-4 sm:inset-x-6 sm:bottom-6">
+            <p class="text-[0.72rem] font-black uppercase tracking-[0.2em] text-(--historia-primary)">Desde Puente Alto</p>
+            <p class="mt-2 text-sm leading-6 text-white/82 sm:text-base">Un proyecto deportivo, social y comunitario construido con tiempo, constancia y confianza.</p>
           </div>
         </div>
       </div>
-    </div>
+    </header>
 
-    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-      <div class="historia-paper historia-fade rounded-4xl px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
-        <div class="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-10">
+    <main class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+      <section class="historia-paper historia-fade grid gap-8 px-6 py-8 sm:px-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-12 lg:px-12 lg:py-12">
+        <div>
+          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">El punto de partida</p>
+          <h2 class="mt-3 text-[clamp(2.2rem,5vw,4.2rem)] font-black uppercase leading-[0.9] text-(--historia-ink)" style="font-family: 'Gobold High', sans-serif;">Volver a la pelota sin pedir permiso</h2>
+        </div>
+        <div class="space-y-4 text-[1rem] leading-8 text-(--historia-muted) sm:text-[1.08rem]">
+          <p>Vikingas es un club hecho por mujeres, para mujeres. Nació porque muchas no habían tenido la oportunidad de jugar: por falta de espacios, responsabilidades personales o ambientes poco inclusivos.</p>
+          <p>Acá no se exige llegar formada. Se puede comenzar, retomar, desarrollarse y competir. La cancha es el punto de encuentro; la pertenencia se construye con respeto, compromiso y compañerismo.</p>
+        </div>
+      </section>
+
+      <section class="mt-16 lg:mt-24" aria-labelledby="ruta-vikingas">
+        <div class="flex flex-col gap-4 border-b border-white/15 pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">La idea que sostiene al club</p>
-            <h2 class="mt-3 text-[clamp(2rem,4vw,3.4rem)] font-black uppercase leading-[0.94] text-(--historia-ink)" style="font-family: 'Gobold High', sans-serif;">
-              Una cancha para volver
-            </h2>
+            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">La ruta Vikingas</p>
+            <h2 id="ruta-vikingas" class="mt-3 max-w-2xl text-[clamp(2.2rem,5vw,4rem)] font-black uppercase leading-[0.9] text-white" style="font-family: 'Gobold High', sans-serif;">Pertenecer. Formarse. Prepararse. Competir.</h2>
+          </div>
+          <p class="max-w-xs text-sm leading-6 text-white/60">Cuatro ideas que orientan el proyecto sin separar a la comunidad del rendimiento.</p>
+        </div>
+
+        <div class="mt-8 grid gap-px overflow-hidden border border-white/15 bg-white/15 sm:grid-cols-2 lg:grid-cols-4">
+          <article v-for="(pillar, index) in pillars" :key="pillar.title" class="historia-pillar bg-(--historia-bg) p-6" :style="{ '--delay': `${index * 90}ms` }">
+            <span class="text-4xl font-black text-(--historia-secondary)" style="font-family: 'Gobold High', sans-serif;">0{{ index + 1 }}</span>
+            <h3 class="mt-8 text-2xl font-black uppercase leading-none text-white" style="font-family: 'Gobold High', sans-serif;">{{ pillar.title }}</h3>
+            <p class="mt-4 text-sm leading-7 text-white/68">{{ pillar.copy }}</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="mt-16 lg:mt-24" aria-labelledby="linea-tiempo">
+        <div class="grid gap-10 lg:grid-cols-[minmax(13rem,0.45fr)_minmax(0,1.55fr)]">
+          <div>
+            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">Una historia que sigue</p>
+            <h2 id="linea-tiempo" class="mt-3 text-[clamp(2.2rem,5vw,4rem)] font-black uppercase leading-[0.9] text-white" style="font-family: 'Gobold High', sans-serif;">De las ganas al equipo</h2>
           </div>
 
-          <div class="space-y-4 text-[1rem] leading-8 text-(--historia-muted) sm:text-[1.05rem]">
-            <p>
-              Vikingas es un club hecho por mujeres, para mujeres. Nació en los barrios de Puente Alto porque hacía falta un espacio de verdad. Un lugar donde mujeres adultas pudieran volver a tocar la pelota sin pedir permiso, sin sentirse fuera de tiempo y sin tener que encajar en lógicas ajenas.
-            </p>
-            <p>
-              Desde el comienzo, la apuesta fue otra: no salir a juntar jugadoras como piezas sueltas, sino armar comunidad con tiempo, constancia y confianza. Que la cancha se sintiera cercana. Que el club se sintiera casa. Nosotras al centro, siempre.
-            </p>
+          <div class="space-y-10 border-l border-(--historia-primary)/45 pl-6 sm:pl-10">
+            <article v-for="(chapter, index) in chapters" :key="chapter.title" class="historia-fade relative grid gap-6 sm:grid-cols-[minmax(8rem,0.4fr)_minmax(0,1fr)] sm:items-center" :style="{ '--delay': `${index * 120}ms` }">
+              <span class="absolute -left-[2.05rem] top-1 size-3 rounded-full bg-(--historia-primary) ring-8 ring-(--historia-bg) sm:-left-[2.95rem]" aria-hidden="true"></span>
+              <img :src="chapter.image" :alt="chapter.alt" loading="lazy" class="h-44 w-full object-cover sm:h-36">
+              <div>
+                <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-secondary)">{{ chapter.kicker }}</p>
+                <h3 class="mt-2 text-2xl font-black uppercase leading-[0.95] text-white sm:text-3xl" style="font-family: 'Gobold High', sans-serif;">{{ chapter.title }}</h3>
+                <p class="mt-3 text-[1rem] leading-7 text-white/70">{{ chapter.copy }}</p>
+              </div>
+            </article>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="mt-10 grid gap-8 lg:mt-14">
-        <article
-          v-for="(chapter, index) in chapters"
-          :key="chapter.title"
-          class="historia-fade grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10"
-        >
-          <div :class="index % 2 === 1 ? 'lg:order-2' : ''" class="space-y-4">
-            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">
-              {{ chapter.kicker }}
-            </p>
-            <h3 class="text-[clamp(2rem,4vw,3rem)] font-black uppercase leading-[0.95] text-white" style="font-family: 'Gobold High', sans-serif;">
-              {{ chapter.title }}
-            </h3>
-            <p class="max-w-xl text-[1rem] leading-8 text-white/72 sm:text-[1.05rem]">
-              {{ chapter.copy }}
-            </p>
-          </div>
-
-          <div :class="index % 2 === 1 ? 'lg:order-1' : ''" class="relative">
-            <div class="absolute -inset-3 rounded-4xl bg-[linear-gradient(135deg,rgba(44,207,191,0.18),transparent_60%)] blur-2xl"></div>
-            <img
-              :src="chapter.image"
-              :alt="chapter.alt"
-              class="relative h-72 w-full rounded-4xl object-cover shadow-[0_22px_56px_rgba(0,0,0,0.18)] sm:h-88"
-            >
+      <section class="mt-16 grid gap-6 lg:mt-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <article class="historia-paper historia-fade px-6 py-8 sm:px-8 lg:px-10">
+          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">Tres categorías, un escudo</p>
+          <h2 class="mt-3 text-[clamp(2.1rem,4vw,3.4rem)] font-black uppercase leading-[0.9] text-(--historia-ink)" style="font-family: 'Gobold High', sans-serif;">Cada una tiene su propósito</h2>
+          <p class="mt-4 text-[1rem] leading-8 text-(--historia-muted)">Escuela Formativa, Serie C y Serie B Ascenso tienen objetivos y niveles de exigencia distintos. Ninguna vale más que otra: todas representan a Vikingas.</p>
+          <div class="mt-6 space-y-3">
+            <div v-for="category in categories" :key="category.name" class="border-t border-(--historia-line) pt-3">
+              <p class="font-black uppercase text-(--historia-ink)">{{ category.name }}</p>
+              <p class="mt-1 text-sm leading-6 text-(--historia-muted)">{{ category.copy }}</p>
+            </div>
           </div>
         </article>
-      </div>
 
-      <div class="mt-12 grid gap-6 lg:mt-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-        <section class="historia-paper historia-fade rounded-4xl px-6 py-8 sm:px-8 lg:px-10">
-          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">Lo que cuidamos</p>
-          <h3 class="mt-3 text-[clamp(1.9rem,4vw,3rem)] font-black uppercase leading-[0.95] text-(--historia-ink)" style="font-family: 'Gobold High', sans-serif;">
-            Más que un club, una red
-          </h3>
-          <p class="mt-4 max-w-2xl text-[1rem] leading-8 text-(--historia-muted) sm:text-[1.05rem]">
-            En Vikingas se entrena y se compite, sí, pero también se acompaña. El club se sostiene porque hay pertenencia, porque existe un espacio seguro y porque los lazos siguen vivos mucho después de que se apagan las luces de la cancha.
-          </p>
+        <article class="historia-fade border border-white/15 bg-white/5 px-6 py-8 sm:px-8 lg:px-10">
+          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">Nuestra forma de competir</p>
+          <h2 class="mt-3 text-[clamp(2.1rem,4vw,3.4rem)] font-black uppercase leading-[0.9] text-white" style="font-family: 'Gobold High', sans-serif;">El resultado se trabaja</h2>
+          <p class="mt-4 text-[1rem] leading-8 text-white/72">Vikingas quiere ganar y alcanzar objetivos deportivos importantes. La diferencia está en cómo se construye ese resultado: con entrenamiento, desarrollo de jugadoras, decisiones coherentes y rendimiento colectivo.</p>
+          <blockquote class="mt-8 border-l-4 border-(--historia-secondary) pl-5 text-2xl font-black uppercase leading-tight text-white sm:text-3xl" style="font-family: 'Gobold High', sans-serif;">Competimos para ganar, pero nunca a cualquier precio.</blockquote>
+        </article>
+      </section>
 
-          <div class="mt-6 flex flex-wrap gap-3">
-            <span
-              v-for="value in values"
-              :key="value"
-              class="inline-flex min-h-11 items-center rounded-full border border-(--historia-line) bg-white px-4 py-2 text-[0.78rem] font-black uppercase tracking-[0.14em] text-(--historia-ink)"
-            >
-              {{ value }}
-            </span>
-          </div>
-        </section>
-
-        <section class="historia-fade rounded-4xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] px-6 py-8 sm:px-8 lg:px-10">
-          <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">Huella reciente</p>
-          <h3 class="mt-3 text-[clamp(1.9rem,4vw,3rem)] font-black uppercase leading-[0.95] text-white" style="font-family: 'Gobold High', sans-serif;">
-            Copas que cuentan el camino
-          </h3>
-
-          <div class="mt-6 space-y-3">
-            <div
-              v-for="achievement in achievements"
-              :key="achievement"
-              class="rounded-[1.4rem] border border-white/8 bg-white/6 px-4 py-4 text-sm leading-6 text-white/78"
-            >
-              {{ achievement }}
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <div class="historia-fade mt-14 rounded-4xl border border-(--historia-primary)/20 bg-[linear-gradient(135deg,rgba(44,207,191,0.08),rgba(216,178,85,0.06))] px-6 py-10 sm:px-10 lg:mt-18 lg:px-14 lg:py-14">
-        <div class="grid items-center gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+      <section class="mt-16 lg:mt-24" aria-labelledby="logros-historia">
+        <div class="flex flex-col gap-4 border-b border-white/15 pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">Legado y pertenencia</p>
-            <h3 class="mt-3 text-[clamp(2rem,4vw,3.4rem)] font-black uppercase leading-15 text-white" style="font-family: 'Gobold High', sans-serif;">
-              Nosotras al centro,<br>siempre
-            </h3>
-            <p class="mt-5 max-w-xl text-[1rem] leading-8 text-white/78 sm:text-[1.05rem]">
-              Vikingas existe porque hubo mujeres que siguieron incluso cuando era difícil. Cuando faltaban espacios, tiempo, energía o respuestas, el club se sostuvo igual: estando juntas.
-            </p>
-            <p class="mt-4 max-w-xl text-[1rem] leading-8 text-white/78 sm:text-[1.05rem]">
-              Nuestra historia también está hecha de derrotas que dolieron, de lesiones, de días en que parecía más fácil soltar que seguir. Pero siempre hubo una al lado de la otra para empujar, esperar, volver y no dejar caer lo que habíamos construido.
-            </p>
-            <p class="mt-4 max-w-xl text-[1rem] leading-8 text-white/78 sm:text-[1.05rem]">
-              Por eso este club tiene sentido de pertenencia de verdad: porque aprendimos a pasar los momentos difíciles juntas y a seguir juntas. Así se hizo Vikingas, y así queremos que siga creciendo.
-            </p>
+            <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">La huella del proceso</p>
+            <h2 id="logros-historia" class="mt-3 text-[clamp(2.2rem,5vw,4rem)] font-black uppercase leading-[0.9] text-white" style="font-family: 'Gobold High', sans-serif;">Logros que cuentan el camino</h2>
           </div>
-          <div class="relative">
-            <div class="absolute -inset-3 rounded-4xl bg-[linear-gradient(135deg,rgba(44,207,191,0.22),rgba(216,178,85,0.12)_60%,transparent)] blur-2xl"></div>
-            <img
-              :src="imageProcess"
-              alt="Vikingas celebrando un logro en equipo"
-              class="relative h-80 w-full rounded-4xl object-cover shadow-[0_22px_56px_rgba(0,0,0,0.22)] sm:h-96"
-            >
+          <p class="max-w-sm text-sm leading-6 text-white/60">Cada copa reconoce al plantel, al cuerpo técnico y a la comunidad que sostuvo el trabajo.</p>
+        </div>
+        <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div v-for="(achievement, index) in achievements" :key="achievement" class="historia-achievement border border-white/12 bg-white/5 px-5 py-5" :style="{ '--delay': `${index * 70}ms` }">
+            <span class="text-sm font-black text-(--historia-secondary)">0{{ index + 1 }}</span>
+            <p class="mt-4 text-sm font-bold leading-6 text-white/82">{{ achievement }}</p>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="historia-fade mt-14 border-t border-white/10 pt-12 text-center lg:mt-18">
-        <p class="mx-auto max-w-3xl text-[clamp(2rem,4vw,4.2rem)] font-black italic leading-tight text-white" style="font-family: 'Gobold High', sans-serif;">
-          Un club creado por mujeres, para mujeres. Y vamos a seguir abriendo canchas hasta que sobren espacios donde jugar.
-        </p>
-      </div>
-    </div>
+      <section class="historia-fade mt-16 border-y border-(--historia-primary)/30 py-14 text-center lg:mt-24 lg:py-20">
+        <p class="mx-auto max-w-4xl text-[clamp(2.3rem,6vw,5rem)] font-black uppercase leading-[0.9] text-white" style="font-family: 'Gobold High', sans-serif;">Nosotras al centro, siempre.</p>
+        <p class="mx-auto mt-6 max-w-2xl text-[1rem] leading-8 text-white/72 sm:text-[1.1rem]">Así se hizo Vikingas: estando juntas, pasando los momentos difíciles y siguiendo adelante con una identidad que se construye todos los días.</p>
+      </section>
+    </main>
   </section>
 </template>
 
 <script setup>
 const heroImage = new URL('../assets/2026/equipo2026.jpg', import.meta.url).href
 const imageStart = new URL('../assets/2026/grupo.webp', import.meta.url).href
-const imageGrowth = new URL('../assets/2026/WhatsApp Image 2026-02-16 at 9.30.54 PM.jpeg', import.meta.url).href
+const imageGrowth = new URL('../assets/2026/equipo2026.jpg', import.meta.url).href
 const imageCompetition = new URL('../assets/2026/IMG_20260323_223534.jpg', import.meta.url).href
-const imageProcess = new URL('../assets/2026/6L6A7821.jpg', import.meta.url).href
+
+const pillars = [
+  {
+    title: 'Pertenecer',
+    copy: 'Construir una comunidad donde la cancha se sienta cercana y cada mujer encuentre un lugar real.'
+  },
+  {
+    title: 'Formarse',
+    copy: 'Aprender fundamentos, adquirir hábitos deportivos y respetar el punto de partida de cada jugadora.'
+  },
+  {
+    title: 'Prepararse',
+    copy: 'Entrenar con constancia, puntualidad, intensidad y disposición para que el equipo pueda responder.'
+  },
+  {
+    title: 'Competir',
+    copy: 'Buscar el mejor resultado con disciplina, confianza y una identidad colectiva que no se negocia.'
+  }
+]
 
 const chapters = [
   {
@@ -199,14 +173,29 @@ const chapters = [
   }
 ]
 
+const categories = [
+  {
+    name: 'Escuela Formativa',
+    copy: 'El punto de entrada para aprender, disfrutar, adquirir hábitos y desarrollar pertenencia.'
+  },
+  {
+    name: 'Serie C',
+    copy: 'El puente entre formación y competencia, con nuevos desafíos y una exigencia progresiva.'
+  },
+  {
+    name: 'Serie B Ascenso',
+    copy: 'La categoría de mayor exigencia competitiva, preparada para buscar objetivos deportivos importantes.'
+  }
+]
+
 
 const achievements = [
-  'Campeonas Oro Liga Dobleve Ascenso 2024',
-  'Subcampeonas Copa Conferencia 2024',
-  'Subcampeonas Copa Liga Dobleve Ascenso 2025',
+  'Campeonas Oro Liga Summer Serie AB+ 2026',
+  'Campeonas Formativo Campeonato VK 2026',
   'Campeonas Oro Todo o Nada 2025',
-  'Campeonas Espartanos',
-  'Campeonas Oro Liga Summer Serie AB+ 2026'
+  'Subcampeonas Copa Liga Dobleve Ascenso 2025',
+  'Campeonas Oro Liga Dobleve Ascenso 2024',
+  'Subcampeonas Copa Conferencia 2024'
 ]
 </script>
 
@@ -228,7 +217,12 @@ const achievements = [
 }
 
 .historia-fade {
-  animation: historia-rise 0.8s ease-out both;
+  animation: historia-rise 0.8s ease-out var(--delay, 0ms) both;
+}
+
+.historia-pillar,
+.historia-achievement {
+  animation: historia-rise 0.7s ease-out var(--delay, 0ms) both;
 }
 
 @keyframes historia-rise {
@@ -245,6 +239,11 @@ const achievements = [
 
 @media (prefers-reduced-motion: reduce) {
   .historia-fade {
+    animation: none;
+  }
+
+  .historia-pillar,
+  .historia-achievement {
     animation: none;
   }
 }
