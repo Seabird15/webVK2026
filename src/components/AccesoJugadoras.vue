@@ -68,19 +68,14 @@
                 Inicia Sesión
               </router-link>
 
-              <!-- Si es nueva -->
+              <!-- El registro se habilita solo mediante invitación -->
               <div v-else class="space-y-3">
-                <router-link
-                  to="/solicitud-acceso"
-                  class="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-primary-dark to-primary text-white py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-                >
-                  <UserPlusIcon class="w-6 h-6" />
-                  Solicitar Acceso
-                </router-link>
-                
                 <div class="text-center">
                   <p class="text-sm text-gray-600">
-                    ¿Ya tienes cuenta? 
+                    ¿Recibiste una invitación? Completa la ficha desde el enlace que te enviamos.
+                  </p>
+                  <p class="mt-2 text-sm text-gray-600">
+                    ¿Ya tienes cuenta?
                     <router-link to="/login-jugadora" class="text-primary font-bold hover:underline inline-flex items-center gap-1">
                       Inicia sesión aquí
                       <ArrowRightIcon class="w-4 h-4" />
@@ -103,7 +98,6 @@ import {
   SparklesIcon, 
   CalendarDaysIcon, 
   ArrowRightOnRectangleIcon,
-  UserPlusIcon,
   ArrowRightIcon
 } from '@heroicons/vue/24/outline';
 import { jugadoraAuthUser } from '../firebase/jugadorasAuth';

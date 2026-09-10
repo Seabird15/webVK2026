@@ -2,12 +2,12 @@
   <section class="min-h-dvh overflow-hidden bg-[#081112] text-white">
     <div class="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:py-12">
       <aside class="rounded-3xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-6 shadow-2xl lg:p-8">
-        <p class="text-sm font-semibold italic text-white/70">Postulación abierta</p>
+        <p class="text-sm font-semibold italic text-white/70">Ficha de ingreso por invitación</p>
         <h1 class="mt-4 text-balance text-[clamp(2.7rem,7vw,5.6rem)] font-black uppercase leading-[0.9]" style="font-family: 'Gobold High', sans-serif;">
           Súmate a<br>Vikingas
         </h1>
         <p class="mt-5 max-w-xl text-pretty text-base font-semibold leading-8 text-white/74">
-          Si quieres volver a competir, empezar a entrenar o encontrar un club donde el proceso importe de verdad, este es el primer paso.
+          Si recibiste una invitación para conocer Vikingas, completa esta ficha. La revisaremos antes de habilitar tu acceso al portal de jugadoras.
         </p>
 
         <div class="mt-8 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
@@ -21,7 +21,7 @@
         <div class="mt-8 rounded-2xl border border-primary/20 bg-primary/10 p-5">
           <p class="text-[0.7rem] font-black uppercase text-primary">Cómo funciona</p>
           <ol class="mt-3 space-y-2 text-sm font-semibold text-white/76">
-            <li>1. Completa tu postulación y crea tu acceso.</li>
+            <li>1. Completa tu ficha usando este enlace de invitación.</li>
             <li>2. El club revisa tu solicitud y tu categoría de interés.</li>
             <li>3. Si eres aprobada, completas perfil y entras al portal de jugadoras.</li>
           </ol>
@@ -54,7 +54,7 @@
               Queremos conocerte
             </h2>
             <p class="mt-3 text-pretty text-sm font-semibold leading-6 text-slate-600">
-              Esta información ayuda a ubicarte mejor dentro del club y priorizar tu ingreso en la categoría correcta.
+              Esta información nos ayuda a conocerte mejor antes de aprobar tu ingreso a la categoría correcta.
             </p>
           </div>
 
