@@ -171,7 +171,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { obtenerTotalesEstadisticasJugadora, sincronizarEstadisticasEquipo } from '../firebase/estadisticas';
 
@@ -184,6 +184,7 @@ const perfil = ref(null);
 const estadisticasAscenso = ref(null);
 const estadisticasSerieC = ref(null);
 const totalesDirectos = ref({ goles: 0, asistencias: 0, partidos: 0 });
+const totalMvp = ref(0);
 
 const TEAM_LABELS = {
   ascenso: 'Ascenso',
@@ -196,6 +197,39 @@ const normalizarEquipo = (equipo = '') => {
   if (valor === 'seriec' || valor === 'serie-c') return 'serieC';
   if (valor === 'ascenso' || valor === 'escuela' || valor === 'serieC') return valor;
   return '';
+};
+
+const normalizarNombreMvp = (nombre = '') => nombre
+  .toString()
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase()
+  .replace(/[^a-z0-9\s]/g, ' ')
+  .trim()
+  .split(/\s+/)
+  .sort()
+  .join(' ');
+
+const obtenerNombreMvp = (data = {}) => {
+  const mvp = data.mvp || data.mvpGanadora || {};
+  return data.mvpGanadoraFinal || mvp.nombre || mvp.nombreCompleto || data.mvpNombre || '';
+};
+
+const cargarTotalMvp = async (nombre) => {
+  const nombreNormalizado = normalizarNombreMvp(nombre);
+  if (!nombreNormalizado) {
+    totalMvp.value = 0;
+    return;
+  }
+
+  const [entrenamientosSnap, partidosSnap] = await Promise.all([
+    getDocs(collection(db, 'entrenamientos')),
+    getDocs(collection(db, 'partidos'))
+  ]);
+
+  totalMvp.value = [...entrenamientosSnap.docs, ...partidosSnap.docs]
+    .filter((docSnap) => normalizarNombreMvp(obtenerNombreMvp(docSnap.data())) === nombreNormalizado)
+    .length;
 };
 
 const extraerEquipos = (data = {}) => {
@@ -283,7 +317,8 @@ const galeriaPublica = computed(() => {
 const fichaRapida = computed(() => {
   const items = [
     { label: esCuerpoTecnico.value ? 'Rol' : 'Posición', valor: perfil.value?.posicion || 'Por definir' },
-    { label: 'Dorsal', valor: perfil.value?.dorsal ? `#${perfil.value.dorsal}` : 'Sin dorsal' }
+    { label: 'Dorsal', valor: perfil.value?.dorsal ? `#${perfil.value.dorsal}` : 'Sin dorsal' },
+    { label: 'MVP del partido', valor: `${totalMvp.value} ${totalMvp.value === 1 ? 'vez' : 'veces'}` }
   ];
 
   if (perfil.value?.pieHabil) {
@@ -379,6 +414,7 @@ const cargarPerfil = async () => {
   estadisticasAscenso.value = null;
   estadisticasSerieC.value = null;
   totalesDirectos.value = { goles: 0, asistencias: 0, partidos: 0 };
+  totalMvp.value = 0;
 
   try {
     const jugadoraId = route.params.id?.toString();
@@ -398,6 +434,8 @@ const cargarPerfil = async () => {
       id: perfilSnap.id,
       ...perfilSnap.data()
     };
+
+    await cargarTotalMvp(`${perfil.value.nombre || ''} ${perfil.value.apellido || ''}`);
 
     const equiposPerfil = extraerEquipos({ id: perfilSnap.id, ...perfilSnap.data() }).filter((equipo) => equipo === 'ascenso' || equipo === 'serieC');
 

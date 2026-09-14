@@ -87,6 +87,28 @@ const obtenerEtiquetaTipo = (tipo = '') => {
   return normalizarTipoResultado(tipo) === 'amistoso' ? 'Amistoso' : 'Liga';
 };
 
+const obtenerMvp = (data = {}) => {
+  const mvpGuardada = data.mvp || data.mvpGanadora || {};
+  const nombre = normalizarTexto(
+    data.mvpGanadoraFinal || mvpGuardada.nombre || mvpGuardada.nombreCompleto || data.mvpNombre
+  );
+
+  if (!nombre) return null;
+
+  const registroVotos = Array.isArray(data.mvpVotos)
+    ? data.mvpVotos.find((item) => normalizarTexto(item?.nombre).toLowerCase() === nombre.toLowerCase())
+    : null;
+
+  return {
+    nombre,
+    votos: Number(registroVotos?.votos ?? mvpGuardada.votos) || 0,
+    equipo: mvpGuardada.equipo || registroVotos?.equipo || data.mvpEquipo || data.equipo || '',
+    foto: mvpGuardada.foto || mvpGuardada.fotoPerfil || mvpGuardada.photoURL || mvpGuardada.imagen || mvpGuardada.urlFoto
+      || registroVotos?.foto || registroVotos?.fotoPerfil || registroVotos?.photoURL || registroVotos?.imagen || registroVotos?.urlFoto
+      || data.mvpFoto || ''
+  };
+};
+
 const esResultadoVisible = (data = {}) => {
   const tipo = normalizarTexto(data.tipo).toLowerCase();
   if (!TIPOS_VISIBLES.has(tipo)) return false;
@@ -113,6 +135,7 @@ const crearResultadoAutomatico = ({ id, data, fuente }) => {
     marcadorVikingas,
     marcadorRival,
     goleadoras: Array.isArray(data.goleadoresLocal) ? data.goleadoresLocal : [],
+    mvp: obtenerMvp(data),
     resultadoFinal: `${marcadorVikingas} - ${marcadorRival}`,
     createdAt: data.createdAt || null,
     updatedAt: data.updatedAt || null,

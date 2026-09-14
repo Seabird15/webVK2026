@@ -4,7 +4,7 @@
             <div
                 v-if="mostrarBannerEnVivo"
                 :class="[
-                    'overflow-hidden rounded-4xl border border-white/10 bg-[#162122]/90 shadow-[0_18px_40px_rgba(0,0,0,0.2)] backdrop-blur-sm',
+                    'overflow-hidden border-y border-white/10 bg-[#162122]/60 shadow-[0_18px_40px_rgba(0,0,0,0.2)] backdrop-blur-sm',
                     compactBanner ? 'px-4 py-3 sm:px-5' : 'mb-8 px-5 py-5 sm:px-6 sm:py-6'
                 ]"
             >
@@ -43,8 +43,8 @@
                 </div>
             </div>
 
-            <div v-if="!liveBannerOnly" class="grid gap-5 lg:grid-cols-2">
-                <article class="rounded-4xl border border-primary bg-[#162122] px-5 py-6 shadow-[0_18px_36px_rgba(0,0,0,0.18)] sm:px-6 sm:py-7">
+            <div v-if="!liveBannerOnly" class="grid gap-14 border-y border-white/10 py-10 lg:grid-cols-2 lg:gap-16 lg:py-12">
+                <article class="px-1 sm:px-2">
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <h2 class="mt-2 text-[clamp(1.9rem,4vw,3rem)] font-black uppercase leading-[0.92] text-white" style="font-family: 'Gobold High', sans-serif;">
@@ -70,7 +70,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-4xl bg-[#1b292a] px-4 py-5 sm:px-5">
+                        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-y border-white/10 px-1 py-5 sm:px-2">
                             <div class="flex flex-col items-center gap-3 text-center">
                                 <img
                                     v-if="proximoPartido.equipo1.logo"
@@ -81,7 +81,7 @@
                                 <p class="text-sm font-bold text-white">{{ proximoPartido.equipo1.nombre }}</p>
                             </div>
 
-                            <div class="rounded-[1.6rem] bg-[#101819] px-4 py-3 text-center shadow-[0_10px_24px_rgba(0,0,0,0.16)]">
+                            <div class="bg-[#101819] px-4 py-3 text-center">
                                 <div v-if="proximoPartido.estado === 'EN_CURSO'" class="space-y-2">
                                     <div class="flex items-center justify-center gap-2 text-[1.1rem] font-black text-white">
                                         <span>{{ proximoPartido.golesLocal }}</span>
@@ -116,7 +116,7 @@
                             </p>
                         </div>
 
-                        <div v-if="proximoPartido.goleadoresLocal && proximoPartido.goleadoresLocal.length && proximoPartido.estado === 'EN_CURSO'" class="rounded-[1.6rem] bg-[#1b292a] px-4 py-4">
+                        <div v-if="proximoPartido.goleadoresLocal && proximoPartido.goleadoresLocal.length && proximoPartido.estado === 'EN_CURSO'" class="border-l-2 border-primary/60 bg-primary/8 px-4 py-4">
                             <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Goleadoras de Vikingas</p>
                             <ul class="mt-2 space-y-1 text-sm text-white/78">
                                 <li v-for="(gol, idx) in proximoPartido.goleadoresLocal" :key="`gol-en-vivo-${idx}`">
@@ -126,12 +126,12 @@
                         </div>
                     </div>
 
-                    <div v-else class="mt-6 rounded-[1.8rem] bg-[#1b292a] px-5 py-8 text-center text-sm text-white/46">
+                    <div v-else class="mt-6 border-y border-white/10 px-5 py-8 text-center text-sm text-white/46">
                         No hay partidos programados próximamente.
                     </div>
                 </article>
 
-                <article class="rounded-4xl border border-primary bg-[#162122] px-5 py-6 shadow-[0_18px_36px_rgba(0,0,0,0.18)] sm:px-6 sm:py-7">
+                <article class="border-l border-primary/50 px-5 py-1 sm:px-7 lg:pl-10">
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <h2 class="mt-2 text-[clamp(1.9rem,4vw,3rem)] font-black uppercase leading-[0.92] text-white" style="font-family: 'Gobold High', sans-serif;">
@@ -154,7 +154,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-4xl bg-[#1b292a] px-4 py-5 sm:px-5">
+                        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-y border-white/10 px-1 py-5 sm:px-2">
                             <div class="flex flex-col items-center gap-3 text-center">
                                 <img
                                     :src="ultimoPartido.equipo1.logo || logoUrlVikingas"
@@ -164,7 +164,7 @@
                                 <p class="text-sm font-bold text-white">{{ ultimoPartido.equipo1.nombre }}</p>
                             </div>
 
-                            <div class="rounded-[1.6rem] bg-[#101819] px-4 py-3 text-center shadow-[0_10px_24px_rgba(0,0,0,0.16)]">
+                            <div class="bg-[#101819] px-4 py-3 text-center">
                                 <div class="flex items-center justify-center gap-2 text-[1.2rem] font-black text-white">
                                     <span>{{ ultimoPartido.resultado.equipo1 }}</span>
                                     <span class="text-white/40">-</span>
@@ -186,7 +186,7 @@
                         <button
                             v-if="ultimoPartido.goleadoresLocal && ultimoPartido.goleadoresLocal.length"
                             @click="mostrarGoleadorasUltimoPartido = true"
-                            class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-[1.6rem] border border-white/10 bg-[#1b292a] px-4 py-4 text-left transition-colors duration-200 hover:bg-[#213132]"
+                            class="flex w-full cursor-pointer items-center justify-between gap-3 border-y border-white/10 bg-white/4 px-4 py-4 text-left transition-colors duration-200 hover:bg-white/8"
                         >
                             <div>
                                 <p class="text-[0.68rem] font-black uppercase tracking-[0.18em] text-primary">Resumen</p>
@@ -196,7 +196,7 @@
                         </button>
                     </div>
 
-                    <div v-else class="mt-6 rounded-[1.8rem] bg-[#1b292a] px-5 py-8 text-center text-sm text-white/46">
+                    <div v-else class="mt-6 border-y border-white/10 px-5 py-8 text-center text-sm text-white/46">
                         Aún no hay un resultado reciente para mostrar.
                     </div>
                 </article>

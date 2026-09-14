@@ -1,27 +1,19 @@
 <template>
   <section class="historia-page overflow-hidden bg-(--historia-bg) text-(--historia-text)">
-    <header class="relative isolate border-b border-white/10">
-      <div class="absolute inset-0 bg-[linear-gradient(115deg,rgba(11,17,18,0.98)_0%,rgba(11,17,18,0.78)_52%,rgba(11,17,18,0.46)_100%)]" aria-hidden="true"></div>
-      <div class="relative mx-auto grid max-w-7xl gap-10 px-4 pb-14 pt-16 sm:px-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(20rem,1.1fr)] lg:items-end lg:px-8 lg:pb-20 lg:pt-24">
-        <div class="max-w-2xl">
-          <p class="historia-fade text-sm font-black uppercase tracking-[0.2em] text-(--historia-primary)">Club Deportivo Social y Cultural Vikingas · 2019</p>
-          <h1 class="historia-fade mt-5 uppercase leading-[0.84]" style="font-family: 'Gobold High', sans-serif; font-size: clamp(4.2rem, 14vw, 9rem);">
-            <span class="block text-transparent [-webkit-text-stroke:1.5px_rgba(247,255,253,0.88)]">Una</span>
-            <span class="block text-white">cancha</span>
-            <span class="block text-white">propia</span>
+    <header class="mx-auto max-w-7xl px-4 pb-10 pt-8 sm:px-6 lg:px-8 lg:pb-12 lg:pt-12">
+      <div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p class="historia-fade text-[0.68rem] font-black uppercase tracking-[0.24em] text-(--historia-primary)">Club Deportivo Social y Cultural Vikingas · 2019</p>
+          <h1 class="historia-fade mt-3 max-w-3xl text-[clamp(3rem,8vw,6.5rem)] font-black uppercase leading-6 text-white" style="font-family: 'Gobold High', sans-serif;">
+            La historia<br /><span class="text-(--historia-primary)">de Vikingas</span>
           </h1>
-          <p class="historia-fade mt-7 max-w-xl text-[clamp(1.02rem,2.8vw,1.34rem)] leading-relaxed text-white/82">
+          <p class="historia-fade mt-6 max-w-xl text-pretty text-base leading-6 text-white/62 sm:text-lg">
             Vikingas nació para que mujeres adultas pudieran comenzar, volver a jugar, aprender y competir en un espacio estable, seguro y exigente.
           </p>
         </div>
-
-        <div class="historia-fade relative lg:justify-self-end">
-          <img :src="heroImage" alt="Plantel de Vikingas reunido en la cancha" class="h-80 w-full object-cover sm:h-104 lg:w-xl">
-          <div class="absolute inset-x-4 bottom-4 border-l-4 border-(--historia-primary) bg-(--historia-bg)/90 px-5 py-4 sm:inset-x-6 sm:bottom-6">
-            <p class="text-[0.72rem] font-black uppercase tracking-[0.2em] text-(--historia-primary)">Desde Puente Alto</p>
-            <p class="mt-2 text-sm leading-6 text-white/82 sm:text-base">Un proyecto deportivo, social y comunitario construido con tiempo, constancia y confianza.</p>
-          </div>
-        </div>
+        <p class="max-w-xs text-sm leading-6 text-white/42 lg:pb-1 lg:text-right">
+          Un proyecto deportivo, social y comunitario construido con tiempo, constancia y confianza.
+        </p>
       </div>
     </header>
 
@@ -29,7 +21,7 @@
       <section class="historia-paper historia-fade grid gap-8 px-6 py-8 sm:px-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-12 lg:px-12 lg:py-12">
         <div>
           <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">El punto de partida</p>
-          <h2 class="mt-3 text-[clamp(2.2rem,5vw,4.2rem)] font-black uppercase leading-[0.9] text-(--historia-ink)" style="font-family: 'Gobold High', sans-serif;">Volver a la pelota sin pedir permiso</h2>
+          <h2 class="mt-3 text-[clamp(2.2rem,5vw,4.2rem)] font-black uppercase leading-16 text-(--historia-ink)" style="font-family: 'Gobold High', sans-serif;">Volver a la pelota sin pedir permiso</h2>
         </div>
         <div class="space-y-4 text-[1rem] leading-8 text-(--historia-muted) sm:text-[1.08rem]">
           <p>Vikingas es un club hecho por mujeres, para mujeres. Nació porque muchas no habían tenido la oportunidad de jugar: por falta de espacios, responsabilidades personales o ambientes poco inclusivos.</p>
@@ -122,7 +114,6 @@
 </template>
 
 <script setup>
-const heroImage = new URL('../assets/2026/equipo2026.jpg', import.meta.url).href
 const imageStart = new URL('../assets/2026/grupo.webp', import.meta.url).href
 const imageGrowth = new URL('../assets/2026/equipo2026.jpg', import.meta.url).href
 const imageCompetition = new URL('../assets/2026/IMG_20260323_223534.jpg', import.meta.url).href

@@ -1,10 +1,10 @@
 <template>
     <HeroHome :hero-data="heroData" />
 
-    <section class="relative overflow-hidden bg-[#071112] px-4 py-4 sm:px-6 lg:px-8 lg:py-5">
+    <section class="relative overflow-hidden bg-[#071112] px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
       <div class="mx-auto max-w-6xl">
         <div
-          class="group relative flex overflow-hidden rounded-4xl bg-[#081516] px-5 py-5 shadow-[0_24px_48px_rgba(0,0,0,0.28)] transition-all duration-300 hover:-translate-y-1 sm:px-7 sm:py-6"
+          class="group relative flex overflow-hidden border-y border-white/10 px-1 py-7 transition-all duration-300 sm:px-3 sm:py-9"
         >
           <div
             class="absolute inset-0 scale-[1.02] bg-bottom opacity-40 transition-transform duration-500 group-hover:scale-[1.06]"
@@ -28,11 +28,11 @@
               </p>
             </div>
 
-            <div class="relative flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col">
+            <div class="relative flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col lg:min-w-64">
               <router-link
                 to="/contacto"
                 @click="trackCTAClick('Contactar al club por convocatoria Serie B y Serie C', 'home_convocatoria_contacto')"
-                class="inline-flex min-h-14 items-center justify-between gap-4 rounded-[1.25rem] bg-[linear-gradient(135deg,#f0d481,#c9a84c)] px-5 py-4 text-[#081516] shadow-[0_18px_30px_rgba(201,168,76,0.24)] transition-transform duration-300 hover:-translate-y-1"
+                class="inline-flex min-h-14 items-center justify-between gap-4 rounded-xl bg-[linear-gradient(135deg,#f0d481,#c9a84c)] px-5 py-4 text-[#081516] shadow-[0_18px_30px_rgba(201,168,76,0.24)] transition-transform duration-300 hover:-translate-y-1"
               >
                 <span>
                   <span class="block text-[0.68rem] font-black uppercase tracking-[0.18em] text-black/70">Primer paso</span>
@@ -45,7 +45,7 @@
               <router-link
                 to="/historia"
                 @click="trackCTAClick('Conocer historia de Vikingas', 'home_convocatoria_historia')"
-                class="inline-flex min-h-14 items-center justify-between gap-4 rounded-[1.25rem] border border-white/20 bg-white/10 px-5 py-4 text-white backdrop-blur-sm transition-transform duration-300 hover:-translate-y-1 hover:border-primary/50"
+                class="inline-flex min-h-14 items-center justify-between gap-4 rounded-xl bg-white/8 px-5 py-4 text-white transition-transform duration-300 hover:-translate-y-1"
               >
                 <span>
                   <span class="block text-[0.68rem] font-black uppercase tracking-[0.18em] text-white/55">Conoce el camino</span>
@@ -66,9 +66,9 @@
     </div>
     <UltimosResultados />
     
-    <section class="relative bg-[#0b1718] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-      <div class="mx-auto grid max-w-6xl gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)]">
-        <article class="relative overflow-hidden rounded-4xl border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] px-5 py-6 shadow-[0_18px_36px_rgba(0,0,0,0.18)] backdrop-blur-sm sm:px-6 sm:py-7">
+    <section class="relative bg-[#0b1718] px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+      <div class="mx-auto grid max-w-6xl gap-12 border-y border-white/10 py-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)] lg:gap-16">
+        <article class="relative overflow-hidden px-1 sm:px-2">
           <div class="absolute -left-16 top-0 h-32 w-32 rounded-full bg-primary/16 blur-3xl"></div>
           <div class="relative flex h-full flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div class="max-w-2xl text-center lg:text-left">
@@ -88,7 +88,7 @@ NUEVA TEMPORADA
               <router-link
                 to="/competencias"
                 @click="trackCTAClick('Ver temporada', 'home_liga')"
-                class="inline-flex min-h-14 items-center justify-between gap-3 rounded-[1.35rem] bg-white px-5 py-4 text-[#082022] shadow-[0_14px_28px_rgba(0,0,0,0.12)] transition-transform duration-200 hover:-translate-y-1"
+                class="inline-flex min-h-14 items-center justify-between gap-3 rounded-xl bg-white px-5 py-4 text-[#082022] shadow-[0_14px_28px_rgba(0,0,0,0.12)] transition-transform duration-200 hover:-translate-y-1"
               >
                 <span>
                   <span class="block text-[0.68rem] font-black uppercase tracking-[0.2em] text-primary">Ver temporada</span>
@@ -99,7 +99,7 @@ NUEVA TEMPORADA
               <button
                 @click="toggleLike"
                 :disabled="isLikeLoading"
-                class="inline-flex min-h-14 cursor-pointer items-center justify-center gap-2 rounded-[1.35rem] border border-white/16 bg-white/8 px-5 py-4 text-white backdrop-blur-sm transition-transform duration-200 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-50"
+                class="inline-flex min-h-14 cursor-pointer items-center justify-center gap-2 rounded-xl bg-white/8 px-5 py-4 text-white transition-transform duration-200 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <HeartIconSolid v-if="hasLiked" class="h-5 w-5 text-red-400" />
                 <HeartIcon v-else class="h-5 w-5 text-white" />
@@ -109,7 +109,7 @@ NUEVA TEMPORADA
           </div>
         </article>
 
-        <article class="overflow-hidden rounded-4xl border border-primary/18 bg-[linear-gradient(180deg,rgba(44,207,191,0.14),rgba(11,23,24,0.72))] px-5 py-6 shadow-[0_18px_36px_rgba(0,0,0,0.14)] sm:px-6 sm:py-7">
+        <article class="overflow-hidden border-l border-primary/40 bg-[linear-gradient(180deg,rgba(44,207,191,0.1),rgba(11,23,24,0.2))] px-5 py-2 sm:px-7 lg:pl-10">
           <p class="text-[0.78rem] font-bold italic tracking-[0.04em] text-white/84">
             Espacio interno del club
           </p>
@@ -122,7 +122,7 @@ NUEVA TEMPORADA
           <router-link
             to="/login-jugadora"
             @click="trackCTAClick('Entrar zona jugadoras', 'home_acceso')"
-            class="mt-6 inline-flex min-h-14 w-full items-center justify-between gap-3 rounded-[1.35rem] border border-white/22 bg-white/92 px-5 py-4 text-[#082022] shadow-[0_14px_28px_rgba(0,0,0,0.12)] transition-transform duration-200 hover:-translate-y-1"
+            class="mt-6 inline-flex min-h-14 w-full items-center justify-between gap-3 rounded-xl bg-white/92 px-5 py-4 text-[#082022] shadow-[0_14px_28px_rgba(0,0,0,0.12)] transition-transform duration-200 hover:-translate-y-1"
           >
             <span>
               <span class="block text-[0.68rem] font-black uppercase tracking-[0.2em] text-primary">Zona privada</span>
@@ -138,7 +138,7 @@ NUEVA TEMPORADA
       <router-link
         to="/historia"
         @click="trackCTAClick('Conoce nuestra historia', 'home_banner')"
-        class="group mx-auto mt-4 flex max-w-6xl items-center gap-5 rounded-3xl border border-white/10 bg-white/5 px-6 py-5 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-white/8 sm:px-8"
+        class="group mx-auto mt-12 flex max-w-6xl items-center gap-5 border-b border-white/10 px-1 py-6 transition-all duration-300 hover:bg-white/4 sm:px-3"
       >
         <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/14 text-2xl transition-transform duration-300 group-hover:scale-110">⚔️</span>
         <span class="min-w-0 flex-1">
@@ -152,9 +152,9 @@ NUEVA TEMPORADA
       </router-link>
     </section>
 
-    <section class="relative overflow-hidden bg-[#071112] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-      <div class="mx-auto max-w-6xl overflow-hidden rounded-4xl border border-primary/18 bg-[linear-gradient(135deg,rgba(201,168,76,0.12),rgba(7,17,18,0.96)_36%,rgba(7,17,18,0.92)_100%)] shadow-[0_24px_48px_rgba(0,0,0,0.26)]">
-        <div class="grid gap-8 px-5 py-7 sm:px-7 sm:py-8 lg:px-10 lg:py-10">
+    <section class="relative overflow-hidden bg-[#071112] px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+      <div class="mx-auto max-w-6xl border-y border-primary/20 bg-[linear-gradient(135deg,rgba(201,168,76,0.08),rgba(7,17,18,0.5)_36%,rgba(7,17,18,0.2)_100%)]">
+        <div class="grid gap-8 px-1 py-8 sm:px-3 sm:py-10 lg:px-8 lg:py-12">
           <div class="flex flex-col md:flex-row items-center md:gap-10 justify-center">
          
             <h2 class="mt-4 text-[clamp(2rem,5vw,3.7rem)] text-center font-black uppercase leading-[0.92] text-white" style="font-family: 'Gobold High', sans-serif;">
