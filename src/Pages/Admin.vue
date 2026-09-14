@@ -80,14 +80,14 @@
 
                     <div class="grid grid-cols-1 gap-3 sm:min-w-[16rem]">
                       <div class="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3">
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Plantel</p>
-                        <p class="mt-2 text-2xl font-black text-blue-900">{{ jugadorasPorEquipo.total }}</p>
-                        <p class="text-xs font-semibold text-blue-700">jugadoras activas</p>
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-700">Club</p>
+                        <p class="mt-2 text-2xl font-black text-blue-900">{{ totalJugadorasClub }}</p>
+                        <p class="text-xs font-semibold text-blue-700">jugadoras únicas registradas</p>
                       </div>
                       <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-700">Semana</p>
-                        <p class="mt-2 text-2xl font-black text-emerald-900">{{ resumenSemana.total }}</p>
-                        <p class="text-xs font-semibold text-emerald-700">eventos programados</p>
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-700">Activas</p>
+                        <p class="mt-2 text-2xl font-black text-emerald-900">{{ jugadorasActivasClub }}</p>
+                        <p class="text-xs font-semibold text-emerald-700">jugadoras con perfil activo</p>
                       </div>
                     </div>
                   </div>
@@ -118,10 +118,10 @@
                         <div class="w-11 h-11 rounded-xl bg-violet-100 flex items-center justify-center">
                           <ChartBarIcon class="w-6 h-6 text-violet-700" />
                         </div>
-                        <span class="text-[11px] font-black uppercase tracking-wide text-violet-700">Asistencia</span>
+                        <span class="text-[11px] font-black uppercase tracking-wide text-violet-700">Activas en entrenamientos</span>
                       </div>
-                      <p class="mt-4 text-4xl font-black text-gray-900">{{ tasaAsistenciaPromedio }}%</p>
-                      <p class="mt-2 text-sm text-gray-600">Promedio de confirmación en entrenamientos finalizados.</p>
+                      <p class="mt-4 text-4xl font-black text-gray-900">{{ jugadorasActivasEntrenamiento }}</p>
+                      <p class="mt-2 text-sm text-gray-600">Jugadoras con inscripción confirmada o pendiente en eventos del club.</p>
                     </article>
 
                     <article class="rounded-2xl border border-rose-200 bg-linear-to-br from-rose-50 to-white p-5 shadow-sm">
@@ -774,11 +774,54 @@ const route = useRoute();
 const activeTab = ref('home');
 const proximoCumpleanios = ref(null);
 const inscripcionesPorEntrenamiento = ref({});
+const inscripcionesGlobales = ref([]);
+const jugadorasRegistradas = ref([]);
 const jugadorasPorEquipo = ref({ ascenso: 0, escuela: 0, serieC: 0, total: 0 });
 const alertasSalud = ref({ nuevas: 0, pendientesRevision: 0, ultimas: [] });
 const respuestasSalud = ref([]);
 let unsubscribeAlertasSalud = null;
 let unsubscribeRespuestasSalud = null;
+
+const totalJugadorasClub = computed(() => {
+  const idsUnicos = new Set();
+
+  jugadorasRegistradas.value.forEach((jugadora) => {
+    const uid = jugadora?.id || jugadora?.uid;
+    if (uid) {
+      idsUnicos.add(uid);
+    }
+  });
+
+  return idsUnicos.size;
+});
+
+const esJugadoraActivaClub = (jugadora) => {
+  const estado = String(jugadora?.estado || '').toLowerCase();
+  const perfilCompleto = jugadora?.perfilCompleto !== false;
+  const noRechazada = estado !== 'rechazada';
+  const noPendiente = estado !== 'pendiente';
+
+  return perfilCompleto && noRechazada && noPendiente && jugadora?.activa !== false;
+};
+
+const jugadorasActivasClub = computed(() => {
+  return jugadorasRegistradas.value.filter((jugadora) => esJugadoraActivaClub(jugadora)).length;
+});
+
+const jugadorasActivasEntrenamiento = computed(() => {
+  const idsUnicos = new Set();
+
+  inscripcionesGlobales.value.forEach((inscripcion) => {
+    const estado = String(inscripcion?.estado || '').toLowerCase();
+    const jugadoraId = inscripcion?.jugadoraId;
+
+    if (jugadoraId && ['confirmada', 'pendiente'].includes(estado)) {
+      idsUnicos.add(jugadoraId);
+    }
+  });
+
+  return idsUnicos.size;
+});
 
 const userGreeting = computed(() => {
   if (authUser.value) {
@@ -1215,9 +1258,15 @@ const cargarInscripcionesEntrenamientos = async () => {
     const entrenamientosPorId = new Map(
       entrenamientosSnapshot.docs.map((documento) => [documento.id, documento.data()])
     );
-    
-    snapshot.forEach(doc => {
-      const data = doc.data();
+
+    const inscripcionesNormalizadas = snapshot.docs.map((documento) => ({
+      id: documento.id,
+      ...documento.data()
+    }));
+
+    inscripcionesGlobales.value = inscripcionesNormalizadas;
+
+    inscripcionesNormalizadas.forEach((data) => {
       const entrenamientoId = data.entrenamientoId;
       const entrenamiento = entrenamientosPorId.get(entrenamientoId);
       const jugadora = jugadorasPorId.get(data.jugadoraId);
@@ -1225,7 +1274,7 @@ const cargarInscripcionesEntrenamientos = async () => {
       if (entrenamiento && !esPartidoOAmistoso(entrenamiento) && jugadoraExcluidaDeAsistencia(jugadora)) {
         return;
       }
-      
+
       if (!inscripcionesPorId[entrenamientoId]) {
         inscripcionesPorId[entrenamientoId] = {
           confirmadas: 0,
@@ -1233,7 +1282,7 @@ const cargarInscripcionesEntrenamientos = async () => {
           pendientes: 0
         };
       }
-      
+
       if (data.estado === 'confirmada') {
         inscripcionesPorId[entrenamientoId].confirmadas++;
       } else if (data.estado === 'baja') {
@@ -1242,7 +1291,7 @@ const cargarInscripcionesEntrenamientos = async () => {
         inscripcionesPorId[entrenamientoId].pendientes++;
       }
     });
-    
+
     inscripcionesPorEntrenamiento.value = inscripcionesPorId;
   } catch (err) {
     console.error('Error cargando inscripciones:', err);
@@ -1254,9 +1303,14 @@ const cargarJugadorasPorEquipo = async () => {
   try {
     const snapshot = await getDocs(collection(db, 'jugadoraRegistro'));
     const conteo = { ascenso: 0, escuela: 0, serieC: 0, total: 0 };
-    
-    snapshot.forEach(doc => {
-      const data = doc.data();
+    const jugadoras = snapshot.docs.map((documento) => ({
+      id: documento.id,
+      ...documento.data()
+    }));
+
+    jugadorasRegistradas.value = jugadoras;
+
+    jugadoras.forEach((data) => {
       const equipos = obtenerEquiposJugadoraDesdeDatos(data);
 
       if (equipos.includes('ascenso')) {
@@ -1271,7 +1325,7 @@ const cargarJugadorasPorEquipo = async () => {
 
       conteo.total++;
     });
-    
+
     jugadorasPorEquipo.value = conteo;
   } catch (err) {
     console.error('Error cargando jugadoras:', err);

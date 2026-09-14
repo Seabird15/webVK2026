@@ -1,7 +1,7 @@
 <template>
   <section class="relative min-h-dvh overflow-hidden bg-black px-4 py-8 text-white sm:px-6 lg:px-8">
-    <div class="pointer-events-none absolute inset-0 text-primary/10">
-      <span class="absolute -left-5 top-28 text-8xl font-black leading-none sm:text-9xl" style="font-family: 'Gobold High', system-ui, sans-serif;">
+    <div class="pointer-events-none absolute inset-0 select-none text-primary/10">
+      <span class="absolute -left-5 top-28 text-8xl font-black leading-none opacity-70 sm:text-9xl" style="font-family: 'Gobold High', system-ui, sans-serif;">
         VK
       </span>
       <span class="absolute right-4 top-20 text-7xl font-black leading-none sm:text-8xl" style="font-family: 'Gobold High', system-ui, sans-serif;">
@@ -13,7 +13,7 @@
     </div>
 
     <div class="relative mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-md flex-col justify-center gap-6 lg:max-w-5xl lg:grid lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-      <aside class="hidden rounded-lg border border-white/10 bg-slate-950 p-8 lg:block">
+      <aside class="hidden rounded-lg border border-white/10 bg-slate-950/90 p-8 shadow-2xl lg:block">
         <p class="text-sm font-black uppercase text-primary">Portal jugadoras</p>
         <h1 class="mt-4 text-balance text-6xl font-black leading-none" style="font-family: 'Gobold High', system-ui, sans-serif;">
           Entrena, confirma, compite
@@ -23,13 +23,13 @@
         </p>
 
         <div class="mt-8 grid gap-3">
-          <div v-for="item in playerHighlights" :key="item" class="rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+          <div v-for="item in playerHighlights" :key="item" class="rounded-lg border border-white/10 bg-white/5 px-4 py-3 transition-colors hover:border-primary/40 hover:bg-primary/8">
             <p class="text-sm font-black uppercase text-white">{{ item }}</p>
           </div>
         </div>
       </aside>
 
-      <div class="overflow-hidden rounded-lg border-2 border-primary bg-white text-slate-950 shadow-2xl">
+      <div class="overflow-hidden rounded-lg border-2 border-primary bg-white text-slate-950 shadow-[0_24px_80px_rgba(0,0,0,0.42)]">
         <header class="relative overflow-hidden px-6 pb-7 pt-7 text-center sm:px-8">
           <div class="pointer-events-none absolute left-4 top-28 text-6xl font-black text-primary/10 sm:text-7xl" style="font-family: 'Gobold High', system-ui, sans-serif;">
             VK
@@ -62,7 +62,7 @@
           </div>
         </div>
 
-        <form class="space-y-5 px-6 py-7 sm:px-8" @submit.prevent="handleLogin">
+        <form class="space-y-5 px-6 py-7 sm:px-8" :aria-busy="isLoading" @submit.prevent="handleLogin">
           <div v-if="!showResetForm" class="space-y-2">
             <label for="jugadora-email" class="flex items-center gap-2 text-xs font-black uppercase text-slate-700">
               <EnvelopeIcon class="size-4 text-primary" aria-hidden="true" />
@@ -77,7 +77,7 @@
                 autocomplete="email"
                 required
                 :disabled="isLoading"
-                class="min-h-12 w-full rounded-lg border-2 border-slate-200 bg-white px-4 pl-12 text-base font-semibold text-slate-950 outline-none focus:border-primary focus:ring-2 focus:ring-primary/25 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                class="min-h-12 w-full rounded-lg border-2 border-slate-200 bg-white px-4 pl-12 text-base font-semibold text-slate-950 outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/25 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
                 placeholder="tuemail@ejemplo.com"
               />
             </div>
@@ -93,17 +93,27 @@
               <input
                 id="jugadora-password"
                 v-model="password"
-                type="password"
+                :type="passwordVisible ? 'text' : 'password'"
                 autocomplete="current-password"
                 required
                 :disabled="isLoading"
-                class="min-h-12 w-full rounded-lg border-2 border-slate-200 bg-white px-4 pl-12 text-base font-semibold text-slate-950 outline-none focus:border-primary focus:ring-2 focus:ring-primary/25 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                class="min-h-12 w-full rounded-lg border-2 border-slate-200 bg-white px-4 pl-12 pr-12 text-base font-semibold text-slate-950 outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/25 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
                 placeholder="••••••••"
               />
+              <button
+                type="button"
+                :disabled="isLoading"
+                class="absolute right-2 top-1/2 flex size-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-primary transition-colors hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-50"
+                :aria-label="passwordVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                @click="passwordVisible = !passwordVisible"
+              >
+                <EyeSlashIcon v-if="passwordVisible" class="size-5" aria-hidden="true" />
+                <EyeIcon v-else class="size-5" aria-hidden="true" />
+              </button>
             </div>
           </div>
 
-          <div v-if="error" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3" role="alert">
+          <div v-if="error" class="rounded-lg border border-red-200 bg-red-50 px-4 py-3" role="alert" aria-live="assertive">
             <div class="flex items-start gap-3">
               <ExclamationCircleIcon class="mt-0.5 size-5 shrink-0 text-red-600" aria-hidden="true" />
               <p class="text-sm font-bold text-red-700">{{ error }}</p>
@@ -114,7 +124,7 @@
             v-if="!showResetForm"
             type="submit"
             :disabled="isLoading"
-            class="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-black uppercase text-white shadow-lg transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
+            class="flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-black uppercase text-white shadow-lg transition-transform duration-200 hover:bg-primary-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-55"
           >
             <ArrowPathIcon v-if="isLoading" class="size-5 animate-spin" aria-hidden="true" />
             <BoltIcon v-else class="size-5" aria-hidden="true" />
@@ -125,19 +135,19 @@
             <button
               type="button"
               :disabled="isLoading || isSendingReset"
-              class="min-h-10 px-1 text-sm font-bold text-primary underline decoration-2 underline-offset-4 transition-colors hover:text-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
-              @click="showResetForm = !showResetForm; resetMessage = ''; error = null"
+              class="min-h-10 cursor-pointer px-1 text-sm font-bold text-primary underline decoration-2 underline-offset-4 transition-colors hover:text-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
+              @click="showResetForm = true; resetMessage = ''; error = null"
             >
               {{ showResetForm ? 'Ocultar recuperación' : '¿Olvidaste tu contraseña?' }}
             </button>
 
           </div>
 
-          <div v-else class="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-left">
+          <div v-else class="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-left" aria-labelledby="reset-title">
             <div>
-              <label for="recuperar-email" class="block text-xs font-black uppercase text-slate-700">
+              <p id="reset-title" class="text-xs font-black uppercase text-slate-700">
                 Correo con el que creaste tu cuenta
-              </label>
+              </p>
               <p class="mt-1 text-xs font-semibold text-slate-500">
                 Ingresa el correo utilizado al crear tu cuenta.
               </p>
@@ -154,19 +164,19 @@
               <button
                 type="button"
                 :disabled="isSendingReset"
-                class="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-black uppercase text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
+                class="flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-black uppercase text-white transition-transform duration-200 hover:bg-primary-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-55"
                 @click="handlePasswordReset"
               >
                 <ArrowPathIcon v-if="isSendingReset" class="size-5 animate-spin" aria-hidden="true" />
                 {{ isSendingReset ? 'Enviando...' : 'Enviar enlace de recuperación' }}
               </button>
-              <div v-if="resetMessage" class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3" role="status">
+              <div v-if="resetMessage" class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3" role="status" aria-live="polite">
                 <p class="text-sm font-bold text-emerald-700">{{ resetMessage }}</p>
               </div>
               <button
                 type="button"
                 :disabled="isSendingReset"
-                class="min-h-10 w-full text-sm font-bold text-primary underline decoration-2 underline-offset-4 transition-colors hover:text-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
+                class="min-h-10 w-full cursor-pointer text-sm font-bold text-primary underline decoration-2 underline-offset-4 transition-colors hover:text-primary-dark disabled:cursor-not-allowed disabled:opacity-55"
                 @click="showResetForm = false; resetMessage = ''; error = null"
               >
                 Volver al inicio de sesión
@@ -180,7 +190,7 @@
         </footer>
       </div>
 
-      <div class="mx-auto inline-flex w-fit items-center gap-2 rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-white">
+      <div class="mx-auto inline-flex w-fit items-center gap-2 rounded-lg border border-white/15 bg-white/10 px-4 py-3 text-white lg:col-span-2 lg:justify-self-center">
         <SparklesIcon class="size-5 text-primary" aria-hidden="true" />
         <p class="text-sm font-bold">Portal exclusivo para jugadoras VK Vikingas</p>
       </div>
@@ -194,6 +204,8 @@ import { useRouter } from 'vue-router';
 import {
   ArrowPathIcon,
   BoltIcon,
+  EyeIcon,
+  EyeSlashIcon,
   EnvelopeIcon,
   ExclamationCircleIcon,
   LockClosedIcon,
@@ -209,6 +221,7 @@ const router = useRouter();
 const email = ref('');
 const password = ref('');
 const isLoading = ref(false);
+const passwordVisible = ref(false);
 const error = ref(null);
 const isSendingReset = ref(false);
 const resetMessage = ref('');
