@@ -314,8 +314,14 @@ export const loginJugadora = async (email, password) => {
       errorJugadora.value = 'Contraseña incorrecta';
     } else if (err.code === 'auth/invalid-email') {
       errorJugadora.value = 'Email inválido';
+    } else if (err.code === 'auth/invalid-credential') {
+      errorJugadora.value = 'Correo o contraseña incorrectos';
+    } else if (err.code === 'auth/too-many-requests') {
+      errorJugadora.value = 'Demasiados intentos. Espera unos minutos y vuelve a intentar';
+    } else if (err.code === 'auth/network-request-failed') {
+      errorJugadora.value = 'No se pudo conectar. Revisa tu conexión e inténtalo nuevamente';
     } else {
-      errorJugadora.value = err.message;
+      errorJugadora.value = 'No se pudo iniciar sesión. Inténtalo nuevamente';
     }
     return false;
   } finally {

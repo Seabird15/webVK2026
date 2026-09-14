@@ -3,8 +3,8 @@
     <header class="mx-auto max-w-7xl px-4 pb-10 pt-8 sm:px-6 lg:px-8 lg:pb-12 lg:pt-12">
       <div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p class="historia-fade text-[0.68rem] font-black uppercase tracking-[0.24em] text-(--historia-primary)">Club Deportivo Social y Cultural Vikingas · 2019</p>
-          <h1 class="historia-fade mt-3 max-w-3xl text-[clamp(3rem,8vw,6.5rem)] font-black uppercase leading-6 text-white" style="font-family: 'Gobold High', sans-serif;">
+          <p class="historia-fade text-[0.68rem] font-black uppercase tracking-[0.24em] mb-4 text-(--historia-primary)">Club Deportivo Social y Cultural Vikingas · 2019</p>
+          <h1 class="historia-fade mt-3 max-w-3xl text-[clamp(3rem,8vw,6.5rem)] font-black uppercase leading-10 md:leading-20 text-white" style="font-family: 'Gobold High', sans-serif;">
             La historia<br /><span class="text-(--historia-primary)">de Vikingas</span>
           </h1>
           <p class="historia-fade mt-6 max-w-xl text-pretty text-base leading-6 text-white/62 sm:text-lg">
@@ -33,7 +33,7 @@
         <div class="flex flex-col gap-4 border-b border-white/15 pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">La ruta Vikingas</p>
-            <h2 id="ruta-vikingas" class="mt-3 max-w-2xl text-[clamp(2.2rem,5vw,4rem)] font-black uppercase leading-[0.9] text-white" style="font-family: 'Gobold High', sans-serif;">Pertenecer. Formarse. Prepararse. Competir.</h2>
+            <h2 id="ruta-vikingas" class="mt-3 max-w-2xl text-[clamp(2.2rem,5vw,4rem)] font-black uppercase leading-10 md:leading-16 text-white" style="font-family: 'Gobold High', sans-serif;">Pertenecer. Formarse. Prepararse. Competir.</h2>
           </div>
           <p class="max-w-xs text-sm leading-6 text-white/60">Cuatro ideas que orientan el proyecto sin separar a la comunidad del rendimiento.</p>
         </div>
@@ -51,7 +51,7 @@
         <div class="grid gap-10 lg:grid-cols-[minmax(13rem,0.45fr)_minmax(0,1.55fr)]">
           <div>
             <p class="text-[0.72rem] font-black uppercase tracking-[0.22em] text-(--historia-primary)">Una historia que sigue</p>
-            <h2 id="linea-tiempo" class="mt-3 text-[clamp(2.2rem,5vw,4rem)] font-black uppercase leading-[0.9] text-white" style="font-family: 'Gobold High', sans-serif;">De las ganas al equipo</h2>
+            <h2 id="linea-tiempo" class="mt-3 text-[clamp(2.2rem,5vw,4rem)] font-black uppercase leading-10 md:leading-20 text-white" style="font-family: 'Gobold High', sans-serif;">De las ganas al equipo</h2>
           </div>
 
           <div class="space-y-10 border-l border-(--historia-primary)/45 pl-6 sm:pl-10">
