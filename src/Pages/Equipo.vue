@@ -1,27 +1,23 @@
 <template>
   <section class="equipo-page overflow-hidden bg-(--eq-bg) text-(--eq-text)">
 
-    <!-- Hero -->
-    <div class="relative isolate">
-      <div class="absolute inset-0" aria-hidden="true">
-        <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,17,18,0.18)_0%,rgba(11,17,18,0.78)_55%,rgba(11,17,18,0.98)_100%)]"></div>
-        <div class="absolute left-[-6%] top-16 h-56 w-56 rounded-full bg-(--eq-primary)/14 blur-3xl"></div>
-        <div class="absolute right-[-8%] top-0 h-64 w-64 rounded-full bg-(--eq-accent)/10 blur-3xl"></div>
-      </div>
-
-      <div class="relative z-10 mx-auto max-w-7xl px-4 pb-8 pt-14 sm:px-6 lg:px-8 lg:pb-12 lg:pt-18">
-        <p class="eq-fade text-sm font-semibold italic text-white/70 sm:text-base">
-          Formadas acá, juntas siempre
-        </p>
-        <h1 class="eq-fade mt-4 uppercase leading-[0.88]" style="font-family: 'Gobold High', sans-serif; font-size: clamp(3.5rem, 12vw, 7.5rem);">
-          <span class="block text-transparent [-webkit-text-stroke:1.5px_rgba(247,255,253,0.85)]">Nuestro</span>
-          <span class="block text-white">Equipo</span>
-        </h1>
-        <p class="eq-fade mt-6 max-w-2xl text-[clamp(1rem,2.6vw,1.28rem)] leading-relaxed text-white/80">
-          Acá no se ficha para ganar rápido. Se entrena, se acompaña y se crece juntas. Cada jugadora que ves llegó para quedarse y construir algo de verdad.
+    <!-- Cabecera -->
+    <section class="mx-auto max-w-7xl px-4 pb-10 pt-8 sm:px-6 lg:px-8 lg:pb-12 lg:pt-12">
+      <div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p class="eq-fade text-[0.68rem] font-black uppercase tracking-[0.24em] text-(--eq-primary)">Formadas acá, juntas siempre</p>
+          <h1 class="eq-fade mt-3 max-w-3xl text-[clamp(3rem,8vw,6.5rem)] font-black uppercase leading-[0.82] text-white" style="font-family: 'Gobold High', sans-serif;">
+            Nuestro<br /><span class="text-(--eq-primary)">equipo</span>
+          </h1>
+          <p class="eq-fade mt-6 max-w-xl text-pretty text-base leading-7 text-white/62 sm:text-lg">
+           Formamos jugadoras. Se entrena, se acompaña y se crece juntas. Cada jugadora que ves llegó para quedarse y construir algo de verdad.
+          </p>
+        </div>
+        <p class="max-w-xs text-sm leading-6 text-white/42 lg:pb-1 lg:text-right">
+          Planteles, cuerpo técnico y proyectos que construyen la identidad vikinga.
         </p>
       </div>
-    </div>
+    </section>
 
     <!-- Tabs -->
     <div class="sticky top-0 z-30 border-b border-white/10 bg-(--eq-bg)/95 backdrop-blur-sm">

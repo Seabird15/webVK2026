@@ -68,7 +68,7 @@
             <router-link
               to="/historia"
               @click="trackCTAClick('Conocer la historia', 'hero')"
-              class="group inline-flex min-h-14 items-center justify-between gap-4 rounded-[1.35rem] border border-white/30 bg-white px-5 py-4 text-left text-[#082022] shadow-[0_18px_34px_rgba(0,0,0,0.12)] transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_22px_38px_rgba(0,0,0,0.16)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--hero-primary-soft)"
+              class="group inline-flex min-h-14 items-center justify-between gap-4 rounded-xl bg-white px-5 py-4 text-left text-[#082022] shadow-[0_18px_34px_rgba(0,0,0,0.12)] transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_22px_38px_rgba(0,0,0,0.16)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--hero-primary-soft)"
             >
               <span>
                 <span class="block text-[0.68rem] font-black uppercase tracking-[0.2em] text-(--hero-primary)">Entrar al club</span>
@@ -83,7 +83,7 @@
             <router-link
               to="/competencias"
               @click="trackCTAClick('Competencias y resultados', 'hero')"
-              class="group inline-flex min-h-14 items-center justify-between gap-4 rounded-[1.35rem] border border-(--hero-primary-soft)/36 bg-[rgba(9,45,47,0.42)] px-5 py-4 text-left text-white shadow-[0_16px_30px_rgba(0,0,0,0.1)] backdrop-blur-sm transition-transform duration-200 hover:-translate-y-1 hover:bg-[rgba(9,45,47,0.5)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--hero-primary-soft)"
+              class="group inline-flex min-h-14 items-center justify-between gap-4 rounded-xl bg-[rgba(9,45,47,0.42)] px-5 py-4 text-left text-white shadow-[0_16px_30px_rgba(0,0,0,0.1)] backdrop-blur-sm transition-transform duration-200 hover:-translate-y-1 hover:bg-[rgba(9,45,47,0.5)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--hero-primary-soft)"
             >
               <span>
                 <span class="block text-[0.68rem] font-black uppercase tracking-[0.2em] text-(--hero-primary-soft)">Seguir la temporada</span>

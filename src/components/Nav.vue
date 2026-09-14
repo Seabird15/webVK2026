@@ -15,7 +15,7 @@
             <div v-if="link.children" class="relative">
               <button
                 type="button"
-                class="flex min-h-11 items-center gap-1.5 rounded-lg px-2.5 text-[11px] font-bold uppercase transition-colors xl:px-3 xl:text-xs"
+                class="flex min-h-11 cursor-pointer items-center gap-1.5 rounded-lg px-2.5 text-[11px] font-bold uppercase transition-colors xl:px-3 xl:text-xs"
                 :class="isGroupActive(link) || openDesktopMenuId === link.id ? 'bg-black text-primary' : 'text-black hover:bg-black/10'"
                 :aria-label="`Mostrar submenu de ${link.label}`"
                 :aria-expanded="openDesktopMenuId === link.id"
@@ -125,7 +125,7 @@
 
           <button
             type="button"
-            class="flex size-11 items-center justify-center rounded-lg text-black transition-colors hover:bg-black/10 xl:hidden"
+            class="flex size-11 cursor-pointer items-center justify-center rounded-lg text-black transition-colors hover:bg-black/10 xl:hidden"
             :aria-expanded="isMenuOpen"
             aria-label="Abrir menú"
             @click="isMenuOpen = !isMenuOpen"
@@ -163,7 +163,7 @@
           <div v-if="link.children">
             <button
               type="button"
-              class="flex w-full items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-sm font-black uppercase text-black transition-colors"
+              class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-sm font-black uppercase text-black transition-colors"
               :class="openMobileMenuId === link.id ? 'bg-black/10' : 'hover:bg-black/10'"
               :aria-label="`Mostrar submenu de ${link.label}`"
               :aria-expanded="openMobileMenuId === link.id"
