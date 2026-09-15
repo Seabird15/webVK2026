@@ -11,11 +11,11 @@
         </p>
       </div>
 
-      <div class="grid items-stretch divide-y divide-white/10 md:grid-cols-3 md:auto-rows-fr md:divide-x md:divide-y-0 md:divide-white/10">
+      <div class="grid items-stretch gap-4 md:grid-cols-3 md:auto-rows-fr md:gap-0 md:divide-x md:divide-white/10">
         <article
           v-for="(resultado, index) in resultadosVisibles"
           :key="resultado.id"
-          class="group relative flex h-full flex-col overflow-hidden px-1 py-8 shadow-[0_0_16px_rgba(255,255,255,0.08)] transition-colors duration-300 hover:bg-white/4 sm:px-3 md:px-6 first:pt-0 md:first:pl-0 md:first:pt-8 md:last:pr-0"
+          class="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/3 px-4 py-6 shadow-[0_0_16px_rgba(255,255,255,0.08)] transition-colors duration-300 hover:bg-white/6 sm:px-5 md:rounded-none md:border-0 md:bg-transparent md:px-6 md:py-8 md:first:pl-0 md:last:pr-0"
         >
           <div class="flex items-start justify-between gap-4">
             <div>

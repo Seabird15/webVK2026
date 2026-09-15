@@ -1,6 +1,20 @@
 <template>
     <HeroHome :hero-data="heroData" />
 
+    <div class="bg-[#071112] px-4 pt-6 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-6xl">
+        <div class="flex flex-col items-center gap-2.5 rounded-2xl border border-primary/25 bg-[linear-gradient(120deg,rgba(201,168,76,0.14),rgba(7,17,18,0.65)_60%)] px-5 py-3.5 text-center shadow-[0_14px_36px_rgba(0,0,0,0.28)] sm:flex-row sm:justify-center sm:gap-4 sm:text-left">
+          <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-[0.68rem] font-black uppercase tracking-[0.22em] text-primary">
+            <CalendarDaysIcon class="h-3.5 w-3.5" />
+            Próximamente
+          </span>
+          <p class="text-sm font-bold uppercase tracking-wide text-white sm:text-base">
+            2da versión <span class="text-secondary">Campeonato Interno VK</span> · Noviembre
+          </p>
+        </div>
+      </div>
+    </div>
+
     <section class="relative overflow-hidden bg-[#071112] px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
       <div class="mx-auto max-w-6xl">
         <div
@@ -65,92 +79,7 @@
       <Eventos />
     </div>
     <UltimosResultados />
-    
-    <section class="relative bg-[#0b1718] px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
-      <div class="mx-auto grid max-w-6xl gap-12 border-y border-white/10 py-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)] lg:gap-16">
-        <article class="relative overflow-hidden px-1 sm:px-2">
-          <div class="absolute -left-16 top-0 h-32 w-32 rounded-full bg-primary/16 blur-3xl"></div>
-          <div class="relative flex h-full flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div class="max-w-2xl text-center lg:text-left">
-              <p class="text-[0.78rem] font-bold italic tracking-[0.04em] text-white/84">
-NUEVA TEMPORADA
-              </p>
-              <h2 class="mt-3 text-[clamp(2rem,5vw,3.6rem)] font-black uppercase xl:leading-15 text-white" style="font-family: 'Gobold High', sans-serif;">
-                Liga Dobleve<br>
-                Series B y C
-              </h2>
-              <p class="mt-4 max-w-xl text-sm leading-7 text-white/72 sm:text-[0.98rem]">
-                Seguimos compitiendo con la misma idea de siempre: procesos largos, compañerismo y una identidad que se construye fecha a fecha.
-              </p>
-            </div>
 
-            <div class="flex flex-col items-stretch gap-3 sm:flex-row lg:flex-col lg:items-end">
-              <router-link
-                to="/competencias"
-                @click="trackCTAClick('Ver temporada', 'home_liga')"
-                class="inline-flex min-h-14 items-center justify-between gap-3 rounded-xl bg-white px-5 py-4 text-[#082022] shadow-[0_14px_28px_rgba(0,0,0,0.12)] transition-transform duration-200 hover:-translate-y-1"
-              >
-                <span>
-                  <span class="block text-[0.68rem] font-black uppercase tracking-[0.2em] text-primary">Ver temporada</span>
-                  <span class="mt-1 block text-[0.92rem] font-black uppercase tracking-[0.08em]">Resultados y calendario</span>
-                </span>
-              </router-link>
-
-              <button
-                @click="toggleLike"
-                :disabled="isLikeLoading"
-                class="inline-flex min-h-14 cursor-pointer items-center justify-center gap-2 rounded-xl bg-white/8 px-5 py-4 text-white transition-transform duration-200 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <HeartIconSolid v-if="hasLiked" class="h-5 w-5 text-red-400" />
-                <HeartIcon v-else class="h-5 w-5 text-white" />
-                <span class="text-[0.82rem] font-black uppercase tracking-[0.12em]">{{ likesCount }} apoyos</span>
-              </button>
-            </div>
-          </div>
-        </article>
-
-        <article class="overflow-hidden border-l border-primary/40 bg-[linear-gradient(180deg,rgba(44,207,191,0.1),rgba(11,23,24,0.2))] px-5 py-2 sm:px-7 lg:pl-10">
-          <p class="text-[0.78rem] font-bold italic tracking-[0.04em] text-white/84">
-            Espacio interno del club
-          </p>
-          <h2 class="mt-3 text-[clamp(1.8rem,4vw,2.8rem)] font-black uppercase leading-[0.95] text-white" style="font-family: 'Gobold High', sans-serif;">
-            Acceso jugadoras
-          </h2>
-          <p class="mt-4 text-sm leading-7 text-white/74 sm:text-[0.98rem]">
-            Revisa entrenamientos, confirma asistencia y mantente conectada con la actividad del plantel.
-          </p>
-          <router-link
-            to="/login-jugadora"
-            @click="trackCTAClick('Entrar zona jugadoras', 'home_acceso')"
-            class="mt-6 inline-flex min-h-14 w-full items-center justify-between gap-3 rounded-xl bg-white/92 px-5 py-4 text-[#082022] shadow-[0_14px_28px_rgba(0,0,0,0.12)] transition-transform duration-200 hover:-translate-y-1"
-          >
-            <span>
-              <span class="block text-[0.68rem] font-black uppercase tracking-[0.2em] text-primary">Zona privada</span>
-              <span class="mt-1 block text-[0.92rem] font-black uppercase tracking-[0.08em]">Entrar ahora</span>
-            </span>
-            <svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </router-link>
-        </article>
-      </div>
-
-      <router-link
-        to="/historia"
-        @click="trackCTAClick('Conoce nuestra historia', 'home_banner')"
-        class="group mx-auto mt-12 flex max-w-6xl items-center gap-5 border-b border-white/10 px-1 py-6 transition-all duration-300 hover:bg-white/4 sm:px-3"
-      >
-        <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/14 text-2xl transition-transform duration-300 group-hover:scale-110">⚔️</span>
-        <span class="min-w-0 flex-1">
-          <span class="block text-[0.68rem] font-black uppercase tracking-[0.22em] text-primary">Desde 2019</span>
-          <span class="mt-1 block text-[1.05rem] font-bold text-white sm:text-lg">Conoce nuestra historia</span>
-          <span class="mt-1 block text-sm leading-relaxed text-white/60">El camino difícil, el más bonito. Procesos, comunidad y una identidad que se construye fecha a fecha.</span>
-        </span>
-        <svg class="h-5 w-5 shrink-0 text-white/40 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-      </router-link>
-    </section>
 
     <section class="relative overflow-hidden bg-[#071112] px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
       <div class="mx-auto max-w-6xl border-y border-primary/20 bg-[linear-gradient(135deg,rgba(201,168,76,0.08),rgba(7,17,18,0.5)_36%,rgba(7,17,18,0.2)_100%)]">
@@ -203,6 +132,7 @@ import { db } from '../firebase/config';
 import { authUser } from '../firebase/auth';
 import { jugadoraAuthUser } from '../firebase/jugadorasAuth';
 import { HeartIcon } from '@heroicons/vue/24/outline';
+import { CalendarDaysIcon } from '@heroicons/vue/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/vue/24/solid';
 import Eventos from '../components/Eventos.vue';
 import HeroHome from '../components/HeroHome.vue';

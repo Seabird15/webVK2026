@@ -52,15 +52,35 @@
         No pudimos cargar la historia de competencias. Intenta nuevamente más tarde.
       </div>
 
-      <div v-else class="grid gap-6 xl:grid-cols-2">
-        <section v-for="serie in series" :key="serie.id" class="overflow-hidden rounded-4xl border border-white/10 bg-white/4.5 shadow-[0_24px_80px_rgba(0,0,0,0.24)]">
+      <div v-else>
+        <div class="mb-5 flex gap-2 xl:hidden" role="tablist" aria-label="Seleccionar serie">
+          <button
+            v-for="serie in series"
+            :key="`tab-${serie.id}`"
+            type="button"
+            role="tab"
+            :aria-selected="serieActivaMobile === serie.id"
+            class="flex-1 rounded-full border px-3 py-2.5 text-xs font-black uppercase tracking-[0.14em] transition"
+            :class="serieActivaMobile === serie.id ? 'border-primary bg-primary text-black' : 'border-white/15 bg-white/5 text-white/65 hover:border-primary/60 hover:text-white'"
+            @click="serieActivaMobile = serie.id"
+          >
+            {{ serie.nombre }} <span class="opacity-70">({{ serie.partidos.length }})</span>
+          </button>
+        </div>
+
+        <div class="grid gap-6 xl:grid-cols-2">
+        <section
+          v-for="serie in series"
+          :key="serie.id"
+          class="overflow-hidden rounded-4xl border border-white/10 bg-white/4.5 shadow-[0_24px_80px_rgba(0,0,0,0.24)]"
+          :class="serieActivaMobile === serie.id ? '' : 'hidden xl:block'"
+        >
           <div class="relative overflow-hidden border-b border-white/10 p-6 sm:p-8" :class="serie.id === 'serieB' ? 'bg-[#103d36]' : 'bg-[#172f42]'">
             <div class="absolute -right-14 -top-20 h-44 w-44 rounded-full border-28 border-white/5"></div>
             <div class="relative flex items-start justify-between gap-4">
               <div>
                 <p class="text-xs font-black uppercase tracking-[0.26em]" :class="serie.id === 'serieB' ? 'text-primary' : 'text-sky-300'">{{ serie.kicker }}</p>
                 <h2 class="mt-2 text-4xl font-bold uppercase leading-none sm:text-5xl" style="font-family: 'Gobold High', sans-serif;">{{ serie.nombre }}</h2>
-                <p class="mt-3 max-w-sm text-sm font-medium text-white/65">{{ serie.descripcion }}</p>
               </div>
               <span class="rounded-full border border-white/20 bg-black/20 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white/70">{{ serie.partidos.length }} fechas</span>
             </div>
@@ -108,6 +128,7 @@
             </div>
           </div>
         </section>
+        </div>
       </div>
 
       <footer class="mt-12 border-t border-white/10 py-8 text-center">
@@ -126,6 +147,7 @@ const partidos = ref([]);
 const cargando = ref(true);
 const error = ref(false);
 const filtroActivo = ref('todos');
+const serieActivaMobile = ref('serieB');
 let unsubscribe = null;
 
 const filtros = [
@@ -169,14 +191,12 @@ const series = computed(() => [
     id: 'serieB',
     nombre: 'Serie B',
     kicker: 'Ascenso',
-    descripcion: 'La ruta de Ascenso, construida con constancia y cancha compartida.',
     partidos: partidosFiltrados.value.filter((item) => obtenerEquipo(item) === 'ascenso' || obtenerEquipo(item) === 'ambos')
   },
   {
     id: 'serieC',
     nombre: 'Serie C',
     kicker: 'Serie C',
-    descripcion: 'Un equipo que sigue creciendo, fecha a fecha, sin soltar el proceso.',
     partidos: partidosFiltrados.value.filter((item) => obtenerEquipo(item) === 'seriec' || obtenerEquipo(item) === 'serie c')
   }
 ]);

@@ -11,16 +11,19 @@
       <!-- Encabezado mejorado -->
       <div class="text-center mb-12 md:mb-16 animate-fade-in">
         <div class="inline-block mb-4">
-          <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-primary to-primary-dark rounded-2xl flex items-center justify-center shadow-2xl mx-auto mb-4 transform hover:scale-110 transition-transform">
+          <div class="w-16 h-16 md:w-20 md:h-20 bg-linear-to-br from-primary to-primary-dark rounded-2xl flex items-center justify-center shadow-2xl mx-auto mb-4 transform hover:scale-110 transition-transform">
             <svg class="w-10 h-10 md:w-12 md:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
           </div>
         </div>
-        <h1 class="text-3xl md:text-5xl font-bold text-white mb-2 md:mb-3">
-          ¡Bienvenida{{ jugadoraData?.nombre ? ', ' + jugadoraData.nombre.split(' ')[0] : '' }}! 
+
+      
+
+        <h1 class="text-3xl md:text-5xl font-black text-white mb-2 md:mb-3 leading-tight">
+          {{ saludoPersonalizado }}
         </h1>
-       
+   
       </div>
 
       <!-- Tarjetas informativas (solo lectura) -->
@@ -114,13 +117,28 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { jugadoraAuthUser, obtenerEquiposJugadora } from '../firebase/jugadorasAuth';
+import { jugadoraAuthUser, jugadoraData, obtenerEquiposJugadora } from '../firebase/jugadorasAuth';
 
 const router = useRouter();
 const isLoading = ref(false);
 const equiposJugadora = obtenerEquiposJugadora();
+
+const nombreJugadora = computed(() => {
+  const nombre = jugadoraData.value?.nombre || jugadoraAuthUser.value?.displayName || '';
+  if (!nombre) return 'jugadora';
+  return nombre.trim().split(' ')[0];
+});
+
+const saludoPersonalizado = computed(() => {
+  const nombre = nombreJugadora.value;
+  if (nombre === 'jugadora') {
+    return '¡Bienvenida a Vikingas!';
+  }
+
+  return `¡Bienvenida, ${nombre}!`;
+});
 
 // Verificar que el usuario esté autenticado y tenga múltiples equipos
 if (!jugadoraAuthUser.value || equiposJugadora.length <= 1) {

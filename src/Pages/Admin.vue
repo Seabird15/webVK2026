@@ -541,6 +541,11 @@
             <GestionarMensajesContacto />
           </div>
 
+          <!-- Sugerencias del club -->
+          <div v-if="activeTab === 'sugerencias-club'">
+            <GestionarSugerenciasClub />
+          </div>
+
           <!-- Slider Home -->
           <div v-if="activeTab === 'slider'">
             <GestionarSliderHome />
@@ -755,6 +760,7 @@ import GestionarEstadisticas from '../components/GestionarEstadisticas.vue';
 import GestionarSliderHome from '../components/GestionarSliderHome.vue';
 import GestionarSolicitudesRegistro from '../components/GestionarSolicitudesRegistro.vue';
 import GestionarMensajesContacto from '../components/GestionarMensajesContacto.vue';
+import GestionarSugerenciasClub from '../components/GestionarSugerenciasClub.vue';
 import GestionarEntrenamientos from '../components/GestionarEntrenamientos.vue';
 import GestionarPartidos from '../components/GestionarPartidos.vue';
 import EditorResultadosPartidosAdmin from '../components/EditorResultadosPartidosAdmin.vue';
@@ -838,6 +844,7 @@ const tabs = computed(() => {
     { id: 'home', label: 'Inicio', icon: HomeIcon },
     { id: 'solicitudes', label: 'Solicitudes', icon: DocumentTextIcon },
     { id: 'contactos', label: 'Contactos web', icon: EnvelopeIcon },
+    { id: 'sugerencias-club', label: 'Sugerencias club', icon: EnvelopeIcon },
     { id: 'jugadoras', label: 'Jugadoras', icon: UsersIcon },
     { id: 'entrenamientos', label: 'Entrenamientos', icon: CalendarIcon },
     { id: 'banner-mensualidad', label: 'Banner Noticia/Mensualidad/Otros', icon: BellAlertIcon },
