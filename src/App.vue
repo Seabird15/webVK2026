@@ -59,7 +59,7 @@ watch(jugadoraData, (newData, oldData) => {
 </script>
 
 <template>
-  <div class="bg-black min-h-screen">
+  <div class="w-full min-h-screen bg-black">
     <Nav />
     <Loader />
     <main>

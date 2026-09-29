@@ -149,15 +149,15 @@
                     <h3 class="mt-2 text-xl font-black text-gray-900">Revisión inmediata</h3>
                     <div class="mt-5 space-y-3">
                       <button
-                        @click="activeTab = 'salud-semanal'"
+                        @click="activeTab = 'seguimiento-entrenamientos'"
                         class="w-full rounded-2xl border border-red-200 bg-linear-to-r from-red-50 to-white px-4 py-4 text-left transition hover:border-red-300 hover:shadow-sm cursor-pointer"
                       >
                         <div class="flex items-center justify-between gap-3">
                           <div>
-                            <p class="text-sm font-black text-gray-900">Salud semanal</p>
-                            <p class="mt-1 text-xs text-gray-600">{{ alertasSalud.pendientesRevision }} pendientes de revisión</p>
+                            <p class="text-sm font-black text-gray-900">Seguimiento de bienestar</p>
+                            <p class="mt-1 text-xs text-gray-600">RPE, recuperación y molestias por sesión</p>
                           </div>
-                          <span class="rounded-full bg-red-50 px-3 py-1 text-xs font-black text-red-700">{{ alertasSalud.nuevas }} nuevas</span>
+                          <span class="rounded-full bg-red-50 px-3 py-1 text-xs font-black text-red-700">Revisar</span>
                         </div>
                       </button>
 
@@ -278,7 +278,7 @@
                 <details class="group rounded-3xl border border-red-200 bg-linear-to-br from-red-50 via-white to-orange-50 p-4 shadow-sm">
                   <summary class="flex list-none cursor-pointer items-center justify-between gap-3">
                     <div>
-                      <p class="text-[11px] font-black uppercase tracking-[0.2em] text-red-700">Salud semanal</p>
+                      <p class="text-[11px] font-black uppercase tracking-[0.2em] text-red-700">Bienestar semanal · histórico</p>
                       <p class="mt-1 text-sm font-bold text-gray-900">Señales de riesgo alto</p>
                     </div>
                     <span class="text-xs font-black text-red-700 transition-transform group-open:rotate-180">▼</span>
@@ -428,7 +428,7 @@
                 <section class="rounded-[28px] border border-red-200 bg-linear-to-br from-red-50 via-white to-orange-50 p-5 sm:p-6 shadow-[0_18px_40px_rgba(239,68,68,0.08)]">
                   <div class="flex items-center justify-between gap-3 mb-5">
                     <div>
-                      <p class="text-[11px] font-black uppercase tracking-[0.24em] text-slate-500">Salud semanal</p>
+                      <p class="text-[11px] font-black uppercase tracking-[0.24em] text-slate-500">Bienestar semanal · histórico</p>
                       <h3 class="mt-2 text-xl font-black text-gray-900">Señales de riesgo alto</h3>
                       <p class="mt-1 text-xs text-gray-500">Lectura rápida de respuestas con umbrales críticos esta semana.</p>
                     </div>
@@ -697,9 +697,13 @@
             <GestionarRankingAsistencia />
           </div>
 
-          <!-- Salud Semanal (solo admin) -->
+          <!-- Respuestas semanales anteriores, conservadas como historial -->
           <div v-if="activeTab === 'salud-semanal' && esAdmin">
             <GestionarSaludSemanal />
+          </div>
+
+          <div v-if="activeTab === 'seguimiento-entrenamientos' && esAdmin">
+            <GestionarSeguimientoEntrenamientos />
           </div>
 
           <!-- Estadísticas -->
@@ -756,6 +760,7 @@ import GestionarEventosEspeciales from '../components/GestionarEventosEspeciales
 import GestionarBannerMensualidad from '../components/GestionarBannerMensualidad.vue';
 import GestionarRankingAsistencia from '../components/GestionarRankingAsistencia.vue';
 import GestionarSaludSemanal from '../components/GestionarSaludSemanal.vue';
+import GestionarSeguimientoEntrenamientos from '../components/GestionarSeguimientoEntrenamientos.vue';
 import GestionarEstadisticas from '../components/GestionarEstadisticas.vue';
 import GestionarSliderHome from '../components/GestionarSliderHome.vue';
 import GestionarSolicitudesRegistro from '../components/GestionarSolicitudesRegistro.vue';
@@ -864,10 +869,14 @@ const tabs = computed(() => {
 
     baseTabs.splice(9, 0, {
       id: 'salud-semanal',
-      label: alertasSalud.value.nuevas > 0
-        ? `Salud Semanal (${alertasSalud.value.nuevas})`
-        : 'Salud Semanal',
+      label: 'Salud semanal (historial)',
       icon: BellAlertIcon,
+    });
+
+    baseTabs.splice(10, 0, {
+      id: 'seguimiento-entrenamientos',
+      label: 'Carga post-entrenamiento',
+      icon: ChartBarIcon,
     });
   }
 

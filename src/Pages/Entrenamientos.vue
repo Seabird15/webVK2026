@@ -20,41 +20,15 @@
 
     <div class="xl:mx-auto xl:max-w-7xl xl:grid xl:grid-cols-[1fr_360px] xl:items-start xl:gap-8 xl:px-4">
     <div class="xl:col-start-1 xl:min-w-0">
-    <div class="mx-auto mt-2 max-w-6xl px-4 sm:mt-4 sm:px-6">
-      <CuestionarioSaludSemanal
-        v-if="jugadoraAuthUser?.uid && jugadoraData"
+    <div v-if="!esAdmin && jugadoraAuthUser?.uid && jugadoraData" class="mx-auto mt-2 max-w-6xl px-4 sm:mt-4 sm:px-6">
+      <CuestionarioBienestar
+        :entrenamientos="entrenamientos"
+        :equipo="equipoSeleccionado"
         :jugadora-id="jugadoraAuthUser.uid"
         :jugadora-nombre="nombreCompletoJugadora"
-        :equipo="equipoSeleccionado"
       />
     </div>
 
-    <div class="mx-auto mt-2 max-w-6xl px-4 sm:mt-4 sm:px-6">
-      <div class="rounded-3xl border border-primary/20 bg-linear-to-r from-primary-dark via-[#12342f] to-black p-3 shadow-[0_14px_36px_rgba(0,0,0,0.24)] sm:p-5">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div class="text-center lg:text-left">
-            <p class="inline-flex items-center justify-center lg:justify-start rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.2em] text-primary">
-              Temporada 2026
-            </p>
-            <h3 class="text-white text-lg sm:text-xl font-black mt-3">Revisa las estadisticas del semestre</h3>
-            <p class="mt-1.5 hidden text-sm text-white/80 sm:block sm:text-base">
-              Consulta el rendimiento de tu equipo en la competencia actual, estadísticas individuales y resultados..
-            </p>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:min-w-90">
-            <router-link
-              to="/competencias"
-              class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs uppercase font-black text-white tracking-widest transition hover:bg-primary/90"
-            >
-              Ver competencia
-              <ChevronRightIcon class="w-4 h-4" />
-            </router-link>
-       
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Contenido -->
     <div class="mx-auto max-w-6xl p-4 sm:p-6">
@@ -255,7 +229,7 @@
                   <button
                     v-else-if="estadoInscripcion[entrenamiento.id] === 'baja'"
                     @click="handleInscribirse(entrenamiento)"
-                    :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
+                    :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || inscripcionCerrada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                     class="flex-1 px-3 py-2.5 rounded-lg font-bold transition-all text-sm cursor-pointer flex items-center justify-center gap-1 bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ArrowPathIcon class="w-4 h-4" />
@@ -264,7 +238,7 @@
                   <button
                     v-else
                     @click="handleInscribirse(entrenamiento)"
-                    :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
+                    :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || inscripcionCerrada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                     class="flex-1 px-3 py-2.5 rounded-lg font-bold transition-all text-sm cursor-pointer flex items-center justify-center gap-1 bg-green-500 text-white hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <CheckIcon class="w-4 h-4" />
@@ -447,7 +421,7 @@
                     <button
                       v-else-if="estadoInscripcion[entrenamiento.id] === 'baja'"
                       @click="handleInscribirse(entrenamiento)"
-                      :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
+                      :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || inscripcionCerrada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                       class="flex-1 px-3 py-2.5 rounded-lg font-bold transition-all text-sm cursor-pointer flex items-center justify-center gap-1 bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ArrowPathIcon class="w-4 h-4" />
@@ -456,7 +430,7 @@
                     <button
                       v-else
                       @click="handleInscribirse(entrenamiento)"
-                      :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
+                      :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || inscripcionCerrada(entrenamiento) || (entrenamiento.esConvocatoria && !esConvocada(entrenamiento) && !esAdmin)"
                       class="flex-1 px-3 py-2.5 rounded-lg font-bold transition-all text-sm cursor-pointer flex items-center justify-center gap-1 bg-green-500 text-white hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <CheckIcon class="w-4 h-4" />
@@ -543,7 +517,7 @@
     </div>
 
     <!-- Sidebar fija de la jugadora (solo desktop) -->
-    <aside class="hidden xl:sticky xl:top-6 xl:col-start-2 xl:block">
+    <aside class="hidden xl:sticky xl:top-20 xl:col-start-2 xl:block">
       <ResumenJugadoraEntrenamientos
         :jugadora="jugadoraData"
         :racha="rachaReciente"
@@ -1121,10 +1095,10 @@
             <button
               v-else-if="estadoInscripcion[entrenamientoSeleccionado.id] === 'baja'"
               @click="handleInscribirse(entrenamientoSeleccionado)"
-              :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
+              :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || inscripcionCerrada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
               :class="[
                 'w-full px-4 py-3 rounded-lg font-bold transition-colors cursor-pointer',
-                jugadoraRestringidaPorEstado || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
+                jugadoraRestringidaPorEstado || inscripcionCerrada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50'
               ]"
@@ -1135,10 +1109,10 @@
             <template v-else>
               <button
                 @click="handleInscribirse(entrenamientoSeleccionado)"
-                :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
+                :disabled="isLoadingAccion || jugadoraRestringidaPorEstado || inscripcionCerrada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)"
                 :class="[
                   'w-full px-4 py-3 rounded-lg font-bold transition-colors cursor-pointer',
-                  jugadoraRestringidaPorEstado || fechaPasada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
+                  jugadoraRestringidaPorEstado || inscripcionCerrada(entrenamientoSeleccionado) || (entrenamientoSeleccionado.esConvocatoria && !esConvocada(entrenamientoSeleccionado) && !esAdmin)
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-green-500 text-white hover:bg-green-600 disabled:opacity-50'
                 ]"
@@ -1369,7 +1343,7 @@ import { db } from '../firebase/config';
 import { obtenerEventosEspeciales } from '../firebase/eventosEspeciales';
 import { obtenerTotalesEstadisticasJugadora } from '../firebase/estadisticas';
 import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
-import CuestionarioSaludSemanal from '../components/CuestionarioSaludSemanal.vue';
+import CuestionarioBienestar from '../components/CuestionarioBienestar.vue';
 import EntrenamientosHeader from '../components/EntrenamientosHeader.vue';
 import FeedbackPendientes from '../components/FeedbackPendientes.vue';
 import ResumenJugadoraEntrenamientos from '../components/ResumenJugadoraEntrenamientos.vue';
@@ -1495,11 +1469,12 @@ const nombreCompletoJugadora = computed(() => {
 });
 
 const VENTANA_HISTORIAL_MS = 24 * 60 * 60 * 1000;
+const VENTANA_ACTIVA_ENTRENAMIENTO_MS = 60 * 60 * 1000;
 const DURACION_PARTIDO_DEFAULT_MS = 90 * 60 * 1000;
 
 const esPartidoOAmistoso = (entrenamiento) => {
   const tipo = (entrenamiento?.tipo || '').toString().toLowerCase();
-  return tipo === 'partido' || tipo === 'amistoso';
+  return tipo === 'partido' || tipo === 'amistoso' || tipo === 'liga';
 };
 
 const obtenerFechaBaseEntrenamiento = (entrenamiento) => {
@@ -1555,6 +1530,8 @@ const eventoFinalizado = (entrenamiento) => {
   return Date.now() > finMs;
 };
 
+const inscripcionCerrada = (entrenamiento) => eventoFinalizado(entrenamiento);
+
 const mantenerEvento24HorasEnListado = (entrenamiento) => {
   if (esAdmin.value) return true;
   return esPartidoOAmistoso(entrenamiento);
@@ -1564,7 +1541,11 @@ const obtenerLimiteListadoMs = (entrenamiento) => {
   const { finMs } = obtenerInicioFinEvento(entrenamiento);
   if (!Number.isFinite(finMs)) return null;
 
-  return finMs + (mantenerEvento24HorasEnListado(entrenamiento) ? VENTANA_HISTORIAL_MS : 0);
+  const ventanaExtra = mantenerEvento24HorasEnListado(entrenamiento)
+    ? VENTANA_HISTORIAL_MS
+    : VENTANA_ACTIVA_ENTRENAMIENTO_MS;
+
+  return finMs + ventanaExtra;
 };
 
 const eventoVisibleEnListado = (entrenamiento) => {
@@ -2240,6 +2221,11 @@ const mostrarMensajeDetalle = (mensaje, tipo = 'success') => {
 
 const handleInscribirse = async (entrenamiento) => {
   if (!jugadoraData.value) return;
+
+  if (inscripcionCerrada(entrenamiento)) {
+    mostrarToast('El horario de inscripción para este entrenamiento ya finalizó.', 'error');
+    return;
+  }
 
   if (jugadoraRestringidaPorEstado.value) {
     mostrarToast(mensajeBloqueoPorEstado.value, 'error');

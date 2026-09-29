@@ -26,12 +26,12 @@
         </router-link>
       </div>
 
-      <div class="grid gap-3 sm:grid-cols-2">
-        <div v-if="racha" class="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+      <div class="grid grid-cols-2 gap-2 sm:gap-3">
+        <div v-if="racha" class="min-w-0 rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
           <div class="flex items-center justify-between gap-3">
             <div class="min-w-0">
-              <p class="text-[10px] font-black uppercase tracking-wide text-gray-500">Racha reciente</p>
-              <p class="mt-1.5 text-lg font-black" :class="racha.estado === 'confirmada' ? 'text-green-700' : 'text-red-700'">
+              <p class="text-[9px] font-black uppercase tracking-wide text-gray-500">Racha reciente</p>
+              <p class="mt-1 text-xl font-black tabular-nums" :class="racha.estado === 'confirmada' ? 'text-green-700' : 'text-red-700'">
                 {{ racha.cantidad }} <span class="text-xs font-bold">{{ racha.estado === 'confirmada' ? '✓' : '✗' }}</span>
               </p>
             </div>
@@ -68,17 +68,11 @@
             <p class="mt-1 text-white/90">{{ proximoCumpleanios[0]?.diasRestantes === 1 ? 'Mañana' : `En ${proximoCumpleanios[0]?.diasRestantes} días` }}</p>
           </div>
         </div>
-      </div>
-
-      <div v-if="estadisticas" class="rounded-xl border border-blue-200 bg-linear-to-br from-blue-50 to-blue-100 p-3 shadow-sm md:p-4">
-        <p class="text-[11px] font-bold uppercase tracking-wide text-blue-600">Asistencia entrenamientos</p>
-        <div class="mt-2 flex items-end justify-between gap-3">
-          <div>
-            <p class="text-3xl font-black text-blue-700 leading-none">{{ porcentajeAsistencia }}%</p>
-            <p class="mt-1 text-xs text-blue-600">{{ estadisticas.confirmadas }}/{{ estadisticas.total }}</p>
-          </div>
-          <div class="rounded-full bg-blue-200/70 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-700">
-            total
+        <div v-if="estadisticas" class="min-w-0 rounded-xl border border-blue-200 bg-blue-50 p-3 shadow-sm">
+          <p class="text-[9px] font-black uppercase leading-tight text-blue-700">Asistencia</p>
+          <div class="mt-1 flex items-end justify-between gap-2">
+            <p class="text-2xl font-black leading-none tabular-nums text-blue-800">{{ porcentajeAsistencia }}%</p>
+            <p class="text-[10px] font-bold tabular-nums text-blue-700">{{ estadisticas.confirmadas }}/{{ estadisticas.total }}</p>
           </div>
         </div>
       </div>

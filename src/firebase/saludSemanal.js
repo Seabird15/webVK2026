@@ -53,6 +53,30 @@ export const obtenerRespuestaSemanalJugadora = async (jugadoraId, semanaClave = 
   return { id: snap.id, ...snap.data() };
 };
 
+export const obtenerEstadoPeriodoSemanal = async (jugadoraId, semanaClave = obtenerSemanaClave()) => {
+  const respuesta = await obtenerRespuestaSemanalJugadora(jugadoraId, semanaClave);
+  if (!respuesta || !Object.prototype.hasOwnProperty.call(respuesta, 'enPeriodo')) return null;
+  return respuesta.enPeriodo;
+};
+
+export const guardarEstadoPeriodoSemanal = async ({ jugadoraId, jugadoraNombre, equipo, enPeriodo }) => {
+  if (!jugadoraId) throw new Error('jugadoraId requerido');
+  if (![true, false, null].includes(enPeriodo)) throw new Error('Estado de período inválido');
+
+  const semanaClave = obtenerSemanaClave();
+  const docId = `${jugadoraId}_${semanaClave}`;
+  await setDoc(doc(db, SALUD_COLLECTION, docId), {
+    jugadoraId,
+    jugadoraNombre: (jugadoraNombre || '').toString().trim() || 'Sin nombre',
+    equipo: (equipo || '').toString().trim().toLowerCase(),
+    semanaClave,
+    enPeriodo,
+    periodoRespondido: true,
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+  return { id: docId, semanaClave, enPeriodo };
+};
+
 export const guardarRespuestaSaludSemanal = async ({
   jugadoraId,
   jugadoraNombre,

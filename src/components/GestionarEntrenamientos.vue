@@ -149,6 +149,7 @@
               <option value="entrenamiento">Entrenamiento</option>
               <option value="partido">Partido</option>
               <option value="amistoso">Amistoso</option>
+              <option value="liga">Liga</option>
               <option value="evento">Evento</option>
             </select>
           </div>
@@ -168,18 +169,18 @@
             </label>
           </div>
 
-          <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'">
-            <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide">Rival <span v-if="formulario.tipo === 'partido'">*</span></label>
+          <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso' || formulario.tipo === 'liga'">
+            <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide">Rival <span v-if="formulario.tipo === 'partido' || formulario.tipo === 'liga'">*</span></label>
             <input
               v-model="formulario.rival"
               type="text"
-              :required="formulario.tipo === 'partido'"
+              :required="formulario.tipo === 'partido' || formulario.tipo === 'liga'"
               placeholder="Ej: Club Deportivo XYZ"
               class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
             />
           </div>
 
-          <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'" class="bg-gradient-to-br from-yellow-50 to-orange-50 p-4 rounded-xl border-2 border-yellow-200">
+          <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso' || formulario.tipo === 'liga'" class="bg-gradient-to-br from-yellow-50 to-orange-50 p-4 rounded-xl border-2 border-yellow-200">
             <label class="flex items-start sm:items-center gap-3 cursor-pointer">
               <input
                 v-model="formulario.mostrarEnProximoPartido"
@@ -193,7 +194,7 @@
             </label>
           </div>
 
-          <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'" class="bg-gradient-to-br from-red-50 to-orange-50 p-4 rounded-xl border-2 border-red-200">
+          <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso' || formulario.tipo === 'liga'" class="bg-gradient-to-br from-red-50 to-orange-50 p-4 rounded-xl border-2 border-red-200">
             <label class="flex items-start sm:items-center gap-3 cursor-pointer">
               <input
                 v-model="formulario.mvpHabilitado"
@@ -208,7 +209,7 @@
           </div>
 
           <!-- Opción de convocatoria (solo para partidos/amistosos) -->
-          <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'" class="bg-gradient-to-br from-blue-50 to-purple-50 p-4 rounded-xl border-2 border-blue-200">
+          <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso' || formulario.tipo === 'liga'" class="bg-gradient-to-br from-blue-50 to-purple-50 p-4 rounded-xl border-2 border-blue-200">
             <label class="flex items-start sm:items-center gap-3 cursor-pointer">
               <input
                 v-model="formulario.esConvocatoria"
@@ -320,12 +321,12 @@
             <div>
               <label class="block text-sm font-black text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-2">
                 <ClockIcon class="w-4 h-4" />
-                Hora finalización <span v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'">*</span>
+                Hora finalización <span v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso' || formulario.tipo === 'liga'">*</span>
               </label>
               <input
                 v-model="formulario.horaFin"
                 type="time"
-                :required="formulario.tipo === 'partido' || formulario.tipo === 'amistoso'"
+                :required="formulario.tipo === 'partido' || formulario.tipo === 'amistoso' || formulario.tipo === 'liga'"
                 class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all font-semibold"
               />
             </div>
@@ -1964,12 +1965,12 @@ const solicitarConfirmacionGuardar = (e) => {
     return;
   }
 
-  if (formulario.value.tipo === 'partido' && !formulario.value.rival?.trim()) {
-    error.value = 'Para un partido debes ingresar el nombre del rival';
+  if ((formulario.value.tipo === 'partido' || formulario.value.tipo === 'liga') && !formulario.value.rival?.trim()) {
+    error.value = 'Para partidos de liga debes ingresar el nombre del rival';
     return;
   }
 
-  if ((formulario.value.tipo === 'partido' || formulario.value.tipo === 'amistoso') && !formulario.value.horaFin) {
+  if ((formulario.value.tipo === 'partido' || formulario.value.tipo === 'amistoso' || formulario.value.tipo === 'liga') && !formulario.value.horaFin) {
     error.value = 'Para partidos o amistosos debes ingresar la hora de finalización';
     return;
   }
