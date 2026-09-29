@@ -188,7 +188,7 @@ const enviando = ref(false);
 const enviado = ref(false);
 const errorFormulario = ref('');
 const enlaceWhatsapp = computed(() => {
-  const texto = `Hola Vikingas, soy ${formulario.value.nombre} ${formulario.value.apellido}. Les escribí desde el formulario de contacto por: ${formulario.value.motivo}.`;
+  const texto = `Hola Vikingas, soy ${formulario.value.nombre} ${formulario.value.apellido}. Les  desde el formulario de contacto por: ${formulario.value.motivo}.`;
   return `https://wa.me/56987451232?text=${encodeURIComponent(texto)}`;
 });
 

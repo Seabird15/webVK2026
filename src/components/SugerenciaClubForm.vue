@@ -8,7 +8,7 @@
       <div class="min-w-0 flex-1">
         <p class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-700">Muro del plantel</p>
         <h2 class="mt-2 text-xl font-black text-gray-900">Mensajes abiertos</h2>
-        <p class="mt-1 text-sm text-gray-600 break-words">Dejá ánimo, recordatorios o lo que quieras compartir con tus compañeras.</p>
+        <p class="mt-1 text-sm text-gray-600 break-words">Deja ánimo, recordatorios o lo que quieras compartir con tus compañeras.</p>
       </div>
       <div class="flex shrink-0 items-center gap-2">
         <span class="inline-flex shrink-0 items-center rounded-full border border-amber-200 bg-amber-100 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-amber-800">
@@ -28,7 +28,7 @@
           v-model="mensaje"
           rows="3"
           maxlength="500"
-          placeholder="Escribí tu mensaje para el plantel..."
+          placeholder="Escribe tu mensaje para el plantel..."
           class="w-full rounded-2xl border border-amber-200 bg-white px-4 py-3 text-sm text-gray-800 shadow-sm transition focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
         ></textarea>
 

@@ -2609,7 +2609,7 @@ const enviarSugerenciaClubDesdeFormulario = async (mensaje) => {
   const texto = (mensaje || '').trim();
 
   if (!texto) {
-    mostrarToast('Escribí tu sugerencia antes de enviar', 'error');
+    mostrarToast(' tu sugerencia antes de enviar', 'error');
     return;
   }
 
