@@ -140,10 +140,14 @@
             </div>
 
             <div class="p-6 flex flex-col flex-grow">
-              <div class="mb-4 flex items-center gap-2">
+              <div class="mb-4 flex flex-wrap items-center gap-2">
                 <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
                   <UserGroupIcon class="w-3.5 h-3.5" />
                   {{ contarConfirmadas(entrenamiento.id) }} confirmada{{ contarConfirmadas(entrenamiento.id) === 1 ? '' : 's' }}
+                </span>
+                <span v-if="obtenerMvpGanadora(entrenamiento)" class="inline-flex items-center gap-1.5 rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-800 border border-yellow-300">
+                  <TrophyIcon class="w-3.5 h-3.5" />
+                  MVP: {{ obtenerMvpGanadora(entrenamiento).nombre }}
                 </span>
               </div>
 
@@ -332,10 +336,14 @@
               </div>
 
               <div class="p-6 flex flex-col flex-grow">
-                <div class="mb-4 flex items-center gap-2">
+                <div class="mb-4 flex flex-wrap items-center gap-2">
                   <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
                     <UserGroupIcon class="w-3.5 h-3.5" />
                     {{ contarConfirmadas(entrenamiento.id) }} confirmada{{ contarConfirmadas(entrenamiento.id) === 1 ? '' : 's' }}
+                  </span>
+                  <span v-if="obtenerMvpGanadora(entrenamiento)" class="inline-flex items-center gap-1.5 rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-800 border border-yellow-300">
+                    <TrophyIcon class="w-3.5 h-3.5" />
+                    MVP: {{ obtenerMvpGanadora(entrenamiento).nombre }}
                   </span>
                 </div>
 
@@ -1482,6 +1490,8 @@ const nombreCompletoJugadora = computed(() => {
 const VENTANA_HISTORIAL_MS = 24 * 60 * 60 * 1000;
 const VENTANA_ACTIVA_ENTRENAMIENTO_MS = 60 * 60 * 1000;
 const DURACION_PARTIDO_DEFAULT_MS = 90 * 60 * 1000;
+const VENTANA_MVP_CERRADA_MS = 2 * 60 * 60 * 1000;
+const LIMITE_MVP_MAX_MS = 2 * 24 * 60 * 60 * 1000;
 
 const esPartidoOAmistoso = (entrenamiento) => {
   const tipo = (entrenamiento?.tipo || '').toString().toLowerCase();
@@ -1548,9 +1558,37 @@ const mantenerEvento24HorasEnListado = (entrenamiento) => {
   return esPartidoOAmistoso(entrenamiento);
 };
 
+const esPartidoConMvpHabilitado = (entrenamiento) => {
+  const tipo = (entrenamiento?.tipo || '').toString().toLowerCase();
+  return tipo === 'partido' && entrenamiento?.mvpHabilitado === true;
+};
+
+const obtenerFechaCierreMvpMs = (entrenamiento) => {
+  const valor = entrenamiento?.mvpCerradaAt;
+  if (!valor) return null;
+
+  const fecha = typeof valor?.toDate === 'function'
+    ? valor.toDate()
+    : new Date(valor?.seconds ? valor.seconds * 1000 : valor);
+
+  return Number.isNaN(fecha.getTime()) ? null : fecha.getTime();
+};
+
 const obtenerLimiteListadoMs = (entrenamiento) => {
   const { finMs } = obtenerInicioFinEvento(entrenamiento);
   if (!Number.isFinite(finMs)) return null;
+
+  // Partidos con MVP: siguen activos hasta 2h post-cierre de votación, con tope de 2 días
+  if (esPartidoConMvpHabilitado(entrenamiento)) {
+    const limiteMaximo = finMs + LIMITE_MVP_MAX_MS;
+
+    if (entrenamiento?.mvpCerrada === true) {
+      const cierreMs = obtenerFechaCierreMvpMs(entrenamiento) ?? finMs;
+      return Math.min(cierreMs + VENTANA_MVP_CERRADA_MS, limiteMaximo);
+    }
+
+    return limiteMaximo;
+  }
 
   const ventanaExtra = mantenerEvento24HorasEnListado(entrenamiento)
     ? VENTANA_HISTORIAL_MS
@@ -1686,6 +1724,35 @@ const mvpHabilitadoEvento = (entrenamiento) => {
 };
 
 const mvpCerradaEvento = (entrenamiento) => entrenamiento?.mvpCerrada === true;
+
+// Resuelve la MVP ganadora de cualquier entrenamiento (para mostrarla en la card, no solo en el detalle)
+const obtenerMvpGanadora = (entrenamiento) => {
+  if (!mvpCerradaEvento(entrenamiento)) return null;
+
+  const votos = Array.isArray(entrenamiento?.mvpVotos) ? entrenamiento.mvpVotos : [];
+  const nombreFinal = (entrenamiento?.mvpGanadoraFinal || '').toString().trim();
+
+  if (nombreFinal) {
+    const enVotos = votos.find(
+      (item) => (item?.nombre || '').toString().trim().toLowerCase() === nombreFinal.toLowerCase()
+    );
+    return enVotos || { nombre: nombreFinal, votos: 0 };
+  }
+
+  if (votos.length === 0) return null;
+  return [...votos].sort((a, b) => (Number(b?.votos) || 0) - (Number(a?.votos) || 0))[0];
+};
+
+const totalMvpJugadora = computed(() => {
+  const nombreJugadora = normalizarNombre(nombreCompletoJugadora.value);
+  if (!nombreJugadora) return 0;
+
+  return entrenamientos.value.filter((entrenamiento) => {
+    const ganadora = obtenerMvpGanadora(entrenamiento);
+    return ganadora && normalizarNombre(ganadora.nombre) === nombreJugadora;
+  }).length;
+});
+
 
 const mvpCerradaSeleccionado = computed(() => {
   if (!entrenamientoSeleccionado.value) return false;
@@ -2038,7 +2105,8 @@ const estadisticasJugadora = computed(() => {
     confirmadas,
     total,
     goles: jugadoraData.value?.goles,
-    asistencias: jugadoraData.value?.asistencias
+    asistencias: jugadoraData.value?.asistencias,
+    mvp: totalMvpJugadora.value
   };
 });
 

@@ -75,10 +75,29 @@
             <p class="text-[10px] font-bold tabular-nums text-blue-700">{{ estadisticas.confirmadas }}/{{ estadisticas.total }}</p>
           </div>
         </div>
+
+        <div v-if="estadisticas" class="min-w-0 rounded-xl border border-gray-200 bg-white p-3 shadow-sm sm:col-span-2">
+          <p class="mb-2 text-[9px] font-black uppercase tracking-wide text-gray-500">Rendimiento</p>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="rounded-lg bg-emerald-50 py-2">
+              <p class="text-sm font-black leading-none text-emerald-700">G</p>
+              <p class="mt-1 text-xl font-black leading-none tabular-nums text-emerald-800">{{ estadisticas.goles || 0 }}</p>
+            </div>
+            <div class="rounded-lg bg-sky-50 py-2">
+              <p class="text-sm font-black leading-none text-sky-700">A</p>
+              <p class="mt-1 text-xl font-black leading-none tabular-nums text-sky-800">{{ estadisticas.asistencias || 0 }}</p>
+            </div>
+            <div class="rounded-lg bg-amber-50 py-2">
+              <p class="text-sm font-black leading-none text-amber-700">MVP</p>
+              <p class="mt-1 text-xl font-black leading-none tabular-nums text-amber-800">{{ estadisticas.mvp || 0 }}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 </template>
+
 
 <script setup>
 import { computed } from 'vue';
