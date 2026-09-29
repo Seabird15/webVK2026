@@ -1,5 +1,7 @@
 import {
   addDoc,
+  arrayRemove,
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -17,7 +19,7 @@ export const enviarSugerenciaClub = async ({ jugadoraId, nombre, apellido, equip
   const texto = (mensaje || '').toString().trim();
 
   if (!jugadoraId || !texto) {
-    throw new Error('Falta información para enviar la sugerencia.');
+    throw new Error('Falta información para enviar el mensaje.');
   }
 
   const documento = await addDoc(sugerenciasClubRef, {
@@ -27,6 +29,7 @@ export const enviarSugerenciaClub = async ({ jugadoraId, nombre, apellido, equip
     equipo: (equipo || '').toString().trim(),
     mensaje: texto,
     estado: 'pendiente',
+    likes: [],
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
     borrado: false
@@ -46,6 +49,29 @@ export const escucharSugerenciasClub = (callback, onError) => {
       updatedAt: snapshotDoc.data().updatedAt
     })));
   }, onError);
+};
+
+// Muro visible para todas las jugadoras: excluye mensajes borrados por el club
+export const escucharMuroMensajesClub = (callback, onError) => {
+  const consulta = query(sugerenciasClubRef, orderBy('createdAt', 'desc'));
+
+  return onSnapshot(consulta, (snapshot) => {
+    callback(snapshot.docs
+      .map((snapshotDoc) => ({
+        id: snapshotDoc.id,
+        ...snapshotDoc.data(),
+        likes: snapshotDoc.data().likes || []
+      }))
+      .filter((mensaje) => !mensaje.borrado));
+  }, onError);
+};
+
+export const alternarLikeSugerenciaClub = async (id, jugadoraId, yaLeGustaba) => {
+  if (!id || !jugadoraId) return;
+
+  await updateDoc(doc(db, 'sugerenciasClub', id), {
+    likes: yaLeGustaba ? arrayRemove(jugadoraId) : arrayUnion(jugadoraId)
+  });
 };
 
 export const actualizarEstadoSugerenciaClub = async (id, estado) => {

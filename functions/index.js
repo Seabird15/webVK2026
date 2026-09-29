@@ -1,6 +1,7 @@
 const functions = require("firebase-functions");
 const functionsV1 = require("firebase-functions/v1");
 const { onCall } = require("firebase-functions/v2/https");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret, defineString } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 
@@ -765,3 +766,33 @@ exports.sendPushNotification = functions.https.onCall(async (data, context) => {
     );
   }
 });
+
+/**
+ * Borra automáticamente los mensajes del muro (sugerenciasClub) con más de 7 días de antigüedad.
+ */
+exports.limpiarMurosMensajesClub = onSchedule(
+  { schedule: "every 24 hours", timeZone: "America/Santiago" },
+  async () => {
+    const LIMITE_DIAS = 7;
+    const cortePorFecha = admin.firestore.Timestamp.fromMillis(
+      Date.now() - LIMITE_DIAS * 24 * 60 * 60 * 1000
+    );
+
+    const snapshot = await admin
+      .firestore()
+      .collection("sugerenciasClub")
+      .where("createdAt", "<", cortePorFecha)
+      .get();
+
+    if (snapshot.empty) {
+      functions.logger.info("limpiarMurosMensajesClub: no hay mensajes vencidos");
+      return;
+    }
+
+    const batch = admin.firestore().batch();
+    snapshot.docs.forEach((docSnap) => batch.delete(docSnap.ref));
+    await batch.commit();
+
+    functions.logger.info(`limpiarMurosMensajesClub: se borraron ${snapshot.size} mensajes vencidos`);
+  }
+);

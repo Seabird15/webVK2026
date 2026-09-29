@@ -35,7 +35,15 @@
       <div class="grid gap-5">
         <div class="space-y-5">
           <FeedbackPendientes :feedbacks="feedbacksPendientes" @open="abrirModalFeedback" />
-          <SugerenciaClubForm v-model="mensajeSugerenciaClub" :enviando="enviandoSugerenciaClub" @submit="enviarSugerenciaClubDesdeFormulario" />
+          <SugerenciaClubForm
+            v-model="mensajeSugerenciaClub"
+            :enviando="enviandoSugerenciaClub"
+            :cargando="cargandoMurosMensajes"
+            :mensajes="murosMensajes"
+            :jugadora-id="jugadoraAuthUser?.uid || ''"
+            @submit="enviarSugerenciaClubDesdeFormulario"
+            @like="alternarLikeMensajeClub"
+          />
         </div>
 
         <aside class="xl:hidden">
@@ -1337,7 +1345,7 @@ import {
   errorInscripciones
 } from '../firebase/inscripciones';
 import { escucharFeedbackJugadora, marcarFeedbackComoLeido, agregarReaccionFeedback } from '../firebase/feedback';
-import { enviarSugerenciaClub as enviarSugerenciaClubFirebase } from '../firebase/sugerenciasClub';
+import { enviarSugerenciaClub as enviarSugerenciaClubFirebase, escucharMuroMensajesClub, alternarLikeSugerenciaClub } from '../firebase/sugerenciasClub';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { obtenerEventosEspeciales } from '../firebase/eventosEspeciales';
@@ -1456,6 +1464,9 @@ const feedbackSeleccionado = ref(null);
 const isReaccionandoFeedback = ref(false);
 const mensajeSugerenciaClub = ref('');
 const enviandoSugerenciaClub = ref(false);
+const murosMensajes = ref([]);
+const cargandoMurosMensajes = ref(true);
+let unsubMuroMensajesClub = null;
 let timeoutMensajeDetalle = null;
 
 // Computed para obtener el entrenamiento seleccionado actualizado en tiempo real
@@ -2632,12 +2643,35 @@ const handleLogout = async () => {
   router.push('/');
 };
 
+const alternarLikeMensajeClub = async (item) => {
+  const uid = jugadoraAuthUser.value?.uid;
+  if (!uid) {
+    mostrarToast('Necesitás estar logueada para reaccionar', 'error');
+    return;
+  }
+
+  const yaLeGustaba = (item.likes || []).includes(uid);
+  try {
+    await alternarLikeSugerenciaClub(item.id, uid, yaLeGustaba);
+  } catch (err) {
+    console.error('Error al reaccionar al mensaje:', err);
+    mostrarToast('No se pudo registrar tu reacción.', 'error');
+  }
+};
+
 onMounted(() => {
   cargarJugadorasRegistradasMapa();
   cargarEntrenamientos();
   cargarBannerMensualidad();
   cargarProximoCumpleanios(); // Cargar el próximo cumpleaños
   cargarEstadisticasJugadora();
+
+  unsubMuroMensajesClub = escucharMuroMensajesClub((datos) => {
+    murosMensajes.value = datos;
+    cargandoMurosMensajes.value = false;
+  }, () => {
+    cargandoMurosMensajes.value = false;
+  });
 });
 
 // Watch para el listener de feedback (se suscribe cuando el UID esté disponible)
@@ -2736,6 +2770,11 @@ onUnmounted(() => {
   if (timeoutMensajeDetalle) {
     clearTimeout(timeoutMensajeDetalle);
     timeoutMensajeDetalle = null;
+  }
+
+  if (typeof unsubMuroMensajesClub === 'function') {
+    unsubMuroMensajesClub();
+    unsubMuroMensajesClub = null;
   }
 
   // Limpiar listener de entrenamientos

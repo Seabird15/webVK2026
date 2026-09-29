@@ -2,9 +2,12 @@
   <section class="space-y-5">
     <div class="rounded-2xl bg-linear-to-r from-primary-dark to-primary p-6 text-white shadow-xl sm:p-8">
       <p class="text-xs font-black uppercase tracking-[0.24em] text-white/70">Club</p>
-      <h2 class="mt-2 text-2xl font-black sm:text-3xl">Sugerencias de jugadoras</h2>
+      <h2 class="mt-2 text-2xl font-black sm:text-3xl">Muro de mensajes abiertos</h2>
       <p class="mt-2 max-w-2xl text-sm leading-relaxed text-white/80">
-        Revisa mensajes abiertos, marca lo que ya se leyó y elimina los que no correspondan.
+        Revisa los mensajes que las jugadoras se dejan entre ellas, marca lo que ya se leyó y elimina los que no correspondan.
+      </p>
+      <p class="mt-2 max-w-2xl text-xs font-semibold text-white/70">
+        Los mensajes se borran automáticamente 7 días después de publicados.
       </p>
     </div>
 
@@ -30,8 +33,8 @@
       No se pudieron cargar las sugerencias del club.
     </div>
     <div v-else-if="sugerenciasVisibles.length === 0" class="rounded-2xl bg-white p-12 text-center shadow-xl">
-      <p class="text-lg font-black text-gray-800">No hay sugerencias en esta vista</p>
-      <p class="mt-2 text-sm text-gray-500">Las nuevas ideas de las jugadoras aparecerán aquí automáticamente.</p>
+      <p class="text-lg font-black text-gray-800">No hay mensajes en esta vista</p>
+      <p class="mt-2 text-sm text-gray-500">Los nuevos mensajes de las jugadoras aparecerán aquí automáticamente.</p>
     </div>
 
     <div v-else class="grid gap-5 xl:grid-cols-2">
@@ -53,7 +56,13 @@
         </div>
 
         <div class="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-4">
-          <time class="text-xs font-semibold text-gray-400">{{ formatearFecha(sugerencia.createdAt) }}</time>
+          <div class="flex flex-wrap items-center gap-3">
+            <time class="text-xs font-semibold text-gray-400">{{ formatearFecha(sugerencia.createdAt) }}</time>
+            <span class="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2.5 py-1 text-xs font-black text-rose-600">
+              ♥ {{ (sugerencia.likes || []).length }}
+            </span>
+            <span class="text-[11px] font-semibold text-gray-400">Se borra: {{ formatearFechaVencimiento(sugerencia.createdAt) }}</span>
+          </div>
 
           <div class="flex items-center gap-2">
             <select v-model="sugerencia.estado" class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-700" @change="guardarEstado(sugerencia)">
@@ -106,6 +115,14 @@ const claseEstado = (estado) => ({ pendiente: 'bg-amber-100 text-amber-800', vis
 const formatearFecha = (valor) => {
   const fecha = typeof valor?.toDate === 'function' ? valor.toDate() : new Date(valor);
   return Number.isNaN(fecha.getTime()) ? 'Fecha no disponible' : fecha.toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' });
+};
+
+const formatearFechaVencimiento = (valor) => {
+  const fecha = typeof valor?.toDate === 'function' ? valor.toDate() : new Date(valor);
+  if (Number.isNaN(fecha.getTime())) return 'Sin definir';
+
+  const vencimiento = new Date(fecha.getTime() + 7 * 24 * 60 * 60 * 1000);
+  return vencimiento.toLocaleDateString('es-CL', { dateStyle: 'medium' });
 };
 
 const guardarEstado = async (sugerencia) => {
