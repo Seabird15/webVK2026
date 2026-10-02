@@ -149,7 +149,6 @@
               <option value="entrenamiento">Entrenamiento</option>
               <option value="partido">Partido</option>
               <option value="amistoso">Amistoso</option>
-              <option value="liga">Liga</option>
               <option value="evento">Evento</option>
             </select>
           </div>
