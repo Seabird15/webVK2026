@@ -436,6 +436,7 @@ const isLoading = ref(false);
 const equipoActivo = ref('ascenso');
 const tipoEstadistica = ref('competicion');
 const jugadoras = ref([]);
+const registroPorId = ref({});
 const mvpPorNombre = ref({});
 const partidosPorNombre = ref({});
 const partidosEquipo = ref(0);
@@ -487,6 +488,21 @@ const perteneceAlEquipoActivo = (equipo = '') => {
   const equipoNormalizado = normalizarEquipoTexto(equipo);
   const equipoActivoNormalizado = normalizarEquipoTexto(equipoActivo.value);
   return equipoNormalizado === equipoActivoNormalizado || equipoNormalizado === 'ambos';
+};
+
+// Red de seguridad: solo mostrar jugadoras que existen en jugadoraRegistro
+// y pertenecen realmente al equipo activo. 'ambos' = ascenso + escuela (nunca serieC).
+const jugadoraEsDelEquipoActivo = (jugadora) => {
+  const registro = registroPorId.value[jugadora?.id];
+  if (!registro) return false;
+
+  const equiposReales = Array.isArray(registro.equipos) && registro.equipos.length > 0
+    ? registro.equipos.map(normalizarEquipoTexto)
+    : normalizarEquipoTexto(registro.equipo) === 'ambos'
+      ? ['ascenso', 'escuela']
+      : [normalizarEquipoTexto(registro.equipo)];
+
+  return equiposReales.includes(normalizarEquipoTexto(equipoActivo.value));
 };
 
 const esPartidoFinalizado = (data = {}) => data.estado === 'FINALIZADO' || data.fasePartido === 'FINALIZADO';
@@ -596,7 +612,14 @@ const estadisticasCompletas = computed(() => {
 const cargarJugadoras = async () => {
   isLoading.value = true;
   try {
-    jugadoras.value = await obtenerEstadisticasEquipo(equipoActivo.value);
+    const [datos, registroSnap] = await Promise.all([
+      obtenerEstadisticasEquipo(equipoActivo.value),
+      getDocs(collection(db, 'jugadoraRegistro'))
+    ]);
+    registroPorId.value = Object.fromEntries(
+      registroSnap.docs.map((docSnap) => [docSnap.id, docSnap.data()])
+    );
+    jugadoras.value = datos.filter(jugadoraEsDelEquipoActivo);
     await cargarMvp();
   } catch (err) {
     console.error('Error cargando estadísticas:', err);

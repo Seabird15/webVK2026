@@ -159,6 +159,7 @@
           <p v-if="respuesta.molestias" class="mt-2 text-sm text-gray-700">
             <strong>Detalle:</strong> {{ momentoMolestia(respuesta) }}<span v-if="respuesta.continuaMolestia"> · continúa</span><span v-if="respuesta.limitaMovimiento"> · limita movimiento</span>
           </p>
+          <p v-if="respuesta.molestias && respuesta.detalleMolestia" class="mt-2 rounded-lg bg-rose-50 p-3 text-sm text-gray-700"><strong>Descripción de la molestia:</strong> {{ respuesta.detalleMolestia }}</p>
           <p v-if="respuesta.comentario" class="mt-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-700"><strong>Comentario:</strong> {{ respuesta.comentario }}</p>
 
           <div class="mt-3 flex flex-wrap justify-end gap-2 border-t border-gray-100 pt-3">
@@ -331,6 +332,12 @@ const guardarPreguntas = async () => {
 
 const valorPregunta = (pregunta) => {
   if (pregunta.tipo === 'yesNo') return pregunta.valor === true ? 'Sí' : pregunta.valor === false ? 'No' : 'Sin respuesta';
+  if (pregunta.tipo === 'periodo') {
+    if (pregunta.valor === true) return 'Sí';
+    if (pregunta.valor === false) return 'No';
+    if (pregunta.valor === null) return 'Prefiero no informar';
+    return 'Sin respuesta';
+  }
   if (pregunta.tipo === 'scale') return `${pregunta.valor ?? '—'}/10`;
   return pregunta.valor || 'Sin respuesta';
 };

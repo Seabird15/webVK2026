@@ -291,10 +291,10 @@ const navLinks = [
       },
       {
         id: 'campeonato-vk',
-        label: 'Campeonato VK',
-        path: '/campeonato-vikingas-4ta',
+        label: 'Campeonato Interno',
+        path: '/campeonato-interno',
         icon: TrophyIcon,
-        description: '4ta versión campeonato VK',
+        description: '2ª versión campeonato interno VK',
         featured: true,
       },
     ],

@@ -94,6 +94,27 @@
           </div>
         </div>
       </div>
+
+      <div class="relative overflow-hidden rounded-xl border border-amber-200 bg-linear-to-br from-amber-50 to-white p-4 shadow-sm">
+        <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+          <div class="absolute -right-10 -top-10 size-32 rounded-full bg-amber-200/50 blur-2xl"></div>
+          <div class="absolute -bottom-12 -left-8 size-32 rounded-full bg-violet-200/50 blur-2xl"></div>
+        </div>
+        <div class="relative flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-amber-700">2ª edición · Desde el 17 de octubre</p>
+            <p class="mt-1 text-base font-black leading-tight text-gray-900 sm:text-lg">Campeonato Interno Vikingas</p>
+            <p class="mt-1 text-xs font-semibold text-gray-500">Conoce los equipos, las nóminas y el fixture</p>
+          </div>
+          <router-link
+            to="/campeonato-interno"
+            class="inline-flex min-h-11 shrink-0 items-center rounded-xl bg-amber-400 px-4 text-sm font-black text-stone-950 transition-transform hover:-translate-y-0.5"
+          >
+            Ver info
+          </router-link>
+        </div>
+      </div>
+
     </div>
   </section>
 </template>

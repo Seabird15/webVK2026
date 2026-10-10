@@ -127,8 +127,10 @@ export const guardarRespuestaPostEntrenamiento = async ({
   const molestias = respuestas?.molestias === true;
   const intensidadMolestia = molestias ? normalizarEscala(respuestas?.intensidadMolestia) : 0;
   const zonaMolestia = molestias ? (respuestas?.zonaMolestia || '').toString().trim() : '';
+  const detalleMolestia = molestias ? (respuestas?.detalleMolestia || '').toString().trim().slice(0, 300) : '';
 
   if (molestias && !zonaMolestia) throw new Error('Indica la zona de la molestia.');
+  if (molestias && !detalleMolestia) throw new Error('Describe la molestia con más detalle.');
 
   const respuestaId = `${entrenamiento.id}_${jugadoraId}`;
   const referencia = doc(db, RESPUESTAS_COLLECTION, respuestaId);
@@ -150,6 +152,7 @@ export const guardarRespuestaPostEntrenamiento = async ({
     molestias,
     zonaMolestia,
     intensidadMolestia,
+    detalleMolestia,
     momentoMolestia: molestias ? (respuestas?.momentoMolestia || '').toString().trim() : '',
     continuaMolestia: molestias && respuestas?.continuaMolestia === true,
     limitaMovimiento: molestias && respuestas?.limitaMovimiento === true,

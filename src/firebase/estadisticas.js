@@ -33,7 +33,7 @@ const crearBloqueBase = () => ({
 const normalizarEquipo = (equipo = '') => {
   const valor = equipo.toString().trim().toLowerCase();
   if (valor === 'seriec' || valor === 'serie-c') return 'serieC';
-  if (valor === 'ascenso' || valor === 'serieC') return valor;
+  if (valor === 'ascenso') return 'ascenso';
   return '';
 };
 
@@ -54,8 +54,14 @@ const normalizarNombre = (valor = '') => {
 };
 
 const extraerEquiposJugadora = (jugadora = {}) => {
+  const equipoTexto = (jugadora.equipo || '').toString().trim().toLowerCase().replace(/[\s_-]+/g, '');
+
   if (Array.isArray(jugadora.equipos) && jugadora.equipos.length > 0) {
-    return [...new Set(jugadora.equipos.map(normalizarEquipo).filter(Boolean))];
+    const equipos = [...new Set(jugadora.equipos.map(normalizarEquipo).filter(Boolean))];
+    if (equipoTexto === 'ambos' && !equipos.includes('ascenso')) {
+      equipos.push('ascenso');
+    }
+    return equipos;
   }
 
   const equipoNormalizado = normalizarEquipo(jugadora.equipo);
@@ -63,8 +69,9 @@ const extraerEquiposJugadora = (jugadora = {}) => {
     return [equipoNormalizado];
   }
 
-  if ((jugadora.equipo || '').toString().trim().toLowerCase() === 'ambos') {
-    return ['ascenso'];
+  // 'ambos' sigue jugadorasAuth.js: ascenso + escuela (nunca serieC)
+  if (equipoTexto === 'ambos') {
+    return ['ascenso', 'escuela'];
   }
 
   return [];

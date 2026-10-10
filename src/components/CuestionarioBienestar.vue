@@ -122,6 +122,10 @@
                   <option value="ambos">Durante y después</option>
                 </select>
               </label>
+              <label class="text-sm font-bold text-gray-800 sm:col-span-2">
+                Describe la molestia
+                <textarea v-model.trim="formAnswers.detalleMolestia" rows="2" maxlength="300" required placeholder="Ej: tirón al correr, dolor punzante al apoyar, molestia constante..." class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-normal focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/30"></textarea>
+              </label>
             </div>
             <div class="mt-3 flex flex-wrap gap-x-5 gap-y-2">
               <label class="flex min-h-11 items-center gap-2 text-sm font-semibold text-gray-700"><input v-model="formAnswers.continuaMolestia" type="checkbox" class="size-4 accent-rose-600" /> Continúa ahora</label>
@@ -166,7 +170,7 @@ import {
   obtenerRespuestasPostEntrenamientoJugadora,
   PREGUNTAS_SEGUIMIENTO_DEFAULT
 } from '../firebase/seguimientoEntrenamientos';
-import { obtenerEstadoPeriodoSemanal, guardarEstadoPeriodoSemanal } from '../firebase/saludSemanal';
+import { obtenerEstadoPeriodoSemanal, guardarEstadoPeriodoSemanal } from '../firebase/periodoSemanal';
 
 const props = defineProps({
   entrenamientos: { type: Array, default: () => [] },
@@ -286,7 +290,7 @@ const preguntasCompletas = computed(() => preguntasActivas.value.every((pregunta
   return pregunta.tipo === 'text'
     || (pregunta.tipo === 'periodo' && opcionesPeriodo.some((opcion) => opcion.valor === valor))
     || (valor !== null && valor !== undefined && valor !== '');
-}) && (formAnswers.molestias !== true || (formAnswers.zonaMolestia && (formAnswers.zonaMolestia !== 'otra' || formAnswers.zonaPersonalizada?.trim()))));
+}) && (formAnswers.molestias !== true || Boolean(formAnswers.zonaMolestia && (formAnswers.zonaMolestia !== 'otra' || formAnswers.zonaPersonalizada?.trim()) && formAnswers.detalleMolestia?.trim())));
 
 const preguntaActualCompleta = computed(() => {
   const pregunta = preguntaActual.value;
@@ -295,7 +299,7 @@ const preguntaActualCompleta = computed(() => {
   if (pregunta.tipo === 'periodo') return opcionesPeriodo.some((opcion) => opcion.valor === valor);
   if (pregunta.tipo !== 'text' && (valor === null || valor === undefined || valor === '')) return false;
   if (pregunta.id === 'molestias' && valor === true) {
-    return Boolean(formAnswers.zonaMolestia && (formAnswers.zonaMolestia !== 'otra' || formAnswers.zonaPersonalizada?.trim()));
+    return Boolean(formAnswers.zonaMolestia && (formAnswers.zonaMolestia !== 'otra' || formAnswers.zonaPersonalizada?.trim()) && formAnswers.detalleMolestia?.trim());
   }
   return true;
 });
@@ -343,6 +347,7 @@ const seleccionarSesion = (sesion) => {
     intensidadMolestia: 0,
     zonaMolestia: '',
     zonaPersonalizada: '',
+    detalleMolestia: '',
     momentoMolestia: '',
     continuaMolestia: false,
     limitaMovimiento: false,

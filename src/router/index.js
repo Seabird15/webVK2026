@@ -96,12 +96,21 @@ const routes = [
     }
   },
   {
-    path: '/campeonato-vikingas-4ta',
-    name: 'CampeonatoVikingas4ta',
-    component: () => import('../Pages/CampeonatoVikingas4ta.vue'),
+    path: '/campeonato-interno',
+    name: 'SegundoCampInterno',
+    component: () => import('../Pages/SegundoCampInterno.vue'),
     meta: {
-      title: 'Campeonato Vikingas 4ta Versión — CD Vikingas',
-      description: 'Campeonato relámpago solidario de Vikingas para categoría C formativa. 16 de mayo desde las 16:00 en canchas Domingo Tocornal. Pronto más información.'
+      title: 'Campeonato Interno Vikingas 2026 — CD Vikingas',
+      description: 'Segunda versión del Campeonato Interno Vikingas. Tinki Winkis, Legión Roja y Valkirias se enfrentan en cuatro fechas: 17, 24, 31 de octubre y la gran final el 7 de noviembre.'
+    }
+  },
+  {
+    path: '/campeonato-interno-en-vivo',
+    name: 'CampeonatoInternoLive',
+    component: () => import('../Pages/CampeonatoInternoLive.vue'),
+    meta: {
+      title: 'Resultados en vivo — Campeonato Interno Vikingas 2026',
+      description: 'Resultados en tiempo real y tabla de posiciones del Campeonato Interno Vikingas 2026: Tinky Winky, Legión Roja y Valkirias.'
     }
   },
   {

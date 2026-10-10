@@ -6,11 +6,12 @@
         <div class="flex flex-col items-center gap-2.5 rounded-2xl border border-primary/25 bg-[linear-gradient(120deg,rgba(201,168,76,0.14),rgba(7,17,18,0.65)_60%)] px-5 py-3.5 text-center shadow-[0_14px_36px_rgba(0,0,0,0.28)] sm:flex-row sm:justify-center sm:gap-4 sm:text-left">
           <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-[0.68rem] font-black uppercase tracking-[0.22em] text-primary">
             <CalendarDaysIcon class="h-3.5 w-3.5" />
-            Próximamente
+            OCTUBRE
           </span>
           <p class="text-sm font-bold uppercase tracking-wide text-white sm:text-base">
-            2da versión <span class="text-secondary">Campeonato Interno VK</span> · Noviembre
+            2da versión <span class="text-secondary">Campeonato Interno VK</span> · OCTUBRE
           </p>
+          <a href="/campeonato-interno" class="text-black p-2 rounded-full px-7  font-bold tracking-wider uppercase bg-white">Ir al campeonato </a>
         </div>
       </div>
     </div>

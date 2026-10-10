@@ -275,39 +275,6 @@
                   </div>
                 </details>
 
-                <details class="group rounded-3xl border border-red-200 bg-linear-to-br from-red-50 via-white to-orange-50 p-4 shadow-sm">
-                  <summary class="flex list-none cursor-pointer items-center justify-between gap-3">
-                    <div>
-                      <p class="text-[11px] font-black uppercase tracking-[0.2em] text-red-700">Bienestar semanal · histórico</p>
-                      <p class="mt-1 text-sm font-bold text-gray-900">Señales de riesgo alto</p>
-                    </div>
-                    <span class="text-xs font-black text-red-700 transition-transform group-open:rotate-180">▼</span>
-                  </summary>
-                  <div class="mt-4 grid grid-cols-2 gap-3">
-                    <div class="rounded-2xl border border-red-200 bg-red-50 p-4">
-                      <p class="text-[10px] font-black uppercase tracking-wide text-red-600">Casos de riesgo alto</p>
-                      <p class="mt-2 text-3xl font-black text-red-700">{{ resumenSaludSemanal.riesgoAlto }}</p>
-                      <p class="mt-1 text-[11px] font-semibold text-red-600">Clasificación global crítica</p>
-                    </div>
-                    <div class="rounded-2xl border border-orange-200 bg-orange-50 p-4">
-                      <p class="text-[10px] font-black uppercase tracking-wide text-orange-600">Dolor 4-5</p>
-                      <p class="mt-2 text-3xl font-black text-orange-700">{{ resumenSaludSemanal.dolorAlto }}</p>
-                      <p class="mt-1 text-[11px] font-semibold text-orange-600">Molestia corporal alta o muy alta</p>
-                    </div>
-                    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-                      <p class="text-[10px] font-black uppercase tracking-wide text-amber-600">Fatiga 4-5</p>
-                      <p class="mt-2 text-3xl font-black text-amber-700">{{ resumenSaludSemanal.fatigaAlta }}</p>
-                      <p class="mt-1 text-[11px] font-semibold text-amber-600">Cansancio alto o muy alto</p>
-                    </div>
-                    <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
-                      <p class="text-[10px] font-black uppercase tracking-wide text-indigo-600">Sueño 1-2</p>
-                      <p class="mt-2 text-3xl font-black text-indigo-700">{{ resumenSaludSemanal.suenoBajo }}</p>
-                      <p class="mt-1 text-[11px] font-semibold text-indigo-600">Descanso malo o muy malo</p>
-                    </div>
-                  </div>
-                  <p class="mt-4 text-sm text-gray-600">{{ resumenSaludSemanal.total }} respuestas registradas en la semana actual.</p>
-                </details>
-
                 <details class="group rounded-3xl border border-amber-200 bg-linear-to-br from-amber-50 via-white to-yellow-50 p-4 shadow-sm">
                   <summary class="flex list-none cursor-pointer items-center justify-between gap-3">
                     <div>
@@ -424,45 +391,7 @@
                 </section>
               </div>
 
-              <div class="mt-6 hidden lg:grid grid-cols-1 2xl:grid-cols-2 gap-6">
-                <section class="rounded-[28px] border border-red-200 bg-linear-to-br from-red-50 via-white to-orange-50 p-5 sm:p-6 shadow-[0_18px_40px_rgba(239,68,68,0.08)]">
-                  <div class="flex items-center justify-between gap-3 mb-5">
-                    <div>
-                      <p class="text-[11px] font-black uppercase tracking-[0.24em] text-slate-500">Bienestar semanal · histórico</p>
-                      <h3 class="mt-2 text-xl font-black text-gray-900">Señales de riesgo alto</h3>
-                      <p class="mt-1 text-xs text-gray-500">Lectura rápida de respuestas con umbrales críticos esta semana.</p>
-                    </div>
-                    <div class="rounded-2xl bg-red-50 p-3">
-                      <ExclamationCircleIcon class="w-6 h-6 text-red-600" />
-                    </div>
-                  </div>
-
-                  <div class="grid grid-cols-2 gap-3">
-                    <div class="rounded-2xl border border-red-200 bg-red-50 p-4">
-                      <p class="text-[10px] font-black uppercase tracking-wide text-red-600">Casos de riesgo alto</p>
-                      <p class="mt-2 text-3xl font-black text-red-700">{{ resumenSaludSemanal.riesgoAlto }}</p>
-                      <p class="mt-1 text-[11px] font-semibold text-red-600">Clasificación global crítica</p>
-                    </div>
-                    <div class="rounded-2xl border border-orange-200 bg-orange-50 p-4">
-                      <p class="text-[10px] font-black uppercase tracking-wide text-orange-600">Dolor 4-5</p>
-                      <p class="mt-2 text-3xl font-black text-orange-700">{{ resumenSaludSemanal.dolorAlto }}</p>
-                      <p class="mt-1 text-[11px] font-semibold text-orange-600">Molestia corporal alta o muy alta</p>
-                    </div>
-                    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-                      <p class="text-[10px] font-black uppercase tracking-wide text-amber-600">Fatiga 4-5</p>
-                      <p class="mt-2 text-3xl font-black text-amber-700">{{ resumenSaludSemanal.fatigaAlta }}</p>
-                      <p class="mt-1 text-[11px] font-semibold text-amber-600">Cansancio alto o muy alto</p>
-                    </div>
-                    <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
-                      <p class="text-[10px] font-black uppercase tracking-wide text-indigo-600">Sueño 1-2</p>
-                      <p class="mt-2 text-3xl font-black text-indigo-700">{{ resumenSaludSemanal.suenoBajo }}</p>
-                      <p class="mt-1 text-[11px] font-semibold text-indigo-600">Descanso malo o muy malo</p>
-                    </div>
-                  </div>
-
-                  <p class="mt-4 text-sm text-gray-600">{{ resumenSaludSemanal.total }} respuestas registradas en la semana actual. Los tres indicadores laterales muestran solo valores en rango crítico.</p>
-                </section>
-
+              <div class="mt-6 hidden lg:grid grid-cols-1 gap-6">
                 <section class="rounded-[28px] border border-amber-200 bg-linear-to-br from-amber-50 via-white to-yellow-50 p-5 sm:p-6 shadow-[0_18px_40px_rgba(245,158,11,0.08)] h-full">
                   <div class="flex items-center justify-between gap-3 mb-5">
                     <div>
@@ -697,13 +626,12 @@
             <GestionarRankingAsistencia />
           </div>
 
-          <!-- Respuestas semanales anteriores, conservadas como historial -->
-          <div v-if="activeTab === 'salud-semanal' && esAdmin">
-            <GestionarSaludSemanal />
-          </div>
-
           <div v-if="activeTab === 'seguimiento-entrenamientos' && esAdmin">
             <GestionarSeguimientoEntrenamientos />
+          </div>
+
+          <div v-if="activeTab === 'campeonato-interno-live' && esAdmin">
+            <GestionarCampeonatoInterno2 />
           </div>
 
           <!-- Estadísticas -->
@@ -731,7 +659,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { logout, authUser, userRole } from '../firebase/auth';
 import { 
@@ -752,15 +680,14 @@ import {
   PencilIcon,
   FlagIcon,
   CheckCircleIcon,
-  ExclamationCircleIcon,
   QuestionMarkCircleIcon
 } from '@heroicons/vue/24/outline';
 import GestionarGalerias from '../components/GestionarGalerias.vue';
 import GestionarEventosEspeciales from '../components/GestionarEventosEspeciales.vue';
 import GestionarBannerMensualidad from '../components/GestionarBannerMensualidad.vue';
 import GestionarRankingAsistencia from '../components/GestionarRankingAsistencia.vue';
-import GestionarSaludSemanal from '../components/GestionarSaludSemanal.vue';
 import GestionarSeguimientoEntrenamientos from '../components/GestionarSeguimientoEntrenamientos.vue';
+import GestionarCampeonatoInterno2 from '../components/GestionarCampeonatoInterno2.vue';
 import GestionarEstadisticas from '../components/GestionarEstadisticas.vue';
 import GestionarSliderHome from '../components/GestionarSliderHome.vue';
 import GestionarSolicitudesRegistro from '../components/GestionarSolicitudesRegistro.vue';
@@ -777,7 +704,6 @@ import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { obtenerEquiposJugadoraDesdeDatos } from '../firebase/jugadorasAuth';
-import { escucharAlertasSaludSemanalAdmin, escucharRespuestasSaludSemanal, limpiarSaludSemanalAntiguaS, obtenerSemanaClave } from '../firebase/saludSemanal';
 import { jugadoraExcluidaDeAsistencia } from '../utils/disponibilidadEntrenamientos';
 
 const router = useRouter();
@@ -788,10 +714,6 @@ const inscripcionesPorEntrenamiento = ref({});
 const inscripcionesGlobales = ref([]);
 const jugadorasRegistradas = ref([]);
 const jugadorasPorEquipo = ref({ ascenso: 0, escuela: 0, serieC: 0, total: 0 });
-const alertasSalud = ref({ nuevas: 0, pendientesRevision: 0, ultimas: [] });
-const respuestasSalud = ref([]);
-let unsubscribeAlertasSalud = null;
-let unsubscribeRespuestasSalud = null;
 
 const totalJugadorasClub = computed(() => {
   const idsUnicos = new Set();
@@ -868,15 +790,15 @@ const tabs = computed(() => {
     });
 
     baseTabs.splice(9, 0, {
-      id: 'salud-semanal',
-      label: 'Salud semanal (historial)',
-      icon: BellAlertIcon,
-    });
-
-    baseTabs.splice(10, 0, {
       id: 'seguimiento-entrenamientos',
       label: 'Carga post-entrenamiento',
       icon: ChartBarIcon,
+    });
+
+    baseTabs.splice(10, 0, {
+      id: 'campeonato-interno-live',
+      label: 'Campeonato interno en vivo',
+      icon: TrophyIcon,
     });
   }
 
@@ -1166,19 +1088,6 @@ const confirmacionPromedioPorEquipo = computed(() => {
   });
 });
 
-const resumenSaludSemanal = computed(() => {
-  const semanaActual = obtenerSemanaClave();
-  const respuestasSemana = respuestasSalud.value.filter((respuesta) => respuesta.semanaClave === semanaActual);
-
-  return {
-    total: respuestasSemana.length,
-    riesgoAlto: respuestasSemana.filter((respuesta) => respuesta.riesgo === 'alto').length,
-    dolorAlto: respuestasSemana.filter((respuesta) => Number(respuesta.dolor) >= 4).length,
-    fatigaAlta: respuestasSemana.filter((respuesta) => Number(respuesta.fatiga) >= 4).length,
-    suenoBajo: respuestasSemana.filter((respuesta) => Number(respuesta.sueno) <= 2).length
-  };
-});
-
 // Tasa de asistencia promedio (solo entrenamientos finalizados)
 const tasaAsistenciaPromedio = computed(() => {
   const finalizados = historialEntrenamientos.value.filter(e => inscripcionesPorEntrenamiento.value[e.id]);
@@ -1348,12 +1257,6 @@ const cargarJugadorasPorEquipo = async () => {
   }
 };
 
-const iniciarListenerRespuestasSalud = () => {
-  unsubscribeRespuestasSalud = escucharRespuestasSaludSemanal((items) => {
-    respuestasSalud.value = items;
-  });
-};
-
 onMounted(async () => {
   const tab = route.query?.tab;
   if (typeof tab === 'string' && tabs.value.some(t => t.id === tab)) {
@@ -1363,24 +1266,6 @@ onMounted(async () => {
   await cargarProximoCumpleanios();
   await cargarInscripcionesEntrenamientos();
   await cargarJugadorasPorEquipo();
-  iniciarListenerRespuestasSalud();
-
-  if (esAdmin.value) {
-    // Limpiar salud semanal más antigua de 1 semana
-    await limpiarSaludSemanalAntiguaS(1);
-    unsubscribeAlertasSalud = escucharAlertasSaludSemanalAdmin((data) => {
-      alertasSalud.value = data;
-    });
-  }
-});
-
-onUnmounted(() => {
-  if (typeof unsubscribeAlertasSalud === 'function') {
-    unsubscribeAlertasSalud();
-  }
-  if (typeof unsubscribeRespuestasSalud === 'function') {
-    unsubscribeRespuestasSalud();
-  }
 });
 
 watch(
