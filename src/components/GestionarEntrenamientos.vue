@@ -193,6 +193,20 @@
             </label>
           </div>
 
+          <div class="bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded-xl border-2 border-amber-200">
+            <label class="flex items-start sm:items-center gap-3 cursor-pointer">
+              <input
+                v-model="formulario.abiertoATodas"
+                type="checkbox"
+                class="w-5 h-5 mt-0.5 sm:mt-0 text-primary-dark focus:ring-2 focus:ring-primary rounded shrink-0"
+              />
+              <div class="flex-1">
+                <span class="text-sm font-black text-gray-700 uppercase tracking-wide">Abierto a todas las jugadoras del equipo</span>
+                <p class="text-xs text-gray-600 mt-1 font-medium">Se muestra a todas las jugadoras del equipo, aunque no tengan habilitado ese día (útil al reprogramar).</p>
+              </div>
+            </label>
+          </div>
+
           <div v-if="formulario.tipo === 'partido' || formulario.tipo === 'amistoso' || formulario.tipo === 'liga'" class="bg-gradient-to-br from-red-50 to-orange-50 p-4 rounded-xl border-2 border-red-200">
             <label class="flex items-start sm:items-center gap-3 cursor-pointer">
               <input
@@ -1374,6 +1388,7 @@ const formulario = ref({
   capacidadMaxima: null,
   mostrarEnProximoPartido: false,
   mvpHabilitado: false,
+  abiertoATodas: false,
   esConvocatoria: false,
   jugadorasConvocadas: [],
   eventoInformativo: false
@@ -1492,6 +1507,7 @@ const mostrarFormularioNuevo = () => {
     capacidadMaxima: null,
     mostrarEnProximoPartido: false,
     mvpHabilitado: false,
+    abiertoATodas: false,
     esConvocatoria: false,
     jugadorasConvocadas: []
   };
@@ -1534,6 +1550,7 @@ const editarEntrenamiento = (entrenamiento) => {
     capacidadMaxima: entrenamiento.capacidadMaxima || null,
     mostrarEnProximoPartido: entrenamiento.mostrarEnProximoPartido || false,
     mvpHabilitado: entrenamiento.mvpHabilitado === true,
+    abiertoATodas: entrenamiento.abiertoATodas === true,
     esConvocatoria: entrenamiento.esConvocatoria || false,
     jugadorasConvocadas: entrenamiento.jugadorasConvocadas || [],
     eventoInformativo: entrenamiento.eventoInformativo || false
@@ -2011,6 +2028,7 @@ const guardarEntrenamiento = async () => {
         capacidadMaxima: formulario.value.capacidadMaxima,
         mostrarEnProximoPartido: formulario.value.mostrarEnProximoPartido,
         mvpHabilitado: formulario.value.mvpHabilitado,
+        abiertoATodas: formulario.value.abiertoATodas === true,
         esConvocatoria: formulario.value.esConvocatoria,
         jugadorasConvocadas: formulario.value.jugadorasConvocadas,
         eventoInformativo: formulario.value.eventoInformativo
@@ -2041,6 +2059,7 @@ const guardarEntrenamiento = async () => {
         capacidadMaxima: formulario.value.capacidadMaxima,
         mostrarEnProximoPartido: formulario.value.mostrarEnProximoPartido,
         mvpHabilitado: formulario.value.mvpHabilitado,
+        abiertoATodas: formulario.value.abiertoATodas === true,
         esConvocatoria: formulario.value.esConvocatoria,
         jugadorasConvocadas: formulario.value.jugadorasConvocadas,
         eventoInformativo: formulario.value.eventoInformativo

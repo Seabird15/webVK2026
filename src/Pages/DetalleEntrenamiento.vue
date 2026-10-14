@@ -355,136 +355,128 @@
             <!-- Player List -->
             <div class="p-4 bg-gray-50 min-h-100">
               <!-- Confirmadas -->
-              <div v-show="tabActivo === 'confirmadas'" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div v-if="inscritasOrganizadas.confirmadas.length === 0" class="col-span-2 text-center py-12 text-gray-400">
+              <div v-show="tabActivo === 'confirmadas'" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div v-if="inscritasOrganizadas.confirmadas.length === 0" class="col-span-full text-center py-12 text-gray-400">
                   <UserGroupIcon class="w-16 h-16 mx-auto mb-3 text-gray-300" />
                   <p class="text-sm font-medium">Aún no hay confirmaciones</p>
                 </div>
                 <div
                   v-for="(inscrita, index) in inscritasOrganizadas.confirmadas"
                   :key="inscrita.id"
-                  class="flex items-center gap-3 bg-white p-3 rounded-lg border-2 border-green-200 hover:border-green-400 hover:shadow-lg transition-all"
+                  class="flex items-center gap-2 bg-white px-2.5 py-1.5 rounded-lg border border-green-200 hover:border-green-400 transition-colors"
                 >
-                  <div class="w-12 h-12 bg-linear-to-br from-primary-dark to-primary-light rounded-full flex items-center justify-center text-white font-black shadow-md">
+                  <div class="w-8 h-8 shrink-0 bg-linear-to-br from-primary-dark to-primary-light rounded-full flex items-center justify-center text-white text-xs font-black">
                     {{ obtenerIniciales(inscrita.jugadoraNombre) }}
                   </div>
-                  <div class="flex-1">
-                    <div class="text-sm font-bold text-gray-900">{{ inscrita.jugadoraNombre }}</div>
-                    <div v-if="inscrita.updatedAt || inscrita.createdAt" class="text-xs text-gray-400 mt-1">Anotada: {{ formatFechaHora(inscrita.updatedAt || inscrita.createdAt) }}</div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-bold text-gray-900 truncate">{{ inscrita.jugadoraNombre }}</div>
+                    <div v-if="inscrita.updatedAt || inscrita.createdAt" class="text-[11px] text-gray-400 truncate">{{ formatFechaHora(inscrita.updatedAt || inscrita.createdAt) }}</div>
                   </div>
-                  <div v-if="vieneDeAdmin && adminPuedeVer" class="flex gap-2">
+                  <div v-if="vieneDeAdmin && adminPuedeVer" class="flex gap-1 shrink-0">
                     <button
                       @click="cambiarEstadoInscripcion(inscrita.id, 'baja')"
-                      class="px-3 py-1.5 bg-red-500 text-white rounded-md text-xs font-bold hover:bg-red-600 transition-colors cursor-pointer"
+                      class="px-2 py-1 bg-red-500 text-white rounded text-[11px] font-bold hover:bg-red-600 transition-colors cursor-pointer"
                       title="Marcar como ausente"
                     >
                       Ausente
                     </button>
                     <button
                       @click="cambiarEstadoInscripcion(inscrita.id, 'pendiente')"
-                      class="px-3 py-1.5 bg-yellow-500 text-white rounded-md text-xs font-bold hover:bg-yellow-600 transition-colors cursor-pointer"
+                      class="px-2 py-1 bg-yellow-500 text-white rounded text-[11px] font-bold hover:bg-yellow-600 transition-colors cursor-pointer"
                       title="Marcar como pendiente"
                     >
                       Pendiente
                     </button>
                   </div>
-                  <div v-else class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <CheckIcon class="w-5 h-5 text-green-600" />
+                  <div v-else class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                    <CheckIcon class="w-4 h-4 text-green-600" />
                   </div>
                 </div>
               </div>
 
               <!-- Bajas -->
-              <div v-show="tabActivo === 'bajas'" class="grid grid-cols-1 gap-3">
-                <div v-if="inscritasOrganizadas.bajas.length === 0" class="text-center py-12 text-gray-400">
+              <div v-show="tabActivo === 'bajas'" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div v-if="inscritasOrganizadas.bajas.length === 0" class="col-span-full text-center py-12 text-gray-400">
                   <HandThumbUpIcon class="w-16 h-16 mx-auto mb-3 text-gray-300" />
                   <p class="text-sm font-medium">No hay ausencias</p>
                 </div>
                 <div
                   v-for="(inscrita, index) in inscritasOrganizadas.bajas"
                   :key="inscrita.id"
-                  class="bg-white rounded-lg border-2 border-red-200 hover:border-red-400 hover:shadow-lg transition-all"
+                  class="bg-white rounded-lg border border-red-200 hover:border-red-400 transition-colors"
                 >
-                  <div class="flex items-center gap-3 p-3">
-                    <div class="w-12 h-12 bg-linear-to-br from-red-700 to-red-800 rounded-full flex items-center justify-center text-white font-black shadow-md">
+                  <div class="flex items-center gap-2 px-2.5 py-1.5">
+                    <div class="w-8 h-8 shrink-0 bg-linear-to-br from-red-700 to-red-800 rounded-full flex items-center justify-center text-white text-xs font-black">
                       {{ obtenerIniciales(inscrita.jugadoraNombre) }}
                     </div>
-                    <div class="flex-1">
-                      <div class="text-sm font-bold text-gray-900">{{ inscrita.jugadoraNombre }}</div>
-                      <div class="text-xs text-gray-500">No asistirá</div>
+                    <div class="flex-1 min-w-0">
+                      <div class="text-sm font-bold text-gray-900 truncate">{{ inscrita.jugadoraNombre }}</div>
+                      <div class="text-[11px] text-gray-400 truncate">Baja: {{ formatFechaHora(inscrita.fechaBaja || inscrita.updatedAt) }}</div>
                     </div>
-                    <div class="flex items-center gap-2">
-                      <div v-if="inscrita.motivoBaja" class="px-2 py-1 bg-blue-100 rounded-full flex items-center gap-1">
-                        <ChatBubbleLeftIcon class="w-3 h-3 text-blue-700" />
-                        <span class="text-blue-700 text-xs font-bold">Motivo</span>
-                      </div>
-                      <div v-if="vieneDeAdmin && adminPuedeVer" class="flex gap-2">
-                        <button
-                          @click="cambiarEstadoInscripcion(inscrita.id, 'confirmada')"
-                          class="px-3 py-1.5 bg-green-500 text-white rounded-md text-xs font-bold hover:bg-green-600 transition-colors cursor-pointer"
-                          title="Marcar como confirmada"
-                        >
-                          Confirmar
-                        </button>
-                        <button
-                          @click="cambiarEstadoInscripcion(inscrita.id, 'pendiente')"
-                          class="px-3 py-1.5 bg-yellow-500 text-white rounded-md text-xs font-bold hover:bg-yellow-600 transition-colors cursor-pointer"
-                          title="Marcar como pendiente"
-                        >
-                          Pendiente
-                        </button>
-                      </div>
-                      <div v-else class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                        <XMarkIcon class="w-5 h-5 text-red-600" />
-                      </div>
+                    <div v-if="vieneDeAdmin && adminPuedeVer" class="flex gap-1 shrink-0">
+                      <button
+                        @click="cambiarEstadoInscripcion(inscrita.id, 'confirmada')"
+                        class="px-2 py-1 bg-green-500 text-white rounded text-[11px] font-bold hover:bg-green-600 transition-colors cursor-pointer"
+                        title="Marcar como confirmada"
+                      >
+                        Confirmar
+                      </button>
+                      <button
+                        @click="cambiarEstadoInscripcion(inscrita.id, 'pendiente')"
+                        class="px-2 py-1 bg-yellow-500 text-white rounded text-[11px] font-bold hover:bg-yellow-600 transition-colors cursor-pointer"
+                        title="Marcar como pendiente"
+                      >
+                        Pendiente
+                      </button>
+                    </div>
+                    <div v-else class="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                      <XMarkIcon class="w-4 h-4 text-red-600" />
                     </div>
                   </div>
-                  <div v-if="inscrita.motivoBaja" class="px-3 pb-3">
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded flex gap-2">
-                      <ChatBubbleLeftIcon class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                      <p class="text-xs text-gray-700 italic">"{{ inscrita.motivoBaja }}"</p>
+                  <div v-if="inscrita.motivoBaja" class="px-2.5 pb-1.5">
+                    <div class="bg-blue-50 border-l-2 border-blue-500 px-2 py-1 rounded flex gap-1.5 items-start">
+                      <ChatBubbleLeftIcon class="w-3 h-3 text-blue-600 shrink-0 mt-0.5" />
+                      <p class="text-[11px] text-gray-700 italic">"{{ inscrita.motivoBaja }}"</p>
                     </div>
-                    <div class="px-3 pt-2 text-xs text-gray-400">Dada de baja: {{ formatFechaHora(inscrita.fechaBaja || inscrita.updatedAt) }}</div>
                   </div>
                 </div>
               </div>
 
               <!-- Pendientes -->
-              <div v-show="tabActivo === 'pendientes'" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div v-if="inscritasOrganizadas.pendientes.length === 0" class="col-span-2 text-center py-12 text-gray-400">
+              <div v-show="tabActivo === 'pendientes'" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div v-if="inscritasOrganizadas.pendientes.length === 0" class="col-span-full text-center py-12 text-gray-400">
                   <CheckBadgeIcon class="w-16 h-16 mx-auto mb-3 text-gray-300" />
                   <p class="text-sm font-medium">Todas han respondido</p>
                 </div>
                 <div
                   v-for="(inscrita, index) in inscritasOrganizadas.pendientes"
                   :key="inscrita.id"
-                  class="flex items-center gap-3 bg-white p-3 rounded-lg border-2 border-yellow-200 hover:border-yellow-400 hover:shadow-lg transition-all"
+                  class="flex items-center gap-2 bg-white px-2.5 py-1.5 rounded-lg border border-yellow-200 hover:border-yellow-400 transition-colors"
                 >
-                  <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center text-white font-black shadow-md">
+                  <div class="w-8 h-8 shrink-0 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center text-white text-xs font-black">
                     {{ obtenerIniciales(inscrita.jugadoraNombre) }}
                   </div>
-                  <div class="flex-1">
-                    <div class="text-sm font-bold text-gray-900">{{ inscrita.jugadoraNombre }}</div>
-                    <div class="text-xs text-gray-500">Esperando respuesta...</div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-bold text-gray-900 truncate">{{ inscrita.jugadoraNombre }}</div>
                   </div>
-                  <div v-if="vieneDeAdmin && adminPuedeVer" class="flex gap-2">
+                  <div v-if="vieneDeAdmin && adminPuedeVer" class="flex gap-1 shrink-0">
                     <button
                       @click="cambiarEstadoInscripcion(inscrita.id, 'confirmada')"
-                      class="px-3 py-1.5 bg-green-500 text-white rounded-md text-xs font-bold hover:bg-green-600 transition-colors cursor-pointer"
+                      class="px-2 py-1 bg-green-500 text-white rounded text-[11px] font-bold hover:bg-green-600 transition-colors cursor-pointer"
                       title="Marcar como confirmada"
                     >
                       Confirmar
                     </button>
                     <button
                       @click="cambiarEstadoInscripcion(inscrita.id, 'baja')"
-                      class="px-3 py-1.5 bg-red-500 text-white rounded-md text-xs font-bold hover:bg-red-600 transition-colors cursor-pointer"
+                      class="px-2 py-1 bg-red-500 text-white rounded text-[11px] font-bold hover:bg-red-600 transition-colors cursor-pointer"
                       title="Marcar como ausente"
                     >
                       Ausente
                     </button>
                   </div>
-                  <div v-else class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                    <ClockIcon class="w-5 h-5 text-yellow-600" />
+                  <div v-else class="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <ClockIcon class="w-4 h-4 text-yellow-600" />
                   </div>
                 </div>
               </div>

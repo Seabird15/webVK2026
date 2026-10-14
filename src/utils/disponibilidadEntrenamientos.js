@@ -112,6 +112,7 @@ export const esEventoConRestriccionSemanal = (entrenamiento = {}) => {
 
   if (!equipo || equipo === 'ambos') return false;
   if (entrenamiento?.esConvocatoria) return false;
+  if (entrenamiento?.abiertoATodas === true) return false;
 
   return !TIPOS_SIN_RESTRICCION_SEMANAL.has(tipo);
 };
