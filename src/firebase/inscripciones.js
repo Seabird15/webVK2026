@@ -63,6 +63,41 @@ export const inscripciones = ref([]);
 export const isLoadingInscripciones = ref(false);
 export const errorInscripciones = ref(null);
 
+const obtenerFechaInscripcionMs = (valor) => {
+  if (typeof valor?.toMillis === 'function') return valor.toMillis();
+  if (Number.isFinite(valor?.seconds)) return valor.seconds * 1000;
+
+  const fecha = valor instanceof Date ? valor : new Date(valor);
+  return Number.isNaN(fecha.getTime()) ? 0 : fecha.getTime();
+};
+
+const deduplicarInscripciones = (inscritas) => {
+  const porJugadora = new Map();
+  const prioridadEstado = { confirmada: 3, baja: 2, pendiente: 1 };
+
+  inscritas.forEach((inscripcion) => {
+    const clave = inscripcion.jugadoraId
+      ? `jugadora:${inscripcion.jugadoraId}`
+      : `inscripcion:${inscripcion.id}`;
+    const existente = porJugadora.get(clave);
+
+    if (!existente) {
+      porJugadora.set(clave, inscripcion);
+      return;
+    }
+
+    const fechaInscripcion = obtenerFechaInscripcionMs(inscripcion.updatedAt || inscripcion.createdAt);
+    const fechaExistente = obtenerFechaInscripcionMs(existente.updatedAt || existente.createdAt);
+    const tienePrioridad = fechaInscripcion > fechaExistente ||
+      (fechaInscripcion === fechaExistente &&
+        (prioridadEstado[inscripcion.estado] || 0) > (prioridadEstado[existente.estado] || 0));
+
+    if (tienePrioridad) porJugadora.set(clave, inscripcion);
+  });
+
+  return [...porJugadora.values()];
+};
+
 // Inscribir jugadora a entrenamiento
 export const inscribirseEntrenamiento = async (entrenamientoId, jugadoraId, jugadoraNombre) => {
   isLoadingInscripciones.value = true;
@@ -84,13 +119,13 @@ export const inscribirseEntrenamiento = async (entrenamientoId, jugadoraId, juga
     const snapshot = await getDocs(q);
 
     if (snapshot.size > 0) {
-      // Si ya existe, actualizar estado a confirmada
-      const docId = snapshot.docs[0].id;
-      await updateDoc(doc(db, 'inscripcionesEntrenamientos', docId), {
+      // Mantener un único estado aunque existan registros duplicados antiguos.
+      const actualizaciones = snapshot.docs.map((docSnap) => updateDoc(doc(db, 'inscripcionesEntrenamientos', docSnap.id), {
         estado: 'confirmada',
         jugadoraNombre: jugadoraNombre,
         updatedAt: new Date()
-      });
+      }));
+      await Promise.all(actualizaciones);
     } else {
       // Si no existe, crear nueva inscripción confirmada
       await addDoc(collection(db, 'inscripcionesEntrenamientos'), {
@@ -131,13 +166,13 @@ export const desuscribirseEntrenamiento = async (entrenamientoId, jugadoraId, mo
     }
 
     // Cambiar estado a baja en lugar de eliminar
-    const docId = snapshot.docs[0].id;
-    await updateDoc(doc(db, 'inscripcionesEntrenamientos', docId), {
+    const actualizaciones = snapshot.docs.map((docSnap) => updateDoc(doc(db, 'inscripcionesEntrenamientos', docSnap.id), {
       estado: 'baja',
       motivoBaja: motivoBaja,
       fechaBaja: new Date(),
       updatedAt: new Date()
-    });
+    }));
+    await Promise.all(actualizaciones);
 
     return true;
   } catch (err) {
@@ -278,6 +313,8 @@ export const escucharInscripcionesEntrenamiento = (entrenamientoId, callback, ge
       const idsConvocadas = entrenamiento.jugadorasConvocadas.map(j => j.id);
       inscritasFiltradas = inscritas.filter(i => idsConvocadas.includes(i.jugadoraId));
     }
+
+    inscritasFiltradas = deduplicarInscripciones(inscritasFiltradas);
     
     // Organizar por estado (usando las inscritas filtradas)
     const organizadas = {
@@ -665,12 +702,27 @@ export const cambiarEstadoInscripcion = async (inscripcionId, nuevoEstado) => {
       return false;
     }
 
-    // Actualizar estado
-    await updateDoc(docRef, {
-      estado: nuevoEstado,
-      ...(nuevoEstado === 'pendiente' && { motivoBaja: '', fechaBaja: null }),
-      updatedAt: new Date()
-    });
+    const datos = docSnap.data() || {};
+    const relacionados = datos.entrenamientoId && datos.jugadoraId
+      ? await getDocs(query(
+          collection(db, 'inscripcionesEntrenamientos'),
+          where('entrenamientoId', '==', datos.entrenamientoId),
+          where('jugadoraId', '==', datos.jugadoraId)
+        ))
+      : null;
+    const documentos = relacionados?.docs.length
+      ? relacionados.docs
+      : [{ id: inscripcionId }];
+    const updatedAt = new Date();
+
+    await Promise.all(documentos.map((inscripcion) => updateDoc(
+      doc(db, 'inscripcionesEntrenamientos', inscripcion.id),
+      {
+        estado: nuevoEstado,
+        ...(nuevoEstado === 'pendiente' && { motivoBaja: '', fechaBaja: null }),
+        updatedAt
+      }
+    )));
 
     return true;
   } catch (err) {

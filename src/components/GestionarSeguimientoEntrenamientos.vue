@@ -88,30 +88,88 @@
           <span class="text-xs font-semibold text-gray-500">{{ preguntasConfig.length }} preguntas configuradas</span>
         </summary>
         <div class="space-y-3 border-t border-gray-200 p-4">
-          <div v-for="(pregunta, index) in preguntasConfig" :key="pregunta.id" class="grid gap-2 rounded-lg border border-gray-200 bg-white p-3 sm:grid-cols-[1fr_auto_auto] sm:items-center">
-            <label class="text-xs font-bold text-gray-600">
-              Pregunta
-              <input v-model.trim="pregunta.label" maxlength="140" class="mt-1 min-h-11 w-full rounded-lg border border-gray-300 px-3 text-sm font-semibold text-gray-900 focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/30" />
+          <div v-for="(pregunta, index) in preguntasConfig" :key="pregunta.id" class="space-y-3 rounded-lg border border-gray-200 bg-white p-3">
+            <div class="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
+              <label class="text-xs font-bold text-gray-600">
+                Pregunta {{ index + 1 }}
+                <input v-model.trim="pregunta.label" maxlength="140" class="mt-1 min-h-11 w-full rounded-lg border border-gray-300 px-3 text-sm font-semibold text-gray-900 focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/30" />
+              </label>
+              <div class="flex items-center gap-1">
+                <button type="button" :disabled="index === 0" aria-label="Subir pregunta" class="min-h-11 min-w-11 rounded-lg border border-gray-300 text-sm font-black text-gray-700 hover:bg-gray-50 disabled:opacity-40" @click="moverPregunta(index, -1)">↑</button>
+                <button type="button" :disabled="index === preguntasConfig.length - 1" aria-label="Bajar pregunta" class="min-h-11 min-w-11 rounded-lg border border-gray-300 text-sm font-black text-gray-700 hover:bg-gray-50 disabled:opacity-40" @click="moverPregunta(index, 1)">↓</button>
+                <button type="button" class="min-h-11 rounded-lg px-3 text-sm font-bold text-rose-700 hover:bg-rose-50" @click="quitarPregunta(index)">Eliminar</button>
+              </div>
+            </div>
+
+            <div class="grid gap-2 sm:grid-cols-2">
+              <label class="text-xs font-bold text-gray-600">
+                Tipo de respuesta
+                <select v-model="pregunta.tipo" class="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/30" @change="prepararTipo(pregunta)">
+                  <option v-for="tipo in TIPOS_PREGUNTA" :key="tipo.value" :value="tipo.value">{{ tipo.label }}</option>
+                </select>
+              </label>
+              <div class="flex flex-wrap items-center gap-x-5 gap-y-1 sm:pt-5">
+                <label class="flex min-h-11 items-center gap-2 text-sm font-semibold text-gray-700">
+                  <input v-model="pregunta.activo" type="checkbox" class="size-4 accent-emerald-700" /> Activa
+                </label>
+                <label class="flex min-h-11 items-center gap-2 text-sm font-semibold text-gray-700">
+                  <input v-model="pregunta.obligatoria" type="checkbox" class="size-4 accent-emerald-700" /> Obligatoria
+                </label>
+              </div>
+            </div>
+
+            <label class="block text-xs font-bold text-gray-600">
+              Texto de ayuda <span class="font-normal text-gray-400">(opcional)</span>
+              <input v-model.trim="pregunta.ayuda" maxlength="200" placeholder="Ej: Marca todas las que apliquen" class="mt-1 min-h-11 w-full rounded-lg border border-gray-300 px-3 text-sm font-normal focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/30" />
             </label>
-            <label class="flex min-h-11 items-center gap-2 text-sm font-semibold text-gray-700">
-              <input v-model="pregunta.activo" type="checkbox" class="size-4 accent-emerald-700" /> Activa
-            </label>
-            <button v-if="!pregunta.esBase" type="button" class="min-h-11 rounded-lg px-3 text-sm font-bold text-rose-700 hover:bg-rose-50" @click="quitarPregunta(index)">Eliminar</button>
-            <span v-else class="text-xs font-semibold text-gray-500">{{ etiquetaTipo(pregunta.tipo) }}</span>
+
+            <div v-if="pregunta.tipo === 'scale'" class="grid gap-2 sm:grid-cols-2">
+              <label class="text-xs font-bold text-gray-600">
+                Etiqueta del 0 <span class="font-normal text-gray-400">(opcional)</span>
+                <input v-model.trim="pregunta.etiquetaMin" maxlength="40" placeholder="Ej: Muy mal" class="mt-1 min-h-11 w-full rounded-lg border border-gray-300 px-3 text-sm font-normal" />
+              </label>
+              <label class="text-xs font-bold text-gray-600">
+                Etiqueta del 10 <span class="font-normal text-gray-400">(opcional)</span>
+                <input v-model.trim="pregunta.etiquetaMax" maxlength="40" placeholder="Ej: Excelente" class="mt-1 min-h-11 w-full rounded-lg border border-gray-300 px-3 text-sm font-normal" />
+              </label>
+            </div>
+
+            <div class="rounded-lg border border-gray-200 bg-gray-50 p-3">
+              <label class="flex min-h-11 items-center gap-2 text-sm font-bold text-gray-800">
+                <input v-model="pregunta.pedirMusculo" type="checkbox" class="size-4 accent-rose-600" @change="prepararTipo(pregunta)" />
+                Pedir que elija el músculo que más sintió
+              </label>
+              <p class="text-xs text-gray-500">
+                La jugadora verá un selector de músculo{{ pregunta.tipo === 'yesNo' ? ' cuando responda “Sí”' : ' junto a esta pregunta' }}.
+              </p>
+              <label v-if="pregunta.pedirMusculo" class="mt-2 block text-xs font-bold text-gray-600">
+                Músculos disponibles <span class="font-normal text-gray-400">(uno por línea)</span>
+                <textarea v-model="pregunta.musculosTexto" rows="5" class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-normal focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/30"></textarea>
+              </label>
+            </div>
           </div>
 
-          <div class="grid gap-2 rounded-lg border border-dashed border-gray-300 bg-white p-3 sm:grid-cols-[1fr_180px_auto] sm:items-end">
-            <label class="text-xs font-bold text-gray-600">
-              Nueva pregunta
-              <input v-model.trim="nuevaPregunta.label" maxlength="140" placeholder="Escribe la pregunta" class="mt-1 min-h-11 w-full rounded-lg border border-gray-300 px-3 text-sm font-normal focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/30" />
+          <div class="space-y-3 rounded-lg border border-dashed border-gray-300 bg-white p-3">
+            <p class="text-xs font-black uppercase text-gray-600">Nueva pregunta</p>
+            <div class="grid gap-2 sm:grid-cols-[1fr_200px] sm:items-end">
+              <label class="text-xs font-bold text-gray-600">
+                Pregunta
+                <input v-model.trim="nuevaPregunta.label" maxlength="140" placeholder="Escribe la pregunta" class="mt-1 min-h-11 w-full rounded-lg border border-gray-300 px-3 text-sm font-normal focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/30" />
+              </label>
+              <label class="text-xs font-bold text-gray-600">
+                Tipo de respuesta
+                <select v-model="nuevaPregunta.tipo" class="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/30">
+                  <option v-for="tipo in TIPOS_PREGUNTA" :key="tipo.value" :value="tipo.value">{{ tipo.label }}</option>
+                </select>
+              </label>
+            </div>
+            <label class="flex min-h-11 items-center gap-2 text-sm font-bold text-gray-800">
+              <input v-model="nuevaPregunta.pedirMusculo" type="checkbox" class="size-4 accent-rose-600" />
+              Pedir que elija el músculo que más sintió
             </label>
-            <label class="text-xs font-bold text-gray-600">
-              Tipo de respuesta
-              <select v-model="nuevaPregunta.tipo" class="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/30">
-                <option value="scale">Escala 0–10</option>
-                <option value="yesNo">Sí / No</option>
-                <option value="text">Texto breve</option>
-              </select>
+            <label v-if="nuevaPregunta.pedirMusculo" class="block text-xs font-bold text-gray-600">
+              Músculos disponibles <span class="font-normal text-gray-400">(uno por línea)</span>
+              <textarea v-model="nuevaPregunta.musculosTexto" rows="5" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-normal focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/30"></textarea>
             </label>
             <button type="button" :disabled="!nuevaPregunta.label" class="min-h-11 rounded-lg border border-gray-300 px-3 text-sm font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50" @click="agregarPregunta">Agregar pregunta</button>
           </div>
@@ -192,7 +250,10 @@ import {
   guardarDisponibilidadSeguimiento,
   TIPOS_SEGUIMIENTO,
   EQUIPOS_SEGUIMIENTO,
-  PREGUNTAS_SEGUIMIENTO_DEFAULT
+  PREGUNTAS_SEGUIMIENTO_DEFAULT,
+  TIPOS_PREGUNTA,
+  MUSCULOS_DEFAULT,
+  normalizarPregunta
 } from '../firebase/seguimientoEntrenamientos';
 
 const respuestas = ref([]);
@@ -206,7 +267,8 @@ const equiposHabilitados = ref(['ascenso', 'escuela', 'serieC']);
 const guardandoDisponibilidad = ref(false);
 const errorDisponibilidad = ref('');
 const mensajeDisponibilidad = ref('');
-const nuevaPregunta = ref({ label: '', tipo: 'scale' });
+const nuevaPreguntaVacia = () => ({ label: '', tipo: 'scale', pedirMusculo: false, musculosTexto: MUSCULOS_DEFAULT.join('\n') });
+const nuevaPregunta = ref(nuevaPreguntaVacia());
 const guardandoConfiguracion = ref(false);
 const errorConfiguracion = ref('');
 const mensajeConfiguracion = ref('');
@@ -257,25 +319,40 @@ const cambiarRevision = async (respuesta) => {
   }
 };
 
+const textoAMusculos = (texto) => (texto || '').split('\n').map((item) => item.trim()).filter(Boolean);
+
+const prepararPreguntaEditable = (pregunta) => {
+  const normalizada = normalizarPregunta(pregunta) || { ...pregunta };
+  return {
+    ...normalizada,
+    minimo: normalizada.minimo ?? 0,
+    maximo: normalizada.maximo ?? 10,
+    musculosTexto: (normalizada.musculos?.length ? normalizada.musculos : MUSCULOS_DEFAULT).join('\n')
+  };
+};
+
+const prepararTipo = (pregunta) => {
+  if (pregunta.pedirMusculo && !pregunta.musculosTexto?.trim()) {
+    pregunta.musculosTexto = MUSCULOS_DEFAULT.join('\n');
+  }
+  if (pregunta.tipo === 'scale') {
+    pregunta.minimo = 0;
+    pregunta.maximo = 10;
+  }
+};
 const cargarPreguntas = async () => {
   try {
     const configuracion = await obtenerConfiguracionSeguimiento();
     tiposHabilitados.value = configuracion.tiposHabilitados;
     equiposHabilitados.value = configuracion.equiposHabilitados;
-    const base = new Set(PREGUNTAS_SEGUIMIENTO_DEFAULT.map((pregunta) => pregunta.id));
-    preguntasConfig.value = configuracion.preguntas.map((pregunta) => ({
-      ...pregunta,
-      esBase: base.has(pregunta.id)
-    }));
+    preguntasConfig.value = configuracion.preguntas.map(prepararPreguntaEditable);
   } catch (err) {
     tiposHabilitados.value = ['entrenamiento'];
     equiposHabilitados.value = ['ascenso', 'escuela', 'serieC'];
-    preguntasConfig.value = PREGUNTAS_SEGUIMIENTO_DEFAULT.map((pregunta) => ({ ...pregunta, esBase: true }));
+    preguntasConfig.value = PREGUNTAS_SEGUIMIENTO_DEFAULT.map(prepararPreguntaEditable);
     errorConfiguracion.value = err?.message || 'No se pudo cargar la configuración de preguntas.';
   }
 };
-
-const etiquetaTipo = (tipo) => ({ scale: 'Escala 0–10', yesNo: 'Sí / No', text: 'Texto breve' }[tipo] || tipo);
 
 const guardarDisponibilidad = async () => {
   guardandoDisponibilidad.value = true;
@@ -299,29 +376,40 @@ const guardarDisponibilidad = async () => {
 const agregarPregunta = () => {
   const label = nuevaPregunta.value.label.trim();
   if (!label) return;
-  preguntasConfig.value.push({
+  const { tipo, pedirMusculo, musculosTexto } = nuevaPregunta.value;
+  preguntasConfig.value.push(prepararPreguntaEditable({
     id: `extra_${Date.now()}`,
     label,
-    tipo: nuevaPregunta.value.tipo,
+    tipo,
     minimo: 0,
     maximo: 10,
     activo: true,
-    esBase: false
-  });
-  nuevaPregunta.value = { label: '', tipo: 'scale' };
+    obligatoria: true,
+    pedirMusculo,
+    musculos: textoAMusculos(musculosTexto)
+  }));
+  nuevaPregunta.value = nuevaPreguntaVacia();
   mensajeConfiguracion.value = '';
 };
 
 const quitarPregunta = (index) => preguntasConfig.value.splice(index, 1);
+
+const moverPregunta = (index, direccion) => {
+  const destino = index + direccion;
+  if (destino < 0 || destino >= preguntasConfig.value.length) return;
+  const [pregunta] = preguntasConfig.value.splice(index, 1);
+  preguntasConfig.value.splice(destino, 0, pregunta);
+};
 
 const guardarPreguntas = async () => {
   guardandoConfiguracion.value = true;
   errorConfiguracion.value = '';
   mensajeConfiguracion.value = '';
   try {
-    const preguntasGuardadas = await guardarConfiguracionSeguimiento(preguntasConfig.value);
-    const base = new Set(PREGUNTAS_SEGUIMIENTO_DEFAULT.map((pregunta) => pregunta.id));
-    preguntasConfig.value = preguntasGuardadas.map((pregunta) => ({ ...pregunta, esBase: base.has(pregunta.id) }));
+    const preguntasGuardadas = await guardarConfiguracionSeguimiento(
+      preguntasConfig.value.map((pregunta) => ({ ...pregunta, musculos: textoAMusculos(pregunta.musculosTexto) }))
+    );
+    preguntasConfig.value = preguntasGuardadas.map(prepararPreguntaEditable);
     mensajeConfiguracion.value = 'Preguntas actualizadas.';
   } catch (err) {
     errorConfiguracion.value = err?.message || 'No se pudieron guardar las preguntas.';
@@ -331,15 +419,17 @@ const guardarPreguntas = async () => {
 };
 
 const valorPregunta = (pregunta) => {
-  if (pregunta.tipo === 'yesNo') return pregunta.valor === true ? 'Sí' : pregunta.valor === false ? 'No' : 'Sin respuesta';
+  const musculo = pregunta.musculo ? ` · Músculo: ${pregunta.musculo}` : '';
+  if (pregunta.tipo === 'yesNo') return (pregunta.valor === true ? 'Sí' : pregunta.valor === false ? 'No' : 'Sin respuesta') + musculo;
   if (pregunta.tipo === 'periodo') {
     if (pregunta.valor === true) return 'Sí';
     if (pregunta.valor === false) return 'No';
     if (pregunta.valor === null) return 'Prefiero no informar';
     return 'Sin respuesta';
   }
-  if (pregunta.tipo === 'scale') return `${pregunta.valor ?? '—'}/10`;
-  return pregunta.valor || 'Sin respuesta';
+  if (pregunta.tipo === 'scale') return `${pregunta.valor ?? '—'}/${pregunta.maximo ?? 10}${musculo}`;
+  if (Array.isArray(pregunta.valor)) return pregunta.valor.length ? pregunta.valor.join(', ') : 'Ninguna';
+  return (pregunta.valor || 'Sin respuesta') + musculo;
 };
 
 const eliminarRespuesta = async (respuesta) => {

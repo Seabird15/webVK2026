@@ -1,5 +1,5 @@
 <template>
-  <section v-if="sesionesPendientes.length" class="mb-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+  <section v-if="sesionesEnVentana.length" class="mb-5 rounded-2xl border bg-white p-4 shadow-sm sm:p-6" :class="sesionesPendientes.length ? 'border-amber-300' : 'border-emerald-200'">
     <button
       type="button"
       class="flex min-h-11 w-full cursor-pointer items-start justify-between gap-4 text-left"
@@ -9,26 +9,34 @@
       <span>
         <span class="flex flex-wrap items-center gap-2">
           <span class="text-lg font-black text-gray-900">Sensaciones post-entrenamiento</span>
-          <span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-900">{{ sesionesPendientes.length }} pendiente{{ sesionesPendientes.length === 1 ? '' : 's' }}</span>
+          <span v-if="sesionesPendientes.length" class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-900">Recordatorio: {{ sesionesPendientes.length }} pendiente{{ sesionesPendientes.length === 1 ? '' : 's' }}</span>
+          <span v-else class="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-900">Listo</span>
         </span>
-        <span class="mt-1 block text-sm text-gray-500">Cuestionario breve, disponible hasta 48 horas después de cada sesión.</span>
+        <span v-if="sesionesPendientes.length" class="mt-1 block text-sm text-gray-500">Cuestionario breve, disponible hasta 48 horas después de cada sesión.</span>
+        <span v-else class="mt-1 block text-sm font-semibold text-emerald-800">¡Listo! Ya completaste el cuestionario de tu último entrenamiento. Gracias.</span>
       </span>
       <ChevronDownIcon class="mt-1 size-5 shrink-0 text-gray-500 transition-transform" :class="expandido ? 'rotate-180' : ''" />
     </button>
 
-    <div v-if="expandido" class="mt-5 space-y-4">
+    <div v-if="expandido || sesionesPendientes.length" class="mt-5 space-y-4">
       <p v-if="cargando" class="py-4 text-center text-sm text-gray-500">Cargando cuestionario...</p>
       <template v-else>
-        <div class="flex flex-wrap gap-2" aria-label="Entrenamientos pendientes">
+        <ul v-if="sesionesCompletadas.length" class="space-y-1">
+          <li v-for="sesion in sesionesCompletadas" :key="`ok-${sesion.id}`" class="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-900">
+            ✓ {{ etiquetaFechaSesion(sesion) }}: cuestionario completado
+          </li>
+        </ul>
+        <div v-if="sesionesPendientes.length" class="flex flex-wrap gap-2" aria-label="Entrenamientos pendientes">
           <button
             v-for="sesion in sesionesPendientes"
             :key="sesion.id"
             type="button"
             class="min-h-11 cursor-pointer rounded-lg border px-3 py-2 text-left text-sm font-bold transition focus:outline-hidden focus:ring-2 focus:ring-primary"
-            :class="sesionSeleccionada?.id === sesion.id ? 'border-primary bg-emerald-50 text-primary-dark' : 'border-gray-200 bg-white text-gray-700 hover:border-primary/40'"
+            :class="sesionSeleccionada?.id === sesion.id ? 'border-primary bg-emerald-50 text-primary-dark' : 'border-amber-300 bg-amber-50 text-amber-950 hover:border-primary/40'"
             @click="seleccionarSesion(sesion)"
           >
               {{ etiquetaFechaSesion(sesion) }}
+              <span class="block text-xs font-semibold text-amber-800">Pendiente · {{ textoVencimiento(sesion) }}</span>
           </button>
         </div>
 
@@ -66,7 +74,11 @@
                     :max="preguntaActual.maximo ?? 10"
                     class="mt-2 min-h-12 w-full cursor-pointer accent-emerald-700"
                   />
-                  <p class="text-xs text-gray-500">{{ preguntaActual.ayuda || '0 indica una sensación baja; el valor máximo, una sensación alta.' }}</p>
+                  <p class="text-xs text-gray-500">{{ preguntaActual.ayuda || 'Elige el valor que mejor represente cómo te sientes.' }}</p>
+                  <div v-if="preguntaActual.etiquetaMin || preguntaActual.etiquetaMax" class="mt-1 flex justify-between text-xs font-semibold text-gray-600">
+                    <span>{{ preguntaActual.etiquetaMin }}</span>
+                    <span>{{ preguntaActual.etiquetaMax }}</span>
+                  </div>
                 </template>
 
                 <div v-else-if="preguntaActual?.tipo === 'yesNo' || preguntaActual?.tipo === 'periodo'" class="mt-5 flex flex-wrap gap-2">
@@ -90,11 +102,20 @@
                   rows="3"
                   maxlength="300"
                   class="mt-4 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/30"
-                  placeholder="Opcional"
+                  :placeholder="esPreguntaObligatoria(preguntaActual) ? 'Escribe tu respuesta' : 'Opcional'"
                 ></textarea>
+
+                <label v-if="preguntaActual && musculoVisible(preguntaActual, formAnswers[preguntaActual.id])" class="mt-4 block text-sm font-bold text-gray-800">
+                  ¿Qué músculo sentiste más?
+                  <select v-model="formAnswers[sufijoMusculo(preguntaActual.id)]" class="mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm font-semibold focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/30">
+                    <option value="">Selecciona un músculo</option>
+                    <option v-for="musculo in preguntaActual.musculos" :key="musculo" :value="musculo">{{ musculo }}</option>
+                  </select>
+                </label>
 
                 <fieldset v-if="preguntaActual?.id === 'molestias' && formAnswers.molestias === true" class="mt-4 rounded-xl border border-rose-200 bg-rose-50/60 p-4">
             <legend class="px-1 text-sm font-black text-gray-900">Detalle de la molestia</legend>
+            <p class="mb-3 text-xs font-semibold text-rose-900">Entiéndase molestia como algo fuera de lo normal al dolor normal del ejercicio.</p>
             <div class="grid gap-3 sm:grid-cols-2">
               <label class="text-sm font-bold text-gray-800">
                 Zona corporal
@@ -166,6 +187,10 @@ import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { ChevronDownIcon } from '@heroicons/vue/24/outline';
 import {
   guardarRespuestaPostEntrenamiento,
+  esPreguntaObligatoria,
+  MUSCULOS_DEFAULT,
+  musculoVisible,
+  sufijoMusculo,
   obtenerConfiguracionSeguimiento,
   obtenerRespuestasPostEntrenamientoJugadora,
   PREGUNTAS_SEGUIMIENTO_DEFAULT
@@ -266,41 +291,57 @@ const equipoHabilitado = (sesion) => {
   return equipoEvento === equipoVista && equiposHabilitados.value.includes(equipoEvento);
 };
 
-const sesionesPendientes = computed(() => props.entrenamientos
+const sesionesEnVentana = computed(() => props.entrenamientos
   .filter((sesion) => {
-    const tipo = (sesion.tipo || '').toString().toLowerCase();
+    const tipo = ((sesion.tipo || '').toString().trim() || 'entrenamiento').toLowerCase();
     const inicio = obtenerInicioSesion(sesion);
     return !sesion.eventoInformativo
       && tiposHabilitados.value.includes(tipo)
       && equipoHabilitado(sesion)
       && inicio !== null
       && ahora.value >= inicio
-      && ahora.value <= inicio + VENTANA_MS
-      && !respuestasRegistradas.value.has(sesion.id);
+      && ahora.value <= inicio + VENTANA_MS;
   })
   .sort((a, b) => (obtenerInicioSesion(b) || 0) - (obtenerInicioSesion(a) || 0)));
+
+const sesionesPendientes = computed(() => sesionesEnVentana.value
+  .filter((sesion) => !respuestasRegistradas.value.has(sesion.id)));
+const sesionesCompletadas = computed(() => sesionesEnVentana.value
+  .filter((sesion) => respuestasRegistradas.value.has(sesion.id)));
+
+const textoVencimiento = (sesion) => {
+  const restante = (obtenerInicioSesion(sesion) || 0) + VENTANA_MS - ahora.value;
+  const horas = Math.max(Math.floor(restante / 3_600_000), 0);
+  if (horas >= 1) return `vence en ${horas} h`;
+  return `vence en ${Math.max(Math.ceil(restante / 60_000), 1)} min`;
+};
 
 const fechaLimite = computed(() => {
   const inicio = obtenerInicioSesion(sesionSeleccionada.value);
   return inicio ? new Date(inicio + VENTANA_MS).toLocaleString('es-CL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
 });
 
-const preguntasCompletas = computed(() => preguntasActivas.value.every((pregunta) => {
+const preguntaRespondida = (pregunta) => {
   const valor = formAnswers[pregunta.id];
-  return pregunta.tipo === 'text'
-    || (pregunta.tipo === 'periodo' && opcionesPeriodo.some((opcion) => opcion.valor === valor))
-    || (valor !== null && valor !== undefined && valor !== '');
-}) && (formAnswers.molestias !== true || Boolean(formAnswers.zonaMolestia && (formAnswers.zonaMolestia !== 'otra' || formAnswers.zonaPersonalizada?.trim()) && formAnswers.detalleMolestia?.trim())));
+  if (pregunta.tipo === 'periodo') return opcionesPeriodo.some((opcion) => opcion.valor === valor);
+  if (!esPreguntaObligatoria(pregunta)) return true;
+  if (valor === null || valor === undefined || valor === '') return false;
+  return !musculoVisible(pregunta, valor) || Boolean(formAnswers[sufijoMusculo(pregunta.id)]);
+};
+
+const molestiaCompleta = () => formAnswers.molestias !== true || Boolean(
+  formAnswers.zonaMolestia
+  && (formAnswers.zonaMolestia !== 'otra' || formAnswers.zonaPersonalizada?.trim())
+  && formAnswers.detalleMolestia?.trim()
+);
+
+const preguntasCompletas = computed(() => preguntasActivas.value.every(preguntaRespondida) && molestiaCompleta());
 
 const preguntaActualCompleta = computed(() => {
   const pregunta = preguntaActual.value;
   if (!pregunta) return false;
-  const valor = formAnswers[pregunta.id];
-  if (pregunta.tipo === 'periodo') return opcionesPeriodo.some((opcion) => opcion.valor === valor);
-  if (pregunta.tipo !== 'text' && (valor === null || valor === undefined || valor === '')) return false;
-  if (pregunta.id === 'molestias' && valor === true) {
-    return Boolean(formAnswers.zonaMolestia && (formAnswers.zonaMolestia !== 'otra' || formAnswers.zonaPersonalizada?.trim()) && formAnswers.detalleMolestia?.trim());
-  }
+  if (!preguntaRespondida(pregunta)) return false;
+  if (pregunta.id === 'molestias' && formAnswers[pregunta.id] === true) return molestiaCompleta();
   return true;
 });
 
@@ -320,8 +361,8 @@ const cargarRespuestas = async (jugadoraId) => {
   respuestasRegistradas.value = new Set();
   try {
     const [respuestas, estadoPeriodo] = await Promise.all([
-      obtenerRespuestasPostEntrenamientoJugadora(jugadorId),
-      obtenerEstadoPeriodoSemanal(jugadorId)
+      obtenerRespuestasPostEntrenamientoJugadora(jugadoraId),
+      obtenerEstadoPeriodoSemanal(jugadoraId)
     ]);
     respuestasRegistradas.value = new Set(respuestas.map((respuesta) => respuesta.entrenamientoId));
     periodoRespondido.value = estadoPeriodo !== null;
@@ -342,6 +383,7 @@ const seleccionarSesion = (sesion) => {
       : pregunta.tipo === 'yesNo' || pregunta.tipo === 'periodo'
         ? null
         : '';
+    if (pregunta.pedirMusculo) formAnswers[sufijoMusculo(pregunta.id)] = '';
   });
   Object.assign(formAnswers, {
     intensidadMolestia: 0,
@@ -410,6 +452,25 @@ const enviarRespuesta = async () => {
     guardando.value = false;
   }
 };
+
+watch([() => props.entrenamientos, tiposHabilitados, equiposHabilitados], () => {
+  const recientes = props.entrenamientos.filter((sesion) => {
+    const inicio = obtenerInicioSesion(sesion);
+    return inicio !== null && Math.abs(ahora.value - inicio) < 7 * 24 * 3_600_000;
+  });
+  console.info('[Cuestionario] config', { tipos: tiposHabilitados.value, equipos: equiposHabilitados.value, equipoVista: props.equipo });
+  recientes.forEach((sesion) => console.info('[Cuestionario] sesión', {
+    id: sesion.id,
+    tipo: sesion.tipo,
+    equipo: sesion.equipo,
+    fecha: sesion.fecha,
+    hora: sesion.hora,
+    informativo: sesion.eventoInformativo,
+    equipoOk: equipoHabilitado(sesion),
+    inicio: new Date(obtenerInicioSesion(sesion)).toString(),
+    respondida: respuestasRegistradas.value.has(sesion.id)
+  }));
+}, { immediate: true });
 
 watch(() => props.jugadoraId, cargarRespuestas, { immediate: true });
 onMounted(async () => {
