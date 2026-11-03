@@ -44,7 +44,7 @@ export const FIXTURE_INICIAL = [
     local: 'valkirias', visita: 'legion', golesLocal: null, golesVisita: null, estado: 'programado'
   },
   {
-    id: 'final', fecha: 4, fechaLabel: 'Sábado 7 de noviembre', hora: 'Gran final',
+    id: 'final', fecha: 4, fechaLabel: 'Sábado 7 de noviembre', hora: 'Desde las 20:00',
     local: 'primero', visita: 'segundo', golesLocal: null, golesVisita: null, estado: 'programado', esFinal: true
   }
 ];

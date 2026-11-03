@@ -165,8 +165,9 @@
                 <div class="space-y-3">
                   <div class="flex items-center justify-between gap-3">
                     <span class="inline-flex items-center gap-2 text-base font-black text-white">
-                      <span class="size-2.5 rounded-full" :class="colorDeEquipo(partido.local)"></span>
-                      {{ partido.local }}
+                      <img v-if="fecha.esFinal" :src="escudoFinalista(partido.local)" :alt="`Escudo ${nombrePartido(partido.local)}`" class="size-9 shrink-0 object-contain" />
+                      <span v-else class="size-2.5 rounded-full" :class="colorDeEquipo(partido.local)"></span>
+                      {{ nombrePartido(partido.local) }}
                     </span>
                   </div>
                   <div class="flex items-center gap-3 pl-4 text-[0.65rem] font-black uppercase tracking-[0.3em] text-stone-600">
@@ -176,8 +177,9 @@
                   </div>
                   <div class="flex items-center justify-between gap-3">
                     <span class="inline-flex items-center gap-2 text-base font-black text-white">
-                      <span class="size-2.5 rounded-full" :class="colorDeEquipo(partido.visita)"></span>
-                      {{ partido.visita }}
+                      <img v-if="fecha.esFinal" :src="escudoFinalista(partido.visita)" :alt="`Escudo ${nombrePartido(partido.visita)}`" class="size-9 shrink-0 object-contain" />
+                      <span v-else class="size-2.5 rounded-full" :class="colorDeEquipo(partido.visita)"></span>
+                      {{ nombrePartido(partido.visita) }}
                     </span>
                   </div>
                 </div>
@@ -231,8 +233,8 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
-import { escucharCampeonatoCompleto, inicializarNominasCampeonato, NOMINAS_INICIALES } from '../firebase/campeonatoInterno2'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { calcularTabla, escucharCampeonatoCompleto, inicializarNominasCampeonato, NOMINAS_INICIALES } from '../firebase/campeonatoInterno2'
 import logoBlanco from '../assets/campeonato-interno/VK LOGO BLANCO PNG.png'
 import fotoTiare from '../assets/campeonato-interno/Tiare.png'
 import fotoMi from '../assets/campeonato-interno/Mi.png'
@@ -242,12 +244,15 @@ import escudoLegion from '../assets/campeonato-interno/escudo-legion-roja.jpeg'
 import escudoValkirias from '../assets/campeonato-interno/escudo-valkirias.jpeg'
 
 const nominas = ref({ ...NOMINAS_INICIALES })
+const partidosCampeonato = ref([])
+const tabla = computed(() => calcularTabla(partidosCampeonato.value))
 let unsubscribeCampeonato = null
 
 onMounted(async () => {
   await inicializarNominasCampeonato()
-  unsubscribeCampeonato = escucharCampeonatoCompleto(({ nominas: nuevas }) => {
+  unsubscribeCampeonato = escucharCampeonatoCompleto(({ nominas: nuevas, partidos }) => {
     nominas.value = nuevas
+    partidosCampeonato.value = partidos
   })
 })
 
@@ -328,6 +333,20 @@ const coloresEquipo = {
 
 const colorDeEquipo = (nombre) => coloresEquipo[nombre] || 'bg-amber-400'
 const plantelDe = (equipoId) => nominas.value[equipoId] || []
+const escudosPorEquipo = {
+  tinky: escudoTinky,
+  legion: escudoLegion,
+  valkirias: escudoValkirias
+}
+const nombrePartido = (nombre) => {
+  if (nombre === 'primero') return tabla.value[0]?.nombreCorto || tabla.value[0]?.nombre || '1º de la tabla'
+  if (nombre === 'segundo') return tabla.value[1]?.nombreCorto || tabla.value[1]?.nombre || '2º de la tabla'
+  return nombre
+}
+const escudoFinalista = (posicion) => {
+  const equipo = posicion === 'primero' ? tabla.value[0] : tabla.value[1]
+  return escudosPorEquipo[equipo?.id] || logoBlanco
+}
 
 const fechas = [
   {
@@ -368,11 +387,10 @@ const fechas = [
     titulo: '7 nov',
     dia: 'Sábado 7',
     diaCompleto: 'Sábado 7 de noviembre',
-    detalle: 'Gran final y premiación.',
+    detalle: 'Gran final desde las 20:00 y premiación.',
     esFinal: true,
     partidos: [
-      { hora: 'Gran final', local: '1º de la tabla', visita: '2º de la tabla' },
-      { hora: 'Cierre', local: 'Entrega de premios', visita: 'y celebración' },
+      { hora: 'Desde las 20:00', local: 'primero', visita: 'segundo' },
     ],
   },
 ]

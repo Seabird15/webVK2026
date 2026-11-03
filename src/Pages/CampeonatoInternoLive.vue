@@ -62,7 +62,7 @@
                 :class="clasesCardPartido(partido)"
               >
                 <div class="flex items-center justify-between gap-3">
-                  <p class="text-[0.65rem] font-black uppercase tracking-[0.25em] text-stone-500">{{ partido.hora }}</p>
+                  <p class="text-[0.65rem] font-black uppercase tracking-[0.25em] text-stone-500">{{ horaDe(partido) }}</p>
                   <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[0.65rem] font-black uppercase tracking-widest" :class="clasesEstado(partido.estado)">
                     <span v-if="partido.estado === 'en_juego'" class="relative flex size-2">
                       <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-current opacity-75"></span>
@@ -224,23 +224,28 @@ let unsubscribe = null;
 const escudos = {
   tinky: escudoTinky,
   legion: escudoLegion,
-  valkirias: escudoValkirias,
-  primero: logoBlanco,
-  segundo: logoBlanco
+  valkirias: escudoValkirias
 };
 
 const nombres = {
   tinky: 'Tinky Winky',
   legion: 'Legión Roja',
   valkirias: 'Valkirias',
-  primero: '1º tabla',
-  segundo: '2º tabla'
 };
 
-const escudoDe = (id) => escudos[id] || logoBlanco;
-const nombreDe = (id) => nombres[id] || id;
-
 const tabla = computed(() => calcularTabla(partidos.value));
+const equipoDePosicion = (id) => {
+  if (id === 'primero') return tabla.value[0]?.id;
+  if (id === 'segundo') return tabla.value[1]?.id;
+  return id;
+};
+const escudoDe = (id) => escudos[equipoDePosicion(id)] || logoBlanco;
+const nombreDe = (id) => {
+  if (id === 'primero') return tabla.value[0]?.nombreCorto || tabla.value[0]?.nombre || '1º de la tabla';
+  if (id === 'segundo') return tabla.value[1]?.nombreCorto || tabla.value[1]?.nombre || '2º de la tabla';
+  return nombres[id] || id;
+};
+const horaDe = (partido) => partido.esFinal ? 'Desde las 20:00' : partido.hora;
 const goleadoras = computed(() => calcularGoleadoras(partidos.value));
 const goleadorasDe = (partido) => (Array.isArray(partido.goleadoras) ? partido.goleadoras : []);
 
