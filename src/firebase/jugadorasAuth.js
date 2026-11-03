@@ -147,6 +147,18 @@ const obtenerEstadoAccesoJugadora = async (uid) => {
   return jugadoraDoc.data()?.estado || loginDoc.data()?.estado || null;
 };
 
+const usuarioEsAdministrativo = async (uid) => {
+  if (!uid) return false;
+
+  try {
+    const userDoc = await getDoc(doc(db, 'users', uid));
+    const rol = (userDoc.data()?.rol || '').toString().trim().toLowerCase();
+    return rol === 'admin' || rol === 'coach';
+  } catch (error) {
+    return false;
+  }
+};
+
 const obtenerMensajeEstadoAcceso = (estado) => {
   if (estado === 'pendiente') {
     return 'Tu acceso aun no ha sido aprobado por administracion.';
@@ -236,6 +248,13 @@ onAuthStateChanged(auth, async (user) => {
     const estadoAcceso = await obtenerEstadoAccesoJugadora(user.uid);
 
     if (estadoAcceso !== 'aprobada') {
+      if (await usuarioEsAdministrativo(user.uid)) {
+        jugadoraAuthUser.value = null;
+        jugadoraData.value = null;
+        authReady.value = true;
+        return;
+      }
+
       errorJugadora.value = obtenerMensajeEstadoAcceso(estadoAcceso);
       jugadoraAuthUser.value = null;
       jugadoraData.value = null;

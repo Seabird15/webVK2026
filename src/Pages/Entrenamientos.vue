@@ -1,8 +1,12 @@
 <template>
   <div class="min-h-screen bg-black">
     <EntrenamientosHeader :equipo="equipoSeleccionado" @logout="handleLogout" />
+    <EncuestaJugadoraVK
+      :es-admin="esAdmin"
+      :puede-votar="!!jugadoraAuthUser?.uid && !esAdmin"
+    />
 
-    <div v-if="bannerMensualidad.activo" class="mx-auto mt-2 max-w-6xl px-4 sm:mt-3 sm:px-6">
+    <div v-if="bannerMensualidad.activo" class="mx-auto mt-2 mb-7 max-w-6xl px-4 sm:mt-3 sm:px-6">
       <div class="rounded-2xl border-2 border-red-300/40 bg-linear-to-r from-red-600 via-rose-500 to-red-600 p-3 text-white shadow-2xl sm:p-5">
         <div class="flex items-start gap-3">
           <div class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/20 sm:size-10">
@@ -1360,6 +1364,7 @@ import { obtenerEventosEspeciales } from '../firebase/eventosEspeciales';
 import { obtenerTotalesEstadisticasJugadora } from '../firebase/estadisticas';
 import InfoUltimaActualizacion from '../components/InfoUltimaActualizacion.vue';
 import CuestionarioBienestar from '../components/CuestionarioBienestar.vue';
+import EncuestaJugadoraVK from '../components/EncuestaJugadoraVK.vue';
 import EntrenamientosHeader from '../components/EntrenamientosHeader.vue';
 import FeedbackPendientes from '../components/FeedbackPendientes.vue';
 import ResumenJugadoraEntrenamientos from '../components/ResumenJugadoraEntrenamientos.vue';

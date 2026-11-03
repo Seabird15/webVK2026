@@ -8,6 +8,7 @@ import {
   updateDoc
 } from 'firebase/firestore';
 import { db } from './config';
+import nominasCampeonatoInterno2 from '../../functions/nominasCampeonatoInterno2.json';
 
 const COLECCION = 'campeonatoInterno2';
 
@@ -54,11 +55,7 @@ export const ESTADOS_PARTIDO = [
   { value: 'finalizado', label: 'Finalizado' }
 ];
 
-export const NOMINAS_INICIALES = {
-  tinky: ['Tiare Bernal (C)', 'Gricel', 'Tania', 'Nico', 'Yas', 'Bele', 'Daisy', 'Jessi Paz', 'Fer Orfanoz', 'Valeria', 'Jose', 'Ge', 'Natiluminati'],
-  legion: ['Mi Beaudout (C)', 'Jane', 'Roxi', 'Majo', 'Eve Torres', 'Motta', 'Carlita', 'Liss', 'Dani Farias', 'Ju', 'Kari', 'Barby', 'Cami Rago'],
-  valkirias: ['Jesi Chirito (C)', 'Lulu', 'Chama', 'Eli Ormeño', 'Danae', 'Mila', 'Carito', 'Chica Nati', 'Eli Orfanoz', 'Eve Quiroga', 'Kathy Arce', 'Eli López', 'Pao Varas']
-};
+export const NOMINAS_INICIALES = nominasCampeonatoInterno2;
 
 export const inicializarNominasCampeonato = async () => {
   const snapshot = await getDocs(collection(db, COLECCION));

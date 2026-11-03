@@ -4,6 +4,8 @@ const { onCall } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret, defineString } = require("firebase-functions/params");
 const admin = require("firebase-admin");
+const crypto = require("crypto");
+const NOMINAS_INICIALES = require("./nominasCampeonatoInterno2.json");
 
 admin.initializeApp();
 
@@ -676,6 +678,192 @@ exports.submitContactMessage = onCall({ secrets: [RESEND_API_KEY] }, async (requ
   }
 
   return { success: true, id: contactoRef.id };
+});
+
+const VK_AWARD_SURVEY_ID = "campeonato-interno-2026-nominas-v1";
+const vkAwardSurveyRef = () => admin.firestore().collection("encuestasJugadoraVK").doc(VK_AWARD_SURVEY_ID);
+
+const obtenerRolEncuestaVK = async (uid) => {
+  const userSnap = await admin.firestore().collection("users").doc(uid).get();
+  return (userSnap.data()?.rol || "").toString().trim().toLowerCase();
+};
+
+const obtenerCandidatasEncuestaVK = async () => {
+  const candidatasPorId = new Map();
+  Object.values(NOMINAS_INICIALES).flat().forEach((nombreOriginal) => {
+    const nombre = (nombreOriginal || "").toString().trim().replace(/\s*\(C\)$/i, "").trim();
+    if (!nombre) return;
+
+    const clave = nombre
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, " ")
+      .toLowerCase();
+    const id = crypto.createHash("sha256").update(clave).digest("hex");
+    if (!candidatasPorId.has(id)) candidatasPorId.set(id, { id, nombre });
+  });
+
+  return [...candidatasPorId.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+};
+
+const resumirResultadosEncuestaVK = (candidatas, votos = {}) => {
+  const resultados = candidatas.map((candidata) => ({
+    ...candidata,
+    votos: Number(votos[candidata.id]) || 0
+  })).sort((a, b) => b.votos - a.votos || a.nombre.localeCompare(b.nombre, "es"));
+
+  return {
+    candidatas: resultados,
+    totalVotos: resultados.reduce((total, candidata) => total + candidata.votos, 0)
+  };
+};
+
+exports.manageVkAwardSurvey = onCall(async (request) => {
+  const uid = await resolverUidAutenticado(request.data, { auth: request.auth });
+  if (!uid) {
+    throw new functions.https.HttpsError("unauthenticated", "Inicia sesión para acceder a la encuesta.");
+  }
+
+  const db = admin.firestore();
+  const surveyRef = vkAwardSurveyRef();
+  const accion = request.data?.accion;
+  const rol = await obtenerRolEncuestaVK(uid);
+  const esAdmin = rol === "admin";
+
+  if (accion === "estado") {
+    const [surveySnap, registroSnap, estadoJugadoraSnap, loginSnap] = await Promise.all([
+      surveyRef.get(),
+      db.collection("jugadoraRegistro").doc(uid).get(),
+      db.collection("jugadoras").doc(uid).get(),
+      db.collection("jugadorasLogin").doc(uid).get()
+    ]);
+    const estadoAcceso = estadoJugadoraSnap.data()?.estado || loginSnap.data()?.estado || "";
+    const esJugadoraAprobada = registroSnap.exists && estadoAcceso === "aprobada";
+
+    if (!esAdmin && !esJugadoraAprobada) {
+      throw new functions.https.HttpsError("permission-denied", "Esta encuesta está disponible para jugadoras y administración.");
+    }
+
+    const candidatasActuales = await obtenerCandidatasEncuestaVK();
+    let surveyData = surveySnap.data() || {};
+    if (!surveySnap.exists) {
+      await surveyRef.create({
+        candidatas: candidatasActuales,
+        votos: {},
+        finalizada: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      }).catch((error) => {
+        if (error.code !== 6 && error.code !== "already-exists") throw error;
+      });
+      const inicializada = await surveyRef.get();
+      surveyData = inicializada.data() || {};
+    }
+
+    let candidatas = Array.isArray(surveyData.candidatas) ? surveyData.candidatas : candidatasActuales;
+    if (surveyData.finalizada !== true) {
+      const candidatasRegistradas = new Set(candidatas.map((candidata) => candidata.id));
+      const candidatasNuevas = candidatasActuales.filter((candidata) => !candidatasRegistradas.has(candidata.id));
+      if (candidatasNuevas.length > 0) {
+        candidatas = [...candidatas, ...candidatasNuevas]
+          .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+        await surveyRef.update({
+          candidatas,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        surveyData = { ...surveyData, candidatas };
+      }
+    }
+    const ballotId = crypto.createHash("sha256").update(`${VK_AWARD_SURVEY_ID}:${uid}`).digest("hex");
+    const ballotSnap = !esAdmin
+      ? await surveyRef.collection("votosEmitidos").doc(ballotId).get()
+      : null;
+    const encuestaFinalizada = surveyData.finalizada === true;
+    const resultados = encuestaFinalizada || esAdmin
+      ? resumirResultadosEncuestaVK(candidatas, surveyData.votos || {})
+      : null;
+
+    return {
+      candidatas,
+      finalizada: encuestaFinalizada,
+      hasVoted: Boolean(ballotSnap?.exists),
+      resultados
+    };
+  }
+
+  if (accion === "votar") {
+    if (esAdmin) {
+      throw new functions.https.HttpsError("permission-denied", "Las cuentas de administración no pueden votar.");
+    }
+
+    const [registroSnap, estadoJugadoraSnap, loginSnap, surveySnap] = await Promise.all([
+      db.collection("jugadoraRegistro").doc(uid).get(),
+      db.collection("jugadoras").doc(uid).get(),
+      db.collection("jugadorasLogin").doc(uid).get(),
+      surveyRef.get()
+    ]);
+    const estadoAcceso = estadoJugadoraSnap.data()?.estado || loginSnap.data()?.estado || "";
+    if (!registroSnap.exists || estadoAcceso !== "aprobada") {
+      throw new functions.https.HttpsError("permission-denied", "Solo las jugadoras con acceso aprobado pueden votar.");
+    }
+
+    const surveyData = surveySnap.data() || {};
+    if (surveyData.finalizada === true) {
+      throw new functions.https.HttpsError("failed-precondition", "La votación ya finalizó.");
+    }
+
+    const candidataId = (request.data?.candidataId || "").toString();
+    const candidatas = Array.isArray(surveyData.candidatas) ? surveyData.candidatas : [];
+    if (!candidatas.some((candidata) => candidata.id === candidataId)) {
+      throw new functions.https.HttpsError("invalid-argument", "Selecciona una candidata válida.");
+    }
+
+    const ballotId = crypto.createHash("sha256").update(`${VK_AWARD_SURVEY_ID}:${uid}`).digest("hex");
+    const ballotRef = surveyRef.collection("votosEmitidos").doc(ballotId);
+    await db.runTransaction(async (transaction) => {
+      const [currentSurveySnap, currentBallotSnap] = await Promise.all([
+        transaction.get(surveyRef),
+        transaction.get(ballotRef)
+      ]);
+      if (currentBallotSnap.exists) {
+        throw new functions.https.HttpsError("already-exists", "Ya se registró un voto para esta cuenta.");
+      }
+      if (currentSurveySnap.data()?.finalizada === true) {
+        throw new functions.https.HttpsError("failed-precondition", "La votación ya finalizó.");
+      }
+
+      const votos = currentSurveySnap.data()?.votos || {};
+      transaction.set(surveyRef, {
+        votos: { ...votos, [candidataId]: (Number(votos[candidataId]) || 0) + 1 },
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      transaction.create(ballotRef, { emitido: true });
+    });
+
+    return { success: true };
+  }
+
+  if (accion === "finalizar") {
+    if (!esAdmin) {
+      throw new functions.https.HttpsError("permission-denied", "Solo administración puede finalizar la encuesta.");
+    }
+
+    await db.runTransaction(async (transaction) => {
+      const surveySnap = await transaction.get(surveyRef);
+      if (!surveySnap.exists) {
+        throw new functions.https.HttpsError("failed-precondition", "La encuesta no está inicializada.");
+      }
+      if (surveySnap.data()?.finalizada === true) return;
+      transaction.update(surveyRef, {
+        finalizada: true,
+        finalizedAt: admin.firestore.FieldValue.serverTimestamp(),
+        finalizedBy: uid
+      });
+    });
+
+    return { success: true };
+  }
+
+  throw new functions.https.HttpsError("invalid-argument", "Acción de encuesta no válida.");
 });
 
 /**

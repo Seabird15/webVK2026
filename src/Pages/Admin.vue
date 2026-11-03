@@ -634,6 +634,10 @@
             <GestionarCampeonatoInterno2 />
           </div>
 
+          <div v-if="activeTab === 'encuesta-jugadora-vk' && esAdmin">
+            <EncuestaJugadoraVK :es-admin="esAdmin" :puede-votar="false" />
+          </div>
+
           <!-- Estadísticas -->
           <div v-if="activeTab === 'estadisticas'">
             <GestionarEstadisticas />
@@ -688,6 +692,7 @@ import GestionarBannerMensualidad from '../components/GestionarBannerMensualidad
 import GestionarRankingAsistencia from '../components/GestionarRankingAsistencia.vue';
 import GestionarSeguimientoEntrenamientos from '../components/GestionarSeguimientoEntrenamientos.vue';
 import GestionarCampeonatoInterno2 from '../components/GestionarCampeonatoInterno2.vue';
+import EncuestaJugadoraVK from '../components/EncuestaJugadoraVK.vue';
 import GestionarEstadisticas from '../components/GestionarEstadisticas.vue';
 import GestionarSliderHome from '../components/GestionarSliderHome.vue';
 import GestionarSolicitudesRegistro from '../components/GestionarSolicitudesRegistro.vue';
@@ -798,6 +803,12 @@ const tabs = computed(() => {
     baseTabs.splice(10, 0, {
       id: 'campeonato-interno-live',
       label: 'Campeonato interno en vivo',
+      icon: TrophyIcon,
+    });
+
+    baseTabs.push({
+      id: 'encuesta-jugadora-vk',
+      label: 'Votación Jugadora VK',
       icon: TrophyIcon,
     });
   }
