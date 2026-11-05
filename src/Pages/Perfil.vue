@@ -75,7 +75,7 @@
               </h2>
               <div class="space-y-2 text-gray-600">
                 <p><strong>Email:</strong> {{ jugadoraAuthUser?.email }}</p>
-                <p><strong>Posición:</strong> {{ formData.posicion }}</p>
+                <p><strong>Posición:</strong> {{ posicionesSeleccionadasTexto }}</p>
                 <p><strong>Dorsal:</strong> #{{ formData.dorsal }}</p>
                 <p><strong>Equipos:</strong> {{ equiposSeleccionadosTexto }}</p>
                 <p><strong>Estado:</strong> {{ formatearEstadoSalud(formData.estadoSalud) }}</p>
@@ -175,23 +175,26 @@
                 :disabled="isLoading"
               />
             </div>
-            <div>
-              <label class="block text-sm font-bold text-gray-700 mb-2">Posición *</label>
-              <select
-                v-model="formData.posicion"
-                required
-                class="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-gray-100"
-                :disabled="isLoading"
-              >
-                <option value="">Selecciona posición</option>
-                <option value="Profe">Profe</option>
-                <option value="Portera">Portera</option>
-                <option value="Cierre">Cierre</option>
-                <option value="Medio">Medio</option>
-                <option value="Pívot">Pívot</option>
-                <option value="Ala">Ala</option>
-              </select>
-            </div>
+            <fieldset class="space-y-2">
+              <legend class="mb-2 text-sm font-bold text-gray-700">Posiciones *</legend>
+              <p class="text-xs text-gray-500">Puedes elegir más de una posición.</p>
+              <div class="space-y-1 rounded-xl border border-gray-200 bg-gray-50 p-3">
+                <label
+                  v-for="opcion in opcionesPosiciones"
+                  :key="opcion"
+                  class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-white"
+                >
+                  <input
+                    v-model="formData.posicion"
+                    type="checkbox"
+                    :value="opcion"
+                    class="size-5 rounded border-gray-300 text-primary focus:ring-primary"
+                    :disabled="isLoading"
+                  />
+                  <span class="font-medium text-gray-700">{{ opcion }}</span>
+                </label>
+              </div>
+            </fieldset>
           </div>
 
           <!-- Equipos y Fecha de nacimiento -->
@@ -414,6 +417,24 @@ const opcionesEquipos = [
   { value: 'serieC', label: 'Serie C', ctaLabel: 'Equipo Serie C', emoji: '💜' },
   { value: 'escuela', label: 'Escuela', ctaLabel: 'Equipo Escuela', emoji: '📚' }
 ];
+const opcionesPosiciones = ['Portera', 'Cierre', 'Ala', 'Medio', 'Pívot'];
+
+const normalizarPosiciones = (valor) => {
+  const posiciones = Array.isArray(valor) ? valor : [valor];
+  const opcionesNormalizadas = new Map(
+    opcionesPosiciones.map(posicion => [
+      posicion.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(),
+      posicion
+    ])
+  );
+
+  return [...new Set(posiciones
+    .map(posicion => (posicion || '').toString().trim())
+    .map(posicion => opcionesNormalizadas.get(
+      posicion.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    ))
+    .filter(Boolean))];
+};
 
 const normalizarEquipo = (equipo) => {
   const valor = (equipo || '').toString().trim().toLowerCase();
@@ -463,7 +484,7 @@ const formData = reactive({
   nombre: jugadoraData.value?.nombre || '',
   apellido: jugadoraData.value?.apellido || '',
   dorsal: jugadoraData.value?.dorsal || null,
-  posicion: jugadoraData.value?.posicion || '',
+  posicion: normalizarPosiciones(jugadoraData.value?.posicion),
   equipos: equiposIniciales,
   fechaNacimiento: jugadoraData.value?.fechaNacimiento || '',
   estadoSalud: jugadoraData.value?.estadoSalud || 'disponible',
@@ -476,13 +497,14 @@ const formData = reactive({
 
 const equiposSeleccionadosTexto = computed(() => formatearEquipos(formData.equipos));
 const equiposDisponibles = computed(() => opcionesEquipos.filter(opcion => formData.equipos.includes(opcion.value)));
+const posicionesSeleccionadasTexto = computed(() => formData.posicion.join(', '));
 
 const sincronizarFormulario = (datos = jugadoraData.value) => {
   if (!datos) return;
   formData.nombre = datos.nombre || '';
   formData.apellido = datos.apellido || '';
   formData.dorsal = datos.dorsal || null;
-  formData.posicion = datos.posicion || '';
+  formData.posicion = normalizarPosiciones(datos.posicion);
   formData.equipos = obtenerEquiposDesdeDatos(datos);
   formData.fechaNacimiento = datos.fechaNacimiento || '';
   formData.estadoSalud = datos.estadoSalud || 'disponible';
@@ -575,7 +597,7 @@ const cancelarEdicion = () => {
   formData.nombre = jugadoraData.value?.nombre || '';
   formData.apellido = jugadoraData.value?.apellido || '';
   formData.dorsal = jugadoraData.value?.dorsal || null;
-  formData.posicion = jugadoraData.value?.posicion || '';
+  formData.posicion = normalizarPosiciones(jugadoraData.value?.posicion);
   formData.equipos = obtenerEquiposDesdeDatos(jugadoraData.value);
   formData.fechaNacimiento = jugadoraData.value?.fechaNacimiento || '';
   formData.estadoSalud = jugadoraData.value?.estadoSalud || 'disponible';
@@ -611,7 +633,7 @@ const handleGuardar = async () => {
   error.value = null;
   mensajeExito.value = '';
 
-  if (!formData.nombre || !formData.apellido || formData.equipos.length === 0 || !formData.dorsal || !formData.posicion || !formData.fechaNacimiento) {
+  if (!formData.nombre || !formData.apellido || formData.equipos.length === 0 || !formData.dorsal || formData.posicion.length === 0 || !formData.fechaNacimiento) {
     error.value = 'Por favor completa todos los campos requeridos';
     return;
   }
@@ -629,7 +651,7 @@ const handleGuardar = async () => {
         nombre: formData.nombre,
         apellido: formData.apellido,
         dorsal: formData.dorsal,
-        posicion: formData.posicion,
+        posicion: [...formData.posicion],
         equipos: [...formData.equipos],
         fechaNacimiento: formData.fechaNacimiento,
         categoriaSeleccionada: categoriaActualizada,

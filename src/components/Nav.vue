@@ -89,7 +89,14 @@
               class="flex min-h-11 items-center gap-2 rounded-lg px-3 text-xs font-black uppercase transition-colors xl:px-4"
               :class="access.variant === 'admin' ? 'bg-black text-white hover:bg-black/85' : 'bg-white text-black hover:bg-white/85'"
             >
-              <component :is="access.icon" class="size-4" aria-hidden="true" />
+              <img
+                v-if="access.signedIn && access.avatar"
+                :src="access.avatar"
+                alt=""
+                class="size-6 shrink-0 rounded-full object-cover ring-2 ring-current/20"
+                aria-hidden="true"
+              />
+              <component v-else :is="access.icon" class="size-4" aria-hidden="true" />
               {{ access.label }}
             </router-link>
           </div>
@@ -103,7 +110,14 @@
             :aria-label="access.ariaLabel"
             :aria-current="route.path === access.path ? 'page' : undefined"
           >
-            <component :is="access.icon" class="size-6 shrink-0" aria-hidden="true" />
+            <img
+              v-if="access.signedIn && access.avatar"
+              :src="access.avatar"
+              alt=""
+              class="size-6 shrink-0 rounded-full object-cover ring-2 ring-current/20"
+              aria-hidden="true"
+            />
+            <component v-else :is="access.icon" class="size-6 shrink-0" aria-hidden="true" />
             <span v-if="access.signedIn" class="whitespace-nowrap">{{ access.label }}</span>
             <span v-if="access.signedIn" class="size-2 rounded-full bg-emerald-400" aria-hidden="true"></span>
           </router-link>
@@ -149,7 +163,14 @@
           :aria-current="route.path === access.path ? 'page' : undefined"
           @click="handleMobileNavigation()"
         >
-          <component :is="access.icon" class="size-6" aria-hidden="true" />
+          <img
+            v-if="access.signedIn && access.avatar"
+            :src="access.avatar"
+            alt=""
+            class="size-7 rounded-full object-cover ring-2 ring-current/20"
+            aria-hidden="true"
+          />
+          <component v-else :is="access.icon" class="size-6" aria-hidden="true" />
           <span class="mt-3 block text-sm font-black uppercase">{{ access.label }}</span>
           <span class="mt-1 block text-xs font-semibold" :class="access.variant === 'admin' ? 'text-white/65' : 'text-black/60'">
             {{ access.description }}
@@ -297,6 +318,7 @@ const quickAccessLinks = computed(() => {
         ? `Sesión iniciada · ${jugadoraData.value.nombre}`
         : 'Sesión iniciada',
       path: '/perfil',
+      avatar: jugadoraData.value?.fotoPerfil || '',
       signedIn: true,
       ariaLabel: 'Sesión de jugadora iniciada. Ir a mi perfil'
     };

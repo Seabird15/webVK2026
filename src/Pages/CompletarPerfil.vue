@@ -83,25 +83,26 @@
             />
           </div>
 
-          <div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">
-              Posición *
-            </label>
-            <select
-              v-model="formData.posicion"
-              required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              :disabled="isLoading"
-            >
-              <option value="">Selecciona posición</option>
-              <option value="Profe">Profe</option>
-              <option value="Portera">Portera</option>
-              <option value="Cierre">Cierre</option>
-              <option value="Medio">Medio</option>
-              <option value="Pívot">Pívot</option>
-              <option value="Ala">Ala</option>
-            </select>
-          </div>
+          <fieldset class="space-y-2">
+            <legend class="mb-2 text-sm font-bold text-gray-700">Posiciones *</legend>
+            <p class="text-xs text-gray-500">Puedes elegir más de una posición.</p>
+            <div class="space-y-1 rounded-lg border border-gray-300 bg-gray-50/60 p-3">
+              <label
+                v-for="opcion in opcionesPosiciones"
+                :key="opcion"
+                class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-white"
+              >
+                <input
+                  v-model="formData.posicion"
+                  type="checkbox"
+                  :value="opcion"
+                  class="size-5 rounded border-gray-300 text-primary focus:ring-primary"
+                  :disabled="isLoading"
+                />
+                <span class="font-medium text-gray-700">{{ opcion }}</span>
+              </label>
+            </div>
+          </fieldset>
         </div>
 
         <!-- Fecha de nacimiento -->
@@ -179,6 +180,7 @@ const opcionesEquipos = [
   { value: 'serieC', label: 'Serie C' },
   { value: 'escuela', label: 'Escuela' }
 ];
+const opcionesPosiciones = ['Portera', 'Cierre', 'Ala', 'Medio', 'Pívot'];
 
 const router = useRouter();
 const inputFoto = ref(null);
@@ -192,7 +194,7 @@ const formData = reactive({
   apellido: '',
   equipos: [],
   dorsal: null,
-  posicion: '',
+  posicion: [],
   fechaNacimiento: '',
   fotoPerfil: null
 });
@@ -226,7 +228,7 @@ const handleSubmit = async () => {
   error.value = null;
 
   // Validaciones
-  if (!formData.nombre || !formData.apellido || formData.equipos.length === 0 || !formData.dorsal || !formData.posicion || !formData.fechaNacimiento) {
+  if (!formData.nombre || !formData.apellido || formData.equipos.length === 0 || !formData.dorsal || formData.posicion.length === 0 || !formData.fechaNacimiento) {
     error.value = 'Por favor completa todos los campos requeridos';
     // // console.warn('Validación fallida - campos incompletos');
     return;
@@ -242,7 +244,7 @@ const handleSubmit = async () => {
       apellido: formData.apellido,
       equipos: [...formData.equipos],
       dorsal: formData.dorsal,
-      posicion: formData.posicion,
+      posicion: [...formData.posicion],
       fechaNacimiento: formData.fechaNacimiento
     },
     fotoFile.value
