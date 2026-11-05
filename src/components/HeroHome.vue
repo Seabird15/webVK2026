@@ -1,10 +1,15 @@
 <template>
   <section class="hero-home relative isolate min-h-screen overflow-hidden text-(--hero-text)">
     <div class="absolute inset-0" aria-hidden="true">
-      <div
-        class="absolute inset-0 scale-[1.02] bg-cover bg-center opacity-78 saturate-[0.85] brightness-[0.48]"
-        :style="{ backgroundImage: `url(${resolvedBackground})`, backgroundPosition: 'center 20%' }"
-      ></div>
+      <img
+        :src="resolvedBackground"
+        alt="Equipo femenino CD Vikingas celebrando con sus trofeos en la cancha"
+        width="1024"
+        height="683"
+        fetchpriority="high"
+        decoding="async"
+        class="absolute inset-0 size-full scale-[1.02] object-cover object-[center_20%] opacity-78 saturate-[0.85] brightness-[0.48]"
+      />
       <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,17,18,0.28)_0%,rgba(11,17,18,0.12)_18%,rgba(11,17,18,0.52)_54%,rgba(11,17,18,0.88)_100%),radial-gradient(circle_at_15%_12%,rgba(216,178,85,0.16),transparent_24%),radial-gradient(circle_at_82%_16%,rgba(44,207,191,0.1),transparent_26%)]"></div>
       <div class="absolute -left-10 top-20 h-56 w-56 rounded-full bg-(--hero-gold)/14 blur-3xl"></div>
       <div class="absolute right-0 top-10 h-72 w-72 rounded-full bg-(--hero-primary)/10 blur-3xl"></div>
@@ -105,7 +110,7 @@
 <script setup>
 import { computed } from 'vue'
 import Eventos from './Eventos.vue'
-import fallbackBackground from '../assets/hero/bghero.PNG'
+import fallbackBackground from '../assets/hero/vikingas-equipo-hero.webp'
 import logoImage from '../assets/logoVk.png'
 import { trackCTAClick } from '../composables/useAnalytics'
 

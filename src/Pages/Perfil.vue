@@ -1,27 +1,59 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-12 px-4">
-    <div class="max-w-4xl mx-auto">
-      <!-- Header -->
-      <div class="flex flex-col lg:flex-row justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-primary-dark">Mi Perfil</h1>
+  <div class="min-h-screen bg-black">
+    <EntrenamientosHeader
+      :titulo="'Mi Perfil'"
+      :equipo="categoriaSeleccionada"
+      @logout="handleLogout"
+    />
+
+    <main class="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-8">
+      <div class="mb-5">
         <button
+          type="button"
           @click="handleBack"
-          class="px-4 my-2 py-2 text-primary-dark border border-primary-dark rounded-lg hover:bg-primary-dark hover:text-white transition-colors cursor-pointer"
+          class="min-h-11 cursor-pointer rounded-lg border border-white/20 px-4 py-2 font-bold text-white transition-colors hover:border-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
           ← Volver
         </button>
       </div>
 
+      <div v-if="mensajeExito" class="mb-6 rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-emerald-900 shadow-sm" role="status" aria-live="polite">
+        <p class="font-bold">Perfil actualizado</p>
+        <p class="mt-1 text-sm text-pretty">{{ mensajeExito }}</p>
+      </div>
+
+      <div v-if="cargandoPerfil" class="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-lg" role="status">
+        <p class="font-semibold text-gray-700">Consultando tus datos de perfil...</p>
+        <div class="mx-auto mt-5 grid max-w-xl gap-3 sm:grid-cols-2" aria-hidden="true">
+          <div class="h-11 rounded-lg bg-gray-100"></div>
+          <div class="h-11 rounded-lg bg-gray-100"></div>
+          <div class="h-11 rounded-lg bg-gray-100"></div>
+          <div class="h-11 rounded-lg bg-gray-100"></div>
+        </div>
+      </div>
+      <div v-else-if="errorCarga" class="rounded-2xl border border-red-200 bg-white p-6 shadow-lg" role="alert">
+        <p class="font-bold text-red-800">No pudimos cargar tu perfil</p>
+        <p class="mt-1 text-sm text-gray-700 text-pretty">{{ errorCarga }}</p>
+        <button
+          type="button"
+          class="mt-4 min-h-11 rounded-lg bg-primary-dark px-4 py-2 font-bold text-white transition-colors hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          @click="cargarPerfil"
+        >
+          Reintentar
+        </button>
+      </div>
+      <template v-else>
       <!-- Tabs -->
-      <div class="flex gap-4 mb-6 border-b border-gray-200 flex-wrap">
+      <div class="mb-6 flex flex-wrap gap-2 border-b border-gray-200">
         <button
           @click="tabActivo = 'datos'"
           :class="[
-            'px-6 py-3 font-bold uppercase text-sm transition-colors cursor-pointer',
+            'min-h-11 cursor-pointer border-b-2 px-4 py-3 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset',
             tabActivo === 'datos'
-              ? 'text-primary border-b-2 border-primary'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'border-primary text-primary-dark'
+              : 'border-transparent text-gray-600 hover:text-gray-900'
           ]"
+          :aria-pressed="tabActivo === 'datos'"
         >
           Datos Personales
         </button>
@@ -31,7 +63,7 @@
       <!-- Tab: Datos Personales -->
       <div v-if="tabActivo === 'datos'" class="space-y-6">
         <!-- Vista modo lectura -->
-        <div v-if="!editando" class="bg-white rounded-lg shadow-lg p-8 space-y-6">
+        <div v-if="!editando" class="space-y-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-lg sm:p-8">
           <!-- Foto de perfil -->
           <div class="flex flex-col lg:flex-row gap-8">
             <div v-if="fotoPerfil" class="w-32 h-32 rounded-lg overflow-hidden bg-gray-100 shrink-0">
@@ -87,7 +119,18 @@
         </div>
 
         <!-- Vista modo edición -->
-        <form v-else @submit.prevent="handleGuardar" class="bg-white rounded-lg shadow-lg p-8 space-y-6">
+        <form v-else @submit.prevent="handleGuardar" class="space-y-8 rounded-2xl border border-gray-100 bg-white p-5 shadow-lg sm:p-8">
+          <div class="border-b border-gray-200 pb-5">
+            <p class="text-xs font-bold uppercase text-primary-dark">Edición de ficha</p>
+            <h2 class="mt-1 text-2xl font-bold text-gray-900 text-balance">Mantén tu perfil al día</h2>
+            <p class="mt-2 text-sm text-gray-600 text-pretty">Actualiza tus datos deportivos y la información que quieres compartir.</p>
+          </div>
+
+          <section class="space-y-5" aria-labelledby="perfil-datos-personales">
+            <div>
+              <h3 id="perfil-datos-personales" class="text-lg font-bold text-gray-900">Datos personales</h3>
+              <p class="mt-1 text-sm text-gray-500">Los campos con * son necesarios para tu ficha.</p>
+            </div>
           <!-- Nombre y Apellido -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -96,7 +139,7 @@
                 v-model="formData.nombre"
                 type="text"
                 required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                class="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-gray-100"
                 :disabled="isLoading"
               />
             </div>
@@ -106,12 +149,18 @@
                 v-model="formData.apellido"
                 type="text"
                 required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                class="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-gray-100"
                 :disabled="isLoading"
               />
             </div>
           </div>
+          </section>
 
+          <section class="space-y-5 border-t border-gray-200 pt-6" aria-labelledby="perfil-datos-deportivos">
+            <div>
+              <h3 id="perfil-datos-deportivos" class="text-lg font-bold text-gray-900">Información deportiva</h3>
+              <p class="mt-1 text-sm text-gray-500">Elige tus equipos y completa tus datos en cancha.</p>
+            </div>
           <!-- Dorsal y Posición -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -122,7 +171,7 @@
                 required
                 min="1"
                 max="99"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                class="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-gray-100"
                 :disabled="isLoading"
               />
             </div>
@@ -131,7 +180,7 @@
               <select
                 v-model="formData.posicion"
                 required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                class="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-gray-100"
                 :disabled="isLoading"
               >
                 <option value="">Selecciona posición</option>
@@ -150,17 +199,17 @@
             <div>
               <label class="block text-sm font-bold text-gray-700 mb-2">Equipos *</label>
               <p class="text-xs text-gray-500 mb-3">Puedes elegir uno, dos o los tres equipos.</p>
-              <div class="space-y-2 border border-gray-300 rounded-lg p-4 bg-gray-50/60">
+              <div               class="space-y-2 rounded-xl border border-gray-200 bg-gray-50 p-3 sm:p-4">
                 <label
                   v-for="opcion in opcionesEquipos"
                   :key="opcion.value"
-                  class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white cursor-pointer transition-colors"
+                  class="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-white"
                 >
                   <input
                     v-model="formData.equipos"
                     type="checkbox"
                     :value="opcion.value"
-                    class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    class="size-5 rounded border-gray-300 text-primary focus:ring-primary"
                     :disabled="isLoading"
                   />
                   <span class="font-medium text-gray-700">{{ opcion.label }}</span>
@@ -173,12 +222,18 @@
                 v-model="formData.fechaNacimiento"
                 type="date"
                 required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                class="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-gray-100"
                 :disabled="isLoading"
               />
             </div>
           </div>
+          </section>
 
+          <section class="space-y-5 border-t border-gray-200 pt-6" aria-labelledby="perfil-publico">
+            <div>
+              <h3 id="perfil-publico" class="text-lg font-bold text-gray-900">Tu perfil público</h3>
+              <p class="mt-1 text-sm text-gray-500">Comparte solo lo que te sientas cómoda mostrando.</p>
+            </div>
           <div>
             <label class="block text-sm font-bold text-gray-700 mb-2">Estado actual</label>
             <div class="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
@@ -192,7 +247,7 @@
               <label class="block text-sm font-bold text-gray-700 mb-2">Pie hábil</label>
               <select
                 v-model="formData.pieHabil"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                class="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-gray-100"
                 :disabled="isLoading"
               >
                 <option value="">Prefiero no mostrarlo</option>
@@ -208,7 +263,7 @@
                 type="number"
                 min="0"
                 max="60"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                class="min-h-24 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-gray-100"
                 :disabled="isLoading"
                 placeholder="Ej. 6"
               />
@@ -221,7 +276,7 @@
               <input
                 v-model="formData.instagram"
                 type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                class="min-h-24 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-gray-100"
                 :disabled="isLoading"
                 placeholder="Ej. @tuusuario"
               />
@@ -231,7 +286,7 @@
               <textarea
                 v-model="galeriaPublicaTexto"
                 rows="4"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                class="min-h-12 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:font-semibold focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-gray-100"
                 :disabled="isLoading"
                 placeholder="Pega una URL por línea"
               ></textarea>
@@ -270,26 +325,27 @@
               </div>
             </div>
           </div>
+          </section>
 
           <!-- Errores -->
-          <div v-if="error" class="p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p class="text-red-600 text-sm font-semibold">{{ error }}</p>
+          <div v-if="error" class="rounded-xl border border-red-200 bg-red-50 p-4" role="alert" aria-live="assertive">
+            <p class="text-sm font-semibold text-red-800 text-pretty">{{ error }}</p>
           </div>
 
           <!-- Botones -->
-          <div class="flex gap-4 pt-6 border-t border-gray-200">
+          <div class="flex flex-col-reverse gap-3 border-t border-gray-200 pt-6 sm:flex-row sm:gap-4">
             <button
               type="button"
               @click="cancelarEdicion"
               :disabled="isLoading"
-              class="flex-1 px-6 py-2 border border-gray-300 rounded-lg font-bold hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer"
+              class="min-h-12 flex-1 cursor-pointer rounded-xl border border-gray-300 px-6 py-3 font-bold text-gray-700 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               type="submit"
               :disabled="isLoading"
-              class="flex-1 px-6 py-2 bg-primary-dark text-white rounded-lg font-bold hover:bg-primary transition-colors disabled:opacity-50 cursor-pointer"
+              class="min-h-12 flex-1 cursor-pointer rounded-xl bg-primary-dark px-6 py-3 font-bold text-white transition-colors hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {{ isLoading ? 'Guardando...' : 'Guardar cambios' }}
             </button>
@@ -300,7 +356,7 @@
       <!-- Tab: Mis Categorías -->
 
       <div v-if="tabActivo === 'categorias'" class="space-y-6">
-        <div class="bg-white rounded-lg shadow-lg p-8">
+        <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-lg sm:p-8">
           <h2 class="text-2xl font-bold mb-6">Mis equipos</h2>
 
           <div v-if="equiposDisponibles.length > 1" class="space-y-4">
@@ -332,31 +388,25 @@
           </div>
         </div>
       </div>
+      </template>
 
-      <!-- Zona de Peligro -->
-      <div class="mt-8 bg-white rounded-lg shadow-lg p-8 border-t-4 border-red-500">
-        <button
-          @click="handleLogout"
-          class="px-6 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors cursor-pointer"
-        >
-          Cerrar sesión
-        </button>
-      </div>
-    </div>
+    </main>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import EntrenamientosHeader from '../components/EntrenamientosHeader.vue';
 import { 
   logoutJugadora, 
   jugadoraAuthUser, 
   jugadoraData, 
   actualizarPerfilJugadora,
   actualizarCategoriaSeleccionadaJugadora,
-  isLoadingJugadora,
-  errorJugadora
+  errorJugadora,
+  fetchJugadoraData,
+  authReady as authJugadoraReady
 } from '../firebase/jugadorasAuth';
 
 const opcionesEquipos = [
@@ -401,6 +451,9 @@ const fotoFile = ref(null);
 const galeriaPublicaTexto = ref('');
 const isLoading = ref(false);
 const error = ref(null);
+const mensajeExito = ref('');
+const cargandoPerfil = ref(!jugadoraData.value);
+const errorCarga = ref('');
 const equiposIniciales = obtenerEquiposDesdeDatos(jugadoraData.value);
 const categoriaSeleccionada = ref(jugadoraData.value?.categoriaSeleccionada || equiposIniciales[0] || 'ascenso');
 
@@ -423,6 +476,37 @@ const formData = reactive({
 
 const equiposSeleccionadosTexto = computed(() => formatearEquipos(formData.equipos));
 const equiposDisponibles = computed(() => opcionesEquipos.filter(opcion => formData.equipos.includes(opcion.value)));
+
+const sincronizarFormulario = (datos = jugadoraData.value) => {
+  if (!datos) return;
+  formData.nombre = datos.nombre || '';
+  formData.apellido = datos.apellido || '';
+  formData.dorsal = datos.dorsal || null;
+  formData.posicion = datos.posicion || '';
+  formData.equipos = obtenerEquiposDesdeDatos(datos);
+  formData.fechaNacimiento = datos.fechaNacimiento || '';
+  formData.estadoSalud = datos.estadoSalud || 'disponible';
+  formData.pieHabil = datos.pieHabil || '';
+  formData.aniosTrayectoria = datos.aniosTrayectoria || null;
+  formData.instagram = datos.instagram || '';
+  formData.bioPublica = datos.bioPublica || '';
+  formData.galeriaPublica = Array.isArray(datos.galeriaPublica) ? datos.galeriaPublica : [];
+  categoriaSeleccionada.value = datos.categoriaSeleccionada || formData.equipos[0] || 'ascenso';
+  fotoPerfil.value = datos.fotoPerfil || null;
+};
+
+watch(jugadoraData, (datos) => {
+  if (!datos || datos.id !== jugadoraAuthUser.value?.uid) return;
+  if (!editando.value) sincronizarFormulario(datos);
+  cargandoPerfil.value = false;
+  errorCarga.value = '';
+}, { immediate: true });
+
+watch(authJugadoraReady, (lista) => {
+  if (lista && !jugadoraData.value && !cargandoPerfil.value) {
+    errorCarga.value = errorJugadora.value || 'No encontramos información de perfil asociada a tu cuenta.';
+  }
+});
 
 const formatearEstadoSalud = (estado) => {
   const map = {
@@ -477,6 +561,8 @@ const formatearGaleriaPublica = (galeria = []) => {
 };
 
 const activarEdicion = () => {
+  mensajeExito.value = '';
+  error.value = null;
   editando.value = true;
   previewFoto.value = fotoPerfil.value;
   fotoFile.value = null;
@@ -523,6 +609,7 @@ const handleFotoChange = (event) => {
 
 const handleGuardar = async () => {
   error.value = null;
+  mensajeExito.value = '';
 
   if (!formData.nombre || !formData.apellido || formData.equipos.length === 0 || !formData.dorsal || !formData.posicion || !formData.fechaNacimiento) {
     error.value = 'Por favor completa todos los campos requeridos';
@@ -535,34 +622,37 @@ const handleGuardar = async () => {
   const galeriaPublica = parsearGaleriaPublica(galeriaPublicaTexto.value);
 
   isLoading.value = true;
+  try {
+    const success = await actualizarPerfilJugadora(
+      jugadoraAuthUser.value.uid,
+      {
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        dorsal: formData.dorsal,
+        posicion: formData.posicion,
+        equipos: [...formData.equipos],
+        fechaNacimiento: formData.fechaNacimiento,
+        categoriaSeleccionada: categoriaActualizada,
+        pieHabil: formData.pieHabil,
+        aniosTrayectoria: formData.aniosTrayectoria || null,
+        instagram: formData.instagram.trim(),
+        bioPublica: formData.bioPublica.trim(),
+        galeriaPublica
+      },
+      fotoFile.value
+    );
 
-  const success = await actualizarPerfilJugadora(
-    jugadoraAuthUser.value.uid,
-    {
-      nombre: formData.nombre,
-      apellido: formData.apellido,
-      dorsal: formData.dorsal,
-      posicion: formData.posicion,
-      equipos: [...formData.equipos],
-      fechaNacimiento: formData.fechaNacimiento,
-      categoriaSeleccionada: categoriaActualizada,
-      pieHabil: formData.pieHabil,
-      aniosTrayectoria: formData.aniosTrayectoria || null,
-      instagram: formData.instagram.trim(),
-      bioPublica: formData.bioPublica.trim(),
-      galeriaPublica
-    },
-    fotoFile.value
-  );
-
-  isLoading.value = false;
-
-  if (success) {
-    // Actualizar referencia local
-    fotoPerfil.value = jugadoraData.value?.fotoPerfil || null;
-    editando.value = false;
-  } else {
-    error.value = errorJugadora.value || 'Error al guardar cambios';
+    if (success) {
+      fotoPerfil.value = jugadoraData.value?.fotoPerfil || fotoPerfil.value;
+      editando.value = false;
+      mensajeExito.value = 'Tus cambios se guardaron correctamente.';
+    } else {
+      error.value = errorJugadora.value || 'Error al guardar cambios';
+    }
+  } catch (err) {
+    error.value = errorJugadora.value || err?.message || 'Error al guardar cambios';
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -582,22 +672,33 @@ const handleLogout = async () => {
   router.push('/');
 };
 
-onMounted(() => {
-  if (jugadoraData.value) {
-    formData.nombre = jugadoraData.value.nombre || '';
-    formData.apellido = jugadoraData.value.apellido || '';
-    formData.dorsal = jugadoraData.value.dorsal || null;
-    formData.posicion = jugadoraData.value.posicion || '';
-    formData.equipos = obtenerEquiposDesdeDatos(jugadoraData.value);
-    formData.fechaNacimiento = jugadoraData.value.fechaNacimiento || '';
-    formData.estadoSalud = jugadoraData.value?.estadoSalud || 'disponible';
-    formData.pieHabil = jugadoraData.value?.pieHabil || '';
-    formData.aniosTrayectoria = jugadoraData.value?.aniosTrayectoria || null;
-    formData.instagram = jugadoraData.value?.instagram || '';
-    formData.bioPublica = jugadoraData.value?.bioPublica || '';
-    formData.galeriaPublica = Array.isArray(jugadoraData.value?.galeriaPublica) ? jugadoraData.value.galeriaPublica : [];
-    categoriaSeleccionada.value = jugadoraData.value?.categoriaSeleccionada || formData.equipos[0] || 'ascenso';
-    fotoPerfil.value = jugadoraData.value.fotoPerfil || null;
+const cargarPerfil = async () => {
+  const uid = jugadoraAuthUser.value?.uid;
+  if (!uid) {
+    cargandoPerfil.value = false;
+    errorCarga.value = 'No se encontró una sesión activa de jugadora.';
+    return;
   }
-});
+
+  cargandoPerfil.value = true;
+  errorCarga.value = '';
+  errorJugadora.value = null;
+
+  if (jugadoraData.value?.id === uid) {
+    sincronizarFormulario(jugadoraData.value);
+    cargandoPerfil.value = false;
+    return;
+  }
+
+  const datos = await fetchJugadoraData(uid, 'jugadoraRegistro');
+  if (datos) {
+    sincronizarFormulario(datos);
+    cargandoPerfil.value = false;
+  } else {
+    cargandoPerfil.value = false;
+    errorCarga.value = errorJugadora.value || 'No encontramos información de perfil asociada a tu cuenta.';
+  }
+};
+
+cargarPerfil();
 </script>

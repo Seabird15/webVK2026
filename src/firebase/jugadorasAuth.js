@@ -278,10 +278,6 @@ onAuthStateChanged(auth, async (user) => {
           if (docSnap.exists()) {
             const nuevosDatos = normalizarDatosJugadora(user.uid, docSnap.data());
             jugadoraData.value = nuevosDatos;
-            console.log('✅ Datos de jugadora actualizados en tiempo real:', {
-              nombre: nuevosDatos.nombre,
-              disponibilidad: nuevosDatos.disponibilidadEntrenamientos
-            });
           }
         },
         (error) => {
@@ -380,8 +376,8 @@ export const fetchJugadoraData = async (uid, coleccion = 'jugadoraRegistro') => 
       return null;
     }
   } catch (err) {
-    // // console.error('Error obteniendo datos de jugadora:', err);
     jugadoraData.value = null;
+    errorJugadora.value = err?.message || 'No se pudieron cargar los datos de la jugadora.';
     return null;
   }
 };
@@ -720,7 +716,11 @@ export const actualizarPerfilJugadora = async (uid, perfilData, fotoFile) => {
       setDoc(doc(db, 'jugadoras', uid), { ...datosSinCamposInternos, uid }, { merge: true }),
       setDoc(doc(db, 'jugadorasLogin', uid), { ...datosSinCamposInternos, uid }, { merge: true })
     ]);
-    await fetchJugadoraData(uid, 'jugadoraRegistro');
+    jugadoraData.value = normalizarDatosJugadora(uid, {
+      ...(jugadoraData.value || {}),
+      ...datosSinCamposInternos,
+      uid
+    });
     return true;
   } catch (err) {
     // // console.error('Error actualizando perfil:', err);

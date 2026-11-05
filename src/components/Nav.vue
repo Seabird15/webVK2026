@@ -95,19 +95,17 @@
           </div>
 
           <router-link
-            to="/login-jugadora"
-            class="flex size-11 items-center justify-center rounded-lg bg-white/75 text-black transition-colors hover:bg-white md:hidden"
-            aria-label="Acceso jugadoras"
+            v-for="access in mobileHeaderLinks"
+            :key="`header-${access.path}`"
+            :to="access.path"
+            class="flex min-h-11 items-center justify-center gap-2 rounded-lg px-2.5 text-xs font-black transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 md:hidden"
+            :class="access.signedIn ? 'bg-black text-primary hover:bg-black/85' : access.variant === 'admin' ? 'bg-black text-white hover:bg-black/85' : 'bg-white/75 text-black hover:bg-white'"
+            :aria-label="access.ariaLabel"
+            :aria-current="route.path === access.path ? 'page' : undefined"
           >
-            <UserIcon class="size-6" aria-hidden="true" />
-          </router-link>
-
-          <router-link
-            to="/login"
-            class="flex size-11 items-center justify-center rounded-lg bg-black text-white transition-colors hover:bg-black/85 md:hidden"
-            aria-label="Acceso administración"
-          >
-            <ShieldCheckIcon class="size-6" aria-hidden="true" />
+            <component :is="access.icon" class="size-6 shrink-0" aria-hidden="true" />
+            <span v-if="access.signedIn" class="whitespace-nowrap">{{ access.label }}</span>
+            <span v-if="access.signedIn" class="size-2 rounded-full bg-emerald-400" aria-hidden="true"></span>
           </router-link>
 
           <a
@@ -146,8 +144,9 @@
           v-for="access in quickAccessLinks"
           :key="`mobile-${access.path}`"
           :to="access.path"
-          class="rounded-lg p-4"
+          class="min-h-11 rounded-lg p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
           :class="access.variant === 'admin' ? 'bg-black text-white' : 'bg-white text-black'"
+          :aria-current="route.path === access.path ? 'page' : undefined"
           @click="handleMobileNavigation()"
         >
           <component :is="access.icon" class="size-6" aria-hidden="true" />
@@ -231,7 +230,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import {
   BookOpenIcon,
@@ -241,13 +240,18 @@ import {
   EnvelopeIcon,
   LockClosedIcon,
   PhotoIcon,
-  ShieldCheckIcon,
   TrophyIcon,
   UserGroupIcon,
   UserIcon,
 } from '@heroicons/vue/24/outline';
 import { trackOutboundClick } from '../composables/useAnalytics';
 import logoVikingas from '../assets/logoVk.png';
+import { authReady, authUser, userRole } from '../firebase/auth';
+import {
+  authReady as jugadoraAuthReady,
+  jugadoraAuthUser,
+  jugadoraData
+} from '../firebase/jugadorasAuth';
 
 const isMenuOpen = ref(false);
 const openDesktopMenuId = ref(null);
@@ -256,22 +260,65 @@ const route = useRoute();
 const brandName = 'Vikingas';
 const logoUrl = logoVikingas;
 
-const quickAccessLinks = [
-  {
-    label: 'Jugadoras',
-    description: 'Entrenamientos',
-    path: '/login-jugadora',
-    icon: UserIcon,
-    variant: 'players',
-  },
-  {
-    label: 'Admin',
-    description: 'Panel interno',
-    path: '/login',
-    icon: LockClosedIcon,
-    variant: 'admin',
-  },
-];
+const sesionActiva = computed(() => {
+  if (!authReady.value || !jugadoraAuthReady.value) return null;
+  if (authUser.value && ['admin', 'coach'].includes(userRole.value)) return 'admin';
+  if (jugadoraAuthUser.value?.uid) return 'jugadora';
+  return null;
+});
+
+const quickAccessLinks = computed(() => {
+  const accesos = [
+    {
+      label: 'Jugadoras',
+      description: 'Entrenamientos',
+      path: '/login-jugadora',
+      icon: UserIcon,
+      variant: 'players',
+      signedIn: false,
+      ariaLabel: 'Acceso de jugadoras'
+    },
+    {
+      label: 'Admin',
+      description: 'Panel interno',
+      path: '/login',
+      icon: LockClosedIcon,
+      variant: 'admin',
+      signedIn: false,
+      ariaLabel: 'Acceso de administración'
+    },
+  ];
+
+  if (sesionActiva.value === 'jugadora') {
+    accesos[0] = {
+      ...accesos[0],
+      label: 'Mi perfil',
+      description: jugadoraData.value?.nombre
+        ? `Sesión iniciada · ${jugadoraData.value.nombre}`
+        : 'Sesión iniciada',
+      path: '/perfil',
+      signedIn: true,
+      ariaLabel: 'Sesión de jugadora iniciada. Ir a mi perfil'
+    };
+  } else if (sesionActiva.value === 'admin') {
+    accesos[1] = {
+      ...accesos[1],
+      label: 'Panel',
+      description: 'Sesión iniciada',
+      path: '/admin',
+      signedIn: true,
+      ariaLabel: 'Sesión administrativa iniciada. Ir al panel'
+    };
+  }
+
+  return accesos;
+});
+
+const mobileHeaderLinks = computed(() => {
+  if (sesionActiva.value === 'jugadora') return [quickAccessLinks.value[0]];
+  if (sesionActiva.value === 'admin') return [quickAccessLinks.value[1]];
+  return quickAccessLinks.value;
+});
 
 const navLinks = [
   { id: 1, label: 'Historia', path: '/historia', icon: BookOpenIcon },

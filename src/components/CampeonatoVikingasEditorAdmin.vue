@@ -343,7 +343,6 @@ const agregarGoleadora = () => {
     formGoleadora.value.equipo = ''
     formGoleadora.value.jugadora = ''
     formGoleadora.value.goles = 0
-    console.log('✅ Goleadora agregada:', goleadoras.value)
   }
 }
 
@@ -438,7 +437,6 @@ const finalizarBloque = (bloqueId) => {
   // Forzar reactividad: recrear el Map para que Vue detecte el cambio
   resultados.value = new Map(resultados.value)
   
-  console.log(`✅ Bloque ${bloqueId} finalizado. Resultados actualizados.`)
 }
 
 // Encontrar equipo por nombre fuzzy matching
@@ -550,11 +548,9 @@ onMounted(async () => {
     const datos = await cargarCampeonatoFirestore()
     if (datos.resultados.size > 0) {
       resultados.value = datos.resultados
-      console.log('✅ Datos cargados de Firestore')
     }
     if (datos.goleadoras.length > 0) {
       goleadoras.value = datos.goleadoras
-      console.log('✅ Goleadoras cargadas de Firestore')
     }
   } catch (error) {
     console.error('Error cargando datos:', error)
@@ -571,7 +567,6 @@ watch(
       try {
         await guardarCampeonatoFirestore(resultados.value, goleadoras.value)
         tiempoGuardadoAnterior = ahora
-        console.log('✅ Auto-guardado en Firestore')
       } catch (error) {
         console.error('Error guardando:', error)
       }

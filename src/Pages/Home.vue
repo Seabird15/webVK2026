@@ -140,9 +140,12 @@ import HeroHome from '../components/HeroHome.vue';
 import UltimosResultados from '../components/UltimosResultados.vue';
 import { trackCTAClick, trackSocialInteraction } from '../composables/useAnalytics';
 import campeonatoBannerImage from '../assets/2026/grupo.webp';
+import vikingasHeroImage from '../assets/hero/vikingas-equipo-hero.webp';
+
+const imagenHeroAnterior = 'https://firebasestorage.googleapis.com/v0/b/loginvk-955b2.firebasestorage.app/o/slide2.webp?alt=media&token=88083cd1-4f14-4e7f-9aef-0bb1421f92e0';
 
 const heroData = ref({
-  imagenFondo: 'https://firebasestorage.googleapis.com/v0/b/loginvk-955b2.firebasestorage.app/o/slide2.webp?alt=media&token=88083cd1-4f14-4e7f-9aef-0bb1421f92e0',
+  imagenFondo: vikingasHeroImage,
   titulo: 'CD VIKINGAS',
   badgeCampeonato: 'JUNTAS, SOMOS ETERNAS',
   subtitulo: 'Fút 7 femenino - Puente alto - desde 2019',
@@ -240,7 +243,14 @@ onMounted(async () => {
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
-      heroData.value = { ...heroData.value, ...docSnap.data() };
+      const configuracionHero = docSnap.data();
+      heroData.value = {
+        ...heroData.value,
+        ...configuracionHero,
+        imagenFondo: !configuracionHero.imagenFondo || configuracionHero.imagenFondo === imagenHeroAnterior
+          ? vikingasHeroImage
+          : configuracionHero.imagenFondo
+      };
     }
   } catch (error) {
     // // console.error('Error cargando datos del hero:', error);
@@ -252,4 +262,3 @@ onMounted(async () => {
 });
 
 </script>
-

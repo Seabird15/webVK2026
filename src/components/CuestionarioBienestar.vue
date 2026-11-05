@@ -453,25 +453,6 @@ const enviarRespuesta = async () => {
   }
 };
 
-watch([() => props.entrenamientos, tiposHabilitados, equiposHabilitados], () => {
-  const recientes = props.entrenamientos.filter((sesion) => {
-    const inicio = obtenerInicioSesion(sesion);
-    return inicio !== null && Math.abs(ahora.value - inicio) < 7 * 24 * 3_600_000;
-  });
-  console.info('[Cuestionario] config', { tipos: tiposHabilitados.value, equipos: equiposHabilitados.value, equipoVista: props.equipo });
-  recientes.forEach((sesion) => console.info('[Cuestionario] sesión', {
-    id: sesion.id,
-    tipo: sesion.tipo,
-    equipo: sesion.equipo,
-    fecha: sesion.fecha,
-    hora: sesion.hora,
-    informativo: sesion.eventoInformativo,
-    equipoOk: equipoHabilitado(sesion),
-    inicio: new Date(obtenerInicioSesion(sesion)).toString(),
-    respondida: respuestasRegistradas.value.has(sesion.id)
-  }));
-}, { immediate: true });
-
 watch(() => props.jugadoraId, cargarRespuestas, { immediate: true });
 onMounted(async () => {
   await cargarConfiguracion();

@@ -1684,7 +1684,6 @@ const entrenamientosFiltered = computed(() => {
     .filter((e, index) => {
       // Filtrar por equipo: mostrar si coincide o si es "todos"
       if (e.equipo !== equipoSeleccionado.value && e.equipo !== 'todos') {
-        console.log(`[FILTRO] "${e.nombre}" - Excluido: equipo no coincide (${e.equipo} != ${equipoSeleccionado.value})`);
         return false;
       }
 
@@ -1692,17 +1691,12 @@ const entrenamientosFiltered = computed(() => {
       if (!esAdmin.value && jugadoraData.value) {
         const puedeAsistir = jugadoraPuedeAsistirEntrenamiento(jugadoraData.value, e);
         if (!puedeAsistir) {
-          console.log(`[FILTRO] "${e.nombre}" - EXCLUIDO: Jugadora NO tiene este día habilitado`);
           return false;
         }
-        console.log(`[FILTRO] "${e.nombre}" - OK: Jugadora tiene este día habilitado`);
       }
 
       // Mantener en listado según rol y tipo de evento
       const visible = eventoVisibleEnListado(e);
-      if (!visible) {
-        console.log(`[FILTRO] "${e.nombre}" - Excluido: No visible en listado (fecha pasada)`);
-      }
       return visible;
     })
     .sort((a, b) => {

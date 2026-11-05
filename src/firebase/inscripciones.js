@@ -339,13 +339,11 @@ export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
 
     // Si es un evento informativo, no crear inscripciones
     if (entrenamiento && entrenamiento.eventoInformativo === true) {
-      console.log('[INSCRIPCIONES] Evento informativo - no crear inscripciones');
       return true;
     }
 
     // Si es una convocatoria, no crear inscripciones aquí (se usan jugadorasConvocadas)
     if (entrenamiento && entrenamiento.esConvocatoria === true) {
-      console.log('[INSCRIPCIONES] Es una convocatoria - no crear inscripciones automáticas');
       return true;
     }
 
@@ -376,38 +374,22 @@ export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
     }
     
     if (jugadoras.length === 0) {
-      console.log('[INSCRIPCIONES] No se encontraron jugadoras para el equipo:', equipo);
       return false;
     }
-    
-    console.log(`[INSCRIPCIONES] Creando inscripciones para ${jugadoras.length} jugadoras del equipo ${equipo}`);
-    console.log(`[INSCRIPCIONES] Entrenamiento:`, {
-      id: entrenamiento?.id,
-      tipo: entrenamiento?.tipo,
-      equipo: entrenamiento?.equipo,
-      fecha: entrenamiento?.fecha,
-      diaSemana: entrenamiento?.fecha ? new Date(entrenamiento.fecha.seconds ? entrenamiento.fecha.seconds * 1000 : entrenamiento.fecha).getDay() : null
-    });
 
     // Crear inscripción pendiente solo para jugadoras que:
     // 1. No estén excluidas por estado de salud (lesionada, vacaciones, etc)
     // 2. Tengan disponible el día del entrenamiento
     const batch = [];
-    let creadas = 0;
-    let filtradas = 0;
     
     for (const jugadora of jugadoras) {
       // Validar si jugadora está excluida por estado de salud
       if (jugadoraExcluidaDeAsistencia(jugadora)) {
-        console.log(`  [FILTRO] ${jugadora.nombre} - EXCLUIDA (estado: ${jugadora.estadoSalud})`);
-        filtradas++;
         continue;
       }
 
       // Validar si jugadora puede asistir ese día
       if (!jugadoraPuedeAsistirEntrenamiento(jugadora, entrenamiento)) {
-        console.log(`  [FILTRO] ${jugadora.nombre} - NO tiene disponibilidad este día`);
-        filtradas++;
         continue;
       }
 
@@ -421,7 +403,6 @@ export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
       
       if (existing.size === 0) {
         // Solo crear si no existe
-        console.log(`  [CREAR] ${jugadora.nombre} ✅`);
         const inscripcion = addDoc(collection(db, 'inscripcionesEntrenamientos'), {
           entrenamientoId: entrenamientoId,
           jugadoraId: jugadora.id,
@@ -431,12 +412,10 @@ export const crearInscripcionesPendientes = async (entrenamientoId, equipo) => {
           updatedAt: new Date()
         });
         batch.push(inscripcion);
-        creadas++;
       }
     }
-    
     await Promise.all(batch);
-    console.log(`[INSCRIPCIONES] Resumen: ${creadas} creadas, ${filtradas} filtradas`);
+    await Promise.all(batch);
     return true;
   } catch (err) {
     console.error('[INSCRIPCIONES] Error creando inscripciones pendientes:', err);
@@ -737,27 +716,21 @@ export const cambiarEstadoInscripcion = async (inscripcionId, nuevoEstado) => {
 // Limpiar y regenerar inscripciones de un entrenamiento
 export const limpiarYRegenerarInscripcionesEntrenamiento = async (entrenamientoId, equipo) => {
   try {
-    console.log(`[LIMPIAR] Iniciando limpieza y regeneración para entrenamiento ${entrenamientoId}`);
-    
     // 1. Eliminar TODAS las inscripciones pendientes de este entrenamiento
     const q = query(
       collection(db, 'inscripcionesEntrenamientos'),
       where('entrenamientoId', '==', entrenamientoId),
       where('estado', '==', 'pendiente')
     );
-    
     const inscripcionesSnap = await getDocs(q);
-    console.log(`[LIMPIAR] Encontradas ${inscripcionesSnap.docs.length} inscripciones pendientes para eliminar`);
     
     const eliminations = inscripcionesSnap.docs.map(docSnap => 
       deleteDoc(doc(db, 'inscripcionesEntrenamientos', docSnap.id))
     );
     
     await Promise.all(eliminations);
-    console.log(`[LIMPIAR] ✅ ${eliminations.length} inscripciones pendientes eliminadas`);
     
     // 2. Regenerar inscripciones con el filtrado correcto
-    console.log(`[REGENERAR] Creando inscripciones con filtrado correcto...`);
     const resultado = await crearInscripcionesPendientes(entrenamientoId, equipo);
     
     return resultado;

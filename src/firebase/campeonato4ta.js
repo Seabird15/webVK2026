@@ -66,7 +66,6 @@ export const guardarCampeonatoFirestore = async (resultados, goleadoras) => {
       { merge: true }
     )
     
-    console.log('✅ Campeonato guardado en Firestore')
     return true
   } catch (error) {
     console.error('❌ Error guardando campeonato:', error)
@@ -84,13 +83,11 @@ export const cargarCampeonatoFirestore = async () => {
     
     if (docSnap.exists()) {
       const data = docSnap.data()
-      console.log('✅ Campeonato cargado de Firestore')
       return {
         resultados: objectToResultadosMap(data.resultados || {}),
         goleadoras: data.goleadoras || []
       }
     } else {
-      console.log('📝 No existe campeonato guardado, usando valores vacíos')
       return {
         resultados: new Map(),
         goleadoras: []
@@ -109,7 +106,6 @@ export const limpiarCampeonatoFirestore = async () => {
   try {
     const docRef = doc(db, CAMPEONATO_4TA_COLLECTION, CAMPEONATO_4TA_DOC)
     await deleteDoc(docRef)
-    console.log('✅ Campeonato eliminado de Firestore')
     return true
   } catch (error) {
     console.error('❌ Error eliminando campeonato:', error)

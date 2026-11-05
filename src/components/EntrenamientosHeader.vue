@@ -8,7 +8,7 @@
     <div class="relative mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-4 sm:flex-row sm:items-center sm:gap-6 sm:px-6 lg:px-8">
       <div class="min-w-0 flex-1">
         <p class="text-[0.7rem] font-black uppercase tracking-[0.3em] text-primary/80 sm:text-[0.75rem]">Zona Jugadoras</p>
-        <h1 class="mt-1 text-3xl font-black uppercase leading-tight sm:mt-2 sm:text-5xl lg:text-6xl" style="font-family: 'Gobold High', system-ui, sans-serif;">Entrenamientos</h1>
+        <h1 class="mt-1 text-3xl font-black uppercase leading-tight sm:mt-2 sm:text-5xl lg:text-6xl" style="font-family: 'Gobold High', system-ui, sans-serif;">{{ titulo }}</h1>
         <p v-if="equipo" class="mt-1 text-xs font-semibold text-white/70 sm:mt-2 sm:text-base">
           <span class="inline-block rounded-full border border-primary/40 bg-primary/20 px-2.5 py-1 sm:px-3 sm:py-1.5">{{ etiquetaEquipo }}</span>
         </p>
@@ -35,6 +35,10 @@ import { computed } from 'vue';
 defineEmits(['logout']);
 
 const props = defineProps({
+  titulo: {
+    type: String,
+    default: 'Entrenamientos'
+  },
   equipo: {
     type: String,
     default: ''
